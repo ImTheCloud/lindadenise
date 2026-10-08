@@ -22,8 +22,8 @@ Le numéro est l'ordre alphabétique des fichiers dans `~/Desktop/DessinsLinda`.
 
 ## Points à voir avec Linda
 
-- Titres manquants (8 dessins « Notes_… ») : propositions ci-dessus entre parenthèses, à valider.
-- N° 36 : la légende « Rêve de chats québécois en hiver… » est écrite dans l'image. La recadrer ou la garder ?
+- Titres des 7 dessins « Notes_… » : titres proposés retenus (copies dans `~/Desktop/DessinsLinda/A titrer/`, à faire valider par Linda).
+- N° 36 : la légende « Rêve de chats québécois en hiver… » écrite dans l image est conservée telle quelle.
 - Rubrique Psaumes : rien pour l'instant.
-- Aurait-elle les dessins dans une taille plus grande ? 1080 px suffit pour l'écran, mais limite l'impression (environ A5 net, A4 un peu mou).
+- Taille : 1080 x 1527 px conservée, pas de version plus grande (impression sans importance).
 - Chaque dessin porte déjà sa signature (monogramme en bas) : à conserver.
