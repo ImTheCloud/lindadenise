@@ -22,7 +22,7 @@ const jsonld = {
   image: `https://lindadenise.be/dessins/${dessin.id}.webp`,
 };
 ---
-<Base lang={lang} titre={titre} description={`${titre} – ${d.dessins.altDe(titre)}. ${rub.court}.`} chemins={chemins} noisette="dessin" image={`/dessins/${dessin.id}.webp`}>
+<Base lang={lang} titre={titre} description={`${d.dessins.altDe(titre)} · ${rub.court} · ${d.dessins.prix}`} chemins={chemins} noisette="dessin" image={`/dessins/${dessin.id}.webp`}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
   <section class="section" data-noisette="dessin">
     <div class="contenu">
@@ -59,7 +59,7 @@ const jsonld = {
 <style>
   .fiche { display: grid; gap: 34px; align-items: start; }
   .fiche__image { padding: 12px; max-width: 560px; margin-inline: auto; }
-  .fiche__image img { width: 100%; height: auto; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; }
+  .fiche__image img { width: auto; max-width: 100%; height: auto; max-height: calc(100svh - 150px); margin-inline: auto; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; }
   .fiche__prix { font-family: var(--titre); font-size: 2.6rem; color: var(--orange-fonce); margin: 0 0 4px; line-height: 1.1; }
   .fiche__petit { font-size: 0.98rem; }
   .fiche__nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 34px; padding-top: 18px; border-top: 3px dashed var(--vert-pale); font-family: var(--titre); font-size: 1.3rem; }

@@ -3,7 +3,7 @@
   --orange: #f28a1e;
   --orange-clair: #ffb347;
   --orange-creme: #fff4e3;
-  --orange-fonce: #c45e00;
+  --orange-fonce: #b05200;
   --orange-titre: #e0780c;
   --vert: #3e9a47;
   --vert-fonce: #2b6e3a;
@@ -69,7 +69,7 @@ p { margin: 0 0 1em; }
   padding: 0.7em 1.3em; cursor: pointer; text-decoration: none;
   border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon);
   background: var(--orange-fonce); color: #fff; border-color: #7a3a00;
-  box-shadow: 0 5px 0 #7a3a00; transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 5px 0 #6b3200; transition: transform 0.15s, box-shadow 0.15s;
 }
 .bouton:hover { color: #fff; transform: translateY(-2px) rotate(-1deg); box-shadow: 0 7px 0 #7a3a00; }
 .bouton:active { transform: translateY(3px); box-shadow: 0 2px 0 #7a3a00; }

@@ -77,14 +77,18 @@ const donnees = JSON.stringify({ sections: n.sections, anecdotes: n.anecdotes })
     // Accueil : salut de bienvenue une seule fois par visite
     const depart = document.body.dataset.noisetteDepart ?? 'texte';
     const dejaVu = lire('noisette-vu') === '1';
-    window.setTimeout(() => {
-      if (!dejaVu) {
+    dernierSujet = depart;
+    if (!dejaVu) {
+      window.setTimeout(() => {
         etat('salut', 3200);
         ecrire('noisette-vu', '1');
-      }
-      dernierSujet = depart;
-      dire(sections[depart]);
-    }, dejaVu ? 1400 : 1000);
+        dire(sections[depart]);
+      }, 1000);
+    }
+    // Pendant la saisie d'un message, elle se tait
+    document.addEventListener('focusin', (e) => {
+      if ((e.target as HTMLElement).matches('input, textarea, select')) bulle.hidden = true;
+    });
 
     // Elle commente la section visible
     if ('IntersectionObserver' in window) {
@@ -113,12 +117,12 @@ const donnees = JSON.stringify({ sections: n.sections, anecdotes: n.anecdotes })
   .noisette__corps:focus-visible { outline-offset: 0; }
   .noisette-svg { width: 100%; height: auto; overflow: visible; }
 
-  .noisette__bulle { position: absolute; right: 8%; bottom: calc(100% - 6px); width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 38px 12px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
+  .noisette__bulle { position: absolute; right: 8%; bottom: calc(100% - 6px); width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 12px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
   .noisette__bulle[hidden] { display: none; }
   .noisette__bulle::after { content: ''; position: absolute; right: 30px; bottom: -14px; width: 18px; height: 18px; background: #fff; border-right: var(--trait) solid var(--vert-fonce); border-bottom: var(--trait) solid var(--vert-fonce); transform: rotate(45deg) skew(8deg, 8deg); }
   .noisette__bulle.pop { animation: noisette-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1); }
   .noisette__texte { margin: 0; color: var(--encre); }
-  .noisette__muet { position: absolute; top: 4px; right: 6px; width: 28px; height: 28px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
+  .noisette__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
   .noisette__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
   /* Les parties de l'écureuil bougent chacune de leur côté */
