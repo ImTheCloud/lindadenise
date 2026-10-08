@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import CarteDessin from '../CarteDessin.astro';
 import Apercu from '../Apercu.astro';
+import Etapes from '../Etapes.astro';
 import { t, chemin, cheminDessin, dessins, parRubrique, type Dessin, type Lang } from '../../i18n';
 interface Props { lang: Lang; dessin: Dessin }
 const { lang, dessin } = Astro.props;
@@ -23,9 +24,9 @@ const jsonld = {
   image: `https://lindadenise.be/dessins/${dessin.id}.webp`,
 };
 ---
-<Base lang={lang} titre={titre} description={`${d.dessins.altDe(titre)} · ${rub.court} · ${d.dessins.prix}`} chemins={chemins} noisette="dessin" image={`/dessins/${dessin.id}.webp`}>
+<Base lang={lang} titre={titre} description={`${d.dessins.altDe(titre)} · ${rub.court} · ${d.dessins.prix}`} chemins={chemins} mascotte="dessin" image={`/dessins/${dessin.id}.webp`}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
-  <section class="section" data-noisette="dessin">
+  <section class="section" data-mascotte="dessin">
     <div class="contenu">
       <p><a href={chemin('dessins', lang)}>{d.dessins.retour}</a></p>
       <div class="fiche">
@@ -46,6 +47,9 @@ const jsonld = {
         </div>
       </div>
     </div>
+  </section>
+  <section class="section section--orange">
+    <div class="contenu"><Etapes titre={d.dessins.etapesTitre} etapes={d.dessins.etapes} /></div>
   </section>
   <section class="section section--vert">
     <div class="contenu">

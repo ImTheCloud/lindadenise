@@ -26,7 +26,7 @@ Git système bloqué (licence Xcode) : utiliser celui de GitHub Desktop avec `GI
 - **Astro 7** (statique, TypeScript), déployé sur Netlify (`netlify.toml`). Pas de framework CSS : `src/styles/global.css` (variables, boutons, cadres dessinés) + styles des composants.
 - **Langues** : FR par défaut (`/`), NL sous `/nl/`. Textes dans `src/i18n/fr.ts` et `nl.ts` (même structure obligatoire, le type vient de fr.ts), chemins dans `src/i18n/index.ts`. Les pages sont des composants dans `src/components/pages/`, appelés par de petits fichiers dans `src/pages/` (FR) et `src/pages/nl/`.
 - **Catalogue** : `src/data/dessins.json` et aperçus filigranés `public/dessins/`, générés par `npm run dessins` (`scripts/preparer-dessins.mjs`, source `~/Desktop/DessinsLinda`). Toute modification de titre, de rubrique ou de traduction se fait dans ce script, puis on relance.
-- **Mascotte** : `src/components/Noisette.astro` + `noisette.svg` (parties animées en CSS, état dans `data-etat`). Chaque section de page porte `data-noisette="clé"` ; les phrases sont dans `noisette.sections` des dictionnaires.
+- **Mascotte** : `src/components/Mascotte.astro` + `mascotte.svg`, ce dernier généré par `node scripts/generer-mascotte.mjs` (ne pas éditer le SVG à la main). Parties animées en CSS (classes `m-*`, pivots en unités du dessin), état dans `data-etat` (repos, parle, salut, saute, dort). Chaque section de page porte `data-mascotte="clé"` ; les phrases sont dans `mascotte.sections` des dictionnaires.
 - **Formulaire** : Netlify Forms (`name="contact"`), envoi en arrière-plan, repli vers la page Merci.
 - **Polices** : Fontsource (Gochi Hand, Itim), hébergées sur le site.
 - Prévu : Supabase gratuit (admin des dessins, connexion de Linda seule, droits par ligne) ; phase 3 Stripe Checkout (Bancontact) + fonctions Netlify. Piège : Supabase gratuit se met en pause après environ une semaine sans activité, prévoir un rappel automatique.
@@ -34,4 +34,4 @@ Git système bloqué (licence Xcode) : utiliser celui de GitHub Desktop avec `GI
 
 ## Design
 
-Fond blanc, orange et vert, tout en dessin : bordures irrégulières, écriture manuscrite, étang et lotus animés, feuilles de tilleul, mascotte écureuil. Logo : lotus en pastille verte. Contraste : l'orange clair `#F28A1E` ne sert qu'en décor ; texte et boutons utilisent `--orange-fonce` / `--orange-titre`. Respecter `prefers-reduced-motion`. Mobile d'abord, grand écran soigné.
+Fond blanc, orange et vert, tout en dessin : bordures irrégulières, écriture manuscrite, étang et lotus animés, feuilles de tilleul, mascotte chat roux (Tilleul). Logo : lotus en pastille verte. Contraste : l'orange clair `#F28A1E` ne sert qu'en décor ; texte et boutons utilisent `--orange-fonce` / `--orange-titre`. Respecter `prefers-reduced-motion`. Mobile d'abord, grand écran soigné.

@@ -40,3 +40,12 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Netlify gratuit : 300 crédits par mois, 15 crédits par déploiement de production (voir `netlify-credits` dans la mémoire du projet)
 - Pendant le développement, les commits portent `[skip ci]` : GitHub reçoit tout, Netlify ne construit rien
 - À la fin : un seul commit sans `[skip ci]` pour publier
+
+## Idées de nouvelles fonctionnalités à proposer à la fin (accord de Claudiu)
+- Page Psaumes (rubrique vide pour l'instant, ou annonce « bientôt »)
+- Livre d'or ou petit mot des visiteurs
+- Liens vers Instagram / Facebook de Linda
+- Message de bienvenue ou mot de Linda en vidéo / audio
+- Newsletter ou alerte « nouveau dessin »
+- Dessin du mois, favoris, partage d'un dessin par carte postale numérique
+- Espace admin (ajouter, modifier, supprimer) et boutique Stripe : déjà prévus

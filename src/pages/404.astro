@@ -2,11 +2,11 @@
 import Base from '../layouts/Base.astro';
 import { chemin } from '../i18n';
 ---
-<Base lang="fr" titre="Page introuvable" chemins={{ fr: '/', nl: '/nl/' }} noisette="texte" noindex>
-  <section class="section centre" data-noisette="texte">
+<Base lang="fr" titre="Page introuvable" chemins={{ fr: '/', nl: '/nl/' }} mascotte="texte" noindex>
+  <section class="section centre" data-mascotte="texte">
     <div class="contenu">
       <h1>Oups, cette page n’existe pas</h1>
-      <p class="chapeau">Noisette a cherché partout, sans succès. Retournons à l’accueil ou à la galerie.</p>
+      <p class="chapeau">Mascotte a cherché partout, sans succès. Retournons à l’accueil ou à la galerie.</p>
       <p class="chapeau" lang="nl">Nootje heeft overal gezocht, zonder succes. Terug naar de startpagina?</p>
       <p>
         <a class="bouton bouton--vert" href={chemin('accueil', 'fr')}>Accueil</a>

@@ -9,8 +9,8 @@ const contenu = d[page];
 const blocs = 'blocs' in contenu ? contenu.blocs : [];
 const licence = page === 'licence' ? d.licence : null;
 ---
-<Base lang={lang} titre={contenu.titre} description={contenu.meta} chemins={chemins} noisette="texte">
-  <section class="section" data-noisette="texte">
+<Base lang={lang} titre={contenu.titre} description={contenu.meta} chemins={chemins} mascotte="texte">
+  <section class="section" data-mascotte="texte">
     <div class="contenu texte">
       <h1>{contenu.titre}</h1>
       {licence && (

@@ -7,8 +7,8 @@ const { lang } = Astro.props;
 const d = t(lang);
 const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
 ---
-<Base lang={lang} titre={d.dessins.titre} description={d.dessins.metaDescription} chemins={chemins} noisette="galerie">
-  <section class="section galerie" data-noisette="galerie">
+<Base lang={lang} titre={d.dessins.titre} description={d.dessins.metaDescription} chemins={chemins} mascotte="galerie">
+  <section class="section galerie" data-mascotte="galerie">
     <div class="contenu">
       <header class="centre">
         <h1>{d.dessins.titre}</h1>

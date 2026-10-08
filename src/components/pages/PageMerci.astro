@@ -6,8 +6,8 @@ const { lang } = Astro.props;
 const d = t(lang);
 const chemins = { fr: chemin('merci', 'fr'), nl: chemin('merci', 'nl') };
 ---
-<Base lang={lang} titre={d.merci.titre} chemins={chemins} noisette="contact" noindex>
-  <section class="section centre" data-noisette="contact">
+<Base lang={lang} titre={d.merci.titre} chemins={chemins} mascotte="contact" noindex>
+  <section class="section centre" data-mascotte="contact">
     <div class="contenu">
       <h1>{d.merci.titre}</h1>
       <p class="chapeau">{d.merci.texte}</p>

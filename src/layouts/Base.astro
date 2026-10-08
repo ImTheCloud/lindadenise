@@ -4,7 +4,7 @@ import '@fontsource/itim';
 import '../styles/global.css';
 import Entete from '../components/Entete.astro';
 import PiedDePage from '../components/PiedDePage.astro';
-import Noisette from '../components/Noisette.astro';
+import Mascotte from '../components/Mascotte.astro';
 import { t, SITE, type Lang } from '../i18n';
 
 interface Props {
@@ -14,11 +14,11 @@ interface Props {
   /** chemins de la page dans chaque langue, pour le sélecteur et hreflang */
   chemins: { fr: string; nl: string };
   /** section de la mascotte affichée à l'arrivée */
-  noisette?: string;
+  mascotte?: string;
   image?: string;
   noindex?: boolean;
 }
-const { lang, titre, description, chemins, noisette = 'texte', image = '/images/partage.png', noindex = false } = Astro.props;
+const { lang, titre, description, chemins, mascotte = 'texte', image = '/images/partage.png', noindex = false } = Astro.props;
 const d = t(lang);
 const titrePage = titre ? `${titre} – Linda Denise` : d.meta.titre;
 const desc = description ?? d.meta.description;
@@ -47,12 +47,12 @@ const canonique = SITE + chemins[lang];
     <meta property="og:locale" content={lang === 'fr' ? 'fr_BE' : 'nl_BE'} />
     <script is:inline>document.documentElement.classList.remove('sans-js');</script>
   </head>
-  <body data-noisette-depart={noisette}>
+  <body data-mascotte-depart={mascotte}>
     <a class="evitement" href="#principal">{lang === 'fr' ? 'Aller au contenu' : 'Naar de inhoud'}</a>
     <Entete lang={lang} chemins={chemins} />
     <main id="principal"><slot /></main>
     <PiedDePage lang={lang} />
-    <Noisette lang={lang} />
+    <Mascotte lang={lang} />
     <script>
       // Apparition douce des blocs au défilement
       const blocs = document.querySelectorAll('.apparait');

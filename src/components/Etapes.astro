@@ -1,0 +1,26 @@
+---
+// Les trois étapes pour recevoir un dessin (accueil et fiches).
+interface Props { titre: string; etapes: { titre: string; texte: string }[] }
+const { titre, etapes } = Astro.props;
+---
+<section class="etapes">
+  <h3 class="etapes__titre">{titre}</h3>
+  <ol class="etapes__liste">
+    {etapes.map((e, i) => (
+      <li class="etape">
+        <span class="etape__numero" aria-hidden="true">{i + 1}</span>
+        <div><strong>{e.titre}</strong><p>{e.texte}</p></div>
+      </li>
+    ))}
+  </ol>
+</section>
+<style>
+  .etapes__titre { margin-bottom: 0.7em; }
+  .etapes__liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .etape { display: flex; gap: 14px; align-items: flex-start; }
+  .etape__numero { flex: none; display: grid; place-items: center; width: 44px; height: 44px; font-family: var(--titre); font-size: 1.6rem; color: #fff; background: var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; transform: rotate(-4deg); }
+  .etape:nth-child(2) .etape__numero { background: var(--orange-fonce); transform: rotate(3deg); }
+  .etape strong { font-family: var(--titre); font-weight: 400; font-size: 1.35rem; color: var(--vert-fonce); }
+  .etape p { margin: 0.1em 0 0; color: var(--encre-douce); }
+  @media (min-width: 900px) { .etapes__liste.etapes__liste { grid-template-columns: repeat(3, 1fr); gap: 28px; } }
+</style>
