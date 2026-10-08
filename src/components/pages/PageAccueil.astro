@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Etang from '../Etang.astro';
 import Feuilles from '../Feuilles.astro';
 import CarteDessin from '../CarteDessin.astro';
+import Apercu from '../Apercu.astro';
 import { t, chemin, cheminDessin, dessins, parRubrique, RUBRIQUES, type Lang } from '../../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -13,15 +14,21 @@ const trouve = (id: string) => dessins.find((x) => x.id === id)!;
 const collage = ['trois-tournesols', 'paon-indien', 'trio-de-chats-quebecois'].map(trouve);
 const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: 'le-phare', fleurs: 'lys-tigre', animaux: '2-ecureuils-au-bord-de-l-eau' };
 const une = dessins.filter((x) => x.une);
-const ratio = (x: { hauteur: number; largeur: number }) => x.hauteur / x.largeur;
 ---
 <Base lang={lang} chemins={chemins} noisette="accueil">
   <section class="heros" data-noisette="accueil">
     <Feuilles />
     <div class="contenu heros__grille">
       <div class="heros__texte">
-        <p class="surtitre">{a.surtitre}</p>
-        <h1><span class="mot-vert">Linda</span> <span class="mot-orange">Denise</span></h1>
+        <div class="titre-arc">
+          <h1 aria-label="Linda Denise">
+            <svg class="titre-arc__svg" viewBox="0 0 640 330" aria-hidden="true">
+              <defs><path id="arc-titre" d="M 40,306 A 300,300 0 0 1 600,306" /></defs>
+              <text><textPath href="#arc-titre" startOffset="50%" text-anchor="middle"><tspan class="mot-vert">Linda </tspan><tspan class="mot-orange">Denise</tspan></textPath></text>
+            </svg>
+          </h1>
+          <p class="surtitre titre-arc__sous">{a.surtitre}</p>
+        </div>
         <p class="chapeau">{a.texte}</p>
         <div class="heros__actions">
           <a class="bouton" href={chemin('dessins', lang)}>{a.cta1}</a>
@@ -31,7 +38,7 @@ const ratio = (x: { hauteur: number; largeur: number }) => x.hauteur / x.largeur
       <div class="collage" aria-hidden="false">
         {collage.map((x, i) => (
           <a class={`collage__img collage__img--${i + 1}`} href={cheminDessin(x.id, lang)}>
-            <img src={`/dessins/${x.id}-vignette.webp`} width="400" height={Math.round(400 * ratio(x))} alt={d.dessins.altDe(x.titre[lang])} loading="eager" decoding="async" />
+            <Apercu id={x.id} alt={d.dessins.altDe(x.titre[lang])} largeur={x.largeur} hauteur={x.hauteur} chargement="eager" />
           </a>
         ))}
       </div>
@@ -47,7 +54,7 @@ const ratio = (x: { hauteur: number; largeur: number }) => x.hauteur / x.largeur
           const c = trouve(couvertures[r]);
           return (
             <a class="rubrique apparait" style={`transition-delay:${i * 90}ms`} href={`${chemin('dessins', lang)}#${r}`}>
-              <img src={`/dessins/${c.id}-vignette.webp`} width="400" height={Math.round(400 * ratio(c))} alt="" loading="lazy" decoding="async" />
+              <Apercu id={c.id} alt="" largeur={c.largeur} hauteur={c.hauteur} />
               <span class="rubrique__nom">{d.rubriques[r].nom}</span>
               <span class="rubrique__texte">{d.rubriques[r].texte}</span>
               <span class="rubrique__nombre">{a.nombre(parRubrique(r).length)}</span>
@@ -109,12 +116,18 @@ const ratio = (x: { hauteur: number; largeur: number }) => x.hauteur / x.largeur
   .heros { position: relative; overflow: hidden; display: flex; align-items: center; min-height: calc(100svh - 68px); padding-top: clamp(28px, 5vw, 64px); padding-bottom: clamp(190px, 26vw, 330px); background: linear-gradient(#fff 55%, #f6fbf6); }
   .heros__grille { width: 100%; }
   .heros__grille { position: relative; z-index: 2; display: grid; gap: 28px; align-items: center; }
-  .heros__texte h1 { font-size: clamp(3.8rem, 1.2rem + 9.5vw, 8.6rem); margin-bottom: 0.08em; line-height: 0.95; }
+  .titre-arc { position: relative; max-width: 600px; margin-bottom: 8px; }
+  .titre-arc h1 { margin: 0; line-height: 0; }
+  .titre-arc__svg { width: 100%; height: auto; overflow: visible; }
+  .titre-arc__svg text { font-family: var(--titre); font-size: 112px; }
+  .titre-arc__svg .mot-vert { fill: var(--vert); }
+  .titre-arc__svg .mot-orange { fill: var(--orange-titre); }
+  .titre-arc__sous { position: absolute; left: 0; right: 0; top: 62%; text-align: center; margin: 0; font-size: clamp(1.1rem, 0.9rem + 1vw, 1.7rem); }
   .heros__texte .chapeau { font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem); }
   .heros__actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 26px; }
   .collage { position: relative; width: min(100%, 520px); aspect-ratio: 1 / 0.92; margin-inline: auto; }
   .collage__img { position: absolute; display: block; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 8px; box-shadow: var(--ombre); transition: transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1); }
-  .collage__img img { width: 100%; height: auto; border-radius: 10px; }
+  .collage__img :global(img) { width: 100%; height: auto; border-radius: 10px; }
   .collage__img--1 { width: 42%; left: 0; top: 8%; transform: rotate(-7deg); animation: collage-flotte 7s ease-in-out infinite; }
   .collage__img--2 { width: 46%; right: 2%; top: 0; transform: rotate(5deg); z-index: 2; animation: collage-flotte 8s ease-in-out -2s infinite; }
   .collage__img--3 { width: 44%; left: 28%; bottom: 0; transform: rotate(-2deg); z-index: 3; animation: collage-flotte 9s ease-in-out -4s infinite; }
@@ -125,7 +138,7 @@ const ratio = (x: { hauteur: number; largeur: number }) => x.hauteur / x.largeur
   .rubrique { display: flex; flex-direction: column; text-decoration: none; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 12px 12px 18px; box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1); text-align: center; }
   .rubrique:nth-child(odd) { transform: rotate(-1deg); } .rubrique:nth-child(even) { transform: rotate(1deg); }
   .rubrique:hover { transform: translateY(-8px) rotate(0deg); }
-  .rubrique img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; border-radius: 14px 6px 14px 8px / 8px 14px 6px 14px; margin-bottom: 14px; }
+  .rubrique :global(img) { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; border-radius: 14px 6px 14px 8px / 8px 14px 6px 14px; margin-bottom: 14px; }
   .rubrique__nom { font-family: var(--titre); font-size: 1.9rem; color: var(--orange-titre); line-height: 1.1; }
   .rubrique__texte { color: var(--encre-douce); font-size: 1rem; padding: 6px 10px 8px; }
   .rubrique__nombre { margin-top: auto; font-family: var(--titre); font-size: 1.2rem; color: var(--vert-fonce); }

@@ -1,0 +1,20 @@
+---
+// Aperçu filigrané d'un dessin : AVIF (léger) avec repli WebP.
+interface Props {
+  id: string;
+  grand?: boolean;
+  alt: string;
+  largeur: number;
+  hauteur: number;
+  chargement?: 'lazy' | 'eager';
+  priorite?: boolean;
+}
+const { id, grand = false, alt, largeur, hauteur, chargement = 'lazy', priorite = false } = Astro.props;
+const base = `/dessins/${id}${grand ? '' : '-vignette'}`;
+const w = grand ? largeur : 400;
+const h = Math.round((w * hauteur) / largeur);
+---
+<picture>
+  <source srcset={`${base}.avif`} type="image/avif" />
+  <img src={`${base}.webp`} width={w} height={h} alt={alt} loading={chargement} decoding="async" fetchpriority={priorite ? 'high' : undefined} />
+</picture>

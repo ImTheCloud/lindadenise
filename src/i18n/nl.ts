@@ -33,7 +33,7 @@ export const nl: Dico = {
       { titre: 'Voor in huis', texte: 'Vind de tekening die leven brengt in je kamers.' },
     ],
     prix: '10 € per tekening',
-    prixTexte: 'Digitaal bestand zonder watermerk, voor privégebruik.',
+    prixTexte: 'Digitaal bestand, zonder watermerk.',
     prixCta: 'Contacteer Linda',
     aproposTitre: 'Wie is Linda?',
     aproposTexte:
@@ -49,7 +49,7 @@ export const nl: Dico = {
     retour: '← Alle tekeningen',
     rubrique: 'Rubriek',
     prix: '10 €',
-    prixTexte: 'Digitaal bestand zonder watermerk, voor privégebruik.',
+    prixTexte: 'Digitaal bestand, zonder watermerk.',
     cta: 'Deze tekening ontvangen',
     licence: 'Bekijk de gebruiksvoorwaarden',
     autres: 'Nog meer tekeningen om te ontdekken',
@@ -85,6 +85,9 @@ export const nl: Dico = {
     erreur: 'Oeps, het bericht is niet verstuurd. Probeer het zo meteen opnieuw.',
     prefill: (t: string) => `Hallo Linda, de tekening “${t}” interesseert me. `,
     reponse: 'Linda antwoordt zelf, meestal binnen enkele dagen.',
+    conditionsAvant: 'Ik heb de ',
+    conditionsLien: 'gebruiksvoorwaarden',
+    conditionsApres: ' van de tekening gelezen en ga ermee akkoord (persoonlijk, niet-commercieel gebruik).',
   },
   merci: { titre: 'Bedankt!', texte: 'Je bericht is verstuurd. Linda antwoordt je binnenkort.', retour: 'Terug naar home' },
   pied: {

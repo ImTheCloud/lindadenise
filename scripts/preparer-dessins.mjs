@@ -111,13 +111,12 @@ const filigrane = (w, h) => {
 </pattern></defs><rect width="${w}" height="${h}" fill="url(#p)"/></svg>`);
 };
 
-async function apercu(source, largeur, sortie, qualite) {
-  const base = sharp(source).resize({ width: largeur });
-  const { data, info } = await base.clone().toBuffer({ resolveWithObject: true });
-  await sharp(data)
-    .composite([{ input: filigrane(info.width, info.height) }])
-    .webp({ quality: qualite })
-    .toFile(sortie);
+// Chaque aperçu existe en AVIF (léger) et en WebP (repli pour les anciens navigateurs).
+async function apercu(source, largeur, base, qualiteWebp, qualiteAvif) {
+  const { data, info } = await sharp(source).resize({ width: largeur }).toBuffer({ resolveWithObject: true });
+  const avecFiligrane = sharp(data).composite([{ input: filigrane(info.width, info.height) }]);
+  await avecFiligrane.clone().webp({ quality: qualiteWebp }).toFile(base + '.webp');
+  await avecFiligrane.clone().avif({ quality: qualiteAvif, effort: 5 }).toFile(base + '.avif');
   return { largeur: info.width, hauteur: info.height };
 }
 
@@ -131,8 +130,8 @@ for (const [rubrique, fr, nl] of CATALOGUE) {
   if (!fichier) { manquants.push(fr); continue; }
   const id = slug(fr);
   const source = path.join(SOURCE, fichier);
-  const grande = await apercu(source, 760, path.join(SORTIE_IMG, `${id}.webp`), 78);
-  await apercu(source, 400, path.join(SORTIE_IMG, `${id}-vignette.webp`), 74);
+  const grande = await apercu(source, 760, path.join(SORTIE_IMG, id), 76, 52);
+  await apercu(source, 400, path.join(SORTIE_IMG, `${id}-vignette`), 66, 48);
   sortie.push({ id, rubrique, titre: { fr, nl }, largeur: grande.largeur, hauteur: grande.hauteur, une: A_LA_UNE.includes(fr) });
 }
 

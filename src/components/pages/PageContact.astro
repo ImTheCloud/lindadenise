@@ -27,6 +27,10 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
           <option value="">{c.aucun}</option>
           {dessins.map((x) => <option value={x.titre[lang]} data-id={x.id}>{x.titre[lang]}</option>)}
         </select>
+        <p class="conditions" data-conditions hidden>
+          <input id="conditions" name="conditions" type="checkbox" value="oui" />
+          <label for="conditions">{c.conditionsAvant}<a href={chemin('licence', lang)} target="_blank" rel="noopener">{c.conditionsLien}</a>{c.conditionsApres}</label>
+        </p>
         <label for="message">{c.message}</label>
         <textarea id="message" name="message" rows="6" required></textarea>
         <button class="bouton" type="submit">{c.envoyer}</button>
@@ -48,6 +52,15 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
       if (option) select.value = option.value;
       message.value = prefill[id];
     }
+    const bloc = form.querySelector<HTMLElement>('[data-conditions]')!;
+    const case_ = bloc.querySelector<HTMLInputElement>('input')!;
+    const majConditions = () => {
+      const choisi = select.value !== '';
+      bloc.hidden = !choisi;
+      case_.required = choisi;
+    };
+    select.addEventListener('change', majConditions);
+    majConditions();
     const etat = form.querySelector<HTMLElement>('.formulaire__etat')!;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -76,6 +89,10 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
   .formulaire label { font-family: var(--titre); font-size: 1.3rem; color: var(--vert-fonce); margin-top: 10px; }
   .formulaire input, .formulaire select, .formulaire textarea { font: inherit; font-size: 1.1rem; padding: 12px 14px; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); background: #fff; color: var(--encre); width: 100%; }
   .formulaire input:focus, .formulaire select:focus, .formulaire textarea:focus { outline: 3px dashed var(--orange-fonce); outline-offset: 2px; }
+  .conditions { display: flex; gap: 12px; align-items: flex-start; margin: 14px 0 0; }
+  .conditions[hidden] { display: none; }
+  .conditions input { width: 24px; height: 24px; margin-top: 4px; flex: none; accent-color: var(--vert-fonce); }
+  .conditions label { font-family: var(--texte); font-size: 1rem; color: var(--encre); margin: 0; }
   .formulaire .bouton { justify-self: start; margin-top: 18px; }
   .formulaire .bouton:disabled { opacity: 0.6; cursor: wait; }
   .formulaire__etat { min-height: 1.6em; margin: 6px 0 0; font-weight: 600; }
