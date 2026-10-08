@@ -111,7 +111,7 @@ const donnees = JSON.stringify({ sections: n.sections, anecdotes: n.anecdotes })
 </script>
 
 <style is:global>
-  .noisette { position: fixed; right: clamp(8px, 2vw, 28px); bottom: 0; z-index: 60; width: clamp(104px, 17vw, 300px); pointer-events: none; }
+  .noisette { position: fixed; right: clamp(8px, 2vw, 28px); bottom: 0; z-index: 60; width: clamp(104px, 16vw, 260px); pointer-events: none; }
   .noisette > * { pointer-events: auto; }
   .noisette__corps { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; filter: drop-shadow(0 6px 8px rgba(43, 110, 58, 0.18)); }
   .noisette__corps:focus-visible { outline-offset: 0; }
@@ -126,40 +126,46 @@ const donnees = JSON.stringify({ sections: n.sections, anecdotes: n.anecdotes })
   .noisette__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
   /* Les parties de l'écureuil bougent chacune de leur côté */
-  /* Points de pivot en unités du dessin (viewBox 340 x 320), pas en pourcentages */
-  .n-queue { transform-origin: 214px 262px; animation: n-queue 5s ease-in-out infinite; }
-  .n-tete { transform-origin: 128px 140px; animation: n-tete 6s ease-in-out infinite; }
-  .n-corps { transform-origin: 150px 290px; animation: n-respire 3.6s ease-in-out infinite; }
-  .n-paupiere { transform-origin: 86px 86px; transform: scaleY(0); animation: n-cligne 5.5s infinite; }
-  .n-bras { transform-origin: 140px 166px; }
-  .n-oreille { transform-origin: 122px 76px; }
-  .noisette__corps:hover .n-oreille { animation: n-oreille 0.5s ease-in-out 2; }
+  /* transform-box seulement sur les parties animées : sinon les rotate() internes du dessin se décalent */
+  .n-queue, .n-tete, .n-corps, .n-paupiere, .n-bras, .n-oreille, .n-bouche-ouverte { transform-box: fill-box; }
+  .n-queue { transform-origin: 12% 92%; animation: n-queue 5s ease-in-out infinite; }
+  .n-tete { transform-origin: 50% 92%; animation: n-tete 6s ease-in-out infinite; }
+  .n-corps { transform-origin: 50% 100%; animation: n-respire 3.6s ease-in-out infinite; }
+  .n-paupiere { transform-origin: 50% 0%; transform: scaleY(0); animation: n-cligne 5.5s infinite; }
+  .n-bras-d { transform-origin: 40% 6%; }
+  .n-bras-g { transform-origin: 60% 6%; }
+  .n-oreille-g { transform-origin: 60% 90%; }
+  .n-oreille-d { transform-origin: 40% 90%; }
+  .noisette__corps:hover .n-oreille-g { animation: n-oreille-g 0.5s ease-in-out 2; }
+  .noisette__corps:hover .n-oreille-d { animation: n-oreille-d 0.5s ease-in-out 2 0.1s; }
   .noisette-svg .n-bouche-ouverte { display: none !important; }
 
   .noisette[data-etat='parle'] .n-bouche-fermee { display: none; }
-  .noisette[data-etat='parle'] .n-bouche-ouverte { display: block !important; transform-origin: 74px 122px; animation: n-parle 0.34s ease-in-out infinite; }
+  .noisette[data-etat='parle'] .n-bouche-ouverte { display: block !important; transform-origin: 50% 0%; animation: n-parle 0.34s ease-in-out infinite; }
   .noisette[data-etat='parle'] .n-tete { animation: n-hoche 0.7s ease-in-out infinite; }
 
   .noisette[data-etat='salut'] .n-gland { opacity: 0; }
-  .noisette[data-etat='salut'] .n-bras { animation: n-salue 0.55s ease-in-out infinite alternate; }
+  .noisette[data-etat='salut'] .n-bras-d { animation: n-salue 0.55s ease-in-out infinite alternate; }
+  .noisette[data-etat='salut'] .n-bras-g { transform: rotate(14deg); }
   .noisette[data-etat='salut'] .n-bouche-fermee { display: none; }
   .noisette[data-etat='salut'] .n-bouche-ouverte { display: block !important; }
 
   .noisette[data-etat='saute'] .noisette__corps { animation: n-saute 0.8s cubic-bezier(0.3, 0.7, 0.4, 1); }
 
   @keyframes noisette-pop { from { transform: scale(0.6) rotate(-3deg); opacity: 0; } to { transform: none; opacity: 1; } }
-  @keyframes n-queue { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(3.5deg); } }
+  @keyframes n-queue { 0%, 100% { transform: rotate(-2deg) scaleY(1); } 50% { transform: rotate(5deg) scaleY(1.02); } }
   @keyframes n-tete { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(2deg); } }
   @keyframes n-hoche { 0%, 100% { transform: rotate(-3deg) translateY(0); } 50% { transform: rotate(3deg) translateY(2px); } }
   @keyframes n-respire { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.014); } }
   @keyframes n-cligne { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
   @keyframes n-parle { 0%, 100% { transform: scaleY(0.45); } 50% { transform: scaleY(1); } }
-  @keyframes n-salue { from { transform: rotate(62deg); } to { transform: rotate(98deg); } }
+  @keyframes n-salue { from { transform: rotate(-150deg); } to { transform: rotate(-188deg); } }
   @keyframes n-saute { 0% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.06, 0.92); } 45% { transform: translateY(-34px) scale(0.96, 1.06); } 80% { transform: translateY(0) scale(1.05, 0.94); } 100% { transform: none; } }
-  @keyframes n-oreille { 50% { transform: rotate(-12deg); } }
+  @keyframes n-oreille-g { 50% { transform: rotate(-14deg); } }
+  @keyframes n-oreille-d { 50% { transform: rotate(14deg); } }
 
   @media (max-width: 700px) {
-    .noisette { width: 104px; right: 4px; }
+    .noisette { width: 88px; right: 4px; }
     .noisette__bulle { right: 2px; font-size: 0.98rem; max-width: min(240px, calc(100vw - 20px)); }
   }
 </style>
