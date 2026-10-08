@@ -1,0 +1,74 @@
+---
+import { t, chemin, autreLangue, type Lang } from '../i18n';
+interface Props { lang: Lang; chemins: { fr: string; nl: string } }
+const { lang, chemins } = Astro.props;
+const d = t(lang);
+const autre = autreLangue(lang);
+const liens = [
+  { cle: 'dessins', href: chemin('dessins', lang), nom: d.nav.dessins },
+  { cle: 'apropos', href: chemin('apropos', lang), nom: d.nav.apropos },
+  { cle: 'contact', href: chemin('contact', lang), nom: d.nav.contact },
+] as const;
+const actuel = Astro.url.pathname;
+---
+<header class="entete">
+  <div class="contenu entete__ligne">
+    <a class="marque" href={chemin('accueil', lang)} aria-label={`Linda Denise – ${d.nav.accueil}`}>
+      <img src="/favicon.svg" alt="" width="52" height="52" />
+      <span class="marque__nom">Linda <b>Denise</b></span>
+    </a>
+    <button class="burger" type="button" aria-expanded="false" aria-controls="menu-principal" data-burger>
+      <span class="sr-only">{d.nav.menu}</span><i></i><i></i><i></i>
+    </button>
+    <div class="menu" id="menu-principal" data-menu>
+      <nav aria-label="Principal">
+        <ul>
+          {liens.map((l) => (
+            <li><a href={l.href} aria-current={actuel.startsWith(l.href) ? 'page' : undefined}>{l.nom}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <a class="langue" href={chemins[autre]} hreflang={autre} lang={autre} title={d.langues[autre]}>
+        <span class:list={[lang === 'fr' && 'actif']}>FR</span><span class:list={[lang === 'nl' && 'actif']}>NL</span>
+      </a>
+    </div>
+  </div>
+</header>
+<script>
+  const bouton = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  bouton?.addEventListener('click', () => {
+    const ouvert = bouton.getAttribute('aria-expanded') === 'true';
+    bouton.setAttribute('aria-expanded', String(!ouvert));
+    menu?.classList.toggle('ouvert', !ouvert);
+  });
+</script>
+<style>
+  .entete { position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px); border-bottom: var(--trait) solid var(--vert-pale); }
+  .entete__ligne { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+  .marque { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .marque img { transition: transform 0.4s; }
+  .marque:hover img { transform: rotate(-12deg) scale(1.06); }
+  .marque__nom { font-family: var(--titre); font-size: 1.9rem; color: var(--vert-fonce); line-height: 1; }
+  .marque__nom b { font-weight: 400; color: var(--orange-titre); }
+  .menu { display: flex; align-items: center; gap: 28px; }
+  .menu ul { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
+  .menu a:not(.langue) { font-family: var(--titre); font-size: 1.45rem; text-decoration: none; color: var(--vert-fonce); padding: 6px 14px; border-radius: var(--rayon-petit); display: block; }
+  .menu a:not(.langue):hover, .menu a[aria-current='page'] { background: var(--orange-creme); color: var(--orange-fonce); }
+  .langue { display: inline-flex; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); overflow: hidden; text-decoration: none; font-family: var(--titre); font-size: 1.15rem; }
+  .langue span { padding: 3px 11px; color: var(--vert-fonce); }
+  .langue .actif { background: var(--vert-fonce); color: #fff; }
+  .burger { display: none; width: 52px; height: 48px; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); background: #fff; cursor: pointer; flex-direction: column; justify-content: center; align-items: center; gap: 5px; }
+  .burger i { display: block; width: 24px; height: 3px; background: var(--vert-fonce); border-radius: 3px; transition: transform 0.25s, opacity 0.25s; }
+  .burger[aria-expanded='true'] i:nth-of-type(1) { transform: translateY(8px) rotate(45deg); }
+  .burger[aria-expanded='true'] i:nth-of-type(2) { opacity: 0; }
+  .burger[aria-expanded='true'] i:nth-of-type(3) { transform: translateY(-8px) rotate(-45deg); }
+  @media (max-width: 820px) {
+    .burger { display: flex; }
+    .menu { position: absolute; left: 0; right: 0; top: 100%; background: #fff; flex-direction: column; align-items: stretch; gap: 14px; padding: 18px var(--gouttiere) 24px; border-bottom: var(--trait) solid var(--vert-pale); display: none; }
+    .menu.ouvert { display: flex; }
+    .menu ul { flex-direction: column; }
+    .menu a:not(.langue) { font-size: 1.7rem; padding: 10px 14px; }
+    .langue { align-self: flex-start; }
+  }
+</style>

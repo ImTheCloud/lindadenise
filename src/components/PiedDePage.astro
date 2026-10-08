@@ -1,0 +1,35 @@
+---
+import { t, chemin, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+<footer class="pied">
+  <svg class="pied__vague" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 C120,8 240,52 360,30 C480,8 600,52 720,30 C840,8 960,52 1080,30 C1200,8 1320,52 1440,30 L1440,60 L0,60 Z" fill="#2b6e3a" /></svg>
+  <div class="pied__corps">
+    <div class="contenu pied__ligne">
+      <div class="pied__marque">
+        <img src="/favicon.svg" alt="" width="56" height="56" />
+        <div><strong>Linda Denise</strong><br /><span>{d.pied.phrase}</span></div>
+      </div>
+      <ul class="pied__liens">
+        <li><a href={chemin('mentions', lang)}>{d.pied.mentions}</a></li>
+        <li><a href={chemin('licence', lang)}>{d.pied.licence}</a></li>
+        <li><a href={chemin('confidentialite', lang)}>{d.pied.confidentialite}</a></li>
+      </ul>
+    </div>
+    <p class="contenu pied__droits">{d.pied.droits}</p>
+  </div>
+</footer>
+<style>
+  .pied { margin-top: 40px; color: #fff; }
+  .pied__vague { width: 100%; height: 40px; display: block; margin-bottom: -1px; }
+  .pied__corps { background: var(--vert-fonce); padding: 28px 0 110px; }
+  .pied__ligne { display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between; align-items: center; }
+  .pied__marque { display: flex; gap: 14px; align-items: center; font-family: var(--titre); font-size: 1.5rem; line-height: 1.2; }
+  .pied__marque span { font-family: var(--texte); font-size: 1rem; opacity: 0.85; }
+  .pied__liens { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; margin: 0; padding: 0; }
+  .pied a { color: #fff; }
+  .pied a:hover { color: var(--orange-clair); }
+  .pied__droits { margin: 22px auto 0; font-size: 0.95rem; opacity: 0.8; }
+</style>

@@ -1,0 +1,73 @@
+---
+import Base from '../../layouts/Base.astro';
+import CarteDessin from '../CarteDessin.astro';
+import { t, chemin, cheminDessin, dessins, parRubrique, type Dessin, type Lang } from '../../i18n';
+interface Props { lang: Lang; dessin: Dessin }
+const { lang, dessin } = Astro.props;
+const d = t(lang);
+const titre = dessin.titre[lang];
+const chemins = { fr: cheminDessin(dessin.id, 'fr'), nl: cheminDessin(dessin.id, 'nl') };
+const i = dessins.findIndex((x) => x.id === dessin.id);
+const prec = dessins[(i - 1 + dessins.length) % dessins.length];
+const suiv = dessins[(i + 1) % dessins.length];
+const memeRubrique = parRubrique(dessin.rubrique).filter((x) => x.id !== dessin.id).slice(0, 4);
+const rub = d.rubriques[dessin.rubrique];
+const contactUrl = `${chemin('contact', lang)}?dessin=${dessin.id}`;
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'VisualArtwork',
+  name: titre,
+  creator: { '@type': 'Person', name: 'Linda Denise' },
+  artform: 'Digital drawing',
+  image: `https://lindadenise.be/dessins/${dessin.id}.webp`,
+};
+---
+<Base lang={lang} titre={titre} description={`${titre} – ${d.dessins.altDe(titre)}. ${rub.court}.`} chemins={chemins} noisette="dessin" image={`/dessins/${dessin.id}.webp`}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  <section class="section" data-noisette="dessin">
+    <div class="contenu">
+      <p><a href={chemin('dessins', lang)}>{d.dessins.retour}</a></p>
+      <div class="fiche">
+        <div class="fiche__image cadre">
+          <img src={`/dessins/${dessin.id}.webp`} width={dessin.largeur} height={dessin.hauteur} alt={d.dessins.altDe(titre)} decoding="async" fetchpriority="high" />
+        </div>
+        <div class="fiche__infos">
+          <p class="surtitre">{d.dessins.rubrique} · <a href={`${chemin('dessins', lang)}#${dessin.rubrique}`}>{rub.court}</a></p>
+          <h1>{titre}</h1>
+          <p class="fiche__prix">{d.dessins.prix}</p>
+          <p>{d.dessins.prixTexte}</p>
+          <p><a class="bouton" href={contactUrl}>{d.dessins.cta}</a></p>
+          <p class="fiche__petit"><a href={chemin('licence', lang)}>{d.dessins.licence}</a></p>
+          <nav class="fiche__nav" aria-label="Navigation">
+            <a href={cheminDessin(prec.id, lang)} rel="prev">← {d.dessins.precedent}</a>
+            <a href={cheminDessin(suiv.id, lang)} rel="next">{d.dessins.suivant} →</a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section section--vert">
+    <div class="contenu">
+      <h2 class="centre">{d.dessins.autres}</h2>
+      <div class="suite">
+        {memeRubrique.map((x) => <CarteDessin dessin={x} lang={lang} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .fiche { display: grid; gap: 34px; align-items: start; }
+  .fiche__image { padding: 12px; max-width: 560px; margin-inline: auto; }
+  .fiche__image img { width: 100%; height: auto; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; }
+  .fiche__prix { font-family: var(--titre); font-size: 2.6rem; color: var(--orange-fonce); margin: 0 0 4px; line-height: 1.1; }
+  .fiche__petit { font-size: 0.98rem; }
+  .fiche__nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 34px; padding-top: 18px; border-top: 3px dashed var(--vert-pale); font-family: var(--titre); font-size: 1.3rem; }
+  .suite { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 28px; }
+  .suite :global(.carte) { margin: 0; }
+  @media (min-width: 860px) {
+    .fiche { grid-template-columns: 1.05fr 0.95fr; gap: 64px; }
+    .fiche__image { position: sticky; top: 92px; margin: 0; }
+    .suite { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>

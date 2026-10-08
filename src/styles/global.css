@@ -1,0 +1,93 @@
+:root {
+  --blanc: #fff;
+  --orange: #f28a1e;
+  --orange-clair: #ffb347;
+  --orange-creme: #fff4e3;
+  --orange-fonce: #c45e00;
+  --orange-titre: #e0780c;
+  --vert: #3e9a47;
+  --vert-fonce: #2b6e3a;
+  --vert-creme: #f1f9f1;
+  --vert-pale: #dff0df;
+  --encre: #2b3b2b;
+  --encre-douce: #4d5d4d;
+
+  --titre: 'Gochi Hand', 'Segoe Print', cursive;
+  --texte: 'Itim', 'Segoe Print', system-ui, sans-serif;
+
+  --trait: 3px;
+  --rayon: 28px 12px 24px 14px / 14px 26px 12px 28px;
+  --rayon-petit: 18px 8px 16px 10px / 10px 16px 8px 18px;
+  --max: 1180px;
+  --gouttiere: clamp(16px, 4vw, 40px);
+  --ombre: 0 6px 0 rgba(43, 110, 58, 0.12);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--blanc);
+  color: var(--encre);
+  font-family: var(--texte);
+  font-size: clamp(1.06rem, 0.98rem + 0.3vw, 1.22rem);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+img, svg { max-width: 100%; display: block; }
+a { color: var(--vert-fonce); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+a:hover { color: var(--orange-fonce); }
+:focus-visible { outline: 3px dashed var(--orange-fonce); outline-offset: 3px; border-radius: 6px; }
+
+h1, h2, h3 { font-family: var(--titre); font-weight: 400; line-height: 1.08; margin: 0 0 0.5em; color: var(--vert-fonce); }
+h1 { font-size: clamp(2.6rem, 1.6rem + 4.4vw, 4.6rem); }
+h2 { font-size: clamp(2rem, 1.4rem + 2.4vw, 3.1rem); }
+h3 { font-size: clamp(1.45rem, 1.2rem + 0.9vw, 1.9rem); }
+p { margin: 0 0 1em; }
+
+.contenu { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gouttiere); }
+.section { padding-block: clamp(48px, 8vw, 96px); position: relative; }
+.section--vert { background: var(--vert-creme); }
+.section--orange { background: var(--orange-creme); }
+.centre { text-align: center; }
+.chapeau { font-size: 1.15em; color: var(--encre-douce); max-width: 56ch; }
+.centre .chapeau { margin-inline: auto; }
+.surtitre { font-family: var(--titre); font-size: 1.5rem; color: var(--orange-fonce); margin: 0 0 0.2em; }
+.mot-orange { color: var(--orange-titre); }
+.mot-vert { color: var(--vert); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Boutons dessinés */
+.bouton {
+  display: inline-flex; align-items: center; gap: 0.5em;
+  font-family: var(--titre); font-size: 1.35rem; line-height: 1;
+  padding: 0.7em 1.3em; cursor: pointer; text-decoration: none;
+  border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon);
+  background: var(--orange-fonce); color: #fff; border-color: #7a3a00;
+  box-shadow: 0 5px 0 #7a3a00; transition: transform 0.15s, box-shadow 0.15s;
+}
+.bouton:hover { color: #fff; transform: translateY(-2px) rotate(-1deg); box-shadow: 0 7px 0 #7a3a00; }
+.bouton:active { transform: translateY(3px); box-shadow: 0 2px 0 #7a3a00; }
+.bouton--vert { background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 5px 0 #173f20; }
+.bouton--vert:hover { box-shadow: 0 7px 0 #173f20; }
+.bouton--contour { background: #fff; color: var(--vert-fonce); border-color: var(--vert-fonce); box-shadow: 0 5px 0 rgba(43, 110, 58, 0.35); }
+.bouton--contour:hover { color: var(--orange-fonce); border-color: var(--orange-fonce); }
+
+/* Cadre « dessiné à la main » */
+.cadre { border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); background: #fff; box-shadow: var(--ombre); }
+
+/* Apparition douce */
+.apparait { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.apparait.visible { opacity: 1; transform: none; }
+.sans-js .apparait { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .apparait { opacity: 1; transform: none; }
+}

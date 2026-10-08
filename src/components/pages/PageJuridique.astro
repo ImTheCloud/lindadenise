@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import { t, chemin, type Lang, type Page } from '../../i18n';
+interface Props { lang: Lang; page: 'mentions' | 'confidentialite' | 'licence' }
+const { lang, page } = Astro.props;
+const d = t(lang);
+const chemins = { fr: chemin(page as Page, 'fr'), nl: chemin(page as Page, 'nl') };
+const contenu = d[page];
+const blocs = 'blocs' in contenu ? contenu.blocs : [];
+const licence = page === 'licence' ? d.licence : null;
+---
+<Base lang={lang} titre={contenu.titre} description={contenu.meta} chemins={chemins} noisette="texte">
+  <section class="section" data-noisette="texte">
+    <div class="contenu texte">
+      <h1>{contenu.titre}</h1>
+      {licence && (
+        <>
+          <p class="chapeau">{licence.intro}</p>
+          <div class="deux">
+            <div class="cadre oui"><h2>{licence.ouiTitre}</h2><ul>{licence.oui.map((x) => <li>{x}</li>)}</ul></div>
+            <div class="cadre non"><h2>{licence.nonTitre}</h2><ul>{licence.non.map((x) => <li>{x}</li>)}</ul></div>
+          </div>
+          <p>{licence.fin} <a href={chemin('contact', lang)}>{d.nav.contact}</a></p>
+        </>
+      )}
+      {blocs.map((b) => (
+        <section>
+          <h2>{b.titre}</h2>
+          {b.texte.map((p) => <p>{p}</p>)}
+        </section>
+      ))}
+    </div>
+  </section>
+</Base>
+<style>
+  .texte { max-width: 820px; }
+  .texte h2 { font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem); margin-top: 1.4em; }
+  .deux { display: grid; gap: 22px; margin: 28px 0; }
+  .deux .cadre { padding: 8px 22px 14px; }
+  .deux h2 { margin-top: 0.6em; }
+  .deux ul { padding-left: 1.2em; margin: 0 0 8px; }
+  .deux li { margin-bottom: 0.5em; }
+  .oui { border-color: var(--vert-fonce); background: var(--vert-creme); }
+  .non { border-color: var(--orange-fonce); background: var(--orange-creme); }
+  .non h2 { color: var(--orange-fonce); }
+  @media (min-width: 760px) { .deux { grid-template-columns: 1fr 1fr; } }
+</style>

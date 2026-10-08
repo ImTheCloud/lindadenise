@@ -1,0 +1,9 @@
+---
+import PageDessin from '../../../components/pages/PageDessin.astro';
+import { dessins } from '../../../i18n';
+export function getStaticPaths() {
+  return dessins.map((dessin) => ({ params: { id: dessin.id }, props: { dessin } }));
+}
+const { dessin } = Astro.props;
+---
+<PageDessin lang="nl" dessin={dessin} />

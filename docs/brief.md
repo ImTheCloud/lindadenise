@@ -18,22 +18,31 @@ La beauté de la nature et les chats. Esthétique, apaisant, naïf, joyeux, colo
 
 - Fond blanc, orange et vert
 - Logo : forme de lotus, ou les lettres LD ; le tilleul (« Linda » en néerlandais) ; l'écureuil, animal qu'elle aime
-- Logo à créer (6 à 8 pistes, choix de Linda, SVG)
 
 ## Catalogue
 
 72 dessins reçus (JPG, titrés). Rubriques prévues : Chats, Nature, Fleurs, autres à définir après tri, et plus tard Psaumes (aucun dessin pour l'instant).
 
-## Vente (phase 2)
+## Vente
 
-- Fichiers uniquement, pas d'impression
-- 5 € le dessin, usage libre pour l'acheteur
-- Paiement Stripe (Bancontact), reçu par email, téléchargement sécurisé
-- À ne lancer qu'après vérification du statut légal de Linda (voir `docs/prive/`)
+- Fichiers numériques uniquement, pas d'impression
+- **10 € le dessin** (prix indicatif, affiché sur le site)
+- Pour l'instant : bouton « Recevoir ce dessin » qui mène au formulaire de contact, Linda répond personnellement
+- Plus tard : paiement Stripe (Bancontact), reçu par email, téléchargement sécurisé
+- Licence : **usage privé uniquement**, pas d'usage commercial (page « Licence d'utilisation »)
+- Le paiement en ligne ne démarre qu'après vérification de son statut légal, que Linda gère elle-même (voir `docs/prive/`)
 
 ## Langues
 
-Français par défaut, néerlandais en plus.
+Français par défaut, néerlandais en second (`/nl/`).
+
+## Identité visuelle retenue
+
+- Logo : lotus en pastille verte (piste 2). Les autres pistes sont gardées dans `design/logos/`.
+- Écriture dessinée partout (Gochi Hand pour les titres, Itim pour le texte), dans l'esprit des lettres LD du logo 3.
+- Mascotte : Noisette (FR) / Nootje (NL), écureuil animé en SVG, qui accueille et commente les sections. Textes écrits à l'avance (pas d'IA). Nom proposé, à faire valider par Linda.
+- Décor : étang dessiné avec lotus qui flottent, feuilles de tilleul qui tombent.
+- Photo de Linda sur l'accueil et la page À propos.
 
 ## Textes d'accueil (pistes, à réécrire)
 
@@ -51,5 +60,6 @@ Linda doit pouvoir ajouter, modifier et supprimer ses dessins elle-même, surtou
 
 ## Phases
 
-1. Vitrine : portfolio filigrané, rubriques, page À propos, contact, admin
-2. Boutique : paiement et téléchargement, une fois le statut légal confirmé
+1. Vitrine : portfolio filigrané, rubriques, À propos, contact (fait, à valider avec Linda)
+2. Admin : ajouter, modifier, supprimer les dessins (Supabase)
+3. Boutique : paiement et téléchargement, une fois le statut légal confirmé

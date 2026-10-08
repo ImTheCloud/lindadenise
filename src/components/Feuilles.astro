@@ -1,0 +1,28 @@
+---
+// Feuilles de tilleul qui tombent doucement (décor, ignoré par les lecteurs d'écran).
+const feuilles = [
+  { x: 6, t: 34, d: 0, du: 17, c: '#3E9A47', dx: 60 }, { x: 18, t: 22, d: -6, du: 21, c: '#F28A1E', dx: -50 },
+  { x: 33, t: 28, d: -11, du: 19, c: '#3E9A47', dx: 70 }, { x: 47, t: 20, d: -3, du: 23, c: '#FFB347', dx: -40 },
+  { x: 62, t: 32, d: -14, du: 18, c: '#2B6E3A', dx: 55 }, { x: 76, t: 24, d: -8, du: 22, c: '#F28A1E', dx: -65 },
+  { x: 90, t: 30, d: -1, du: 20, c: '#3E9A47', dx: 45 },
+];
+const FEUILLE = 'M50,6 C64,28 88,40 83,64 C80,80 62,85 50,75 C38,85 20,80 17,64 C12,40 36,28 50,6 Z';
+---
+<div class="feuilles" aria-hidden="true">
+  {feuilles.map((f) => (
+    <svg class="feuille" viewBox="0 0 100 100" style={`left:${f.x}%;width:${f.t}px;height:${f.t}px;animation-duration:${f.du}s;animation-delay:${f.d}s;--dx:${f.dx}px`}>
+      <path d={FEUILLE} fill={f.c} /><path d="M50,74 L50,26 M50,56 L36,42 M50,56 L64,42" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".6" />
+    </svg>
+  ))}
+</div>
+<style>
+  .feuilles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .feuille { position: absolute; top: -50px; opacity: 0; animation: feuille-tombe linear infinite; }
+  @keyframes feuille-tombe {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    8% { opacity: 0.9; }
+    50% { transform: translate(calc(var(--dx) * -1), 45vh) rotate(180deg); }
+    92% { opacity: 0.9; }
+    100% { transform: translate(var(--dx), 95vh) rotate(380deg); opacity: 0; }
+  }
+</style>

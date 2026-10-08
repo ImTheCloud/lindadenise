@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import CarteDessin from '../CarteDessin.astro';
+import { t, chemin, dessins, parRubrique, RUBRIQUES, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
+---
+<Base lang={lang} titre={d.dessins.titre} description={d.dessins.metaDescription} chemins={chemins} noisette="galerie">
+  <section class="section galerie" data-noisette="galerie">
+    <div class="contenu">
+      <header class="centre">
+        <h1>{d.dessins.titre}</h1>
+        <p class="chapeau">{d.dessins.intro}</p>
+      </header>
+      <div class="filtres" role="group" aria-label={d.dessins.rubrique}>
+        <button type="button" class="filtre" data-filtre="tous" aria-pressed="true">{d.dessins.tous} <span>{dessins.length}</span></button>
+        {RUBRIQUES.map((r) => (
+          <button type="button" class="filtre" data-filtre={r} aria-pressed="false">{d.rubriques[r].court} <span>{parRubrique(r).length}</span></button>
+        ))}
+      </div>
+      <div class="mur" id="mur">
+        {dessins.map((x, i) => <CarteDessin dessin={x} lang={lang} priorite={i < 4} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const boutons = document.querySelectorAll<HTMLButtonElement>('.filtre');
+  const cartes = document.querySelectorAll<HTMLElement>('#mur .carte');
+  const appliquer = (f: string) => {
+    boutons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filtre === f)));
+    cartes.forEach((c) => (c.hidden = f !== 'tous' && c.dataset.rubrique !== f));
+  };
+  boutons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const f = b.dataset.filtre ?? 'tous';
+      appliquer(f);
+      history.replaceState(null, '', f === 'tous' ? location.pathname : `#${f}`);
+    }),
+  );
+  const depart = location.hash.slice(1);
+  if (depart && [...boutons].some((b) => b.dataset.filtre === depart)) appliquer(depart);
+</script>
+
+<style>
+  .galerie h1 { margin-bottom: 0.2em; }
+  .filtres { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 30px 0 36px; }
+  .filtre { font-family: var(--titre); font-size: 1.35rem; line-height: 1; padding: 0.55em 1.1em; cursor: pointer; background: #fff; color: var(--vert-fonce); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); transition: transform 0.15s; }
+  .filtre span { font-size: 0.9em; opacity: 0.7; margin-left: 4px; }
+  .filtre:hover { transform: rotate(-2deg) translateY(-2px); }
+  .filtre[aria-pressed='true'] { background: var(--vert-fonce); color: #fff; }
+  .mur { column-count: 2; column-gap: 22px; }
+  @media (min-width: 700px) { .mur { column-count: 3; } }
+  @media (min-width: 1000px) { .mur { column-count: 4; } }
+</style>

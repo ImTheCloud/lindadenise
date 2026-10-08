@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" class="noisette-svg" role="img" aria-label="Noisette, l'écureuil de Linda">
+<ellipse class="n-ombre" cx="120" cy="268" rx="64" ry="9" fill="#2B6E3A" opacity=".14"/>
+<g class="n-queue">
+<path d="M146,248 C216,264 250,196 226,136 C210,96 168,76 156,102 C150,116 170,124 180,148 C190,176 176,208 146,208 Z" fill="#F28A1E" stroke="#D96F0C" stroke-width="3" stroke-linejoin="round"/>
+<path d="M172,230 C208,224 224,186 210,150 C202,130 186,118 172,112" fill="none" stroke="#FFB347" stroke-width="10" stroke-linecap="round" opacity=".8"/>
+<path d="M216,118 l9,-7 M229,148 l11,-3 M226,182 l10,5 M210,208 l8,8" stroke="#D96F0C" stroke-width="3" stroke-linecap="round" fill="none"/>
+</g>
+<g class="n-corps">
+<path d="M120,112 C84,116 66,170 74,216 C80,252 160,252 166,216 C174,170 156,116 120,112 Z" fill="#F28A1E" stroke="#D96F0C" stroke-width="3"/>
+<ellipse cx="120" cy="198" rx="32" ry="42" fill="#FFD9A3"/>
+<ellipse cx="92" cy="254" rx="22" ry="10" fill="#FFB347" stroke="#D96F0C" stroke-width="3"/>
+<ellipse cx="148" cy="254" rx="22" ry="10" fill="#FFB347" stroke="#D96F0C" stroke-width="3"/>
+</g>
+<g class="n-gland">
+<ellipse cx="120" cy="212" rx="13" ry="15" fill="#3E9A47"/>
+<path d="M104,204 C104,188 136,188 136,204 Z" fill="#2B6E3A"/>
+<path d="M120,190 L123,181" stroke="#2B6E3A" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+<g class="n-bras n-bras-g">
+<path d="M86,152 C72,174 84,200 106,208" fill="none" stroke="#D96F0C" stroke-width="22" stroke-linecap="round"/>
+<path d="M86,152 C72,174 84,200 106,208" fill="none" stroke="#F28A1E" stroke-width="16" stroke-linecap="round"/>
+<circle cx="108" cy="208" r="9" fill="#FFB347" stroke="#D96F0C" stroke-width="3"/>
+</g>
+<g class="n-bras n-bras-d">
+<path d="M154,152 C168,174 156,200 134,208" fill="none" stroke="#D96F0C" stroke-width="22" stroke-linecap="round"/>
+<path d="M154,152 C168,174 156,200 134,208" fill="none" stroke="#F28A1E" stroke-width="16" stroke-linecap="round"/>
+<circle cx="132" cy="208" r="9" fill="#FFB347" stroke="#D96F0C" stroke-width="3"/>
+</g>
+<g class="n-tete">
+<g class="n-oreille n-oreille-g"><ellipse cx="84" cy="60" rx="14" ry="20" transform="rotate(-18 84 60)" fill="#F28A1E" stroke="#D96F0C" stroke-width="3"/><ellipse cx="85" cy="63" rx="7" ry="12" transform="rotate(-18 85 63)" fill="#FFD9A3"/><path d="M73,44 C70,34 72,28 77,23 C79,30 84,34 85,43 Z" fill="#D96F0C" stroke="#D96F0C" stroke-width="3" stroke-linejoin="round"/></g>
+<g class="n-oreille n-oreille-d"><ellipse cx="156" cy="60" rx="14" ry="20" transform="rotate(18 156 60)" fill="#F28A1E" stroke="#D96F0C" stroke-width="3"/><ellipse cx="155" cy="63" rx="7" ry="12" transform="rotate(18 155 63)" fill="#FFD9A3"/><path d="M167,44 C170,34 168,28 163,23 C161,30 156,34 155,43 Z" fill="#D96F0C" stroke="#D96F0C" stroke-width="3" stroke-linejoin="round"/></g>
+<ellipse cx="120" cy="94" rx="44" ry="37" fill="#F28A1E" stroke="#D96F0C" stroke-width="3"/>
+<ellipse cx="120" cy="108" rx="31" ry="19" fill="#FFD9A3"/>
+<ellipse cx="86" cy="104" rx="8" ry="5" fill="#FF7B5C" opacity=".35"/><ellipse cx="154" cy="104" rx="8" ry="5" fill="#FF7B5C" opacity=".35"/>
+<g stroke="#D96F0C" stroke-width="1.8" stroke-linecap="round" opacity=".65" fill="none"><path d="M92,106 L66,99 M92,111 L64,113 M148,106 L174,99 M148,111 L176,113"/></g>
+<g class="n-yeux"><circle cx="101" cy="89" r="7.5" fill="#2B3B2B"/><circle cx="139" cy="89" r="7.5" fill="#2B3B2B"/><circle cx="103.6" cy="86.2" r="2.6" fill="#fff"/><circle cx="141.6" cy="86.2" r="2.6" fill="#fff"/><circle cx="99" cy="92" r="1.2" fill="#fff"/><circle cx="137" cy="92" r="1.2" fill="#fff"/>
+<circle class="n-paupiere" cx="101" cy="89" r="8.4" fill="#F28A1E"/><circle class="n-paupiere" cx="139" cy="89" r="8.4" fill="#F28A1E"/></g>
+<ellipse cx="120" cy="100" rx="5.5" ry="4" fill="#2B3B2B"/>
+<path class="n-bouche-fermee" d="M120,104 L120,108 M110,109 Q120,118 130,109" fill="none" stroke="#2B3B2B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="n-bouche-ouverte" style="display:none"><path d="M109,108 Q120,132 131,108 Z" fill="#8A2E1B"/><ellipse cx="120" cy="119" rx="6.5" ry="3.6" fill="#FF8A80"/></g>
+</g>
+</svg>

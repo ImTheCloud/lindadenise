@@ -1,0 +1,77 @@
+---
+// Étang dessiné : eau, nénuphars et lotus qui flottent doucement.
+const PET = 'M0,0 C-27,-18 -29,-60 0,-94 C29,-60 27,-18 0,0 Z';
+const VEIN = 'M0,-10 C-4,-36 -3,-62 0,-82';
+const petales = [
+  { a: -80, s: 0.78, c: '#FFB347' }, { a: 80, s: 0.78, c: '#FFB347' },
+  { a: -52, s: 0.92, c: '#F28A1E' }, { a: 52, s: 0.92, c: '#F28A1E' },
+  { a: -24, s: 1, c: '#F7992B' }, { a: 24, s: 1, c: '#F7992B' },
+  { a: 0, s: 1.06, c: '#F28A1E' },
+];
+const lotus = [
+  { x: 210, y: 150, s: 0.62, d: '0s' },
+  { x: 700, y: 176, s: 0.95, d: '-2s' },
+  { x: 1180, y: 146, s: 0.7, d: '-4s' },
+  { x: 1370, y: 190, s: 0.45, d: '-1s' },
+];
+---
+<div class="etang" aria-hidden="true">
+  <svg viewBox="0 0 1440 280" preserveAspectRatio="xMidYMax slice">
+    <defs>
+      <g id="lotus-dessin">
+        {petales.map((p) => (
+          <g transform={`rotate(${p.a}) scale(${p.s})`}>
+            <path d={PET} fill={p.c} />
+            <path d={VEIN} fill="none" stroke="#FFD9A3" stroke-width="3" stroke-linecap="round" opacity=".6" />
+          </g>
+        ))}
+      </g>
+    </defs>
+
+    <!-- roseaux -->
+    <g class="roseaux" stroke="#2B6E3A" stroke-width="5" stroke-linecap="round" fill="none">
+      <path d="M40,280 C36,230 46,196 40,160" /><path d="M64,280 C70,236 60,210 70,176" /><path d="M20,280 C24,246 14,226 22,196" />
+      <path d="M1400,280 C1404,232 1394,200 1402,166" /><path d="M1376,280 C1370,240 1380,214 1372,184" /><path d="M1420,280 C1416,250 1426,232 1418,206" />
+    </g>
+    <g fill="#2B6E3A"><ellipse cx="40" cy="154" rx="9" ry="22" /><ellipse cx="70" cy="170" rx="8" ry="19" /><ellipse cx="1402" cy="160" rx="9" ry="22" /><ellipse cx="1372" cy="178" rx="8" ry="19" /></g>
+
+    <!-- eau -->
+    <path class="eau eau--fond" d="M0,120 C180,100 300,140 480,118 C660,96 780,140 960,118 C1140,96 1280,136 1440,112 L1440,280 L0,280 Z" fill="#DFF0DF" />
+    <path class="eau eau--milieu" d="M0,160 C200,140 320,180 520,158 C720,136 820,180 1020,158 C1200,138 1320,172 1440,152 L1440,280 L0,280 Z" fill="#C6E5C6" />
+    <path class="eau eau--avant" d="M0,214 C240,196 380,232 600,214 C820,196 960,232 1180,212 C1300,202 1380,214 1440,208 L1440,280 L0,280 Z" fill="#3E9A47" />
+
+    <!-- rides -->
+    <g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".85">
+      <path class="ride ride--1" d="M120,200 Q170,190 220,200" />
+      <path class="ride ride--2" d="M520,236 Q580,224 640,236" />
+      <path class="ride ride--3" d="M900,196 Q950,186 1000,196" />
+      <path class="ride ride--4" d="M1180,238 Q1240,226 1300,238" />
+    </g>
+
+    <!-- nénuphars et lotus -->
+    {lotus.map((l) => (
+      <g transform={`translate(${l.x},${l.y})`}>
+        <g class="flotte" style={`animation-delay:${l.d}`}>
+          <ellipse cx="0" cy="6" rx={118 * l.s} ry={22 * l.s} fill="#2B6E3A" />
+          <ellipse cx="0" cy="2" rx={110 * l.s} ry={18 * l.s} fill="#3E9A47" />
+          <path d={`M0,2 L${96 * l.s},-2`} stroke="#2B6E3A" stroke-width="3" stroke-linecap="round" />
+          <g transform={`scale(${l.s})`}><use href="#lotus-dessin" /></g>
+        </g>
+      </g>
+    ))}
+  </svg>
+</div>
+<style>
+  .etang { position: absolute; left: 0; right: 0; bottom: 0; height: clamp(150px, 22vw, 290px); pointer-events: none; overflow: hidden; }
+  .etang svg { width: 100%; height: 100%; display: block; }
+  .flotte { animation: etang-flotte 6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 90%; }
+  .ride { transform-box: fill-box; transform-origin: center; animation: etang-ride 5s ease-in-out infinite; }
+  .ride--2 { animation-delay: -1.2s; } .ride--3 { animation-delay: -2.4s; } .ride--4 { animation-delay: -3.6s; }
+  .eau--milieu { animation: etang-vague 9s ease-in-out infinite alternate; }
+  .eau--avant { animation: etang-vague 7s ease-in-out infinite alternate-reverse; }
+  .roseaux { transform-box: fill-box; transform-origin: 50% 100%; animation: etang-roseau 5s ease-in-out infinite alternate; }
+  @keyframes etang-flotte { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-6px) rotate(1.5deg); } }
+  @keyframes etang-ride { 0%, 100% { transform: scaleX(0.85); opacity: 0.35; } 50% { transform: scaleX(1.18); opacity: 0.95; } }
+  @keyframes etang-vague { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
+  @keyframes etang-roseau { from { transform: rotate(-1.2deg); } to { transform: rotate(1.4deg); } }
+</style>

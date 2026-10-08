@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import { t, chemin, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const a = d.apropos;
+const chemins = { fr: chemin('apropos', 'fr'), nl: chemin('apropos', 'nl') };
+---
+<Base lang={lang} titre={a.titre} description={a.meta} chemins={chemins} noisette="apropos">
+  <section class="section" data-noisette="apropos">
+    <div class="contenu histoire">
+      <div class="histoire__photo">
+        <div class="portrait"><img src="/images/linda.webp" width="640" height="640" alt={d.accueil.photoAlt} decoding="async" fetchpriority="high" /></div>
+        <ul class="mots" aria-hidden="true">{a.mots.map((m) => <li>{m}</li>)}</ul>
+      </div>
+      <div class="histoire__texte">
+        <h1>{a.titre}</h1>
+        {a.paragraphes.map((p, i) => <p class:list={[i === 0 && 'chapeau']}>{p}</p>)}
+        <p><a class="bouton" href={chemin('contact', lang)}>{a.cta}</a></p>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .histoire { display: grid; gap: 40px; align-items: start; }
+  .portrait { width: min(82%, 380px); margin-inline: auto; background: var(--vert-pale); padding: 12px; border: var(--trait) solid var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; box-shadow: var(--ombre); transform: rotate(-3deg); }
+  .portrait img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }
+  .mots { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; padding: 0; margin: 28px 0 0; }
+  .mots li { font-family: var(--titre); font-size: 1.3rem; padding: 4px 16px; border: var(--trait) solid var(--orange-fonce); border-radius: var(--rayon-petit); color: var(--orange-fonce); background: var(--orange-creme); }
+  .mots li:nth-child(even) { border-color: var(--vert-fonce); color: var(--vert-fonce); background: var(--vert-creme); transform: rotate(2deg); }
+  .mots li:nth-child(odd) { transform: rotate(-2deg); }
+  @media (min-width: 900px) { .histoire { grid-template-columns: 0.8fr 1.2fr; gap: 72px; } .histoire__photo { position: sticky; top: 100px; } }
+</style>

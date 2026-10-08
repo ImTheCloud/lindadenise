@@ -1,0 +1,26 @@
+---
+import { cheminDessin, type Dessin, type Lang } from '../i18n';
+interface Props { dessin: Dessin; lang: Lang; priorite?: boolean }
+const { dessin, lang, priorite = false } = Astro.props;
+const titre = dessin.titre[lang];
+const ratio = dessin.hauteur / dessin.largeur;
+---
+<a class="carte" href={cheminDessin(dessin.id, lang)} data-rubrique={dessin.rubrique}>
+  <img
+    src={`/dessins/${dessin.id}-vignette.webp`}
+    width="400"
+    height={Math.round(400 * ratio)}
+    alt={`${titre} – Linda Denise`}
+    loading={priorite ? 'eager' : 'lazy'}
+    decoding="async"
+  />
+  <span class="carte__titre">{titre}</span>
+</a>
+<style>
+  .carte { display: block; text-decoration: none; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 10px 10px 8px; box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s; break-inside: avoid; margin-bottom: 22px; }
+  .carte img { width: 100%; height: auto; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; background: var(--vert-creme); }
+  .carte__titre { display: block; font-family: var(--titre); font-size: 1.35rem; line-height: 1.15; color: var(--vert-fonce); padding: 10px 6px 4px; text-align: center; }
+  .carte:hover, .carte:focus-visible { transform: translateY(-6px) rotate(-1.4deg); box-shadow: 0 12px 0 rgba(43, 110, 58, 0.14); }
+  .carte:hover .carte__titre { color: var(--orange-fonce); }
+  .carte[hidden] { display: none; }
+</style>
