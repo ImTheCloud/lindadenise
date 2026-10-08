@@ -154,6 +154,11 @@ export const nl: Dico = {
     fermer: 'Linde het zwijgen opleggen',
     invite: 'Aai me!',
     reveil: 'Hm? Ah, je bent terug!',
+    reactions: {
+      carte: ['Die is mooi, toch?', 'Oh, die vind ik leuk!', 'Open hem, dan zie je de details.', 'Linda heeft hem met haar vingertop getekend.'],
+      filtres: { tous: 'Iedereen is er! Neem je tijd.', chats: 'Katten? Mijn favoriete rubriek!', nature: 'De natuur: daar vindt Linda haar ideeën.', fleurs: 'Hmm, het ruikt hier lekker…', animaux: 'Diertjes! Ik beloof dat ik niet ga jagen.' } as Record<string, string>,
+      ennui: 'Ben je er nog? Ik ga even een dutje doen…',
+    },
     sections: {
       accueil: 'Hoi, ik ben Linde! Welkom bij Linda, kom binnen, ik geef je een rondleiding.',
       rubriques: 'Katten, bloemen, bossen… voor elk wat wils. Waar beginnen we?',
@@ -164,6 +169,7 @@ export const nl: Dico = {
       dessin: 'Mooie keuze! Linda antwoordt je graag.',
       contact: 'Een vraag? Linda antwoordt zelf, beloofd.',
       texte: 'Even serieus lezen… ik wacht spinnend op je.',
+      fin: 'Al aan het einde? Kom snel terug, ik houd je plekje warm.',
     },
     anecdotes: [
       'Prrr… wist je dat Linda met haar vinger tekent?',

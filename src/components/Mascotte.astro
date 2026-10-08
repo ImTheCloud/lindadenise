@@ -4,7 +4,7 @@ import { t, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const m = t(lang).mascotte;
-const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, reveil: m.reveil });
+const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, reveil: m.reveil, reactions: m.reactions });
 ---
 <aside class="mascotte" data-etat="repos" data-donnees={donnees} aria-label={m.nom}>
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
@@ -26,10 +26,11 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     const corps = racine.querySelector<HTMLButtonElement>('.mascotte__corps')!;
     const fermer = racine.querySelector<HTMLButtonElement>('.mascotte__muet')!;
     const coeurs = racine.querySelector<HTMLElement>('.mascotte__coeurs')!;
-    const { sections, anecdotes, reveil } = JSON.parse(racine.dataset.donnees ?? '{}') as {
+    const { sections, anecdotes, reveil, reactions } = JSON.parse(racine.dataset.donnees ?? '{}') as {
       sections: Record<string, string>;
       anecdotes: string[];
       reveil: string;
+      reactions: { carte: string[]; filtres: Record<string, string>; ennui: string };
     };
 
     const lire = (cle: string) => { try { return sessionStorage.getItem(cle); } catch { return null; } };
@@ -82,9 +83,11 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 
     // Repos : sans activité le chat se couche, puis s'endort ; le moindre mouvement le relève
     let minuteurDodo: number | undefined;
+    let minuteurEnnui: number | undefined;
     const reveiller = () => {
       window.clearTimeout(minuteurSommeil);
       window.clearTimeout(minuteurDodo);
+      window.clearTimeout(minuteurEnnui);
       const avant = racine.dataset.etat;
       if (avant === 'dort' || avant === 'couche') {
         etat('repos');
@@ -92,7 +95,8 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
         window.setTimeout(() => racine.classList.remove('etire'), 1500);
         if (avant === 'dort') window.setTimeout(() => dire(reveil, 5000), 600);
       }
-      minuteurSommeil = window.setTimeout(() => { bulle.hidden = true; etat('couche'); }, 18000);
+      minuteurEnnui = window.setTimeout(() => dire(reactions.ennui, 5500), 11000);
+      minuteurSommeil = window.setTimeout(() => { bulle.hidden = true; etat('couche'); }, 19000);
       minuteurDodo = window.setTimeout(() => { bulle.hidden = true; etat('dort'); }, 40000);
     };
     ['pointermove', 'scroll', 'keydown', 'touchstart'].forEach((nom) => addEventListener(nom, reveiller, { passive: true }));
@@ -149,17 +153,41 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       if (!bulle.hidden) minuteurBulle = window.setTimeout(() => (bulle.hidden = true), 3500);
     });
 
-    // Arrivée : le chat salue une fois par visite
+    // Arrivée : le chat entre en courant et parle tout de suite, à chaque page
     const depart = document.body.dataset.mascotteDepart ?? 'texte';
     const dejaVu = lire('mascotte-vu') === '1';
     dernierSujet = depart;
-    if (!dejaVu) {
-      window.setTimeout(() => {
-        etat('salut', 3200);
-        ecrire('mascotte-vu', '1');
-        dire(sections[depart]);
-      }, 1000);
+    if (!moinsDeMouvement) {
+      racine.classList.add('arrive');
+      window.setTimeout(() => racine.classList.remove('arrive'), 1100);
     }
+    window.setTimeout(() => {
+      if (!dejaVu) {
+        etat('salut', 3400);
+        ecrire('mascotte-vu', '1');
+        dire(sections.accueil, 9500);
+      } else {
+        etat('saute', 800);
+        window.setTimeout(() => dire(sections[depart]), 300);
+      }
+    }, 450);
+
+    // Réactions : survol d'un dessin, filtres de la galerie
+    let derniereRemarque = 0;
+    document.addEventListener('pointerover', (e) => {
+      const carte = (e.target as HTMLElement).closest?.('.carte');
+      if (!carte || Date.now() - derniereRemarque < 14000) return;
+      derniereRemarque = Date.now();
+      dire(reactions.carte[Math.floor(Math.random() * reactions.carte.length)], 5000);
+    });
+    document.querySelectorAll<HTMLElement>('.filtre').forEach((b) =>
+      b.addEventListener('click', () => {
+        const phrase = reactions.filtres[b.dataset.filtre ?? ''];
+        if (!phrase) return;
+        etat('saute', 700);
+        window.setTimeout(() => dire(phrase, 5500), 300);
+      }),
+    );
     document.addEventListener('focusin', (e) => {
       if ((e.target as HTMLElement).matches('input, textarea, select')) bulle.hidden = true;
     });
@@ -219,10 +247,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .m-corps { transform-origin: 150px 350px; animation: m-respire 3.6s ease-in-out infinite; }
   .m-paupiere { transform-box: fill-box; transform-origin: 50% 0%; transform: scaleY(0); animation: m-cligne 5.2s infinite; }
   .m-bras-mouvement { transform-origin: 118px 254px; }
-  .m-pose-corps, .m-pose-tete, .m-pose-queue { transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1); }
-  .m-pose-corps { transform-origin: 150px 352px; }
-  .m-pose-tete { transform-origin: 150px 206px; }
-  .m-pose-queue { transform-origin: 206px 318px; }
+  .m-cq-corps { transform-origin: 190px 356px; animation: m-respire-couche 4.2s ease-in-out infinite; }
   .m-oreille-g { transform-origin: 112px 90px; }
   .m-oreille-d { transform-origin: 188px 90px; }
   .m-zzz { opacity: 0; }
@@ -245,21 +270,20 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte[data-etat='saute'] .m-bouche-fermee { display: none; }
   .mascotte[data-etat='saute'] .m-bouche-ouverte { display: block !important; }
 
-  /* Couché : le corps s'aplatit, la tête se pose, les yeux se mi-ferment. Endormi : yeux clos et zZz. */
-  .mascotte[data-etat='couche'] .m-pose-corps, .mascotte[data-etat='dort'] .m-pose-corps { transform: scale(1.14, 0.74); }
-  .mascotte[data-etat='couche'] .m-pose-tete, .mascotte[data-etat='dort'] .m-pose-tete { transform: translate(6px, 54px) rotate(5deg); }
-  .mascotte[data-etat='couche'] .m-pose-queue, .mascotte[data-etat='dort'] .m-pose-queue { transform: rotate(16deg) translate(-6px, 4px); }
-  .mascotte[data-etat='couche'] .m-paupiere { transform: scaleY(0.5); animation: none; }
+  /* Couché : il se pose en boule, sur le côté. Endormi : yeux clos et zZz. */
+  .mascotte[data-etat='couche'] .m-assis, .mascotte[data-etat='dort'] .m-assis { display: none; }
+  .mascotte[data-etat='couche'] .m-couche-pose, .mascotte[data-etat='dort'] .m-couche-pose { display: block !important; transform-origin: 190px 356px; animation: m-se-couche 0.7s cubic-bezier(0.3, 1.3, 0.5, 1); }
+  .mascotte[data-etat='couche'] .m-paupiere { transform: scaleY(0.55); animation: none; }
   .mascotte[data-etat='couche'] .m-regard, .mascotte[data-etat='dort'] .m-regard { transform: none; }
   .mascotte[data-etat='dort'] .m-yeux { display: none; }
   .mascotte[data-etat='dort'] .m-yeux-clos { display: block !important; }
-  .mascotte[data-etat='dort'] .m-tete { animation: m-dort-tete 5s ease-in-out infinite; }
-  .mascotte[data-etat='dort'] .m-corps { animation-duration: 6s; }
-  .mascotte[data-etat='dort'] .m-queue, .mascotte[data-etat='couche'] .m-queue { animation-duration: 9s; }
+  .mascotte[data-etat='dort'] .m-cq-corps { animation-duration: 6s; }
   .mascotte[data-etat='dort'] .m-zzz { opacity: 1; }
   .mascotte[data-etat='dort'] .m-z { animation: m-zzz 2.8s ease-in-out infinite; }
   .mascotte[data-etat='dort'] .m-z2 { animation-delay: 0.6s; }
   .mascotte[data-etat='dort'] .m-z3 { animation-delay: 1.2s; }
+
+  .mascotte.arrive .mascotte__corps { animation: m-arrive 0.95s cubic-bezier(0.2, 0.9, 0.3, 1.15); }
 
   .mascotte.etire .m-corps { animation: m-etire 1.5s ease-in-out; }
   .mascotte.etire .m-tete { animation: m-etire-tete 1.5s ease-in-out; }
@@ -281,7 +305,9 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   @keyframes m-toilette { from { transform: rotate(34deg); } to { transform: rotate(44deg); } }
   @keyframes m-toilette-tete { 0%, 100% { transform: rotate(0); } 20%, 80% { transform: rotate(-6deg) translate(-4px, 8px); } }
   @keyframes m-saute { 0% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.06, 0.92); } 45% { transform: translateY(-38px) scale(0.96, 1.07); } 80% { transform: translateY(0) scale(1.05, 0.94); } 100% { transform: none; } }
-  @keyframes m-dort-tete { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+  @keyframes m-respire-couche { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.03); } }
+  @keyframes m-se-couche { from { transform: translateY(-26px) scale(0.92, 1.06); opacity: 0.2; } 60% { transform: translateY(0) scale(1.06, 0.92); opacity: 1; } to { transform: none; } }
+  @keyframes m-arrive { 0% { transform: translateX(170%) rotate(8deg); } 55% { transform: translateX(-6%) rotate(-3deg); } 75% { transform: translateX(0) translateY(-22px); } 100% { transform: none; } }
   @keyframes m-zzz { 0% { transform: translate(0, 10px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(8px, -14px); opacity: 0; } }
   @keyframes m-etire { 0%, 100% { transform: scale(1, 1); } 40%, 60% { transform: scale(0.97, 1.07); } }
   @keyframes m-etire-tete { 0%, 100% { transform: translateY(0); } 40%, 60% { transform: translateY(-8px) rotate(-3deg); } }

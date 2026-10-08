@@ -4,7 +4,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
 ---
-<footer class="pied">
+<footer class="pied" data-mascotte="fin">
   <svg class="pied__vague" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 C120,8 240,52 360,30 C480,8 600,52 720,30 C840,8 960,52 1080,30 C1200,8 1320,52 1440,30 L1440,60 L0,60 Z" fill="#2b6e3a" /></svg>
   <div class="pied__corps">
     <div class="contenu pied__ligne">

@@ -1,56 +1,30 @@
 // Génère src/components/mascotte.svg : Tilleul, le chat roux aux yeux verts, inspiré de Tiroux dans les dessins de Linda.
 // Usage : node scripts/generer-mascotte.mjs
-// Style : aplats avec ombres, un contour unique par grande partie (filtre), parties animées séparément (classes m-*).
+// Deux poses : assis (m-assis) et couché en boule (m-couche-pose). Un contour unique par grande partie (filtre),
+// parties animées séparément (classes m-*), animations dans src/components/Mascotte.astro.
 import fs from 'node:fs';
 
 const f = (n) => Math.round(n * 10) / 10;
 
-// ---------- queue : courbe en S, rayures perpendiculaires ----------
-const P = [[206, 318], [308, 332], [340, 236], [290, 148]];
-const bez = (t) => { const u = 1 - t; return [0, 1].map((k) => u ** 3 * P[0][k] + 3 * u * u * t * P[1][k] + 3 * u * t * t * P[2][k] + t ** 3 * P[3][k]); };
-const dv = (t) => { const u = 1 - t; return [0, 1].map((k) => 3 * u * u * (P[1][k] - P[0][k]) + 6 * u * t * (P[2][k] - P[1][k]) + 3 * t * t * (P[3][k] - P[2][k])); };
-const w = (t) => 34 - 9 * t;
-const pt = (t, r) => { const [x, y] = bez(t), [dx, dy] = dv(t), l = Math.hypot(dx, dy); return [x + (-dy / l) * (w(t) / 2) * r, y + (dx / l) * (w(t) / 2) * r]; };
-const N = 70;
-const L = [], R = [];
-for (let i = 0; i <= N; i++) { L.push(pt(i / N, 1)); R.push(pt(i / N, -1)); }
-const ray = w(1) / 2;
-const contour = 'M' + L.map((p) => f(p[0]) + ',' + f(p[1])).join(' L') + ' A' + f(ray) + ',' + f(ray) + ' 0 0 0 ' + f(R[N][0]) + ',' + f(R[N][1]) + ' L' + [...R].reverse().map((p) => f(p[0]) + ',' + f(p[1])).join(' L') + ' Z';
-const ligne = (r, a, b, n = 50) => 'M' + Array.from({ length: n + 1 }, (_, i) => pt(a + (b - a) * i / n, r).map(f).join(',')).join(' L');
-const bandes = [0.1, 0.22, 0.34, 0.46, 0.58, 0.7, 0.82].map((t) => `M${pt(t, 1.4).map(f).join(',')} L${pt(t, -1.4).map(f).join(',')}`).join(' ');
+// ---------- queue : courbe de Bézier épaissie, rayures perpendiculaires ----------
+function queue(P, largeur, pas) {
+  const bez = (t) => { const u = 1 - t; return [0, 1].map((k) => u ** 3 * P[0][k] + 3 * u * u * t * P[1][k] + 3 * u * t * t * P[2][k] + t ** 3 * P[3][k]); };
+  const dv = (t) => { const u = 1 - t; return [0, 1].map((k) => 3 * u * u * (P[1][k] - P[0][k]) + 6 * u * t * (P[2][k] - P[1][k]) + 3 * t * t * (P[3][k] - P[2][k])); };
+  const pt = (t, r) => { const [x, y] = bez(t), [dx, dy] = dv(t), l = Math.hypot(dx, dy); return [x + (-dy / l) * (largeur(t) / 2) * r, y + (dx / l) * (largeur(t) / 2) * r]; };
+  const N = 70;
+  const L = [], R = [];
+  for (let i = 0; i <= N; i++) { L.push(pt(i / N, 1)); R.push(pt(i / N, -1)); }
+  const ray = largeur(1) / 2;
+  const contour = 'M' + L.map((p) => f(p[0]) + ',' + f(p[1])).join(' L') + ' A' + f(ray) + ',' + f(ray) + ' 0 0 0 ' + f(R[N][0]) + ',' + f(R[N][1]) + ' L' + [...R].reverse().map((p) => f(p[0]) + ',' + f(p[1])).join(' L') + ' Z';
+  const ligne = (r, a, b, n = 50) => 'M' + Array.from({ length: n + 1 }, (_, i) => pt(a + (b - a) * i / n, r).map(f).join(',')).join(' L');
+  const bandes = pas.map((t) => `M${pt(t, 1.4).map(f).join(',')} L${pt(t, -1.4).map(f).join(',')}`).join(' ');
+  return { contour, ligne, bandes };
+}
+const qAssis = queue([[206, 318], [308, 332], [340, 236], [290, 148]], (t) => 34 - 9 * t, [0.1, 0.22, 0.34, 0.46, 0.58, 0.7, 0.82]);
+const qCouche = queue([[300, 316], [262, 362], [160, 368], [78, 348]], () => 26, [0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86]);
 
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" class="mascotte-svg" role="img" aria-label="Tilleul, le chat de Linda">
-<defs>
-<linearGradient id="m-pelage" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9A653"/><stop offset="1" stop-color="#E3722A"/></linearGradient>
-<linearGradient id="m-creme" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF8EC"/><stop offset="1" stop-color="#FFE0B8"/></linearGradient>
-<radialGradient id="m-oeil" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#9BE37C"/><stop offset="1" stop-color="#2F9A47"/></radialGradient>
-<filter id="m-contour" x="-6%" y="-6%" width="112%" height="112%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.6" result="e"/><feFlood flood-color="#8B3E12"/><feComposite in2="e" operator="in" result="t"/><feMerge><feMergeNode in="t"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="m-contour-large" filterUnits="userSpaceOnUse" x="-40" y="-40" width="440" height="440"><feMorphology in="SourceAlpha" operator="dilate" radius="2.6" result="e"/><feFlood flood-color="#8B3E12"/><feComposite in2="e" operator="in" result="t"/><feMerge><feMergeNode in="t"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="m-flou"><feGaussianBlur stdDeviation="3.2"/></filter>
-<clipPath id="m-queue-clip"><path d="${contour}"/></clipPath>
-</defs>
-<ellipse class="m-ombre" cx="150" cy="352" rx="108" ry="8" fill="#2B6E3A" opacity=".14"/>
-
-<g class="m-pose-queue"><g class="m-queue" filter="url(#m-contour)">
-<path d="${contour}" fill="url(#m-pelage)"/>
-<g clip-path="url(#m-queue-clip)" fill="none" stroke-linecap="butt">
-<path d="${bandes}" stroke="#C25A18" stroke-width="8" opacity=".75"/>
-<path d="${ligne(0.55, 0.04, 0.96)}" stroke="#FFC98A" stroke-width="6" opacity=".6" stroke-linecap="round"/>
-</g>
-</g></g>
-
-<g class="m-pose-corps"><g class="m-corps" filter="url(#m-contour)">
-<path d="M108,206 C82,238 72,292 84,326 C90,346 106,352 130,352 L170,352 C194,352 210,346 216,326 C228,292 218,238 192,206 Z" fill="url(#m-pelage)"/>
-<path d="M110,214 C94,244 90,292 100,328 C104,338 110,344 118,348 C102,306 100,254 114,222 Z" fill="#B24E12" opacity=".28"/>
-<path d="M150,214 C132,222 126,262 130,298 C134,322 146,332 150,332 C154,332 166,322 170,298 C174,262 168,222 150,214 Z" fill="url(#m-creme)"/>
-<path d="M96,246 C108,248 116,254 120,262 M92,270 C104,270 112,274 116,282 M94,296 C104,296 110,298 114,304 M204,246 C192,248 184,254 180,262 M208,270 C196,270 188,274 184,282 M206,296 C196,296 190,298 186,304" fill="none" stroke="#B24E12" stroke-width="4" stroke-linecap="round" opacity=".5"/>
-<path d="M104,340 C102,324 122,318 138,324 C152,330 152,350 138,354 C122,358 106,354 104,340 Z" fill="url(#m-creme)"/>
-<path d="M196,340 C198,324 178,318 162,324 C148,330 148,350 162,354 C178,358 194,354 196,340 Z" fill="url(#m-creme)"/>
-<path d="M118,330 l-1,7 M127,332 l0,7 M136,332 l1,6 M182,330 l1,7 M173,332 l0,7 M164,332 l-1,6" stroke="#C07A4A" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-</g></g>
-
-<g class="m-pose-tete"><g class="m-tete"><g transform="translate(150,206) scale(0.92) translate(-150,-206)">
-<g filter="url(#m-contour)">
+// ---------- tête (réutilisée dans les deux poses) ----------
+const tete = `<g filter="url(#m-contour)">
 <g class="m-oreille m-oreille-g">
 <path d="M86,106 C74,78 70,50 80,26 C106,36 130,56 140,76 Z" fill="url(#m-pelage)"/>
 <path d="M94,94 C88,76 86,58 90,44 C106,52 120,64 126,78 Z" fill="#F9B8A8"/>
@@ -74,13 +48,57 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" class
 </g>
 <ellipse class="m-paupiere" cx="112" cy="124" rx="21" ry="23" fill="#F3922F"/><ellipse class="m-paupiere" cx="188" cy="124" rx="21" ry="23" fill="#F3922F"/>
 </g>
-<g class="m-yeux-clos" style="display:none" fill="none" stroke="#6B2E12" stroke-width="3.6" stroke-linecap="round"><path d="M92,126 C102,138 122,138 132,126"/><path d="M168,126 C178,138 198,138 208,126"/><path d="M96,132 l-5,5 M132,132 l5,5 M168,132 l-5,5 M204,132 l5,5" stroke-width="2.6"/></g>
+<g class="m-yeux-clos" style="display:none" fill="none" stroke="#6B2E12" stroke-width="3.8" stroke-linecap="round"><path d="M92,126 C102,138 122,138 132,126"/><path d="M168,126 C178,138 198,138 208,126"/><path d="M96,132 l-5,5 M132,132 l5,5 M168,132 l-5,5 M204,132 l5,5" stroke-width="2.8"/></g>
 <path d="M142,150 C142,145 158,145 158,150 C158,157 150,161 150,161 C150,161 142,157 142,150 Z" fill="#F27C8C"/>
 <path class="m-bouche-fermee" d="M150,161 L150,168 M134,172 C140,184 150,180 150,168 C150,180 160,184 166,172" fill="none" stroke="#6B2E12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 <g class="m-bouche-ouverte" style="display:none"><path d="M134,168 C140,196 160,196 166,168 C158,174 142,174 134,168 Z" fill="#8A2E1B" stroke="#6B2E12" stroke-width="2.6" stroke-linejoin="round"/><path d="M142,184 C146,192 154,192 158,184 C154,180 146,180 142,184 Z" fill="#FF8A80"/></g>
 </g>
-<g stroke="#8B3E12" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"><path d="M98,162 L50,152 M98,168 L48,174 M202,162 L250,152 M202,168 L252,174"/></g>
-</g></g></g>
+<g stroke="#8B3E12" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"><path d="M98,162 L50,152 M98,168 L48,174 M202,162 L250,152 M202,168 L252,174"/></g>`;
+
+const contourFiltre = (id, region = '') => `<filter id="${id}"${region}><feMorphology in="SourceAlpha" operator="dilate" radius="2.6" result="e"/><feFlood flood-color="#8B3E12"/><feComposite in2="e" operator="in" result="t"/><feMerge><feMergeNode in="t"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 380" class="mascotte-svg" role="img" aria-label="Tilleul, le chat de Linda">
+<defs>
+<linearGradient id="m-pelage" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9A653"/><stop offset="1" stop-color="#E3722A"/></linearGradient>
+<linearGradient id="m-creme" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF8EC"/><stop offset="1" stop-color="#FFE0B8"/></linearGradient>
+<linearGradient id="m-patte" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9A653"/><stop offset=".6" stop-color="#EE8A38"/><stop offset=".78" stop-color="#FFF3E0"/><stop offset="1" stop-color="#FFE0B8"/></linearGradient>
+<radialGradient id="m-cuisse" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FAB064"/><stop offset="1" stop-color="#E3722A"/></radialGradient>
+<radialGradient id="m-oeil" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#9BE37C"/><stop offset="1" stop-color="#2F9A47"/></radialGradient>
+${contourFiltre('m-contour', ' x="-6%" y="-6%" width="112%" height="112%"')}
+${contourFiltre('m-contour-large', ' filterUnits="userSpaceOnUse" x="-40" y="-40" width="440" height="460"')}
+<filter id="m-flou"><feGaussianBlur stdDeviation="3.2"/></filter>
+<clipPath id="m-queue-clip"><path d="${qAssis.contour}"/></clipPath>
+<clipPath id="m-queue-couche-clip"><path d="${qCouche.contour}"/></clipPath>
+</defs>
+<ellipse class="m-ombre" cx="150" cy="364" rx="112" ry="8" fill="#2B6E3A" opacity=".14"/>
+
+<g class="m-assis">
+
+<g class="m-queue" filter="url(#m-contour)">
+<path d="${qAssis.contour}" fill="url(#m-pelage)"/>
+<g clip-path="url(#m-queue-clip)" fill="none" stroke-linecap="butt">
+<path d="${qAssis.bandes}" stroke="#C25A18" stroke-width="8" opacity=".75"/>
+<path d="${qAssis.ligne(0.55, 0.04, 0.96)}" stroke="#FFC98A" stroke-width="6" opacity=".6" stroke-linecap="round"/>
+</g>
+</g>
+
+<g class="m-corps" filter="url(#m-contour)">
+<path d="M108,206 C82,238 72,292 84,326 C90,346 106,356 130,356 L170,356 C194,356 210,346 216,326 C228,292 218,238 192,206 Z" fill="url(#m-pelage)"/>
+<path d="M110,214 C94,244 90,292 100,328 C104,338 110,346 118,350 C102,306 100,254 114,222 Z" fill="#B24E12" opacity=".28"/>
+<path d="M150,214 C132,222 126,262 130,298 C134,322 146,332 150,332 C154,332 166,322 170,298 C174,262 168,222 150,214 Z" fill="url(#m-creme)"/>
+<path d="M96,246 C108,248 116,254 120,262 M92,270 C104,270 112,274 116,282 M204,246 C192,248 184,254 180,262 M208,270 C196,270 188,274 184,282" fill="none" stroke="#B24E12" stroke-width="4" stroke-linecap="round" opacity=".5"/>
+<path d="M70,348 C68,336 90,332 106,338 C120,344 118,358 102,360 C84,362 72,358 70,348 Z" fill="url(#m-creme)"/>
+<path d="M230,348 C232,336 210,332 194,338 C180,344 182,358 198,360 C216,362 228,358 230,348 Z" fill="url(#m-creme)"/>
+<path d="M82,346 l-1,6 M92,344 l0,7 M102,346 l1,6 M218,346 l1,6 M208,344 l0,7 M198,346 l-1,6" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+<path d="M122,266 C122,246 144,246 144,266 C145,292 146,320 148,338 C150,350 148,360 138,360 C126,360 115,352 116,338 C117,320 120,292 122,266 Z" fill="url(#m-patte)"/>
+<path d="M178,266 C178,246 156,246 156,266 C155,292 154,320 152,338 C150,350 152,360 162,360 C174,360 185,352 184,338 C183,320 180,292 178,266 Z" fill="url(#m-patte)"/>
+<path d="M144,268 C145,292 146,318 148,342 M156,268 C155,292 154,318 152,342" fill="none" stroke="#B24E12" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
+<path d="M126,350 l0,7 M134,352 l0,7 M142,350 l0,7 M174,350 l0,7 M166,352 l0,7 M158,350 l0,7" stroke="#C07A4A" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+</g>
+
+<g class="m-tete"><g transform="translate(150,206) scale(0.92) translate(-150,-206)">
+${tete}
+</g></g>
 
 <g class="m-bras-salut" style="display:none"><g class="m-bras-mouvement" filter="url(#m-contour-large)">
 <path d="M118,254 L70,200" stroke="#F08A3A" stroke-width="32" stroke-linecap="round" fill="none"/>
@@ -89,8 +107,36 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" class
 <path d="M60,190 l-4,-5 M68,188 l0,-7 M76,190 l4,-5" stroke="#C07A4A" stroke-width="2.4" stroke-linecap="round"/>
 </g></g>
 
-<g class="m-zzz" aria-hidden="true" fill="none" stroke="#2B6E3A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-<path class="m-z m-z1" d="M232,96 h18 l-18 20 h18"/><path class="m-z m-z2" d="M262,66 h14 l-14 16 h14"/><path class="m-z m-z3" d="M286,40 h10 l-10 12 h10"/>
+</g>
+
+<g class="m-couche-pose" style="display:none">
+<g class="m-cq-corps" filter="url(#m-contour-large)">
+<path d="M64,312 C54,250 108,200 192,200 C276,200 324,250 314,312 C308,346 268,356 190,356 C118,356 68,346 64,312 Z" fill="url(#m-pelage)"/>
+<path d="M120,216 C112,234 112,252 118,268 M158,206 C150,230 150,256 156,276 M198,204 C192,228 194,256 200,278 M238,212 C236,234 240,256 248,272" fill="none" stroke="#B24E12" stroke-width="4.5" stroke-linecap="round" opacity=".5"/>
+<path d="M234,274 C228,234 292,230 300,278 C306,316 276,344 248,338 C226,332 238,304 234,274 Z" fill="url(#m-cuisse)" stroke="#B24E12" stroke-width="3" stroke-opacity=".55"/>
+<path d="M246,252 C266,250 284,262 290,282" fill="none" stroke="#FFD08A" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+<path d="M252,296 C268,310 284,308 294,298" fill="none" stroke="#B24E12" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+<path d="M262,340 C268,326 300,324 312,336 C318,348 296,356 276,354 C264,352 258,348 262,340 Z" fill="url(#m-creme)"/>
+</g>
+<g class="m-cq-queue" filter="url(#m-contour-large)">
+<path d="${qCouche.contour}" fill="url(#m-pelage)"/><circle cx="300" cy="316" r="13" fill="url(#m-pelage)"/>
+<g clip-path="url(#m-queue-couche-clip)" fill="none">
+<path d="${qCouche.bandes}" stroke="#C25A18" stroke-width="7" opacity=".75"/>
+<path d="${qCouche.ligne(0.5, 0.04, 0.96)}" stroke="#FFC98A" stroke-width="5" opacity=".6" stroke-linecap="round"/>
+</g>
+</g>
+<g class="m-cq-tete">
+<g filter="url(#m-contour-large)">
+<path d="M64,338 C60,322 82,316 102,322 C118,328 118,348 102,352 C84,356 66,352 64,338 Z" fill="url(#m-creme)"/>
+<path d="M114,340 C112,326 134,320 152,326 C166,332 164,352 148,356 C130,360 116,354 114,340 Z" fill="url(#m-creme)"/>
+</g>
+<g transform="translate(17,176) rotate(-7 150 134) scale(0.68)">
+${tete}
+</g>
+</g>
+<g class="m-zzz" aria-hidden="true" fill="none" stroke="#2B6E3A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+<path class="m-z m-z1" d="M232,176 h20 l-20 22 h20"/><path class="m-z m-z2" d="M264,142 h16 l-16 18 h16"/><path class="m-z m-z3" d="M290,112 h12 l-12 14 h12"/>
+</g>
 </g>
 </svg>
 `;

@@ -152,6 +152,11 @@ export const fr = {
     fermer: 'Faire taire Tilleul',
     invite: 'Touchez-moi !',
     reveil: 'Hmm ? Ah, vous êtes revenu !',
+    reactions: {
+      carte: ['Celui-là est joli, non ?', 'Oh, j’aime bien celui-ci !', 'Ouvrez-le, vous verrez les détails.', 'Linda l’a dessiné du bout du doigt.'],
+      filtres: { tous: 'Tout le monde est là ! Prenez votre temps.', chats: 'Des chats ? Mon rayon préféré !', nature: 'La nature : c’est là que Linda trouve ses idées.', fleurs: 'Hmm, ça sent bon par ici…', animaux: 'Des petites bêtes ! Je promets de ne pas chasser.' } as Record<string, string>,
+      ennui: 'Vous êtes toujours là ? Je vais faire une petite sieste…',
+    },
     sections: {
       accueil: 'Salut, je suis Tilleul ! Bienvenue chez Linda, entrez, je vous fais visiter.',
       rubriques: 'Chats, fleurs, forêts… il y en a pour tous les goûts. Par quoi commence-t-on ?',
@@ -162,6 +167,7 @@ export const fr = {
       dessin: 'Joli choix ! Linda sera ravie de vous répondre.',
       contact: 'Une question ? Linda répond elle-même, promis.',
       texte: 'Un peu de lecture sérieuse… je vous attends en ronronnant.',
+      fin: 'Déjà au bout ? Revenez vite, je garde la place au chaud.',
     },
     anecdotes: [
       'Prrr… vous savez que Linda dessine avec son doigt ?',
