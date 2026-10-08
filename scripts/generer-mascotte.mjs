@@ -21,7 +21,7 @@ function queue(P, largeur, pas) {
   return { contour, ligne, bandes };
 }
 const qAssis = queue([[206, 318], [308, 332], [340, 236], [290, 148]], (t) => 34 - 9 * t, [0.1, 0.22, 0.34, 0.46, 0.58, 0.7, 0.82]);
-const qCouche = queue([[300, 316], [262, 362], [160, 368], [78, 348]], () => 26, [0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86]);
+const qCouche = queue([[304, 324], [270, 366], [172, 372], [92, 354]], () => 24, [0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86]);
 
 // ---------- tête (réutilisée dans les deux poses) ----------
 const tete = `<g filter="url(#m-contour)">
@@ -111,15 +111,17 @@ ${tete}
 
 <g class="m-couche-pose" style="display:none">
 <g class="m-cq-corps" filter="url(#m-contour-large)">
-<path d="M64,312 C54,250 108,200 192,200 C276,200 324,250 314,312 C308,346 268,356 190,356 C118,356 68,346 64,312 Z" fill="url(#m-pelage)"/>
-<path d="M120,216 C112,234 112,252 118,268 M158,206 C150,230 150,256 156,276 M198,204 C192,228 194,256 200,278 M238,212 C236,234 240,256 248,272" fill="none" stroke="#B24E12" stroke-width="4.5" stroke-linecap="round" opacity=".5"/>
-<path d="M234,274 C228,234 292,230 300,278 C306,316 276,344 248,338 C226,332 238,304 234,274 Z" fill="url(#m-cuisse)" stroke="#B24E12" stroke-width="3" stroke-opacity=".55"/>
-<path d="M246,252 C266,250 284,262 290,282" fill="none" stroke="#FFD08A" stroke-width="5" stroke-linecap="round" opacity=".7"/>
-<path d="M252,296 C268,310 284,308 294,298" fill="none" stroke="#B24E12" stroke-width="3" stroke-linecap="round" opacity=".5"/>
-<path d="M262,340 C268,326 300,324 312,336 C318,348 296,356 276,354 C264,352 258,348 262,340 Z" fill="url(#m-creme)"/>
+<path d="M98,322 C84,262 132,224 202,220 C272,216 324,254 318,316 C314,346 272,358 202,358 C142,358 102,348 98,322 Z" fill="url(#m-pelage)"/>
+<path d="M104,330 C132,346 200,352 262,346 C292,342 308,334 316,322 C312,346 272,358 202,358 C142,358 106,350 104,330 Z" fill="#B24E12" opacity=".22"/>
+<path d="M124,256 C152,230 214,220 266,242" fill="none" stroke="#FFC98A" stroke-width="7" stroke-linecap="round" opacity=".6"/>
+<path d="M150,236 C142,254 142,272 148,290 M186,228 C180,250 180,272 186,292 M222,230 C218,252 220,274 228,292" fill="none" stroke="#B24E12" stroke-width="4.5" stroke-linecap="round" opacity=".5"/>
+<path d="M240,268 C234,234 298,232 306,282 C310,320 282,344 254,338 C232,332 244,302 240,268 Z" fill="url(#m-cuisse)" stroke="#B24E12" stroke-width="3" stroke-opacity=".5"/>
+<path d="M252,254 C272,252 290,266 296,286" fill="none" stroke="#FFD08A" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+<path d="M258,298 C274,312 290,310 300,300" fill="none" stroke="#B24E12" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+<path d="M270,342 C276,328 306,326 318,338 C324,350 302,358 282,356 C270,354 266,350 270,342 Z" fill="url(#m-creme)"/>
 </g>
 <g class="m-cq-queue" filter="url(#m-contour-large)">
-<path d="${qCouche.contour}" fill="url(#m-pelage)"/><circle cx="300" cy="316" r="13" fill="url(#m-pelage)"/>
+<path d="${qCouche.contour}" fill="url(#m-pelage)"/><circle cx="304" cy="324" r="12" fill="url(#m-pelage)"/>
 <g clip-path="url(#m-queue-couche-clip)" fill="none">
 <path d="${qCouche.bandes}" stroke="#C25A18" stroke-width="7" opacity=".75"/>
 <path d="${qCouche.ligne(0.5, 0.04, 0.96)}" stroke="#FFC98A" stroke-width="5" opacity=".6" stroke-linecap="round"/>
@@ -127,15 +129,16 @@ ${tete}
 </g>
 <g class="m-cq-tete">
 <g filter="url(#m-contour-large)">
-<path d="M64,338 C60,322 82,316 102,322 C118,328 118,348 102,352 C84,356 66,352 64,338 Z" fill="url(#m-creme)"/>
-<path d="M114,340 C112,326 134,320 152,326 C166,332 164,352 148,356 C130,360 116,354 114,340 Z" fill="url(#m-creme)"/>
+<path d="M62,344 C58,326 82,320 106,326 C124,332 124,354 106,358 C84,362 64,358 62,344 Z" fill="url(#m-creme)"/>
+<path d="M116,346 C114,328 140,322 162,328 C178,334 176,356 158,360 C138,364 118,360 116,346 Z" fill="url(#m-creme)"/>
+<path d="M76,336 l-1,6 M88,334 l0,7 M100,336 l1,6 M132,338 l-1,6 M144,336 l0,7 M156,338 l1,6" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
 </g>
-<g transform="translate(17,176) rotate(-7 150 134) scale(0.68)">
+<g transform="translate(2,168) rotate(-8 150 134) scale(0.84)">
 ${tete}
 </g>
 </g>
 <g class="m-zzz" aria-hidden="true" fill="none" stroke="#2B6E3A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-<path class="m-z m-z1" d="M232,176 h20 l-20 22 h20"/><path class="m-z m-z2" d="M264,142 h16 l-16 18 h16"/><path class="m-z m-z3" d="M290,112 h12 l-12 14 h12"/>
+<path class="m-z m-z1" d="M236,170 h20 l-20 22 h20"/><path class="m-z m-z2" d="M268,138 h16 l-16 18 h16"/><path class="m-z m-z3" d="M294,108 h12 l-12 14 h12"/>
 </g>
 </g>
 </svg>
