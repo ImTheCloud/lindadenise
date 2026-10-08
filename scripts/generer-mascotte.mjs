@@ -21,7 +21,7 @@ function queue(P, largeur, pas) {
   return { contour, ligne, bandes };
 }
 const qAssis = queue([[206, 318], [308, 332], [340, 236], [290, 148]], (t) => 34 - 9 * t, [0.1, 0.22, 0.34, 0.46, 0.58, 0.7, 0.82]);
-const qCouche = queue([[304, 324], [270, 366], [172, 372], [92, 354]], () => 24, [0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86]);
+const qCouche = queue([[262, 338], [246, 374], [172, 376], [92, 358]], () => 24, [0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86]);
 
 // ---------- tête (réutilisée dans les deux poses) ----------
 const tete = `<g filter="url(#m-contour)">
@@ -67,6 +67,8 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 380" class
 ${contourFiltre('m-contour', ' x="-6%" y="-6%" width="112%" height="112%"')}
 ${contourFiltre('m-contour-large', ' filterUnits="userSpaceOnUse" x="-40" y="-40" width="440" height="460"')}
 <filter id="m-flou"><feGaussianBlur stdDeviation="3.2"/></filter>
+<clipPath id="m-leg-g"><path d="M120,262 C120,246 146,246 146,262 C147,290 150,316 152,336 C153,346 150,352 146,354 C143,358 139,358 137,354 C134,358 130,358 127,354 C124,358 120,358 118,354 C114,350 112,344 113,336 C115,316 119,290 120,262 Z"/></clipPath>
+<clipPath id="m-leg-d"><path d="M180,262 C180,246 154,246 154,262 C153,290 150,316 148,336 C147,346 150,352 154,354 C157,358 161,358 163,354 C166,358 170,358 173,354 C176,358 180,358 182,354 C186,350 188,344 187,336 C185,316 181,290 180,262 Z"/></clipPath>
 <clipPath id="m-queue-clip"><path d="${qAssis.contour}"/></clipPath>
 <clipPath id="m-queue-couche-clip"><path d="${qCouche.contour}"/></clipPath>
 </defs>
@@ -82,7 +84,7 @@ ${contourFiltre('m-contour-large', ' filterUnits="userSpaceOnUse" x="-40" y="-40
 </g>
 </g>
 
-<g class="m-corps" filter="url(#m-contour)">
+<g class="m-corps"><g filter="url(#m-contour)">
 <path d="M108,206 C82,238 72,292 84,326 C90,346 106,356 130,356 L170,356 C194,356 210,346 216,326 C228,292 218,238 192,206 Z" fill="url(#m-pelage)"/>
 <path d="M110,214 C94,244 90,292 100,328 C104,338 110,346 118,350 C102,306 100,254 114,222 Z" fill="#B24E12" opacity=".28"/>
 <path d="M150,214 C132,222 126,262 130,298 C134,322 146,332 150,332 C154,332 166,322 170,298 C174,262 168,222 150,214 Z" fill="url(#m-creme)"/>
@@ -90,10 +92,14 @@ ${contourFiltre('m-contour-large', ' filterUnits="userSpaceOnUse" x="-40" y="-40
 <path d="M70,348 C68,336 90,332 106,338 C120,344 118,358 102,360 C84,362 72,358 70,348 Z" fill="url(#m-creme)"/>
 <path d="M230,348 C232,336 210,332 194,338 C180,344 182,358 198,360 C216,362 228,358 230,348 Z" fill="url(#m-creme)"/>
 <path d="M82,346 l-1,6 M92,344 l0,7 M102,346 l1,6 M218,346 l1,6 M208,344 l0,7 M198,346 l-1,6" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-<path d="M122,266 C122,246 144,246 144,266 C145,292 146,320 148,338 C150,350 148,360 138,360 C126,360 115,352 116,338 C117,320 120,292 122,266 Z" fill="url(#m-patte)"/>
-<path d="M178,266 C178,246 156,246 156,266 C155,292 154,320 152,338 C150,350 152,360 162,360 C174,360 185,352 184,338 C183,320 180,292 178,266 Z" fill="url(#m-patte)"/>
-<path d="M144,268 C145,292 146,318 148,342 M156,268 C155,292 154,318 152,342" fill="none" stroke="#B24E12" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
-<path d="M126,350 l0,7 M134,352 l0,7 M142,350 l0,7 M174,350 l0,7 M166,352 l0,7 M158,350 l0,7" stroke="#C07A4A" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+</g>
+<g filter="url(#m-contour)">
+<path d="M120,262 C120,246 146,246 146,262 C147,290 150,316 152,336 C153,346 150,352 146,354 C143,358 139,358 137,354 C134,358 130,358 127,354 C124,358 120,358 118,354 C114,350 112,344 113,336 C115,316 119,290 120,262 Z" fill="url(#m-pelage)"/><path d="M180,262 C180,246 154,246 154,262 C153,290 150,316 148,336 C147,346 150,352 154,354 C157,358 161,358 163,354 C166,358 170,358 173,354 C176,358 180,358 182,354 C186,350 188,344 187,336 C185,316 181,290 180,262 Z" fill="url(#m-pelage)"/>
+<g clip-path="url(#m-leg-g)"><path d="M100,328 C110,320 120,332 128,324 C136,332 146,322 156,330 L156,370 L100,370 Z" fill="url(#m-creme)"/></g>
+<g clip-path="url(#m-leg-d)"><path d="M200,328 C190,320 180,332 172,324 C164,332 154,322 144,330 L144,370 L200,370 Z" fill="url(#m-creme)"/></g>
+<path d="M126,346 l0,8 M137,346 l0,8 M174,346 l0,8 M163,346 l0,8" stroke="#C07A4A" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+<path d="M124,268 C124,296 122,320 121,334" fill="none" stroke="#FFC98A" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+</g>
 </g>
 
 <g class="m-tete"><g transform="translate(150,206) scale(0.92) translate(-150,-206)">
@@ -115,23 +121,27 @@ ${tete}
 <path d="M104,330 C132,346 200,352 262,346 C292,342 308,334 316,322 C312,346 272,358 202,358 C142,358 106,350 104,330 Z" fill="#B24E12" opacity=".22"/>
 <path d="M124,256 C152,230 214,220 266,242" fill="none" stroke="#FFC98A" stroke-width="7" stroke-linecap="round" opacity=".6"/>
 <path d="M150,236 C142,254 142,272 148,290 M186,228 C180,250 180,272 186,292 M222,230 C218,252 220,274 228,292" fill="none" stroke="#B24E12" stroke-width="4.5" stroke-linecap="round" opacity=".5"/>
-<path d="M240,268 C234,234 298,232 306,282 C310,320 282,344 254,338 C232,332 244,302 240,268 Z" fill="url(#m-cuisse)" stroke="#B24E12" stroke-width="3" stroke-opacity=".5"/>
-<path d="M252,254 C272,252 290,266 296,286" fill="none" stroke="#FFD08A" stroke-width="5" stroke-linecap="round" opacity=".7"/>
-<path d="M258,298 C274,312 290,310 300,300" fill="none" stroke="#B24E12" stroke-width="3" stroke-linecap="round" opacity=".5"/>
-<path d="M270,342 C276,328 306,326 318,338 C324,350 302,358 282,356 C270,354 266,350 270,342 Z" fill="url(#m-creme)"/>
 </g>
 <g class="m-cq-queue" filter="url(#m-contour-large)">
-<path d="${qCouche.contour}" fill="url(#m-pelage)"/><circle cx="304" cy="324" r="12" fill="url(#m-pelage)"/>
+<path d="${qCouche.contour}" fill="url(#m-pelage)"/>
 <g clip-path="url(#m-queue-couche-clip)" fill="none">
 <path d="${qCouche.bandes}" stroke="#C25A18" stroke-width="7" opacity=".75"/>
 <path d="${qCouche.ligne(0.5, 0.04, 0.96)}" stroke="#FFC98A" stroke-width="5" opacity=".6" stroke-linecap="round"/>
 </g>
 </g>
+<g class="m-cq-cuisse" filter="url(#m-contour-large)">
+<path d="M232,276 C224,230 298,222 310,284 C316,326 286,352 252,346 C226,340 238,308 232,276 Z" fill="url(#m-cuisse)"/>
+<path d="M246,256 C270,250 292,264 298,288" fill="none" stroke="#FFD08A" stroke-width="5.5" stroke-linecap="round" opacity=".7"/>
+<path d="M250,300 C268,318 288,314 300,302" fill="none" stroke="#B24E12" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+<path d="M254,346 C258,330 292,326 312,338 C320,350 300,360 278,360 C262,360 252,354 254,346 Z" fill="url(#m-creme)"/>
+<path d="M300,338 l4,7 M291,336 l2,8 M282,338 l0,8" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+</g>
 <g class="m-cq-tete">
 <g filter="url(#m-contour-large)">
-<path d="M62,344 C58,326 82,320 106,326 C124,332 124,354 106,358 C84,362 64,358 62,344 Z" fill="url(#m-creme)"/>
-<path d="M116,346 C114,328 140,322 162,328 C178,334 176,356 158,360 C138,364 118,360 116,346 Z" fill="url(#m-creme)"/>
-<path d="M76,336 l-1,6 M88,334 l0,7 M100,336 l1,6 M132,338 l-1,6 M144,336 l0,7 M156,338 l1,6" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+<path d="M104,338 C92,332 70,334 60,344 C54,352 62,362 76,362 L118,362 C134,362 136,338 120,336 Z" fill="url(#m-creme)"/>
+<path d="M62,346 l8,4 M60,354 l9,2 M68,340 l5,6" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+<path d="M150,340 C140,332 118,336 112,346 C108,356 116,364 130,364 L160,364 C176,364 178,342 164,338 Z" fill="url(#m-creme)"/>
+<path d="M114,350 l7,3 M112,358 l8,1" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
 </g>
 <g transform="translate(2,168) rotate(-8 150 134) scale(0.84)">
 ${tete}

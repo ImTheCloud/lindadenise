@@ -153,14 +153,20 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       if (!bulle.hidden) minuteurBulle = window.setTimeout(() => (bulle.hidden = true), 3500);
     });
 
-    // Arrivée : le chat parle tout de suite, à chaque page
+    // Arrivée : le chat parle tout de suite. Salut complet à chaque arrivée sur le site
+    // (première page, venue de l'extérieur, ou rechargement) ; ensuite un mot sur la page ouverte.
     const depart = document.body.dataset.mascotteDepart ?? 'texte';
-    const dejaVu = lire('mascotte-vu') === '1';
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    let pageInterne = false;
+    try { pageInterne = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { /* sans référent */ }
+    const arrivee = lire('mascotte-vu') !== '1' || navigation?.type === 'reload' || !pageInterne;
     dernierSujet = depart;
     window.setTimeout(() => {
-      if (!dejaVu) {
-        etat('salut', 3400);
+      if (arrivee) {
+        muet = false;
+        ecrire('mascotte-muet', '0');
         ecrire('mascotte-vu', '1');
+        etat('salut', 3400);
         dire(sections.accueil, 9500);
       } else {
         etat('saute', 800);
