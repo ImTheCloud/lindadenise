@@ -155,7 +155,7 @@ export const nl: Dico = {
     invite: 'Aai me!',
     reveil: 'Hm? Ah, je bent terug!',
     sections: {
-      accueil: 'Miauw! Ik ben Linde. Welkom bij Linda, kom binnen, ik geef je een rondleiding.',
+      accueil: 'Hoi, ik ben Linde! Welkom bij Linda, kom binnen, ik geef je een rondleiding.',
       rubriques: 'Katten, bloemen, bossen… voor elk wat wils. Waar beginnen we?',
       une: 'Al deze tekeningen zijn met de vingertop op een telefoon gemaakt. Indrukwekkend, toch?',
       offrir: 'Een tekening om te geven? Dat doet altijd plezier. En ik hou van cadeautjes.',
@@ -169,6 +169,7 @@ export const nl: Dico = {
       'Prrr… wist je dat Linda met haar vinger tekent?',
       'Mijn rode vacht heb ik van Tiroux, een van de katten in haar tekeningen.',
       'Linda laat zich inspireren door bomen, bossen, bloemen en de tuin.',
+      'Ik hoor bij de tekeningen van Linda, weet je! Zoek Tiroux in de galerij: dat is mijn dubbelganger.',
       'Miauw! Nog een aai, alsjeblieft.',
       'De katten van Linda zijn geïnspireerd door foto’s van een vriend uit Quebec.',
     ],

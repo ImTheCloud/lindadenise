@@ -153,7 +153,7 @@ export const fr = {
     invite: 'Touchez-moi !',
     reveil: 'Hmm ? Ah, vous êtes revenu !',
     sections: {
-      accueil: 'Miaou ! Je m’appelle Tilleul. Bienvenue chez Linda, entrez, je vous fais visiter.',
+      accueil: 'Salut, je suis Tilleul ! Bienvenue chez Linda, entrez, je vous fais visiter.',
       rubriques: 'Chats, fleurs, forêts… il y en a pour tous les goûts. Par quoi commence-t-on ?',
       une: 'Tous ces dessins sont faits du bout du doigt, sur un téléphone. Impressionnant, non ?',
       offrir: 'Un dessin à offrir ? Ça fait toujours plaisir. Et moi, j’adore les cadeaux.',
@@ -167,6 +167,7 @@ export const fr = {
       'Prrr… vous savez que Linda dessine avec son doigt ?',
       'Mon pelage roux, je le tiens de Tiroux, un des chats de ses dessins.',
       'Linda s’inspire des arbres, des forêts, des fleurs et du jardin.',
+      'Je fais partie des dessins de Linda, vous savez ! Cherchez Tiroux dans la galerie : c’est mon sosie.',
       'Miaou ! Encore une caresse, s’il vous plaît.',
       'Les chats de Linda sont inspirés de photos d’un ami québécois.',
     ],

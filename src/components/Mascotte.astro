@@ -54,7 +54,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     };
 
     const dire = (message: string, duree = 9000) => {
-      if (muet || !message || racine.dataset.etat === 'dort') return;
+      if (muet || !message || racine.dataset.etat === 'dort' || racine.dataset.etat === 'couche') return;
       texte.textContent = message;
       bulle.hidden = false;
       bulle.classList.remove('pop');
@@ -80,14 +80,20 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       }
     };
 
-    // Sommeil : après un moment sans activité, le chat s'endort ; le moindre mouvement le réveille
+    // Repos : sans activité le chat se couche, puis s'endort ; le moindre mouvement le relève
+    let minuteurDodo: number | undefined;
     const reveiller = () => {
       window.clearTimeout(minuteurSommeil);
-      if (racine.dataset.etat === 'dort') {
-        etat('saute', 800);
-        window.setTimeout(() => dire(reveil, 5000), 500);
+      window.clearTimeout(minuteurDodo);
+      const avant = racine.dataset.etat;
+      if (avant === 'dort' || avant === 'couche') {
+        etat('repos');
+        racine.classList.add('etire');
+        window.setTimeout(() => racine.classList.remove('etire'), 1500);
+        if (avant === 'dort') window.setTimeout(() => dire(reveil, 5000), 600);
       }
-      minuteurSommeil = window.setTimeout(() => { bulle.hidden = true; etat('dort'); }, 32000);
+      minuteurSommeil = window.setTimeout(() => { bulle.hidden = true; etat('couche'); }, 18000);
+      minuteurDodo = window.setTimeout(() => { bulle.hidden = true; etat('dort'); }, 40000);
     };
     ['pointermove', 'scroll', 'keydown', 'touchstart'].forEach((nom) => addEventListener(nom, reveiller, { passive: true }));
     reveiller();
@@ -110,12 +116,12 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     }
 
     // Petites habitudes de chat, de temps en temps
-    const habitudes = ['etire', 'oreille', 'regarde-g', 'regarde-d'];
+    const habitudes = ['etire', 'oreille', 'regarde-g', 'regarde-d', 'toilette'];
     const habitude = () => {
       if (racine.dataset.etat === 'repos' && !moinsDeMouvement) {
         const h = habitudes[Math.floor(Math.random() * habitudes.length)];
         racine.classList.add(h);
-        window.setTimeout(() => racine.classList.remove(h), 1700);
+        window.setTimeout(() => racine.classList.remove(h), h === 'toilette' ? 2300 : 1700);
       }
       window.setTimeout(habitude, 8000 + Math.random() * 8000);
     };
@@ -212,7 +218,11 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .m-tete { transform-origin: 150px 206px; animation: m-tete 6s ease-in-out infinite; }
   .m-corps { transform-origin: 150px 350px; animation: m-respire 3.6s ease-in-out infinite; }
   .m-paupiere { transform-box: fill-box; transform-origin: 50% 0%; transform: scaleY(0); animation: m-cligne 5.2s infinite; }
-  .m-patte-g { transform-origin: 126px 244px; }
+  .m-bras-mouvement { transform-origin: 118px 254px; }
+  .m-pose-corps, .m-pose-tete, .m-pose-queue { transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1); }
+  .m-pose-corps { transform-origin: 150px 352px; }
+  .m-pose-tete { transform-origin: 150px 206px; }
+  .m-pose-queue { transform-origin: 206px 318px; }
   .m-oreille-g { transform-origin: 112px 90px; }
   .m-oreille-d { transform-origin: 188px 90px; }
   .m-zzz { opacity: 0; }
@@ -224,7 +234,10 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte[data-etat='parle'] .m-bouche-ouverte { display: block !important; transform-origin: 150px 168px; animation: m-parle 0.34s ease-in-out infinite; }
   .mascotte[data-etat='parle'] .m-tete { animation: m-hoche 0.7s ease-in-out infinite; }
 
-  .mascotte[data-etat='salut'] .m-patte-g { animation: m-salue 0.5s ease-in-out infinite alternate; }
+  .mascotte[data-etat='salut'] .m-bras-salut, .mascotte.toilette .m-bras-salut { display: block !important; }
+  .mascotte[data-etat='salut'] .m-bras-mouvement { animation: m-salue 0.5s ease-in-out infinite alternate; }
+  .mascotte.toilette .m-bras-mouvement { transform: rotate(38deg); animation: m-toilette 0.45s ease-in-out infinite alternate; }
+  .mascotte.toilette .m-tete { animation: m-toilette-tete 2.2s ease-in-out; }
   .mascotte[data-etat='salut'] .m-bouche-fermee { display: none; }
   .mascotte[data-etat='salut'] .m-bouche-ouverte { display: block !important; }
 
@@ -232,11 +245,17 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte[data-etat='saute'] .m-bouche-fermee { display: none; }
   .mascotte[data-etat='saute'] .m-bouche-ouverte { display: block !important; }
 
-  .mascotte[data-etat='dort'] .m-paupiere { transform: scaleY(1); animation: none; }
+  /* Couché : le corps s'aplatit, la tête se pose, les yeux se mi-ferment. Endormi : yeux clos et zZz. */
+  .mascotte[data-etat='couche'] .m-pose-corps, .mascotte[data-etat='dort'] .m-pose-corps { transform: scale(1.14, 0.74); }
+  .mascotte[data-etat='couche'] .m-pose-tete, .mascotte[data-etat='dort'] .m-pose-tete { transform: translate(6px, 54px) rotate(5deg); }
+  .mascotte[data-etat='couche'] .m-pose-queue, .mascotte[data-etat='dort'] .m-pose-queue { transform: rotate(16deg) translate(-6px, 4px); }
+  .mascotte[data-etat='couche'] .m-paupiere { transform: scaleY(0.5); animation: none; }
+  .mascotte[data-etat='couche'] .m-regard, .mascotte[data-etat='dort'] .m-regard { transform: none; }
+  .mascotte[data-etat='dort'] .m-yeux { display: none; }
+  .mascotte[data-etat='dort'] .m-yeux-clos { display: block !important; }
   .mascotte[data-etat='dort'] .m-tete { animation: m-dort-tete 5s ease-in-out infinite; }
   .mascotte[data-etat='dort'] .m-corps { animation-duration: 6s; }
-  .mascotte[data-etat='dort'] .m-queue { animation-duration: 9s; }
-  .mascotte[data-etat='dort'] .m-regard { transform: none; }
+  .mascotte[data-etat='dort'] .m-queue, .mascotte[data-etat='couche'] .m-queue { animation-duration: 9s; }
   .mascotte[data-etat='dort'] .m-zzz { opacity: 1; }
   .mascotte[data-etat='dort'] .m-z { animation: m-zzz 2.8s ease-in-out infinite; }
   .mascotte[data-etat='dort'] .m-z2 { animation-delay: 0.6s; }
@@ -258,9 +277,11 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   @keyframes m-respire { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.016); } }
   @keyframes m-cligne { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
   @keyframes m-parle { 0%, 100% { transform: scaleY(0.45); } 50% { transform: scaleY(1); } }
-  @keyframes m-salue { from { transform: rotate(100deg); } to { transform: rotate(132deg); } }
+  @keyframes m-salue { from { transform: rotate(-12deg); } to { transform: rotate(16deg); } }
+  @keyframes m-toilette { from { transform: rotate(34deg); } to { transform: rotate(44deg); } }
+  @keyframes m-toilette-tete { 0%, 100% { transform: rotate(0); } 20%, 80% { transform: rotate(-6deg) translate(-4px, 8px); } }
   @keyframes m-saute { 0% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.06, 0.92); } 45% { transform: translateY(-38px) scale(0.96, 1.07); } 80% { transform: translateY(0) scale(1.05, 0.94); } 100% { transform: none; } }
-  @keyframes m-dort-tete { 0%, 100% { transform: rotate(7deg) translateY(6px); } 50% { transform: rotate(8deg) translateY(9px); } }
+  @keyframes m-dort-tete { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
   @keyframes m-zzz { 0% { transform: translate(0, 10px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(8px, -14px); opacity: 0; } }
   @keyframes m-etire { 0%, 100% { transform: scale(1, 1); } 40%, 60% { transform: scale(0.97, 1.07); } }
   @keyframes m-etire-tete { 0%, 100% { transform: translateY(0); } 40%, 60% { transform: translateY(-8px) rotate(-3deg); } }
