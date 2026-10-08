@@ -35,3 +35,8 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Titres des dessins : dernière relecture avec Linda
 - Formulaire : notifications email dans Netlify, premier message « Non spam », test d'une vraie demande
 - README à mettre à jour (le rappeler en fin de projet)
+
+## Mise en ligne et crédits Netlify
+- Netlify gratuit : 300 crédits par mois, 15 crédits par déploiement de production (voir `netlify-credits` dans la mémoire du projet)
+- Pendant le développement, les commits portent `[skip ci]` : GitHub reçoit tout, Netlify ne construit rien
+- À la fin : un seul commit sans `[skip ci]` pour publier
