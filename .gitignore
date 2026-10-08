@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.netlify/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Notes privees (identite, statut legal) : le depot est public
+docs/prive/
+
+# Les originaux des dessins ne vont JAMAIS dans le depot
+originaux/
