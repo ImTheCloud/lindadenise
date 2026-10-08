@@ -122,8 +122,9 @@ const donnees = JSON.stringify({ sections: n.sections, anecdotes: n.anecdotes })
   .noisette__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
   /* Les parties de l'écureuil bougent chacune de leur côté */
-  .noisette-svg * { transform-box: fill-box; }
-  .n-queue { transform-origin: 14% 92%; animation: n-queue 5s ease-in-out infinite; }
+  /* transform-box seulement sur les parties animées : sinon les rotate() internes du dessin se décalent */
+  .n-queue, .n-tete, .n-corps, .n-paupiere, .n-bras, .n-oreille, .n-bouche-ouverte { transform-box: fill-box; }
+  .n-queue { transform-origin: 12% 92%; animation: n-queue 5s ease-in-out infinite; }
   .n-tete { transform-origin: 50% 92%; animation: n-tete 6s ease-in-out infinite; }
   .n-corps { transform-origin: 50% 100%; animation: n-respire 3.6s ease-in-out infinite; }
   .n-paupiere { transform-origin: 50% 0%; transform: scaleY(0); animation: n-cligne 5.5s infinite; }
@@ -154,7 +155,7 @@ const donnees = JSON.stringify({ sections: n.sections, anecdotes: n.anecdotes })
   @keyframes n-respire { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.014); } }
   @keyframes n-cligne { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
   @keyframes n-parle { 0%, 100% { transform: scaleY(0.45); } 50% { transform: scaleY(1); } }
-  @keyframes n-salue { from { transform: rotate(-125deg); } to { transform: rotate(-160deg); } }
+  @keyframes n-salue { from { transform: rotate(-150deg); } to { transform: rotate(-188deg); } }
   @keyframes n-saute { 0% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.06, 0.92); } 45% { transform: translateY(-34px) scale(0.96, 1.06); } 80% { transform: translateY(0) scale(1.05, 0.94); } 100% { transform: none; } }
   @keyframes n-oreille-g { 50% { transform: rotate(-14deg); } }
   @keyframes n-oreille-d { 50% { transform: rotate(14deg); } }
