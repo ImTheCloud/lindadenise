@@ -95,17 +95,17 @@ const une = dessins.filter((x) => x.une);
 
   <section class="section" data-mascotte="impression">
     <div class="contenu impression">
+      <div class="apparait impression__texte">
+        <h2>{a.impressionTitre}</h2>
+        <p class="chapeau">{a.impressionTexte}</p>
+        <a class="bouton bouton--vert" href={chemin('contact', lang)}>{a.impressionCta}</a>
+      </div>
       <figure class="impression__video apparait cadre">
         <video controls playsinline preload="none" poster="/video/impressions.webp" width="478" height="850" aria-label={a.impressionAlt}>
           <source src="/video/impressions.mp4" type="video/mp4" />
           {a.impressionLecture}
         </video>
       </figure>
-      <div class="apparait">
-        <h2>{a.impressionTitre}</h2>
-        <p class="chapeau">{a.impressionTexte}</p>
-        <a class="bouton bouton--vert" href={chemin('contact', lang)}>{a.impressionCta}</a>
-      </div>
     </div>
   </section>
 
@@ -163,11 +163,21 @@ const une = dessins.filter((x) => x.une);
   .apropos__photo { width: min(78%, 360px); margin-inline: auto; background: var(--vert-pale); padding: 10px; border: var(--trait) solid var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; box-shadow: var(--ombre); transform: rotate(-3deg); }
   .apropos__photo img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }
 
+  @media (max-width: 619px) {
+    .rubriques { grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
+    .rubrique { display: grid; grid-template-columns: 104px 1fr; column-gap: 14px; align-items: center; text-align: left; padding: 10px 14px 10px 10px; }
+    .rubrique :global(img) { grid-column: 1; grid-row: 1 / 4; width: 104px; height: 104px; margin: 0; }
+    .rubrique__nom, .rubrique__texte, .rubrique__nombre { grid-column: 2; }
+    .rubrique__nom { font-size: 1.6rem; }
+    .rubrique__texte { padding: 2px 0; font-size: 0.95rem; line-height: 1.35; }
+    .rubrique__nombre { margin-top: 0; font-size: 1.05rem; }
+  }
   @media (min-width: 700px) { .mur { column-count: 3; } }
   @media (min-width: 960px) {
     .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: 48px; }
     .mur { column-count: 4; }
     .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
     .impression { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
+    .impression__video { order: -1; }
   }
 </style>

@@ -37,3 +37,4 @@ export const autreLangue = (lang: Lang): Lang => (lang === 'fr' ? 'nl' : 'fr');
 
 export const parRubrique = (r: Rubrique) => dessins.filter((d) => d.rubrique === r);
 export const SITE = 'https://lindadenise.be';
+export const EMAIL = 'teugelslinda@yahoo.fr';

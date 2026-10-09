@@ -16,7 +16,7 @@ export const fr = {
   },
   accueil: {
     surtitre: 'Dessins faits au doigt',
-    texte: 'La nature, les fleurs et les chats, dessinés avec simplicité et beaucoup de couleurs. Entrez, regardez, respirez.',
+    texte: 'Des arbres, des fleurs et des chats pleins de couleurs, dessinés du bout du doigt par Linda, ancienne professeure de cuisine. Entrez, regardez, respirez.',
     cta1: 'Découvrir les dessins',
     cta2: 'Qui est Linda ?',
     rubriquesTitre: 'Quatre univers à explorer',
@@ -38,10 +38,10 @@ export const fr = {
     impressionCta: 'Une envie de tirage ? Écrivez-nous.',
     impressionAlt: 'Vidéo : dessins de Linda imprimés en grand format, posés dans un salon',
     impressionLecture: 'Votre navigateur ne lit pas cette vidéo.',
-    aproposTitre: 'Qui est Linda ?',
+    aproposTitre: 'Rencontrez Linda',
     aproposTexte:
-      'Ancienne professeure de cuisine, Linda a découvert il y a quatre ans qu’on peut dessiner avec le doigt sur un smartphone. Depuis, elle ne s’arrête plus.',
-    aproposCta: 'Lire son histoire',
+      'Après avoir longtemps enseigné la cuisine, Linda a reçu son premier smartphone il y a quatre ans et y a découvert un plaisir tout simple : dessiner avec le doigt. Elle y cherche la beauté de la nature et des chats, avec des couleurs vibrantes et beaucoup de douceur.',
+    aproposCta: 'Découvrir son histoire',
     photoAlt: 'Linda Denise, souriante, devant de grandes feuilles vertes',
   },
   dessins: {
@@ -102,6 +102,7 @@ export const fr = {
   merci: { titre: 'Merci !', texte: 'Votre message est bien parti. Linda vous répondra bientôt.', retour: 'Retour à l’accueil' },
   pied: {
     droits: '© Linda Denise. Tous droits réservés.',
+    ecrire: 'Écrire à Linda',
     mentions: 'Mentions légales',
     licence: 'Conditions d’utilisation',
     confidentialite: 'Confidentialité',
@@ -128,9 +129,11 @@ export const fr = {
     intro: 'Lorsque vous recevez un dessin, vous recevez le droit de l’utiliser à titre privé. Le droit d’auteur reste à Linda Denise.',
     ouiTitre: 'Vous pouvez',
     oui: [
-      'l’afficher sur vos écrans, par exemple en fond d’écran ;',
-      'l’imprimer pour votre maison ;',
-      'offrir une copie imprimée à un proche.',
+      'l’afficher sur tous vos écrans, par exemple en fond d’écran ;',
+      'l’imprimer pour votre maison, en petit ou en grand format ;',
+      'l’encadrer et l’accrocher chez vous ;',
+      'offrir une copie imprimée à un proche ;',
+      'le conserver sans limite de durée.',
     ],
     nonTitre: 'Vous ne pouvez pas',
     non: [

@@ -1,5 +1,5 @@
 ---
-import { t, chemin, type Lang } from '../i18n';
+import { t, chemin, EMAIL, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
@@ -12,6 +12,7 @@ const d = t(lang);
         <img src="/favicon.svg" alt="" width="56" height="56" />
         <div><strong>Linda Denise</strong><br /><span>{d.pied.phrase}</span></div>
       </div>
+      <p class="pied__contact"><a href={`mailto:${EMAIL}`}>{EMAIL}</a><br /><a href={chemin('contact', lang)}>{d.pied.ecrire}</a></p>
       <ul class="pied__liens">
         <li><a href={chemin('mentions', lang)}>{d.pied.mentions}</a></li>
         <li><a href={chemin('licence', lang)}>{d.pied.licence}</a></li>
@@ -28,6 +29,8 @@ const d = t(lang);
   .pied__ligne { display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between; align-items: center; }
   .pied__marque { display: flex; gap: 14px; align-items: center; font-family: var(--titre); font-size: 1.5rem; line-height: 1.2; }
   .pied__marque span { font-family: var(--texte); font-size: 1rem; opacity: 0.85; }
+  .pied__contact { margin: 0; line-height: 1.4; }
+  .pied__contact a { padding: 6px 0; }
   .pied__liens { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; margin: 0; padding: 0; }
   .pied a { color: #fff; display: inline-block; padding: 12px 0; }
   .pied a:hover { color: var(--orange-clair); }

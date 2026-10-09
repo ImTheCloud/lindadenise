@@ -18,7 +18,7 @@ export const nl: Dico = {
   },
   accueil: {
     surtitre: 'Tekeningen met de vinger',
-    texte: 'De natuur, bloemen en katten, getekend met eenvoud en veel kleur. Kom binnen, kijk rond, adem in.',
+    texte: 'Bomen, bloemen en katten vol kleur, met de vingertop getekend door Linda, voormalige kooklerares. Kom binnen, kijk rond, adem in.',
     cta1: 'Ontdek de tekeningen',
     cta2: 'Wie is Linda?',
     rubriquesTitre: 'Vier werelden om te ontdekken',
@@ -40,10 +40,10 @@ export const nl: Dico = {
     impressionCta: 'Zin in een afdruk? Schrijf ons.',
     impressionAlt: 'Video: tekeningen van Linda, in groot formaat afgedrukt en in een woonkamer neergezet',
     impressionLecture: 'Je browser kan deze video niet afspelen.',
-    aproposTitre: 'Wie is Linda?',
+    aproposTitre: 'Maak kennis met Linda',
     aproposTexte:
-      'Linda was kooklerares. Vier jaar geleden ontdekte ze dat je met je vinger kunt tekenen op een smartphone. Sindsdien houdt ze er niet meer mee op.',
-    aproposCta: 'Lees haar verhaal',
+      'Na lang les te hebben gegeven in koken kreeg Linda vier jaar geleden haar eerste smartphone en ontdekte ze een eenvoudig plezier: tekenen met de vinger. Ze zoekt de schoonheid van de natuur en van katten, met levendige kleuren en veel zachtheid.',
+    aproposCta: 'Ontdek haar verhaal',
     photoAlt: 'Linda Denise, glimlachend voor grote groene bladeren',
   },
   dessins: {
@@ -104,6 +104,7 @@ export const nl: Dico = {
   merci: { titre: 'Bedankt!', texte: 'Je bericht is verstuurd. Linda antwoordt je binnenkort.', retour: 'Terug naar home' },
   pied: {
     droits: '© Linda Denise. Alle rechten voorbehouden.',
+    ecrire: 'Schrijf aan Linda',
     mentions: 'Juridische informatie',
     licence: 'Gebruiksvoorwaarden',
     confidentialite: 'Privacy',
@@ -130,9 +131,11 @@ export const nl: Dico = {
     intro: 'Wanneer je een tekening ontvangt, krijg je het recht om ze privé te gebruiken. Het auteursrecht blijft bij Linda Denise.',
     ouiTitre: 'Dit mag je',
     oui: [
-      'ze tonen op je schermen, bijvoorbeeld als achtergrond;',
-      'ze afdrukken voor in je huis;',
-      'een afgedrukte kopie aan een naaste geven.',
+      'ze tonen op al je schermen, bijvoorbeeld als achtergrond;',
+      'ze afdrukken voor in je huis, in klein of groot formaat;',
+      'ze inlijsten en bij je thuis ophangen;',
+      'een afgedrukte kopie aan een naaste geven;',
+      'ze bewaren zonder tijdslimiet.',
     ],
     nonTitre: 'Dit mag je niet',
     non: [
