@@ -167,6 +167,7 @@ export const nl: Dico = {
     fermer: 'Bubbel sluiten',
     silence: 'Laat Linde slapen',
     reveiller: 'Linde wakker maken',
+    dodo: 'Zzz… Tik me aan wanneer je me wakker wilt maken.',
     invite: 'Aai me!',
     reveil: 'Hm? Ah, je bent terug!',
     reactions: {

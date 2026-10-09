@@ -165,6 +165,7 @@ export const fr = {
     fermer: 'Fermer la bulle',
     silence: 'Laisser Tilleul dormir',
     reveiller: 'Réveiller Tilleul',
+    dodo: 'Zzz… Touchez-moi quand vous voudrez me réveiller.',
     invite: 'Touchez-moi !',
     reveil: 'Hmm ? Ah, vous êtes revenu !',
     reactions: {

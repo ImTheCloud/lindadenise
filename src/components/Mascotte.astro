@@ -4,7 +4,7 @@ import { t, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const m = t(lang).mascotte;
-const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, reveil: m.reveil, reactions: m.reactions, parler: m.parler, reveiller: m.reveiller });
+const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, reveil: m.reveil, reactions: m.reactions, parler: m.parler, reveiller: m.reveiller, dodo: m.dodo });
 ---
 <aside class="mascotte" data-etat="repos" data-donnees={donnees} aria-label={m.nom}>
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
@@ -16,6 +16,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     </button>
   </div>
   <p class="mascotte__invite" aria-hidden="true">{m.invite}</p>
+  <p class="mascotte__reveil" aria-hidden="true">{m.reveiller}</p>
   <div class="mascotte__coeurs" aria-hidden="true"></div>
   <button class="mascotte__corps" type="button" aria-label={m.parler}>
     <Fragment set:html={svg} />
@@ -32,9 +33,10 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     const fermer = racine.querySelector<HTMLButtonElement>('.mascotte__muet')!;
     const silence = racine.querySelector<HTMLButtonElement>('.mascotte__silence')!;
     const coeurs = racine.querySelector<HTMLElement>('.mascotte__coeurs')!;
-    const { sections, anecdotes, reveil, reactions, parler, reveiller: libelleReveil } = JSON.parse(racine.dataset.donnees ?? '{}') as {
+    const { sections, anecdotes, reveil, reactions, parler, reveiller: libelleReveil, dodo } = JSON.parse(racine.dataset.donnees ?? '{}') as {
       parler: string;
       reveiller: string;
+      dodo: string;
       sections: Record<string, string>;
       anecdotes: string[];
       reveil: string;
@@ -79,8 +81,9 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 
     // Il parle : la bulle s'écrit lettre après lettre, et sa bouche bouge tant que le texte s'écrit
     let frappe: number | undefined;
-    const dire = (message: string, lecture = 6500) => {
-      if (muet || !message || racine.dataset.etat === 'dort' || racine.dataset.etat === 'couche') return;
+    const dire = (message: string, lecture = 6500, adieu = false) => {
+      if (!message) return;
+      if (!adieu && (muet || racine.dataset.etat === 'dort' || racine.dataset.etat === 'couche')) return;
       window.clearInterval(frappe);
       window.clearTimeout(minuteurBulle);
       cache.textContent = message;
@@ -91,7 +94,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       bulle.classList.add('pop');
       dernierChangement = Date.now();
       const terminer = () => {
-        if (racine.dataset.etat === 'parle') etat('repos');
+        if (racine.dataset.etat === 'parle') etat(muet ? 'dort' : 'repos');
         minuteurBulle = window.setTimeout(() => (bulle.hidden = true), lecture);
       };
       if (moinsDeMouvement) { vu.textContent = message; terminer(); return; }
@@ -183,6 +186,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       window.clearTimeout(minuteurEnnui);
       taire();
       regler();
+      dire(dodo, 4500, true);
     });
 
     corps.addEventListener('click', () => {
@@ -286,6 +290,9 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte__silence:hover, .mascotte__silence:focus-visible { background: var(--orange-creme); color: var(--orange-fonce); border-color: var(--orange-fonce); transform: rotate(-1.5deg); }
   .mascotte.silence { width: clamp(84px, 9vw, 130px); }
   .mascotte.silence .mascotte__invite { display: none; }
+  .mascotte.silence .mascotte__silence { display: none; }
+  .mascotte__reveil { display: none; position: absolute; right: 100%; bottom: 18%; margin: 0 4px 0 0; padding: 5px 12px; font-family: var(--titre); font-size: 1rem; line-height: 1.1; white-space: nowrap; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 16px 9px 14px 9px / 9px 14px 9px 16px; pointer-events: none; }
+  .mascotte.silence .mascotte__reveil { display: block; }
   .mascotte__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
   /* Invitation à toucher le chat, tant qu'on ne l'a pas fait */
