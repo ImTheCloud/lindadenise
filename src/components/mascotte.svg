@@ -104,16 +104,18 @@
 <path d="M232,276 C224,230 298,222 310,284 C316,326 286,352 252,346 C226,340 238,308 232,276 Z" fill="url(#m-cuisse)"/>
 <path d="M246,256 C270,250 292,264 298,288" fill="none" stroke="#FFD08A" stroke-width="5.5" stroke-linecap="round" opacity=".7"/>
 <path d="M250,300 C268,318 288,314 300,302" fill="none" stroke="#B24E12" stroke-width="3" stroke-linecap="round" opacity=".5"/>
-<path d="M254,346 C258,330 292,326 312,338 C320,350 300,360 278,360 C262,360 252,354 254,346 Z" fill="url(#m-creme)"/>
-<path d="M300,338 l4,7 M291,336 l2,8 M282,338 l0,8" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+</g>
+<g class="m-cq-pied" stroke-linejoin="round" stroke-linecap="round">
+<path d="M298,334 L264,334 A7.5,7.5 0 0 0 255,345 A6,6 0 0 0 255,356 A7.5,7.5 0 0 0 264,364 L288,364 C306,364 314,352 310,344 C307,337 304,334 298,334 Z" fill="url(#m-creme)" stroke="#8B3E12" stroke-width="3.4"/>
+<path d="M255,345 l9,0.6 M255,356 l9,-0.4" fill="none" stroke="#C07A4A" stroke-width="2.2"/>
 </g>
 <g class="m-cq-tete">
 <g filter="url(#m-contour-large)">
-<path d="M118,350 C116,338 132,332 150,334 C170,336 182,344 178,355 C174,365 140,367 128,363 C121,360 118,356 118,350 Z" fill="url(#m-creme)"/>
+<path d="M110,342 C110,332 130,330 156,332 C176,334 184,344 178,356 C172,366 130,368 118,362 C112,358 110,350 110,342 Z" fill="url(#m-creme)"/>
 </g>
-<g filter="url(#m-contour-large)">
-<path d="M60,346 C58,334 74,328 92,330 C112,332 124,340 120,352 C116,362 80,364 68,360 C62,358 60,352 60,346 Z" fill="url(#m-creme)"/>
-<path d="M68,342 l7,3 M66,350 l8,2" stroke="#C07A4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M118,333 L72,332 A7.5,7.5 0 0 0 63,343 A7,7 0 0 0 63,354 A7.5,7.5 0 0 0 72,364 C90,366 108,366 114,362 C126,356 126,338 118,333 Z" fill="url(#m-creme)" stroke="#8B3E12" stroke-width="3.4"/>
+<path d="M63,343 l10,0.6 M63,354 l10,-0.4" fill="none" stroke="#C07A4A" stroke-width="2.2"/>
 </g>
 <g transform="translate(2,168) rotate(-8 150 134) scale(0.84)">
 <g filter="url(#m-contour)">
