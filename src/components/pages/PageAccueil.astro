@@ -165,6 +165,14 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     .rubrique__nombre { margin-top: 2px; font-size: 1.05rem; }
   }
   @media (min-width: 960px) {
+    .rubriques { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+    .rubrique { position: relative; justify-content: center; min-height: 300px; padding: 20px 24px 20px 316px; text-align: left; }
+    .rubrique :global(img) { position: absolute; left: 20px; top: 50%; translate: 0 -50%; width: 276px; height: 276px; margin: 0; }
+    .rubrique__nom { font-size: 2.3rem; }
+    .rubrique__texte { padding: 4px 0 8px; font-size: 1.1rem; }
+    .rubrique__nombre { margin-top: 6px; }
+  }
+  @media (min-width: 960px) {
     .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: 48px; }
     .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
     .impression { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
