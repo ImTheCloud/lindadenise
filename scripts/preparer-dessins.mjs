@@ -94,8 +94,6 @@ const CATALOGUE = [
   ['animaux', 'Vaches dans le pré', 'Koeien in de wei'],
 ];
 
-const A_LA_UNE = ['Trois tournesols', 'Lys tigré', 'Paon indien', 'Trio de chats québécois', "2 écureuils au bord de l'eau", 'Frangipanier', 'Le phare', 'Tiroux, le sage'];
-
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const titreDeFichier = (f) => f.replace(/\.jpg$/i, '').replace(/\s*_\d{6}_\d{6}(_\d)?(\s?\d|\s?\(\d\))?\s*$/, '').replace(/\s+/g, ' ').trim();
@@ -139,7 +137,7 @@ for (const [rubrique, fr, nl] of CATALOGUE) {
   const source = path.join(SOURCE, fichier);
   const grande = await apercu(source, 760, path.join(SORTIE_IMG, id), 76, 52);
   await apercu(source, 400, path.join(SORTIE_IMG, `${id}-vignette`), 66, 48);
-  sortie.push({ id, rubrique, titre: { fr, nl }, largeur: grande.largeur, hauteur: grande.hauteur, une: A_LA_UNE.includes(fr) });
+  sortie.push({ id, rubrique, titre: { fr, nl }, largeur: grande.largeur, hauteur: grande.hauteur });
 }
 
 fs.writeFileSync(SORTIE_JSON, JSON.stringify(sortie, null, 2) + '\n');

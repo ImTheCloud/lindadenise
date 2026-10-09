@@ -3,7 +3,6 @@ import Base from '../../layouts/Base.astro';
 import Etang from '../Etang.astro';
 import Feuilles from '../Feuilles.astro';
 import Etapes from '../Etapes.astro';
-import CarteDessin from '../CarteDessin.astro';
 import Apercu from '../Apercu.astro';
 import { t, chemin, cheminDessin, dessins, parRubrique, RUBRIQUES, type Lang } from '../../i18n';
 interface Props { lang: Lang }
@@ -14,7 +13,6 @@ const chemins = { fr: chemin('accueil', 'fr'), nl: chemin('accueil', 'nl') };
 const trouve = (id: string) => dessins.find((x) => x.id === id)!;
 const collage = ['trois-tournesols', 'paon-indien', 'trio-de-chats-quebecois'].map(trouve);
 const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: 'le-phare', fleurs: 'lys-tigre', animaux: '2-ecureuils-au-bord-de-l-eau' };
-const une = dessins.filter((x) => x.une);
 ---
 <Base lang={lang} chemins={chemins} mascotte="accueil">
   <section class="heros" data-mascotte="accueil">
@@ -56,19 +54,7 @@ const une = dessins.filter((x) => x.une);
           );
         })}
       </div>
-    </div>
-  </section>
-
-  <section class="section section--vert" data-mascotte="une">
-    <div class="contenu">
-      <div class="centre apparait">
-        <h2>{a.uneTitre}</h2>
-        <p class="chapeau">{a.uneTexte}</p>
-      </div>
-      <div class="mur apparait">
-        {une.map((x, i) => <CarteDessin dessin={x} lang={lang} />)}
-      </div>
-      <p class="centre"><a class="bouton bouton--vert" href={chemin('dessins', lang)}>{a.tousLesDessins}</a></p>
+      <p class="centre apparait rubriques__suite"><a class="bouton bouton--vert" href={chemin('dessins', lang)}>{a.tousLesDessins}</a></p>
     </div>
   </section>
 
@@ -87,7 +73,8 @@ const une = dessins.filter((x) => x.une);
       <div class="apparait etapes-bloc"><Etapes titre={d.dessins.etapesTitre} etapes={d.dessins.etapes} /></div>
       <div class="prix apparait cadre">
         <p class="prix__montant">{a.prix}</p>
-        <p>{a.prixTexte}</p>
+        <h3 class="prix__titre">{a.prixPourquoiTitre}</h3>
+        <ul class="prix__liste">{a.prixPourquoi.map((p) => <li>{p}</li>)}</ul>
         <a class="bouton" href={chemin('contact', lang)}>{a.prixCta}</a>
       </div>
     </div>
@@ -98,7 +85,7 @@ const une = dessins.filter((x) => x.une);
       <div class="apparait impression__texte">
         <h2>{a.impressionTitre}</h2>
         <p class="chapeau">{a.impressionTexte}</p>
-        <a class="bouton bouton--vert" href={chemin('contact', lang)}>{a.impressionCta}</a>
+        <p>{a.impressionTexte2}</p>
       </div>
       <figure class="impression__video apparait cadre">
         <video controls playsinline preload="none" poster="/video/impressions.webp" width="478" height="850" aria-label={a.impressionAlt}>
@@ -106,6 +93,7 @@ const une = dessins.filter((x) => x.une);
           {a.impressionLecture}
         </video>
       </figure>
+      <p class="impression__cta apparait"><a class="bouton bouton--vert" href={chemin('contact', lang)}>{a.impressionCta}</a></p>
     </div>
   </section>
 
@@ -148,15 +136,20 @@ const une = dessins.filter((x) => x.une);
   .rubrique__texte { color: var(--encre-douce); font-size: 1rem; padding: 6px 10px 8px; }
   .rubrique__nombre { margin-top: auto; font-family: var(--titre); font-size: 1.2rem; color: var(--vert-fonce); }
 
-  .mur { column-count: 2; column-gap: 22px; margin: 34px 0 20px; }
+  .rubriques__suite { margin-top: 34px; }
   .offrir { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 26px; margin: 34px 0; }
   .offre { background: #fff; border: var(--trait) solid var(--orange-fonce); border-radius: var(--rayon); padding: 22px 22px 8px; box-shadow: 0 6px 0 rgba(196, 94, 0, 0.18); }
   .offre h3 { color: var(--orange-fonce); }
   .offre__pastille { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--orange-fonce); color: #fff; font-size: 1.6rem; margin-bottom: 12px; }
   .etapes-bloc { max-width: 980px; margin: 8px auto 40px; }
   .prix { max-width: 560px; margin-inline: auto; text-align: center; padding: 26px 24px 30px; border-color: var(--orange-fonce); transform: rotate(-0.8deg); }
+  .prix__titre { color: var(--orange-fonce); font-size: 1.5rem; margin: 14px 0 8px; }
+  .prix__liste { list-style: none; margin: 0 0 22px; padding: 0; text-align: left; display: grid; gap: 8px; }
+  .prix__liste li { position: relative; padding-left: 28px; line-height: 1.4; }
+  .prix__liste li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--orange-fonce); font-weight: 700; }
   .prix__montant { font-family: var(--titre); font-size: clamp(2.4rem, 6vw, 3.4rem); color: var(--orange-fonce); margin: 0; line-height: 1.1; }
   .impression { display: grid; gap: 32px; align-items: center; }
+  .impression__cta { margin: 0; text-align: center; }
   .impression__video { width: min(78%, 320px); margin: 0 auto; padding: 10px; background: var(--vert-pale); transform: rotate(2deg); }
   .impression__video video { display: block; width: 100%; height: auto; aspect-ratio: 478 / 850; border-radius: 10px; background: #000; }
   .apropos { display: grid; gap: 36px; align-items: center; }
@@ -165,17 +158,14 @@ const une = dessins.filter((x) => x.une);
 
   @media (max-width: 619px) {
     .rubriques { grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
-    .rubrique { display: grid; grid-template-columns: 104px 1fr; column-gap: 14px; align-items: center; text-align: left; padding: 10px 14px 10px 10px; }
-    .rubrique :global(img) { grid-column: 1; grid-row: 1 / 4; width: 104px; height: 104px; margin: 0; }
-    .rubrique__nom, .rubrique__texte, .rubrique__nombre { grid-column: 2; }
+    .rubrique { position: relative; justify-content: center; min-height: 124px; padding: 12px 14px 12px 136px; text-align: left; }
+    .rubrique :global(img) { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 104px; height: 104px; margin: 0; }
     .rubrique__nom { font-size: 1.6rem; }
     .rubrique__texte { padding: 2px 0; font-size: 0.95rem; line-height: 1.35; }
-    .rubrique__nombre { margin-top: 0; font-size: 1.05rem; }
+    .rubrique__nombre { margin-top: 2px; font-size: 1.05rem; }
   }
-  @media (min-width: 700px) { .mur { column-count: 3; } }
   @media (min-width: 960px) {
     .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: 48px; }
-    .mur { column-count: 4; }
     .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
     .impression { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
     .impression__video { order: -1; }

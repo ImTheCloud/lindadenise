@@ -12,7 +12,6 @@ export interface Dessin {
   titre: { fr: string; nl: string };
   largeur: number;
   hauteur: number;
-  une: boolean;
 }
 export const dessins = dessinsJson as Dessin[];
 

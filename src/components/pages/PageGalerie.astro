@@ -52,6 +52,12 @@ const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
   .filtre span { font-size: 0.9em; opacity: 0.7; margin-left: 4px; }
   .filtre:hover { transform: rotate(-2deg) translateY(-2px); }
   .filtre[aria-pressed='true'] { background: var(--vert-fonce); color: #fff; }
+  @media (max-width: 619px) {
+    .galerie { padding-top: 24px; }
+    .galerie h1 { font-size: 2.3rem; }
+    .filtres { gap: 8px; margin: 16px 0 22px; }
+    .filtre { font-size: 1.1rem; padding: 0.45em 0.85em; border-radius: 14px 8px 14px 8px / 8px 14px 8px 14px; }
+  }
   .mur { column-count: 2; column-gap: 22px; }
   @media (min-width: 700px) { .mur { column-count: 3; } }
   @media (min-width: 1000px) { .mur { column-count: 4; } }
