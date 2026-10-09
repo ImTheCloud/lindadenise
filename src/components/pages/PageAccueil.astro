@@ -131,7 +131,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .rubrique { display: flex; flex-direction: column; text-decoration: none; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 12px 12px 18px; box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1); text-align: center; }
   .rubrique:nth-child(odd) { transform: rotate(-1deg); } .rubrique:nth-child(even) { transform: rotate(1deg); }
   .rubrique:hover { transform: translateY(-8px) rotate(0deg); }
-  .rubrique :global(img) { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; border-radius: 14px 6px 14px 8px / 8px 14px 6px 14px; margin-bottom: 14px; }
+  .rubrique :global(img) { width: 100%; height: auto; aspect-ratio: 1080 / 1527; object-fit: cover; object-position: top; border-radius: 14px 6px 14px 8px / 8px 14px 6px 14px; margin-bottom: 14px; }
   .rubrique__nom { font-family: var(--titre); font-size: 1.9rem; color: var(--orange-titre); line-height: 1.1; }
   .rubrique__texte { color: var(--encre-douce); font-size: 1rem; padding: 6px 10px 8px; }
   .rubrique__nombre { margin-top: auto; font-family: var(--titre); font-size: 1.2rem; color: var(--vert-fonce); }
@@ -165,12 +165,9 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     .rubrique__nombre { margin-top: 2px; font-size: 1.05rem; }
   }
   @media (min-width: 960px) {
-    .rubriques { grid-template-columns: repeat(2, 1fr); gap: 32px; }
-    .rubrique { position: relative; justify-content: center; min-height: 300px; padding: 20px 24px 20px 316px; text-align: left; }
-    .rubrique :global(img) { position: absolute; left: 20px; top: 50%; translate: 0 -50%; width: 276px; height: 276px; margin: 0; }
-    .rubrique__nom { font-size: 2.3rem; }
-    .rubrique__texte { padding: 4px 0 8px; font-size: 1.1rem; }
-    .rubrique__nombre { margin-top: 6px; }
+    .rubriques { grid-template-columns: repeat(4, 1fr); gap: 28px; }
+    .rubrique__nom { font-size: 2.1rem; }
+    .rubrique__texte { font-size: 1.08rem; }
   }
   @media (min-width: 960px) {
     .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: 48px; }
