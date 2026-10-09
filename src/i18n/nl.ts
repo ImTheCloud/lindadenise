@@ -165,7 +165,7 @@ export const nl: Dico = {
     nom: 'Linde',
     parler: 'Linde, de kat van Linda, aaien',
     fermer: 'Bubbel sluiten',
-    silence: 'Linde stil maken',
+    silence: 'Laat Linde slapen',
     reveiller: 'Linde wakker maken',
     invite: 'Aai me!',
     reveil: 'Hm? Ah, je bent terug!',

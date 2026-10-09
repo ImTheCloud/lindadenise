@@ -163,7 +163,7 @@ export const fr = {
     nom: 'Tilleul',
     parler: 'Caresser Tilleul, le chat de Linda',
     fermer: 'Fermer la bulle',
-    silence: 'Faire taire Tilleul',
+    silence: 'Laisser Tilleul dormir',
     reveiller: 'Réveiller Tilleul',
     invite: 'Touchez-moi !',
     reveil: 'Hmm ? Ah, vous êtes revenu !',
