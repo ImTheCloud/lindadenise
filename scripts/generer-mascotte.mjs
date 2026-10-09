@@ -25,7 +25,7 @@ function queue(P, largeur, pas) {
   return { contour, ligne, bandes };
 }
 const qAssis = queue([[206, 318], [308, 332], [340, 236], [290, 148]], (t) => 34 - 9 * t, [0.1, 0.22, 0.34, 0.46, 0.58, 0.7, 0.82]);
-const qCouche = queue([[262, 338], [246, 374], [172, 376], [92, 358]], () => 24, [0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86]);
+const qCouche = queue([[284, 350], [250, 378], [172, 378], [92, 360]], () => 24, [0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86]);
 
 // ---------- tête (réutilisée dans les deux poses) ----------
 const tete = `<g filter="url(#m-contour)">
@@ -134,10 +134,10 @@ ${tete}
 <path d="${qCouche.ligne(0.5, 0.04, 0.96)}" stroke="#FFC98A" stroke-width="5" opacity=".6" stroke-linecap="round"/>
 </g>
 </g>
-<g class="m-cq-cuisse" filter="url(#m-contour-large)">
-<path d="M232,276 C224,230 298,222 310,284 C316,326 286,352 252,346 C226,340 238,308 232,276 Z" fill="url(#m-cuisse)"/>
-<path d="M246,256 C270,250 292,264 298,288" fill="none" stroke="#FFD08A" stroke-width="5.5" stroke-linecap="round" opacity=".7"/>
-<path d="M250,300 C268,318 288,314 300,302" fill="none" stroke="#B24E12" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+<g class="m-cq-hanche" fill="none" stroke-linecap="round">
+<path d="M240,254 C230,284 238,318 266,342" stroke="#B24E12" stroke-width="3.6" opacity=".32"/>
+<path d="M262,236 C292,242 310,266 312,296" stroke="#FFD08A" stroke-width="7" opacity=".5"/>
+<path d="M272,300 C284,312 298,312 308,304" stroke="#B24E12" stroke-width="3" opacity=".28"/>
 </g>
 <g class="m-cq-pied" stroke-linejoin="round" stroke-linecap="round">
 <path d="M298,334 L264,334 A7.5,7.5 0 0 0 255,345 A6,6 0 0 0 255,356 A7.5,7.5 0 0 0 264,364 L288,364 C306,364 314,352 310,344 C307,337 304,334 298,334 Z" fill="url(#m-creme)" stroke="#8B3E12" stroke-width="3.4"/>
