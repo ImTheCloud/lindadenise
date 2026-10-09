@@ -11,7 +11,7 @@ const d = t(lang);
 const a = d.accueil;
 const chemins = { fr: chemin('accueil', 'fr'), nl: chemin('accueil', 'nl') };
 const trouve = (id: string) => dessins.find((x) => x.id === id)!;
-const collage = ['trois-tournesols', 'l-ile-de-brehat', 'trio-de-chats-quebecois'].map(trouve);
+const collage = ['trois-tournesols', 'l-ile-de-brehat', 'time-et-rouroux-a-la-plage'].map(trouve);
 const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: 'jacinthe-sauvage-dans-le-bois', fleurs: 'grand-bigard-tulipes', animaux: 'paon-indien' };
 ---
 <Base lang={lang} chemins={chemins} mascotte="accueil">
