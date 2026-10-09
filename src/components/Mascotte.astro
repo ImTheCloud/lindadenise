@@ -8,7 +8,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 ---
 <aside class="mascotte" data-etat="repos" data-donnees={donnees} aria-label={m.nom}>
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
-    <p class="mascotte__texte"></p>
+    <p class="mascotte__texte"><span class="mascotte__cache"></span><span class="mascotte__vu" aria-hidden="true"></span></p>
     <button class="mascotte__muet" type="button" aria-label={m.fermer}>×</button>
   </div>
   <p class="mascotte__invite" aria-hidden="true">{m.invite}</p>
@@ -22,7 +22,8 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   const racine = document.querySelector<HTMLElement>('.mascotte');
   if (racine) {
     const bulle = racine.querySelector<HTMLElement>('.mascotte__bulle')!;
-    const texte = racine.querySelector<HTMLElement>('.mascotte__texte')!;
+    const cache = racine.querySelector<HTMLElement>('.mascotte__cache')!;
+    const vu = racine.querySelector<HTMLElement>('.mascotte__vu')!;
     const corps = racine.querySelector<HTMLButtonElement>('.mascotte__corps')!;
     const fermer = racine.querySelector<HTMLButtonElement>('.mascotte__muet')!;
     const coeurs = racine.querySelector<HTMLElement>('.mascotte__coeurs')!;
@@ -43,29 +44,47 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     let dernierChangement = 0;
     let rang = 0;
     let minuteurBulle: number | undefined;
-    let minuteurEtat: number | undefined;
     let minuteurSommeil: number | undefined;
 
     racine.classList.toggle('touche', touche);
 
-    const etat = (e: string, duree = 0) => {
-      racine.dataset.etat = e;
-      window.clearTimeout(minuteurEtat);
-      if (duree) minuteurEtat = window.setTimeout(() => { if (racine.dataset.etat === e) racine.dataset.etat = 'repos'; }, duree);
+    const etat = (e: string) => { racine.dataset.etat = e; };
+
+    // Petit saut de joie (classe à part : il se combine avec la parole)
+    const saut = (duree = 800) => {
+      racine.classList.remove('saut');
+      void racine.offsetWidth;
+      racine.classList.add('saut');
+      window.setTimeout(() => racine.classList.remove('saut'), duree);
     };
 
-    const dire = (message: string, duree = 9000) => {
+    // Il parle : la bulle s'écrit lettre après lettre, et sa bouche bouge tant que le texte s'écrit
+    let frappe: number | undefined;
+    const dire = (message: string, lecture = 6500) => {
       if (muet || !message || racine.dataset.etat === 'dort' || racine.dataset.etat === 'couche') return;
-      texte.textContent = message;
+      window.clearInterval(frappe);
+      window.clearTimeout(minuteurBulle);
+      cache.textContent = message;
+      vu.textContent = '';
       bulle.hidden = false;
       bulle.classList.remove('pop');
       void bulle.offsetWidth;
       bulle.classList.add('pop');
-      if (racine.dataset.etat === 'repos') etat('parle', Math.min(duree - 500, 600 + message.length * 55));
-      window.clearTimeout(minuteurBulle);
-      minuteurBulle = window.setTimeout(() => (bulle.hidden = true), duree);
       dernierChangement = Date.now();
+      const terminer = () => {
+        if (racine.dataset.etat === 'parle') etat('repos');
+        minuteurBulle = window.setTimeout(() => (bulle.hidden = true), lecture);
+      };
+      if (moinsDeMouvement) { vu.textContent = message; terminer(); return; }
+      etat('parle');
+      let i = 0;
+      frappe = window.setInterval(() => {
+        i += 1;
+        vu.textContent = message.slice(0, i);
+        if (i >= message.length) { window.clearInterval(frappe); terminer(); }
+      }, 34);
     };
+    const taire = () => { window.clearInterval(frappe); bulle.hidden = true; };
 
     const faireDesCoeurs = (n: number) => {
       if (moinsDeMouvement) return;
@@ -93,11 +112,11 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
         etat('repos');
         racine.classList.add('etire');
         window.setTimeout(() => racine.classList.remove('etire'), 1500);
-        if (avant === 'dort') window.setTimeout(() => dire(reveil, 5000), 600);
+        if (avant === 'dort') window.setTimeout(() => dire(reveil, 3500), 600);
       }
-      minuteurEnnui = window.setTimeout(() => dire(reactions.ennui, 5500), 11000);
-      minuteurSommeil = window.setTimeout(() => { bulle.hidden = true; etat('couche'); }, 19000);
-      minuteurDodo = window.setTimeout(() => { bulle.hidden = true; etat('dort'); }, 40000);
+      minuteurEnnui = window.setTimeout(() => dire(reactions.ennui, 3500), 11000);
+      minuteurSommeil = window.setTimeout(() => { taire(); etat('couche'); }, 19000);
+      minuteurDodo = window.setTimeout(() => { taire(); etat('dort'); }, 40000);
     };
     ['pointermove', 'scroll', 'keydown', 'touchstart'].forEach((nom) => addEventListener(nom, reveiller, { passive: true }));
     reveiller();
@@ -134,7 +153,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     fermer.addEventListener('click', () => {
       muet = true;
       ecrire('mascotte-muet', '1');
-      bulle.hidden = true;
+      taire();
       etat('repos');
     });
 
@@ -144,9 +163,9 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       ecrire('mascotte-touche', '1');
       racine.classList.add('touche');
       reveiller();
-      etat('saute', 900);
+      saut(900);
       faireDesCoeurs(6);
-      window.setTimeout(() => dire(anecdotes[rang++ % anecdotes.length], 8000), 450);
+      window.setTimeout(() => dire(anecdotes[rang++ % anecdotes.length], 5000), 450);
     });
     racine.addEventListener('mouseenter', () => window.clearTimeout(minuteurBulle));
     racine.addEventListener('mouseleave', () => {
@@ -166,10 +185,10 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
         muet = false;
         ecrire('mascotte-muet', '0');
         ecrire('mascotte-vu', '1');
-        etat('salut', 3400);
-        dire(sections.accueil, 9500);
+        saut();
+        dire(sections.accueil);
       } else {
-        etat('saute', 800);
+        saut();
         window.setTimeout(() => dire(sections[depart]), 300);
       }
     }, 450);
@@ -180,18 +199,18 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       const carte = (e.target as HTMLElement).closest?.('.carte');
       if (!carte || Date.now() - derniereRemarque < 14000) return;
       derniereRemarque = Date.now();
-      dire(reactions.carte[Math.floor(Math.random() * reactions.carte.length)], 5000);
+      dire(reactions.carte[Math.floor(Math.random() * reactions.carte.length)], 3000);
     });
     document.querySelectorAll<HTMLElement>('.filtre').forEach((b) =>
       b.addEventListener('click', () => {
         const phrase = reactions.filtres[b.dataset.filtre ?? ''];
         if (!phrase) return;
-        etat('saute', 700);
-        window.setTimeout(() => dire(phrase, 5500), 300);
+        saut(700);
+        window.setTimeout(() => dire(phrase, 3500), 300);
       }),
     );
     document.addEventListener('focusin', (e) => {
-      if ((e.target as HTMLElement).matches('input, textarea, select')) bulle.hidden = true;
+      if ((e.target as HTMLElement).matches('input, textarea, select')) taire();
     });
 
     // Il commente la section visible et fait un petit saut en changeant de sujet
@@ -204,7 +223,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
             if (!cle || cle === dernierSujet || !sections[cle]) continue;
             if (Date.now() - dernierChangement < 4000) continue;
             dernierSujet = cle;
-            if (racine.dataset.etat === 'repos') etat('saute', 700);
+            saut(700);
             window.setTimeout(() => dire(sections[cle]), 350);
           }
         },
@@ -228,7 +247,9 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte__bulle[hidden] { display: none; }
   .mascotte__bulle::after { content: ''; position: absolute; right: 30px; bottom: -14px; width: 18px; height: 18px; background: #fff; border-right: var(--trait) solid var(--vert-fonce); border-bottom: var(--trait) solid var(--vert-fonce); transform: rotate(45deg) skew(8deg, 8deg); }
   .mascotte__bulle.pop { animation: mascotte-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1); }
-  .mascotte__texte { margin: 0; color: var(--encre); }
+  .mascotte__texte { position: relative; margin: 0; color: var(--encre); }
+  .mascotte__cache { opacity: 0; }
+  .mascotte__vu { position: absolute; inset: 0; }
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
   .mascotte__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
@@ -245,7 +266,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 
   /* Parties animées, pivots en unités du dessin (viewBox 360 x 360) ; seules les paupières utilisent leur propre boîte */
   .m-queue { transform-origin: 206px 318px; animation: m-queue 4.6s ease-in-out infinite; }
-  .m-tete { transform-origin: 150px 206px; animation: m-tete 6s ease-in-out infinite; }
+  .m-tete { transform-origin: 150px 192px; animation: m-tete 6s ease-in-out infinite; }
   .m-corps { transform-origin: 150px 350px; animation: m-respire 3.6s ease-in-out infinite; }
   .m-paupiere { transform-box: fill-box; transform-origin: 50% 0%; transform: scaleY(0); animation: m-cligne 5.2s infinite; }
   .m-cq-corps { transform-origin: 190px 356px; animation: m-respire-couche 4.2s ease-in-out infinite; }
@@ -257,16 +278,12 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte-svg .m-bouche-ouverte { display: none !important; }
 
   .mascotte[data-etat='parle'] .m-bouche-fermee { display: none; }
-  .mascotte[data-etat='parle'] .m-bouche-ouverte { display: block !important; transform-origin: 150px 168px; animation: m-parle 0.34s ease-in-out infinite; }
+  .mascotte[data-etat='parle'] .m-bouche-ouverte { display: block !important; transform-origin: 150px 168px; animation: m-parle 0.5s ease-in-out infinite; }
+
+  .mascotte.saut .mascotte__corps { animation: m-saute 0.8s cubic-bezier(0.3, 0.7, 0.4, 1); }
   .mascotte[data-etat='parle'] .m-tete { animation: m-hoche 0.7s ease-in-out infinite; }
 
-  .mascotte[data-etat='salut'] .mascotte__corps { animation: m-saute 0.8s cubic-bezier(0.3, 0.7, 0.4, 1); }
-  .mascotte[data-etat='salut'] .m-bouche-fermee { display: none; }
-  .mascotte[data-etat='salut'] .m-bouche-ouverte { display: block !important; }
 
-  .mascotte[data-etat='saute'] .mascotte__corps { animation: m-saute 0.8s cubic-bezier(0.3, 0.7, 0.4, 1); }
-  .mascotte[data-etat='saute'] .m-bouche-fermee { display: none; }
-  .mascotte[data-etat='saute'] .m-bouche-ouverte { display: block !important; }
 
   /* Couché : il se pose en boule, sur le côté, les yeux fermés. Endormi : en plus, les zZz. */
   .mascotte[data-etat='couche'] .m-assis, .mascotte[data-etat='dort'] .m-assis { display: none; }
@@ -295,7 +312,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   @keyframes m-hoche { 0%, 100% { transform: rotate(-3deg) translateY(0); } 50% { transform: rotate(3deg) translateY(2px); } }
   @keyframes m-respire { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.016); } }
   @keyframes m-cligne { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
-  @keyframes m-parle { 0%, 100% { transform: scaleY(0.45); } 50% { transform: scaleY(1); } }
+  @keyframes m-parle { 0%, 100% { transform: scaleY(0.22); } 20% { transform: scaleY(1); } 40% { transform: scaleY(0.5); } 62% { transform: scaleY(0.95); } 80% { transform: scaleY(0.3); } }
   @keyframes m-saute { 0% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.06, 0.92); } 45% { transform: translateY(-38px) scale(0.96, 1.07); } 80% { transform: translateY(0) scale(1.05, 0.94); } 100% { transform: none; } }
   @keyframes m-respire-couche { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.03); } }
   @keyframes m-se-couche { from { transform: translateY(-26px) scale(0.92, 1.06); opacity: 0.2; } 60% { transform: translateY(0) scale(1.06, 0.92); opacity: 1; } to { transform: none; } }
