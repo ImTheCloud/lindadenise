@@ -1,5 +1,7 @@
 # Linda Denise : portfolio et boutique de dessins
 
+**Au début de chaque conversation, lire `docs/avancement.md` (où on en est, ce qui est validé, la suite). À la fin d'une session, le mettre à jour.**
+
 ## Le projet
 
 Site de Linda Denise (retraitée belge, dessins numériques faits au doigt sur smartphone). Portfolio de dessins avec filigrane, puis vente de fichiers à 10 € (phase 3). Brief : `docs/brief.md`. Notes privées (identité, statut légal) : `docs/prive/`, non versionné.
