@@ -131,7 +131,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .rubrique { display: flex; flex-direction: column; text-decoration: none; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 12px 12px 18px; box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1); text-align: center; }
   .rubrique:nth-child(odd) { transform: rotate(-1deg); } .rubrique:nth-child(even) { transform: rotate(1deg); }
   .rubrique:hover { transform: translateY(-8px) rotate(0deg); }
-  .rubrique :global(img) { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; border-radius: 14px 6px 14px 8px / 8px 14px 6px 14px; margin-bottom: 14px; }
+  .rubrique :global(img) { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; border-radius: 14px 6px 14px 8px / 8px 14px 6px 14px; margin-bottom: 14px; }
   .rubrique__nom { font-family: var(--titre); font-size: 1.9rem; color: var(--orange-titre); line-height: 1.1; }
   .rubrique__texte { color: var(--encre-douce); font-size: 1rem; padding: 6px 10px 8px; }
   .rubrique__nombre { margin-top: auto; font-family: var(--titre); font-size: 1.2rem; color: var(--vert-fonce); }
