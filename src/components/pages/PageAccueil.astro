@@ -93,6 +93,22 @@ const une = dessins.filter((x) => x.une);
     </div>
   </section>
 
+  <section class="section" data-mascotte="impression">
+    <div class="contenu impression">
+      <figure class="impression__video apparait cadre">
+        <video controls playsinline preload="none" poster="/video/impressions.webp" width="478" height="850" aria-label={a.impressionAlt}>
+          <source src="/video/impressions.mp4" type="video/mp4" />
+          {a.impressionLecture}
+        </video>
+      </figure>
+      <div class="apparait">
+        <h2>{a.impressionTitre}</h2>
+        <p class="chapeau">{a.impressionTexte}</p>
+        <a class="bouton bouton--vert" href={chemin('contact', lang)}>{a.impressionCta}</a>
+      </div>
+    </div>
+  </section>
+
   <section class="section" data-mascotte="apropos">
     <div class="contenu apropos">
       <div class="apropos__photo apparait">
@@ -140,6 +156,9 @@ const une = dessins.filter((x) => x.une);
   .etapes-bloc { max-width: 980px; margin: 8px auto 40px; }
   .prix { max-width: 560px; margin-inline: auto; text-align: center; padding: 26px 24px 30px; border-color: var(--orange-fonce); transform: rotate(-0.8deg); }
   .prix__montant { font-family: var(--titre); font-size: clamp(2.4rem, 6vw, 3.4rem); color: var(--orange-fonce); margin: 0; line-height: 1.1; }
+  .impression { display: grid; gap: 32px; align-items: center; }
+  .impression__video { width: min(78%, 320px); margin: 0 auto; padding: 10px; background: var(--vert-pale); transform: rotate(2deg); }
+  .impression__video video { display: block; width: 100%; height: auto; aspect-ratio: 478 / 850; border-radius: 10px; background: #000; }
   .apropos { display: grid; gap: 36px; align-items: center; }
   .apropos__photo { width: min(78%, 360px); margin-inline: auto; background: var(--vert-pale); padding: 10px; border: var(--trait) solid var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; box-shadow: var(--ombre); transform: rotate(-3deg); }
   .apropos__photo img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }
@@ -149,5 +168,6 @@ const une = dessins.filter((x) => x.une);
     .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: 48px; }
     .mur { column-count: 4; }
     .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
+    .impression { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
   }
 </style>
