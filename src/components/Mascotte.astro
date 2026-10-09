@@ -120,12 +120,12 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     }
 
     // Petites habitudes de chat, de temps en temps
-    const habitudes = ['etire', 'oreille', 'regarde-g', 'regarde-d', 'toilette'];
+    const habitudes = ['etire', 'oreille', 'regarde-g', 'regarde-d'];
     const habitude = () => {
       if (racine.dataset.etat === 'repos' && !moinsDeMouvement) {
         const h = habitudes[Math.floor(Math.random() * habitudes.length)];
         racine.classList.add(h);
-        window.setTimeout(() => racine.classList.remove(h), h === 'toilette' ? 2300 : 1700);
+        window.setTimeout(() => racine.classList.remove(h), 1700);
       }
       window.setTimeout(habitude, 8000 + Math.random() * 8000);
     };
@@ -248,7 +248,6 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .m-tete { transform-origin: 150px 206px; animation: m-tete 6s ease-in-out infinite; }
   .m-corps { transform-origin: 150px 350px; animation: m-respire 3.6s ease-in-out infinite; }
   .m-paupiere { transform-box: fill-box; transform-origin: 50% 0%; transform: scaleY(0); animation: m-cligne 5.2s infinite; }
-  .m-bras-mouvement { transform-origin: 118px 254px; }
   .m-cq-corps { transform-origin: 190px 356px; animation: m-respire-couche 4.2s ease-in-out infinite; }
   .m-oreille-g { transform-origin: 112px 90px; }
   .m-oreille-d { transform-origin: 188px 90px; }
@@ -261,10 +260,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte[data-etat='parle'] .m-bouche-ouverte { display: block !important; transform-origin: 150px 168px; animation: m-parle 0.34s ease-in-out infinite; }
   .mascotte[data-etat='parle'] .m-tete { animation: m-hoche 0.7s ease-in-out infinite; }
 
-  .mascotte[data-etat='salut'] .m-bras-salut, .mascotte.toilette .m-bras-salut { display: block !important; }
-  .mascotte[data-etat='salut'] .m-bras-mouvement { animation: m-salue 0.5s ease-in-out infinite alternate; }
-  .mascotte.toilette .m-bras-mouvement { transform: rotate(38deg); animation: m-toilette 0.45s ease-in-out infinite alternate; }
-  .mascotte.toilette .m-tete { animation: m-toilette-tete 2.2s ease-in-out; }
+  .mascotte[data-etat='salut'] .mascotte__corps { animation: m-saute 0.8s cubic-bezier(0.3, 0.7, 0.4, 1); }
   .mascotte[data-etat='salut'] .m-bouche-fermee { display: none; }
   .mascotte[data-etat='salut'] .m-bouche-ouverte { display: block !important; }
 
@@ -300,9 +296,6 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   @keyframes m-respire { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.016); } }
   @keyframes m-cligne { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
   @keyframes m-parle { 0%, 100% { transform: scaleY(0.45); } 50% { transform: scaleY(1); } }
-  @keyframes m-salue { from { transform: rotate(-12deg); } to { transform: rotate(16deg); } }
-  @keyframes m-toilette { from { transform: rotate(34deg); } to { transform: rotate(44deg); } }
-  @keyframes m-toilette-tete { 0%, 100% { transform: rotate(0); } 20%, 80% { transform: rotate(-6deg) translate(-4px, 8px); } }
   @keyframes m-saute { 0% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.06, 0.92); } 45% { transform: translateY(-38px) scale(0.96, 1.07); } 80% { transform: translateY(0) scale(1.05, 0.94); } 100% { transform: none; } }
   @keyframes m-respire-couche { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.03); } }
   @keyframes m-se-couche { from { transform: translateY(-26px) scale(0.92, 1.06); opacity: 0.2; } 60% { transform: translateY(0) scale(1.06, 0.92); opacity: 1; } to { transform: none; } }
