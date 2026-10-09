@@ -7,8 +7,8 @@ const d = t(lang);
 const a = d.apropos;
 const chemins = { fr: chemin('apropos', 'fr'), nl: chemin('apropos', 'nl') };
 ---
-<Base lang={lang} titre={a.titre} description={a.meta} chemins={chemins} mascotte="apropos">
-  <section class="section" data-mascotte="apropos">
+<Base lang={lang} titre={a.titre} description={a.meta} chemins={chemins}>
+  <section class="section">
     <div class="contenu histoire">
       <div class="histoire__photo">
         <div class="portrait"><img src="/images/linda.webp" width="640" height="640" alt={d.accueil.photoAlt} decoding="async" fetchpriority="high" /></div>

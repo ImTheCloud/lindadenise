@@ -14,8 +14,8 @@ const trouve = (id: string) => dessins.find((x) => x.id === id)!;
 const collage = ['trois-tournesols', 'l-ile-de-brehat', 'time-et-rouroux-a-la-plage'].map(trouve);
 const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: 'arbres', fleurs: 'grand-bigard-tulipes', animaux: 'paon-indien' };
 ---
-<Base lang={lang} chemins={chemins} mascotte="accueil">
-  <section class="heros" data-mascotte="accueil">
+<Base lang={lang} chemins={chemins}>
+  <section class="heros">
     <Feuilles />
     <div class="contenu heros__grille">
       <div class="heros__texte">
@@ -38,7 +38,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     <Etang />
   </section>
 
-  <section class="section" data-mascotte="rubriques">
+  <section class="section">
     <div class="contenu">
       <h2 class="centre apparait">{a.rubriquesTitre}</h2>
       <div class="rubriques">
@@ -58,7 +58,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     </div>
   </section>
 
-  <section class="section section--orange" data-mascotte="offrir">
+  <section class="section section--orange">
     <div class="contenu">
       <h2 class="centre apparait">{a.offrirTitre}</h2>
       <div class="offrir">
@@ -80,7 +80,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     </div>
   </section>
 
-  <section class="section" data-mascotte="impression">
+  <section class="section">
     <div class="contenu impression">
       <div class="apparait impression__texte">
         <h2>{a.impressionTitre}</h2>
@@ -97,7 +97,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     </div>
   </section>
 
-  <section class="section" data-mascotte="apropos">
+  <section class="section">
     <div class="contenu apropos">
       <div class="apropos__photo apparait">
         <img src="/images/linda.webp" width="640" height="640" alt={a.photoAlt} loading="lazy" decoding="async" />

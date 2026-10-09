@@ -8,8 +8,8 @@ const c = d.contact;
 const chemins = { fr: chemin('contact', 'fr'), nl: chemin('contact', 'nl') };
 const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[lang])]));
 ---
-<Base lang={lang} titre={c.titre} description={c.meta} chemins={chemins} mascotte="contact">
-  <section class="section" data-mascotte="contact">
+<Base lang={lang} titre={c.titre} description={c.meta} chemins={chemins}>
+  <section class="section">
     <div class="contenu contact">
       <header class="centre">
         <h1>{c.titre}</h1>

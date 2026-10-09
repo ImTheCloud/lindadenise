@@ -24,9 +24,9 @@ const jsonld = {
   image: `https://lindadenise.be/dessins/${dessin.id}.webp`,
 };
 ---
-<Base lang={lang} titre={titre} description={`${d.dessins.altDe(titre)} · ${rub.court} · ${d.dessins.prix}`} chemins={chemins} mascotte="dessin" image={`/dessins/${dessin.id}.webp`}>
+<Base lang={lang} titre={titre} description={`${d.dessins.altDe(titre)} · ${rub.court} · ${d.dessins.prix}`} chemins={chemins} image={`/dessins/${dessin.id}.webp`}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
-  <section class="section section--fiche" data-mascotte="dessin">
+  <section class="section section--fiche">
     <div class="contenu">
       <p><a href={chemin('dessins', lang)}>{d.dessins.retour}</a></p>
       <div class="fiche">

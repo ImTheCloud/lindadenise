@@ -4,7 +4,7 @@ import { t, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const m = t(lang).mascotte;
-const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, reveil: m.reveil, reactions: m.reactions, parler: m.parler, reveiller: m.reveiller, dodo: m.dodo });
+const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, parler: m.parler, reveiller: m.reveiller, dodo: m.dodo });
 ---
 <aside class="mascotte" data-etat="repos" data-donnees={donnees} aria-label={m.nom}>
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
@@ -32,14 +32,12 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     const fermer = racine.querySelector<HTMLButtonElement>('.mascotte__muet')!;
     const silence = racine.querySelector<HTMLButtonElement>('.mascotte__silence')!;
     const coeurs = racine.querySelector<HTMLElement>('.mascotte__coeurs')!;
-    const { sections, anecdotes, reveil, reactions, parler, reveiller: libelleReveil, dodo } = JSON.parse(racine.dataset.donnees ?? '{}') as {
+    const { accueil, anecdotes, parler, reveiller: libelleReveil, dodo } = JSON.parse(racine.dataset.donnees ?? '{}') as {
+      accueil: string;
+      anecdotes: string[];
       parler: string;
       reveiller: string;
       dodo: string;
-      sections: Record<string, string>;
-      anecdotes: string[];
-      reveil: string;
-      reactions: { carte: string[]; filtres: Record<string, string>; ennui: string };
     };
 
     const lire = (cle: string) => { try { return sessionStorage.getItem(cle); } catch { return null; } };
@@ -51,8 +49,6 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 
     let muet = lireDurable('mascotte-muet') === '1';
     let touche = lire('mascotte-touche') === '1';
-    let dernierSujet = '';
-    let dernierChangement = 0;
     let rang = 0;
     let minuteurBulle: number | undefined;
     let minuteurSommeil: number | undefined;
@@ -91,7 +87,6 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       bulle.classList.remove('pop');
       void bulle.offsetWidth;
       bulle.classList.add('pop');
-      dernierChangement = Date.now();
       const terminer = () => {
         if (racine.dataset.etat === 'parle') etat(muet ? 'dort' : 'repos');
         minuteurBulle = window.setTimeout(() => (bulle.hidden = true), lecture);
@@ -123,20 +118,16 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 
     // Repos : sans activité le chat se couche, puis s'endort ; le moindre mouvement le relève
     let minuteurDodo: number | undefined;
-    let minuteurEnnui: number | undefined;
     const reveiller = () => {
       if (muet) return;
       window.clearTimeout(minuteurSommeil);
       window.clearTimeout(minuteurDodo);
-      window.clearTimeout(minuteurEnnui);
       const avant = racine.dataset.etat;
       if (avant === 'dort' || avant === 'couche') {
         etat('repos');
         racine.classList.add('etire');
         window.setTimeout(() => racine.classList.remove('etire'), 1500);
-        if (avant === 'dort') window.setTimeout(() => dire(reveil, 3500), 600);
       }
-      minuteurEnnui = window.setTimeout(() => dire(reactions.ennui, 3500), 11000);
       minuteurSommeil = window.setTimeout(() => { taire(); etat('couche'); }, 19000);
       minuteurDodo = window.setTimeout(() => { taire(); etat('dort'); }, 40000);
     };
@@ -182,7 +173,6 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       ecrireDurable('mascotte-muet', '1');
       window.clearTimeout(minuteurSommeil);
       window.clearTimeout(minuteurDodo);
-      window.clearTimeout(minuteurEnnui);
       taire();
       regler();
       dire(dodo, 4500, true);
@@ -208,63 +198,18 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
       if (!bulle.hidden) minuteurBulle = window.setTimeout(() => (bulle.hidden = true), 3500);
     });
 
-    // Arrivée : le chat parle tout de suite. Salut complet à chaque arrivée sur le site
-    // (première page, venue de l'extérieur, ou rechargement) ; ensuite un mot sur la page ouverte.
-    const depart = document.body.dataset.mascotteDepart ?? 'texte';
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
-    let pageInterne = false;
-    try { pageInterne = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { /* sans référent */ }
-    const arrivee = lire('mascotte-vu') !== '1' || navigation?.type === 'reload' || !pageInterne;
-    dernierSujet = depart;
-    window.setTimeout(() => {
-      if (arrivee) {
-        ecrire('mascotte-vu', '1');
+    // Il ne parle qu'à la toute première visite, puis seulement quand on le touche
+    if (lireDurable('mascotte-accueil') !== '1') {
+      window.setTimeout(() => {
+        ecrireDurable('mascotte-accueil', '1');
         saut();
-        dire(sections.accueil);
-      } else {
-        saut();
-        window.setTimeout(() => dire(sections[depart]), 300);
-      }
-    }, 450);
+        dire(accueil);
+      }, 450);
+    }
 
-    // Réactions : survol d'un dessin, filtres de la galerie
-    let derniereRemarque = 0;
-    document.addEventListener('pointerover', (e) => {
-      const carte = (e.target as HTMLElement).closest?.('.carte');
-      if (!carte || Date.now() - derniereRemarque < 14000) return;
-      derniereRemarque = Date.now();
-      dire(reactions.carte[Math.floor(Math.random() * reactions.carte.length)], 3000);
-    });
-    document.querySelectorAll<HTMLElement>('.filtre').forEach((b) =>
-      b.addEventListener('click', () => {
-        const phrase = reactions.filtres[b.dataset.filtre ?? ''];
-        if (!phrase) return;
-        saut(700);
-        window.setTimeout(() => dire(phrase, 3500), 300);
-      }),
-    );
     document.addEventListener('focusin', (e) => {
       if ((e.target as HTMLElement).matches('input, textarea, select')) taire();
     });
-
-    // Il commente la section visible et fait un petit saut en changeant de sujet
-    if ('IntersectionObserver' in window) {
-      const obs = new IntersectionObserver(
-        (entrees) => {
-          for (const e of entrees) {
-            if (!e.isIntersecting) continue;
-            const cle = (e.target as HTMLElement).dataset.mascotte ?? '';
-            if (!cle || cle === dernierSujet || !sections[cle]) continue;
-            if (Date.now() - dernierChangement < 4000) continue;
-            dernierSujet = cle;
-            saut(700);
-            window.setTimeout(() => dire(sections[cle]), 350);
-          }
-        },
-        { threshold: 0.55 },
-      );
-      document.querySelectorAll('[data-mascotte]').forEach((el) => obs.observe(el));
-    }
   }
 </script>
 
