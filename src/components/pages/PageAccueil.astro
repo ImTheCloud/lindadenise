@@ -12,7 +12,7 @@ const a = d.accueil;
 const chemins = { fr: chemin('accueil', 'fr'), nl: chemin('accueil', 'nl') };
 const trouve = (id: string) => dessins.find((x) => x.id === id)!;
 const collage = ['trois-tournesols', 'paon-indien', 'trio-de-chats-quebecois'].map(trouve);
-const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: 'le-phare', fleurs: 'lys-tigre', animaux: '2-ecureuils-au-bord-de-l-eau' };
+const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: 'l-ile-de-brehat', fleurs: 'frangipanier', animaux: 'caroline' };
 ---
 <Base lang={lang} chemins={chemins} mascotte="accueil">
   <section class="heros" data-mascotte="accueil">
@@ -158,8 +158,8 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
 
   @media (max-width: 619px) {
     .rubriques { grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
-    .rubrique { position: relative; justify-content: center; min-height: 124px; padding: 12px 14px 12px 136px; text-align: left; }
-    .rubrique :global(img) { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 104px; height: 104px; margin: 0; }
+    .rubrique { position: relative; justify-content: center; min-height: 152px; padding: 12px 14px 12px 154px; text-align: left; }
+    .rubrique :global(img) { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 130px; height: 130px; margin: 0; }
     .rubrique__nom { font-size: 1.6rem; }
     .rubrique__texte { padding: 2px 0; font-size: 0.95rem; line-height: 1.35; }
     .rubrique__nombre { margin-top: 2px; font-size: 1.05rem; }
