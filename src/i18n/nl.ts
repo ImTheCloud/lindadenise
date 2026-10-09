@@ -164,7 +164,9 @@ export const nl: Dico = {
   mascotte: {
     nom: 'Linde',
     parler: 'Linde, de kat van Linda, aaien',
-    fermer: 'Linde het zwijgen opleggen',
+    fermer: 'Bubbel sluiten',
+    silence: 'Linde stil maken',
+    reveiller: 'Linde wakker maken',
     invite: 'Aai me!',
     reveil: 'Hm? Ah, je bent terug!',
     reactions: {

@@ -162,7 +162,9 @@ export const fr = {
   mascotte: {
     nom: 'Tilleul',
     parler: 'Caresser Tilleul, le chat de Linda',
-    fermer: 'Faire taire Tilleul',
+    fermer: 'Fermer la bulle',
+    silence: 'Faire taire Tilleul',
+    reveiller: 'Réveiller Tilleul',
     invite: 'Touchez-moi !',
     reveil: 'Hmm ? Ah, vous êtes revenu !',
     reactions: {

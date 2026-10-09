@@ -4,12 +4,13 @@ import { t, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const m = t(lang).mascotte;
-const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, reveil: m.reveil, reactions: m.reactions });
+const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, reveil: m.reveil, reactions: m.reactions, parler: m.parler, reveiller: m.reveiller });
 ---
 <aside class="mascotte" data-etat="repos" data-donnees={donnees} aria-label={m.nom}>
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
     <p class="mascotte__texte"><span class="mascotte__cache"></span><span class="mascotte__vu" aria-hidden="true"></span></p>
     <button class="mascotte__muet" type="button" aria-label={m.fermer}>×</button>
+    <button class="mascotte__silence" type="button">{m.silence}</button>
   </div>
   <p class="mascotte__invite" aria-hidden="true">{m.invite}</p>
   <div class="mascotte__coeurs" aria-hidden="true"></div>
@@ -26,8 +27,11 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     const vu = racine.querySelector<HTMLElement>('.mascotte__vu')!;
     const corps = racine.querySelector<HTMLButtonElement>('.mascotte__corps')!;
     const fermer = racine.querySelector<HTMLButtonElement>('.mascotte__muet')!;
+    const silence = racine.querySelector<HTMLButtonElement>('.mascotte__silence')!;
     const coeurs = racine.querySelector<HTMLElement>('.mascotte__coeurs')!;
-    const { sections, anecdotes, reveil, reactions } = JSON.parse(racine.dataset.donnees ?? '{}') as {
+    const { sections, anecdotes, reveil, reactions, parler, reveiller: libelleReveil } = JSON.parse(racine.dataset.donnees ?? '{}') as {
+      parler: string;
+      reveiller: string;
       sections: Record<string, string>;
       anecdotes: string[];
       reveil: string;
@@ -36,9 +40,12 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 
     const lire = (cle: string) => { try { return sessionStorage.getItem(cle); } catch { return null; } };
     const ecrire = (cle: string, v: string) => { try { sessionStorage.setItem(cle, v); } catch { /* sans stockage */ } };
+    // Le silence demandé par le visiteur est gardé d'une visite à l'autre
+    const lireDurable = (cle: string) => { try { return localStorage.getItem(cle); } catch { return null; } };
+    const ecrireDurable = (cle: string, v: string) => { try { localStorage.setItem(cle, v); } catch { /* sans stockage */ } };
     const moinsDeMouvement = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    let muet = lire('mascotte-muet') === '1';
+    let muet = lireDurable('mascotte-muet') === '1';
     let touche = lire('mascotte-touche') === '1';
     let dernierSujet = '';
     let dernierChangement = 0;
@@ -50,8 +57,17 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
 
     const etat = (e: string) => { racine.dataset.etat = e; };
 
+    // Silence : Tilleul dort, ne dit plus rien et ne bouge plus tant qu'on ne le réveille pas
+    const regler = () => {
+      racine.classList.toggle('silence', muet);
+      corps.setAttribute('aria-label', muet ? libelleReveil : parler);
+      if (muet) etat('dort');
+    };
+    regler();
+
     // Petit saut de joie (classe à part : il se combine avec la parole)
     const saut = (duree = 800) => {
+      if (muet) return;
       racine.classList.remove('saut');
       void racine.offsetWidth;
       racine.classList.add('saut');
@@ -104,6 +120,7 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     let minuteurDodo: number | undefined;
     let minuteurEnnui: number | undefined;
     const reveiller = () => {
+      if (muet) return;
       window.clearTimeout(minuteurSommeil);
       window.clearTimeout(minuteurDodo);
       window.clearTimeout(minuteurEnnui);
@@ -151,14 +168,27 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     window.setTimeout(habitude, 6000);
 
     fermer.addEventListener('click', () => {
-      muet = true;
-      ecrire('mascotte-muet', '1');
       taire();
-      etat('repos');
+      if (racine.dataset.etat === 'parle') etat('repos');
+    });
+
+    silence.addEventListener('click', () => {
+      muet = true;
+      ecrireDurable('mascotte-muet', '1');
+      window.clearTimeout(minuteurSommeil);
+      window.clearTimeout(minuteurDodo);
+      window.clearTimeout(minuteurEnnui);
+      taire();
+      regler();
     });
 
     corps.addEventListener('click', () => {
-      if (muet) { muet = false; ecrire('mascotte-muet', '0'); }
+      if (muet) {
+        muet = false;
+        ecrireDurable('mascotte-muet', '0');
+        etat('repos');
+        regler();
+      }
       touche = true;
       ecrire('mascotte-touche', '1');
       racine.classList.add('touche');
@@ -182,8 +212,6 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
     dernierSujet = depart;
     window.setTimeout(() => {
       if (arrivee) {
-        muet = false;
-        ecrire('mascotte-muet', '0');
         ecrire('mascotte-vu', '1');
         saut();
         dire(sections.accueil);
@@ -251,6 +279,10 @@ const donnees = JSON.stringify({ sections: m.sections, anecdotes: m.anecdotes, r
   .mascotte__cache { opacity: 0; }
   .mascotte__vu { position: absolute; inset: 0; }
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
+  .mascotte__silence { display: block; margin-top: 4px; padding: 6px 0; border: 0; background: none; font: inherit; font-size: 0.88rem; color: var(--vert-fonce); text-decoration: underline; cursor: pointer; }
+  .mascotte__silence:hover { color: var(--orange-fonce); }
+  .mascotte.silence { width: clamp(84px, 9vw, 130px); }
+  .mascotte.silence .mascotte__invite { display: none; }
   .mascotte__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
   /* Invitation à toucher le chat, tant qu'on ne l'a pas fait */
