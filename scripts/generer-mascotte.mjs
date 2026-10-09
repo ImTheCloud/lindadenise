@@ -139,9 +139,9 @@ ${tete}
 <path d="M262,236 C292,242 310,266 312,296" stroke="#FFD08A" stroke-width="7" opacity=".5"/>
 <path d="M272,300 C284,312 298,312 308,304" stroke="#B24E12" stroke-width="3" opacity=".28"/>
 </g>
-<g class="m-cq-pied" stroke-linejoin="round" stroke-linecap="round">
-<path d="M298,334 L264,334 A7.5,7.5 0 0 0 255,345 A6,6 0 0 0 255,356 A7.5,7.5 0 0 0 264,364 L288,364 C306,364 314,352 310,344 C307,337 304,334 298,334 Z" fill="url(#m-creme)" stroke="#8B3E12" stroke-width="3.4"/>
-<path d="M255,345 l9,0.6 M255,356 l9,-0.4" fill="none" stroke="#C07A4A" stroke-width="2.2"/>
+<g class="m-cq-pied" stroke-linejoin="round" stroke-linecap="round" transform="rotate(-6 282 348)">
+<path d="M298,338 C288,331 272,331 262,334 A7.5,7.5 0 0 0 254,344 A6,6 0 0 0 254,355 A7.5,7.5 0 0 0 262,364 C276,368 294,366 302,360 C312,354 310,342 298,338 Z" fill="url(#m-creme)" stroke="#8B3E12" stroke-width="3.4"/>
+<path d="M254,344 l9,0.8 M254,355 l9,-0.6" fill="none" stroke="#C07A4A" stroke-width="2.2"/>
 </g>
 <g class="m-cq-tete">
 <g filter="url(#m-contour-large)">
