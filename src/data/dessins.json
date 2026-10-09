@@ -352,6 +352,61 @@
     "une": true
   },
   {
+    "id": "lecture-sur-le-ponton",
+    "rubrique": "chats",
+    "titre": {
+      "fr": "Lecture sur le ponton",
+      "nl": "Lezen op de steiger"
+    },
+    "largeur": 760,
+    "hauteur": 1075,
+    "une": false
+  },
+  {
+    "id": "le-chat-et-le-nichoir",
+    "rubrique": "chats",
+    "titre": {
+      "fr": "Le chat et le nichoir",
+      "nl": "De kat en het vogelhuisje"
+    },
+    "largeur": 760,
+    "hauteur": 1075,
+    "une": false
+  },
+  {
+    "id": "le-chat-sur-les-genoux",
+    "rubrique": "chats",
+    "titre": {
+      "fr": "Le chat sur les genoux",
+      "nl": "De kat op schoot"
+    },
+    "largeur": 760,
+    "hauteur": 1075,
+    "une": false
+  },
+  {
+    "id": "chat-blanc-au-jardin",
+    "rubrique": "chats",
+    "titre": {
+      "fr": "Chat blanc au jardin",
+      "nl": "Witte kat in de tuin"
+    },
+    "largeur": 760,
+    "hauteur": 1075,
+    "une": false
+  },
+  {
+    "id": "portrait-de-chat",
+    "rubrique": "chats",
+    "titre": {
+      "fr": "Portrait de chat",
+      "nl": "Kattenportret"
+    },
+    "largeur": 760,
+    "hauteur": 1075,
+    "une": false
+  },
+  {
     "id": "couleurs",
     "rubrique": "fleurs",
     "titre": {
@@ -405,6 +460,17 @@
     "largeur": 760,
     "hauteur": 1075,
     "une": true
+  },
+  {
+    "id": "lys-rouge",
+    "rubrique": "fleurs",
+    "titre": {
+      "fr": "Lys rouge",
+      "nl": "Rode lelie"
+    },
+    "largeur": 760,
+    "hauteur": 1075,
+    "une": false
   },
   {
     "id": "iris-bleus",
@@ -522,6 +588,17 @@
     "titre": {
       "fr": "Arbres",
       "nl": "Bomen"
+    },
+    "largeur": 760,
+    "hauteur": 1075,
+    "une": false
+  },
+  {
+    "id": "arbre-rouge-et-lapins",
+    "rubrique": "nature",
+    "titre": {
+      "fr": "Arbre rouge et lapins",
+      "nl": "Rode boom en konijnen"
     },
     "largeur": 760,
     "hauteur": 1075,
