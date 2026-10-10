@@ -42,6 +42,7 @@ Souhait de Claudiu (2026-10-10) : un chat « ultra beau, stylé, qui fait des ch
 - Tilleul vu de profil : colonne souple (le contour du corps est recalculé autour d'elle), pattes à deux os qui se posent sans glisser, queue en ressorts, tête en 3/4 (petit repère 3D) qui se tourne vers le visiteur et suit le pointeur. Mêmes couleurs, yeux verts, museau crème, rayures.
 - Il marche, fait demi-tour (tête de face, corps qui pivote derrière), s'assoit (queue autour des pattes), se couche, dort (zzz), s'étire, chasse une feuille de tilleul (approche, se tapit, remue l'arrière-train, bondit dessus). Touché : petit saut, cœurs, yeux plissés. Pilote automatique pour enchaîner tout seul.
 - Mouvement réduit demandé : il reste assis. Calcul : environ 0,6 ms par image.
+- 1ers retours de Claudiu appliqués : taille de base validée ; tête réduite (82 %) ; contour en trait arrondi au lieu du filtre (les pointes d'oreilles ne sont plus coupées) ; queue toujours derrière le corps (plus d'effet de transparence) ; yeux découpés par des formes fixes et paupière de fourrure (fin du scintillement) ; demi-tour : la tête se tourne d'abord, puis le corps pivote vite sur un petit saut.
 - Suite si validé : remplacer `Mascotte.astro` en gardant bulle, silence, textes et accueil ; puis supprimer la page d'essai et sa route. Idées : toilette (se lèche la patte), ronronnement, aller à l'étang, chasser les feuilles qui tombent déjà sur le site.
 
 ## Manière de travailler (rappels pratiques)
