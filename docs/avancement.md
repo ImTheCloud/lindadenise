@@ -51,6 +51,11 @@ Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui 
 
 **Corrigé suite aux retours de Claudiu** : oreilles coupées, tête trop grosse, queue vue par transparence, queue saccadée assis, demi-tour « téléporté », scintillement et traits blancs des yeux, contour qui tremble, pattes arrière qui bougeaient à l'affût, yeux pendant l'étirement.
 
+**À faire en premier à la reprise** (demandé par Claudiu le 2026-10-10) :
+1. **Demi-tour** : pendant le pivot, il place son corps bizarrement. Trouver une autre façon de changer de direction, plus propre. Piste : un petit demi-cercle en marchant, vers le visiteur, au lieu de pivoter sur place.
+2. **Paupières et sourcils** : chaque fois qu'il ferme ou ouvre les yeux (s'endort, se réveille, s'étire), le trait du dessus de l'œil monte puis redescend. Cause probable : le passage brusque, sous 0,12 d'ouverture, entre le bord de paupière (alors tout en bas de l'œil) et l'arc de l'œil fermé (dessiné au milieu). Il faut que l'œil fermé soit à la même place que la paupière tout en bas, sans saut.
+3. **Regard** : il doit plus souvent regarder devant lui, assis comme dans les autres actions, et ne se tourner vers le visiteur que de temps en temps.
+
 **À vérifier à la reprise** (la dernière série de corrections n'a pas encore été vue par Claudiu) : plus de scintillement des yeux, en particulier l'œil du fond ; contour du corps stable ; demi-tour jugé « pro ». Claude ne voit pas l'animation en temps réel quand le navigateur intégré est masqué : il teste en faisant avancer le temps à la main. Les captures de Claudiu restent le meilleur juge.
 
 **Ensuite, une fois validé** : remplacer `Mascotte.astro` par le nouveau moteur en gardant la bulle, le bouton de silence, les textes et l'accueil, puis supprimer `essais/` et la route d'essai. Idées pour plus tard : toilette (se lèche la patte), ronronnement, aller jusqu'à l'étang, chasser les feuilles qui tombent déjà sur le site.
