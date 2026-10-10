@@ -34,7 +34,9 @@ Fait et validé par Claudiu :
 3. **Phase 3 : boutique** Stripe (Bancontact) + téléchargement sécurisé, seulement après la réponse sur le statut légal.
 4. Fin de projet : checklist (`docs/checklist-fin-de-projet.md`), achat du domaine `lindadenise.be`, mise en ligne en un seul déploiement, README à mettre à jour. Idées de fonctionnalités à proposer à Claudiu à ce moment-là : page Psaumes, livre d'or, liens réseaux, newsletter.
 
-## Idée à discuter (autre conversation) : animer Tilleul davantage
+## En discussion : un Tilleul plus avancé
+
+Souhait de Claudiu (2026-10-10) : un chat « ultra beau, stylé, qui fait des choses », qui **se déplace** (marche le long de l'écran, va se coucher ailleurs, rejoint l'étang). La performance n'est plus une contrainte. Rive et Spine écartés : export payant (outils gratuits uniquement) et fichiers que Claude ne peut pas modifier.
 
 Aujourd'hui Tilleul est un SVG découpé en parties animées en CSS (voir `CLAUDE.md`, section Mascotte) : deux poses (assis, couché), pas de marche ni de gestes riches. Pistes pour aller plus loin : (1) squelette en SVG avec parties imbriquées et pivots, cycle de marche en CSS ou en JavaScript ; (2) animation image par image (planche de dessins) ; (3) outil d'animation dédié (Rive, Lottie, Spine) avec fichier exporté joué sur le site ; (4) canvas / WebGL pour un vrai rig. À comparer sur : poids de la page (chat léger, site Lighthouse 96-100), respect de `prefers-reduced-motion`, effort de dessin de chaque pose, maintenance par Claude (le SVG est généré par script, pas édité à la main).
 
@@ -42,7 +44,7 @@ Aujourd'hui Tilleul est un SVG découpé en parties animées en CSS (voir `CLAUD
 
 - **Voir le site** : `npm run dev` dans ce dossier, puis http://localhost:4321 (la barre d'outils Astro est désactivée). Le serveur se lance en arrière-plan et reste actif.
 - **Git** : git de GitHub Desktop (voir `CLAUDE.md`), commit et push à chaque modification, **toujours `[skip ci]` à la fin du message** pour ne pas déclencher de déploiement Netlify (15 crédits par déploiement, 300 par mois). Un seul commit sans `[skip ci]` pour publier, uniquement sur demande de Claudiu.
-- **Netlify** : projet `lindadenise` branché sur GitHub (adresse `lindadenise.netlify.app`). La version en ligne est celle du 2026-10-10 (commit sans `[skip ci]`). Il reste à supprimer le projet `lindadenise-ancien` dans Netlify (Claudiu).
+- **Netlify** : projet `lindadenise` branché sur GitHub (adresse `lindadenise.netlify.app`). La version en ligne est celle du 2026-10-10 (commit sans `[skip ci]`). L'ancien projet `lindadenise-ancien` est supprimé.
 - **Catalogue** : titres, rubriques et traductions des dessins dans `scripts/preparer-dessins.mjs` (`npm run dessins`). Les originaux restent sur le Bureau de Claudiu (`~/Desktop/DessinsLinda`), jamais dans git.
 - **Étiquette git** `v1-ecureuil` : ancienne version avec l'écureuil Noisette, au cas où.
 - Le dépôt est public (choix assumé) : rien de personnel dedans.
