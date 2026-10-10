@@ -21,6 +21,16 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     <Fragment set:html={svg} />
   </button>
 </aside>
+<!-- Exécuté avant l'affichage : un chat mis en silence apparaît déjà endormi, sans image debout ni animation -->
+<script is:inline>
+  try {
+    if (localStorage.getItem('mascotte-muet') === '1') {
+      var chat = document.currentScript.previousElementSibling;
+      chat.dataset.etat = 'dort';
+      chat.classList.add('silence', 'sans-anim');
+    }
+  } catch (e) { /* sans stockage */ }
+</script>
 
 <script>
   const racine = document.querySelector<HTMLElement>('.mascotte');
@@ -173,12 +183,14 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       ecrireDurable('mascotte-muet', '1');
       window.clearTimeout(minuteurSommeil);
       window.clearTimeout(minuteurDodo);
+      racine.classList.remove('sans-anim');
       taire();
       regler();
       dire(dodo, 4500, true);
     });
 
     corps.addEventListener('click', () => {
+      racine.classList.remove('sans-anim');
       if (muet) {
         muet = false;
         ecrireDurable('mascotte-muet', '0');
@@ -235,6 +247,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte.silence { width: clamp(84px, 9vw, 130px); }
   .mascotte.silence .mascotte__invite { display: none; }
   .mascotte.silence .mascotte__silence { display: none; }
+  .mascotte.sans-anim .m-couche-pose { animation: none !important; }
   .mascotte__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
   /* Invitation à toucher le chat, tant qu'on ne l'a pas fait */
