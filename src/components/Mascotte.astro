@@ -101,7 +101,6 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       suit: (r) => { repere = r; placer(); },
     });
 
-    (window as any).__chat = chat; // TEMP
     // Il parle : la bulle s'écrit lettre après lettre, et sa bouche bouge tant que le texte s'écrit
     const cacherBulle = () => { bulle.hidden = true; chat.retenu = false; };
     const dire = (message: string, lecture = 6500, adieu = false) => {

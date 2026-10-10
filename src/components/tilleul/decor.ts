@@ -1,0 +1,29 @@
+// Le décor de l'accueil lu tel qu'il est à l'écran : l'étang (Etang.astro) et les feuilles qui tombent (Feuilles.astro)
+// vivent dans la section du haut. Sur les autres pages, ou quand cette section n'est plus visible, il n'y a rien à regarder.
+import type { Decor, FeuilleDecor } from './chat';
+
+const heros = () => document.querySelector<HTMLElement>('.heros');
+
+export const decorAccueil: Decor = {
+  // les lotus ne sont à regarder que si l'étang est au bas de l'écran, là où le chat se promène
+  lotus() {
+    const etang = heros()?.querySelector('.etang');
+    if (!etang) return [];
+    const r = etang.getBoundingClientRect();
+    if (r.top > innerHeight - 70 || r.bottom < innerHeight - 150) return [];
+    return [...etang.querySelectorAll('.flotte')].map((g) => {
+      const b = g.getBoundingClientRect();
+      return { x: b.left + b.width / 2, y: b.top + b.height * 0.3 };
+    });
+  },
+  feuilles() {
+    const h = heros();
+    if (!h) return [];
+    const r = h.getBoundingClientRect();
+    if (r.bottom < innerHeight * 0.5 || r.top > innerHeight * 0.5) return [];
+    return [...h.querySelectorAll<HTMLElement>('.feuille')].filter((el) => el.style.visibility !== 'hidden' && Number(getComputedStyle(el).opacity) > 0.5).map((el): FeuilleDecor => {
+      const b = el.getBoundingClientRect();
+      return { el, x: b.left + b.width / 2, y: b.top + b.height / 2 };
+    });
+  },
+};
