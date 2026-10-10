@@ -11,6 +11,7 @@ const chemins = { fr: chemin('merci', 'fr'), nl: chemin('merci', 'nl') };
     <div class="contenu">
       <h1>{d.merci.titre}</h1>
       <p class="chapeau">{d.merci.texte}</p>
+      <p>{d.merci.note}</p>
       <p><a class="bouton bouton--vert" href={chemin('accueil', lang)}>{d.merci.retour}</a></p>
     </div>
   </section>

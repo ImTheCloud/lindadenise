@@ -7,7 +7,7 @@ Dernière mise à jour : 2026-10-11 (mission Toiles en cours, non publiée : voi
 Consigne complète : `docs/prive/prompt-toiles.md`. Trois phases, un commit `[skip ci]` à la fin de chacune.
 
 - **Phase 1 : faite** (doublons, photos redressées, page Toiles FR + NL, menu, sélection de lot, vue « à l'échelle »).
-- **Phase 2 : à faire** (option toile sur les 76 fiches, licence et conditions, formulaire, documentation).
+- **Phase 2 : faite** (option toile sur les 76 fiches, licence et conditions, formulaire, documentation).
 - **Phase 3 : à faire** (vidéos motion design FR + NL, musique, intégration, documentation finale).
 
 Démarrage : Remote Control activé. Le maintien du Mac éveillé (`request_keep_awake`) a été refusé par le mode automatique : la mission a continué sans.
@@ -17,6 +17,13 @@ Démarrage : Remote Control activé. Le maintien du Mac éveillé (`request_keep
 **La page** : mur de galerie dessiné (enduit, lumière du haut, clou, ombres, bord aluminium, cartel sous chaque toile avec titre et prix), hauteurs et pentes légèrement différentes, relief et reflet qui suivent la souris ou le doigt (rien en mouvement réduit). Téléphone : une toile par écran, le défilement s'arrête doucement sur chacune. Clic : fiche plein écran (précédent / suivant, flèches du clavier, glisser du doigt, Échap), adresse `/toiles/#id` (les fiches des dessins y renvoient). « Voir à l'échelle » : la toile A3 dans un salon dessiné en centimètres (canapé, plante, règle de 50 cm, cotes 29,7 et 42 cm). Sélection : case dans la fiche, barre fixe en bas (nombre, remise, envoi, total, « Demander ces toiles »), gardée le temps de la visite (`sessionStorage`). Toile vendue : grisée, rond « Vendue ». Calculs vérifiés : 1 toile 212 €, 2 → 360 €, 3 → 480 €, 5 → 800 €.
 
 **Photos** : les coins ont été trouvés par ordinateur (OpenCV, hors dépôt) puis vérifiés sur planche contact ; 4 photos corrigées à la main (Frangipanier et Iris posés contre un mur beige, Bouleaux en hiver, Timé gambade). Trois photos étaient prises couchées (Bois de Hal, Chat à l'île de Bréhat, Fleurs bleues) : remises droites (signature « LB » en bas à droite). Plusieurs photos coupent déjà un bord de la toile : on garde ce qui est visible, recadré au ratio A3 sans déformation. Correction des blancs limitée à +10 %.
+
+**Phase 2** :
+- Chaque fiche de dessin a une section « Ce dessin en toile » (lien « Aussi en toile » sous le bouton). Si une toile de ce dessin est disponible : « Déjà imprimée en toile : disponible tout de suite, 200 € + envoi » et lien vers sa fiche. Sinon : toile sur commande (impression sur aluminium, A3, même prix, mêmes frais, mêmes remises), « délai communiqué par Linda à la demande » tant que `DELAI_TOILE_SUR_COMMANDE` (dans `src/data/vente.ts`) est vide, bouton vers le formulaire (sujet « Toile sur commande »). Le crochet n'est **pas** promis pour les toiles sur commande. Phrase sur chaque fiche : le fichier s'imprime sur papier, une toile ne se fait que par Linda.
+- Licence : « impression grand format » et « encadrer » remplacés par « imprimer sur papier pour votre usage privé, et encadrer cette impression » ; interdits ajoutés : impression sur toile, aluminium, Dibond, canevas, verre, bois ou tout support rigide, revente de reproductions ; phrase « Vous souhaitez une toile ? Elle est faite par Linda : demandez-la sur la page Toiles. » Même règle dans « Comment recevoir un dessin ? », « Ce que vous recevez » (accueil) et la case du formulaire.
+- Nouvelle page **Conditions de vente des toiles** (`/conditions-toiles/`, `/nl/verkoopvoorwaarden-doeken/`, lien dans le pied de page, la page Toiles et le formulaire) : pièce unique, prix et remises (tirés de `vente.ts`), pas de paiement sur le site, Belgique uniquement, emballage par Linda, transporteur de son choix et détails par e-mail, « Les conditions de retour seront précisées avant tout paiement. », droit d'auteur. Aucune règle de retour, rétractation ou garantie inventée.
+- Confidentialité : adresse de livraison (seulement pour une toile), durée (« le temps de traiter votre demande et l'envoi, puis supprimées »), stockage chez Netlify (États-Unis), sélection gardée dans le navigateur le temps de la visite. Mentions légales inchangées.
+- Formulaire `contact` : liste « Votre demande » (question, dessin numérique, toile, toile sur commande, exposition ou dépôt), toiles à cocher (pré-cochées depuis la sélection), total calculé, adresse de livraison obligatoire pour une toile (code postal belge à 4 chiffres ; « Un autre pays » bloque l'envoi avec « Les toiles sont livrées uniquement en Belgique. »), case des conditions de vente pour une toile, message pré-écrit selon le sujet (jamais par-dessus ce que le visiteur a écrit). Liens : `?toiles=a,b`, `?sujet=toile-commande&dessin=id`, `?sujet=exposition`, `?dessin=id`. Envoi en arrière-plan inchangé, repli vers Merci. Merci : « pas d'e-mail automatique, la réponse vient de Linda ». Testé (envoi simulé, rien n'est parti) : 3 toiles → « 480 € (3 toiles · remise −20 % · envoi offert) ».
 
 ### Toiles et dessins du site (comparaison du 2026-10-11)
 
@@ -52,6 +59,10 @@ Colis plat d'environ 30 × 42 cm bien emballé, jusqu'à 2 kg, en Belgique. Sour
 - Le bloc « Un mur pour mes toiles » est écrit à la première personne (Linda parle, comme sur la page À propos), signé « Linda ».
 - Les 12 toiles sans dessin du site ne sont pas dans le catalogue numérique : à proposer à Linda (il faudrait ses fichiers HD).
 - Le parquet, le canapé et la plante de la vue « à l'échelle » sont un décor dessiné ; seules les mesures de la toile (A3) et la règle de 50 cm sont exactes.
+- Confidentialité : la page promet que les messages sont supprimés après traitement. Il faudra le faire (Netlify → Forms), ou changer la phrase.
+- Délai des toiles sur commande : à renseigner dans `DELAI_TOILE_SUR_COMMANDE` (FR et NL) dès que Linda l'a donné.
+- La page Conditions de vente ne dit rien des retours, de la rétractation ni de la garantie (Linda ne sait pas encore) : à compléter avant tout paiement.
+- Le formulaire envoie maintenant le sujet en clair (« Une toile », etc.) et les champs `toiles`, `total`, `rue`, `code_postal`, `localite`, `pays`, `conditions_toile` : à vérifier dans Netlify au déploiement final.
 
 ### À poser à Linda (par Claudiu, jamais dans un e-mail de questions : voir `docs/prive/emails-linda.md`)
 

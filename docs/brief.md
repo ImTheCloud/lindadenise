@@ -25,8 +25,8 @@ La beauté de la nature et les chats. Esthétique, apaisant, naïf, joyeux, colo
 
 ## Vente
 
-- Fichiers numériques uniquement, pas d'impression
-- **10 € le dessin** (prix indicatif, affiché sur le site)
+- Dessins en fichier numérique : **10 € le dessin** (prix indicatif, affiché sur le site). L'acheteur peut l'imprimer **sur papier seulement**, pour son usage privé : jamais sur toile, aluminium, Dibond, canevas, verre, bois ou autre support rigide (ce serait concurrencer les toiles de Linda).
+- **Toiles** (depuis octobre 2026) : 23 dessins imprimés sur aluminium au format A3 (29,7 × 42 cm), prévus pour une exposition à Ostende qui n'a pas eu lieu. Vendus comme pièces uniques à **200 € + frais d'envoi**, livraison en Belgique uniquement, emballés et expédiés par Linda. Remise de lot (−10 % dès 2, −20 % dès 3), envoi offert dès 2. Tout dessin du site peut aussi être demandé en toile sur commande (même prix, délai donné par Linda). Linda est ouverte aux expositions et aux dépôts dans un lieu. Page `/toiles/`.
 - Pour l'instant : bouton « Recevoir ce dessin » qui mène au formulaire de contact, Linda répond personnellement
 - Plus tard : paiement Stripe (Bancontact), reçu par email, téléchargement sécurisé
 - Licence : **usage privé uniquement**, pas d'usage commercial (page « Licence d'utilisation »)

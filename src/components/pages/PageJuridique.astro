@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { t, chemin, ADRESSE, NUMERO_ENTREPRISE, type Lang, type Page } from '../../i18n';
-interface Props { lang: Lang; page: 'mentions' | 'confidentialite' | 'licence' }
+interface Props { lang: Lang; page: 'mentions' | 'confidentialite' | 'licence' | 'conditionsToiles' }
 const { lang, page } = Astro.props;
 const d = t(lang);
 const chemins = { fr: chemin(page as Page, 'fr'), nl: chemin(page as Page, 'nl') };
@@ -24,6 +24,7 @@ const licence = page === 'licence' ? d.licence : null;
             <div class="cadre non"><h2>{licence.nonTitre}</h2><ul>{licence.non.map((x) => <li>{x}</li>)}</ul></div>
           </div>
           <p>{licence.fin} <a href={chemin('contact', lang)}>{d.nav.contact}</a></p>
+          <p>{licence.toileAvant}<a href={chemin('toiles', lang)}>{licence.toileLien}</a>{licence.toileApres}</p>
         </>
       )}
       {blocs.map((b, i) => (

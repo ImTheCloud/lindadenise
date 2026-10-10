@@ -7,6 +7,15 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Après ce déploiement : vérifier dans Netlify (Forms) que `contact` est détecté, envoyer un message de test, vérifier l'email reçu (aussi dans les indésirables), marquer « Not spam » si besoin.
 - La notification email est déjà réglée (Forms → Form submission notifications) sur l'adresse de Claudiu : y mettre ou y ajouter celle de Linda quand elle sera prête.
 - Champ téléphone facultatif ajouté (2026-10-10).
+- Champs ajoutés le 2026-10-11 (toiles) : `sujet`, `toiles`, `total`, `rue`, `code_postal`, `localite`, `pays`, `conditions_toile`. Vérifier qu'ils arrivent dans Netlify et dans l'email de notification.
+- Confidentialité : la page dit que les messages sont supprimés une fois la demande traitée. Supprimer régulièrement les messages traités dans Netlify (Forms), ou changer la phrase.
+
+## Boutique Stripe : à prévoir pour les dessins ET les toiles
+- Seulement quand le statut légal de Linda est confirmé (Stripe Checkout, Bancontact).
+- **Toute commande (toile ou dessin numérique) envoie automatiquement un e-mail de confirmation au client** avec les détails : récapitulatif, montant, frais d'envoi, délai, coordonnées de Linda ; pour une toile, le transporteur et le suivi.
+- Toiles : remise de lot (−10 % dès 2 toiles, −20 % dès 3, toiles seulement), envoi offert dès 2 toiles, livraison en Belgique uniquement (adresse vérifiée), pièce unique : marquer la toile « vendue » automatiquement après paiement (aujourd'hui à la main dans `src/data/toiles.json`). Les règles sont déjà dans `src/data/vente.ts` (`calculLot`).
+- Toiles sur commande : délai et prix réels à obtenir de Linda (`DELAI_TOILE_SUR_COMMANDE`).
+- Conditions de vente des toiles (`/conditions-toiles/`) : écrire les retours, le droit de rétractation et la garantie quand Linda sait ce qui s'applique à son statut ; aujourd'hui la page dit seulement « Les conditions de retour seront précisées avant tout paiement. »
 
 ## Référencement (SEO) et Google
 - Acheter `lindadenise.be`, brancher le DNS sur Netlify, activer HTTPS, rediriger `www`
@@ -36,7 +45,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Vérifier la mascotte, le formulaire et le menu sur téléphone
 
 ## Contenu et légal
-- Mentions légales complètes (adresse, numéro d'entreprise selon le statut de Linda), conditions d'utilisation relues
+- Mentions légales complètes (adresse, numéro d'entreprise selon le statut de Linda), conditions d'utilisation et conditions de vente des toiles relues
 - Titres des dessins : dernière relecture avec Linda
 - Formulaire : notifications email dans Netlify, premier message « Non spam », test d'une vraie demande
 - README à mettre à jour (le rappeler en fin de projet)

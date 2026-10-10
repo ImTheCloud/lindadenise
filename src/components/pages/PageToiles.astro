@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Etapes from '../Etapes.astro';
-import { t, chemin, cheminDessin, dessins, toiles, type Lang } from '../../i18n';
+import { t, chemin, cheminDessin, dessins, toiles, resumeLot, type Lang } from '../../i18n';
 import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, REMISES, calculLot } from '../../data/vente';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -23,9 +23,8 @@ const liste = toiles.map((x) => {
 });
 // Résumé de la sélection pour chaque nombre de toiles, calculé ici pour que les textes restent dans les dictionnaires.
 const resumes = Array.from({ length: disponibles + 1 }, (_, n) => {
-  const c = calculLot(n);
-  const detail = [c.pourcent ? tt.selection.remise(c.pourcent) : '', c.envoi ? tt.selection.envoi(c.envoi) : tt.selection.envoiOffert].filter(Boolean);
-  return { nombre: tt.selection.nombre(n), detail: detail.join(' · '), total: tt.selection.total(c.total) };
+  const r = resumeLot(lang, n);
+  return { ...r, total: tt.selection.total(r.total) };
 });
 // Accrochage : chaque toile un peu plus haut ou plus bas, et très légèrement penchée.
 const pente = (i: number) => (((i * 37) % 9) - 4) * 0.28;
@@ -89,6 +88,7 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
           <li>{tt.envoiOffert(ENVOI_OFFERT_DES)}</li>
         </ul>
         <p class="info__note">{tt.livraison} {tt.paiement}</p>
+        <p class="info__note"><a href={chemin('conditionsToiles', lang)}>{tt.conditions}</a></p>
       </article>
     </div>
   </section>

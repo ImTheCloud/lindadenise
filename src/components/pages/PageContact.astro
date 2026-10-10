@@ -1,12 +1,30 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { t, chemin, dessins, type Lang } from '../../i18n';
+import { t, chemin, dessins, toiles, resumeLot, type Lang } from '../../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
 const c = d.contact;
 const chemins = { fr: chemin('contact', 'fr'), nl: chemin('contact', 'nl') };
-const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[lang])]));
+const disponibles = toiles.filter((x) => !x.vendue);
+// Tout ce que le script du formulaire doit écrire vient d'ici, pour que les textes restent dans les dictionnaires.
+const donnees = {
+  dessins: Object.fromEntries(dessins.map((x) => [x.id, { dessin: c.prefill(x.titre[lang]), commande: c.prefillCommande(x.titre[lang]) }])),
+  toiles: Object.fromEntries(disponibles.map((x) => [x.id, c.citer(x.titre[lang])])),
+  totaux: Array.from({ length: disponibles.length + 1 }, (_, n) => {
+    const r = resumeLot(lang, n);
+    return `${d.toiles.prix(r.total)} (${r.nombre} · ${r.detail})`;
+  }),
+  modeles: { toile: c.prefillToiles(1, '{toiles}', '{total}'), toiles: c.prefillToiles(2, '{toiles}', '{total}'), exposition: c.prefillExposition },
+  erreurs: { aucuneToile: c.aucuneToile, horsBelgique: c.horsBelgique, codePostal: c.codePostalErreur },
+};
+const sujets = [
+  ['question', c.sujets.question],
+  ['dessin', c.sujets.dessin],
+  ['toile', c.sujets.toile],
+  ['toile-commande', c.sujets.commande],
+  ['exposition', c.sujets.exposition],
+] as const;
 ---
 <Base lang={lang} titre={c.titre} description={c.meta} chemins={chemins}>
   <section class="section">
@@ -15,7 +33,7 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
         <h1>{c.titre}</h1>
         <p class="chapeau">{c.intro}</p>
       </header>
-      <form class="formulaire cadre" name="contact" method="POST" action={chemin('merci', lang)} data-netlify="true" netlify-honeypot="bot-field" data-prefill={JSON.stringify(prefill)} data-envoi={c.envoi} data-merci={c.merci} data-erreur={c.erreur}>
+      <form class="formulaire cadre" name="contact" method="POST" action={chemin('merci', lang)} data-netlify="true" netlify-honeypot="bot-field" data-donnees={JSON.stringify(donnees)} data-envoi={c.envoi} data-merci={c.merci} data-erreur={c.erreur}>
         <input type="hidden" name="form-name" value="contact" />
         <p class="piege"><label>Ne pas remplir <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
         <label for="nom">{c.nom}</label>
@@ -24,14 +42,64 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
         <input id="email" name="email" type="email" autocomplete="email" required />
         <label for="tel">{c.tel}</label>
         <input id="tel" name="tel" type="tel" autocomplete="tel" />
-        <label for="dessin">{c.dessin}</label>
-        <select id="dessin" name="dessin">
-          <option value="">{c.aucun}</option>
-          {dessins.map((x) => <option value={x.titre[lang]} data-id={x.id}>{x.titre[lang]}</option>)}
+        <label for="sujet">{c.sujet}</label>
+        <select id="sujet" name="sujet">
+          {sujets.map(([code, nom]) => <option value={nom} data-code={code}>{nom}</option>)}
         </select>
-        <p class="conditions" data-conditions hidden>
-          <input id="conditions" name="conditions" type="checkbox" value="oui" />
+
+        <div class="bloc" data-pour="dessin toile-commande" hidden>
+          <label for="dessin">{c.dessin}</label>
+          <select id="dessin" name="dessin" data-requis>
+            <option value="">{c.aucun}</option>
+            {dessins.map((x) => <option value={x.titre[lang]} data-id={x.id}>{x.titre[lang]}</option>)}
+          </select>
+        </div>
+
+        <fieldset class="bloc" data-pour="toile" hidden>
+          <legend>{c.toilesChoix}</legend>
+          <p class="formulaire__note">{c.toilesAide}</p>
+          <div class="choix-toiles">
+            {disponibles.map((x) => <label class="choix"><input type="checkbox" value={x.id} data-toile />{x.titre[lang]}</label>)}
+          </div>
+          <input type="hidden" name="toiles" />
+        </fieldset>
+
+        <div class="bloc total" data-pour="toile toile-commande" hidden>
+          <p><strong>{c.total}</strong> <span data-total></span></p>
+          <input type="hidden" name="total" />
+          <p class="formulaire__note" data-pour="toile">{c.totalNote}</p>
+          <p class="formulaire__note" data-pour="toile-commande">{c.commandeNote}</p>
+        </div>
+
+        <fieldset class="bloc" data-pour="toile toile-commande" hidden>
+          <legend>{c.adresseTitre}</legend>
+          <label for="rue">{c.rue}</label>
+          <input id="rue" name="rue" type="text" autocomplete="street-address" data-requis />
+          <div class="adresse__ligne">
+            <div>
+              <label for="code-postal">{c.codePostal}</label>
+              <input id="code-postal" name="code_postal" type="text" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{3}" maxlength="4" title={c.codePostalErreur} data-requis />
+            </div>
+            <div>
+              <label for="localite">{c.localite}</label>
+              <input id="localite" name="localite" type="text" autocomplete="address-level2" data-requis />
+            </div>
+          </div>
+          <label for="pays">{c.pays}</label>
+          <select id="pays" name="pays">
+            <option value={c.paysBelgique}>{c.paysBelgique}</option>
+            <option value={c.paysAutre} data-autre>{c.paysAutre}</option>
+          </select>
+          <p class="erreur" data-hors-belgique role="alert" hidden>{c.horsBelgique}</p>
+        </fieldset>
+
+        <p class="conditions" data-pour="dessin" hidden>
+          <input id="conditions" name="conditions" type="checkbox" value="oui" data-requis />
           <label for="conditions">{c.conditionsAvant}<a href={chemin('licence', lang)} target="_blank" rel="noopener">{c.conditionsLien}</a>{c.conditionsApres}</label>
+        </p>
+        <p class="conditions" data-pour="toile toile-commande" hidden>
+          <input id="conditions-toile" name="conditions_toile" type="checkbox" value="oui" data-requis />
+          <label for="conditions-toile">{c.conditionsToileAvant}<a href={chemin('conditionsToiles', lang)} target="_blank" rel="noopener">{c.conditionsToileLien}</a>{c.conditionsToileApres}</label>
         </p>
         <label for="message">{c.message}</label>
         <textarea id="message" name="message" rows="8" required placeholder={c.placeholder}></textarea>
@@ -43,26 +111,73 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
   </section>
 </Base>
 <script>
+  interface Donnees {
+    dessins: Record<string, { dessin: string; commande: string }>;
+    toiles: Record<string, string>;
+    totaux: string[];
+    modeles: { toile: string; toiles: string; exposition: string };
+    erreurs: { aucuneToile: string; horsBelgique: string; codePostal: string };
+  }
   const form = document.querySelector<HTMLFormElement>('form.formulaire');
   if (form) {
-    const prefill = JSON.parse(form.dataset.prefill ?? '{}') as Record<string, string>;
-    const select = form.querySelector<HTMLSelectElement>('#dessin')!;
-    const message = form.querySelector<HTMLTextAreaElement>('#message')!;
-    const id = new URLSearchParams(location.search).get('dessin');
-    if (id && prefill[id]) {
-      const option = [...select.options].find((o) => o.dataset.id === id);
-      if (option) select.value = option.value;
-      message.value = prefill[id];
+    const donnees = JSON.parse(form.dataset.donnees ?? '{}') as Donnees;
+    const champ = <T extends Element>(s: string) => form.querySelector<T>(s)!;
+    const sujet = champ<HTMLSelectElement>('#sujet');
+    const dessin = champ<HTMLSelectElement>('#dessin');
+    const message = champ<HTMLTextAreaElement>('#message');
+    const pays = champ<HTMLSelectElement>('#pays');
+    const codePostal = champ<HTMLInputElement>('#code-postal');
+    const casesToiles = [...form.querySelectorAll<HTMLInputElement>('[data-toile]')];
+    const horsBelgique = champ<HTMLElement>('[data-hors-belgique]');
+    const code = () => sujet.selectedOptions[0]?.dataset.code ?? 'question';
+    const idDessin = () => dessin.selectedOptions[0]?.dataset.id ?? '';
+    const choisies = () => casesToiles.filter((x) => x.checked).map((x) => x.value);
+
+    // Le message est pré-écrit tant que le visiteur ne l'a pas modifié lui-même.
+    let messageAuto = '';
+    function preEcrire(texte: string) {
+      if (message.value === '' || message.value === messageAuto) message.value = texte;
+      messageAuto = texte;
     }
-    const bloc = form.querySelector<HTMLElement>('[data-conditions]')!;
-    const case_ = bloc.querySelector<HTMLInputElement>('input')!;
-    const majConditions = () => {
-      const choisi = select.value !== '';
-      bloc.hidden = !choisi;
-      case_.required = choisi;
-    };
-    select.addEventListener('change', majConditions);
-    majConditions();
+
+    function majFormulaire() {
+      const s = code();
+      form!.querySelectorAll<HTMLElement>('[data-pour]').forEach((b) => { b.hidden = !b.dataset.pour!.split(' ').includes(s); });
+      form!.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-requis]').forEach((x) => { x.required = !x.closest('[hidden]'); });
+      const ids = choisies();
+      const nombre = s === 'toile' ? ids.length : s === 'toile-commande' ? 1 : 0;
+      const total = nombre ? donnees.totaux[nombre] : '';
+      champ('[data-total]').textContent = total;
+      champ<HTMLInputElement>('input[name=total]').value = total;
+      const titres = s === 'toile' ? ids.map((id) => donnees.toiles[id]).join(', ') : '';
+      champ<HTMLInputElement>('input[name=toiles]').value = titres;
+      // Au moins une toile cochée, et livraison en Belgique seulement.
+      casesToiles[0]?.setCustomValidity(s === 'toile' && ids.length === 0 ? donnees.erreurs.aucuneToile : '');
+      const ailleurs = !!pays.selectedOptions[0]?.hasAttribute('data-autre') && (s === 'toile' || s === 'toile-commande');
+      pays.setCustomValidity(ailleurs ? donnees.erreurs.horsBelgique : '');
+      horsBelgique.hidden = !ailleurs;
+      let texte = '';
+      if (s === 'dessin' && idDessin()) texte = donnees.dessins[idDessin()].dessin;
+      if (s === 'toile-commande' && idDessin()) texte = donnees.dessins[idDessin()].commande;
+      if (s === 'toile' && ids.length) texte = donnees.modeles[ids.length > 1 ? 'toiles' : 'toile'].replace('{toiles}', titres).replace('{total}', total);
+      if (s === 'exposition') texte = donnees.modeles.exposition;
+      preEcrire(texte);
+    }
+
+    // Arrivée depuis un lien : ?dessin=…, ?sujet=toile-commande&dessin=…, ?toiles=a,b, ?sujet=exposition
+    const params = new URLSearchParams(location.search);
+    const voulu = params.get('sujet') ?? (params.get('toiles') ? 'toile' : params.get('dessin') ? 'dessin' : '');
+    const option = [...sujet.options].find((o) => o.dataset.code === voulu);
+    if (option) sujet.value = option.value;
+    const optionDessin = [...dessin.options].find((o) => o.dataset.id === params.get('dessin'));
+    if (optionDessin) dessin.value = optionDessin.value;
+    const demandees = (params.get('toiles') ?? '').split(',');
+    casesToiles.forEach((x) => { x.checked = demandees.includes(x.value); });
+    [sujet, dessin, pays, ...casesToiles].forEach((x) => x.addEventListener('change', majFormulaire));
+    codePostal.addEventListener('input', () => codePostal.setCustomValidity(''));
+    codePostal.addEventListener('invalid', () => codePostal.setCustomValidity(codePostal.validity.patternMismatch ? donnees.erreurs.codePostal : ''));
+    majFormulaire();
+
     const etat = form.querySelector<HTMLElement>('.formulaire__etat')!;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -74,6 +189,8 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
         const r = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: corps });
         if (!r.ok) throw new Error(String(r.status));
         form.reset();
+        messageAuto = '';
+        majFormulaire();
         etat.textContent = form.dataset.merci ?? '';
         etat.className = 'formulaire__etat ok';
       } catch {
@@ -88,15 +205,25 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
 <style>
   .contact { max-width: 760px; }
   .formulaire { display: grid; gap: 8px; padding: clamp(20px, 4vw, 38px); margin-top: 30px; }
-  .formulaire label { font-family: var(--titre); font-size: 1.3rem; color: var(--vert-fonce); margin-top: 10px; }
+  .formulaire label, .formulaire legend { font-family: var(--titre); font-size: 1.3rem; color: var(--vert-fonce); margin-top: 10px; }
   .formulaire input, .formulaire select, .formulaire textarea { font: inherit; font-size: 1.1rem; padding: 12px 14px; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); background: #fff; color: var(--encre); width: 100%; }
   .formulaire input:focus, .formulaire select:focus, .formulaire textarea:focus { outline: 3px dashed var(--orange-fonce); outline-offset: 2px; }
+  .bloc { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+  .bloc[hidden], .formulaire [data-pour][hidden] { display: none; }
+  .formulaire legend { padding: 0; }
+  .choix-toiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; }
+  .formulaire .choix { display: flex; gap: 10px; align-items: center; margin: 0; font-family: var(--texte); font-size: 1.05rem; color: var(--encre); cursor: pointer; }
+  .formulaire .choix input, .conditions input { appearance: none; -webkit-appearance: none; flex: none; width: 30px; height: 30px; margin: 2px 0 0; padding: 0; cursor: pointer; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 12px 6px 11px 7px / 7px 11px 6px 12px; transition: transform 0.15s, background-color 0.15s; display: grid; place-items: center; }
+  .formulaire .choix input:checked, .conditions input:checked { background: var(--vert-creme); }
+  .formulaire .choix input:checked::after, .conditions input:checked::after { content: ''; width: 18px; height: 11px; margin-top: -4px; border-left: 4.5px solid var(--orange-fonce); border-bottom: 4.5px solid var(--orange-fonce); border-radius: 2px 0 3px 2px; transform: rotate(-48deg); }
+  .total { margin-top: 12px; padding: 12px 16px; background: var(--orange-creme); border-radius: var(--rayon-petit); }
+  .total p { margin: 0; }
+  .total strong { font-family: var(--titre); font-weight: 400; font-size: 1.3rem; color: var(--orange-fonce); }
+  .adresse__ligne { display: grid; grid-template-columns: 9em 1fr; gap: 12px; }
+  .adresse__ligne > div { display: grid; gap: 8px; }
+  .erreur { margin: 4px 0 0; color: #a12a1a; font-weight: 600; }
   .conditions { display: flex; gap: 12px; align-items: flex-start; margin: 14px 0 0; }
-  .conditions[hidden] { display: none; }
-  .conditions input { appearance: none; -webkit-appearance: none; flex: none; width: 30px; height: 30px; margin: 2px 0 0; padding: 0; cursor: pointer; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 12px 6px 11px 7px / 7px 11px 6px 12px; transition: transform 0.15s, background-color 0.15s; display: grid; place-items: center; }
   .conditions input:hover { transform: rotate(-4deg) scale(1.06); }
-  .conditions input:checked { background: var(--vert-creme); }
-  .conditions input:checked::after { content: ''; width: 18px; height: 11px; margin-top: -4px; border-left: 4.5px solid var(--orange-fonce); border-bottom: 4.5px solid var(--orange-fonce); border-radius: 2px 0 3px 2px; transform: rotate(-48deg); }
   .conditions label { font-family: var(--texte); font-size: 1.05rem; color: var(--encre); margin: 0; cursor: pointer; }
   .formulaire .bouton { justify-self: start; margin-top: 18px; }
   .formulaire .bouton:disabled { opacity: 0.6; cursor: wait; }

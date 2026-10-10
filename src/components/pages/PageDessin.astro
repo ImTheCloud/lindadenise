@@ -4,7 +4,7 @@ import CarteDessin from '../CarteDessin.astro';
 import Apercu from '../Apercu.astro';
 import Etapes from '../Etapes.astro';
 import { t, chemin, cheminDessin, cheminToile, dessins, toiles, type Dessin, type Lang } from '../../i18n';
-import { PRIX_TOILE } from '../../data/vente';
+import { PRIX_TOILE, DELAI_TOILE_SUR_COMMANDE } from '../../data/vente';
 interface Props { lang: Lang; dessin: Dessin }
 const { lang, dessin } = Astro.props;
 const d = t(lang);
@@ -46,7 +46,7 @@ const jsonld = {
           <p class="fiche__prix">{d.dessins.prix}</p>
           <p>{d.dessins.prixTexte}</p>
           <p><a class="bouton" href={contactUrl}>{d.dessins.cta}</a></p>
-          <p class="fiche__petit"><a href={chemin('licence', lang)}>{d.dessins.licence}</a>{toile && <> · <a href="#toile">{d.dessins.toileLien}</a></>}</p>
+          <p class="fiche__petit"><a href={chemin('licence', lang)}>{d.dessins.licence}</a> · <a href="#toile">{d.dessins.toileLien}</a></p>
           <nav class="fiche__nav" aria-label="Navigation">
             <a href={cheminDessin(prec.id, lang)} rel="prev">
               <Apercu id={prec.id} alt="" largeur={prec.largeur} hauteur={prec.hauteur} />
@@ -61,24 +61,41 @@ const jsonld = {
       </div>
     </div>
   </section>
-  {toile && (
-    <section class="section section--vert" id="toile">
-      <div class="contenu option-toile cadre">
+  <section class="section section--vert" id="toile">
+    <div class="contenu option-toile cadre">
+      {toile ? (
         <a class="option-toile__image" href={cheminToile(toile.id, lang)} tabindex="-1" aria-hidden="true">
           <picture>
             <source type="image/avif" srcset={`/toiles/${toile.id}-400.avif`} />
             <img src={`/toiles/${toile.id}-400.webp`} width="400" height="566" alt="" loading="lazy" decoding="async" />
           </picture>
         </a>
-        <div>
-          <h2>{d.dessins.toileTitre}</h2>
-          <p class="option-toile__nom">{d.dessins.toileNom(toile.titre[lang])}</p>
-          <p>{d.dessins.toileDeja(PRIX_TOILE)}</p>
-          <a class="bouton bouton--vert" href={cheminToile(toile.id, lang)}>{d.dessins.toileVoir}</a>
+      ) : (
+        <div class="option-toile__image" aria-hidden="true">
+          <Apercu id={dessin.id} alt="" largeur={dessin.largeur} hauteur={dessin.hauteur} />
         </div>
+      )}
+      <div>
+        <h2>{d.dessins.toileTitre}</h2>
+        {toile ? (
+          <>
+            <p class="option-toile__nom">{d.dessins.toileNom(toile.titre[lang])}</p>
+            <p>{d.dessins.toileDeja(PRIX_TOILE)}</p>
+            <a class="bouton bouton--vert" href={cheminToile(toile.id, lang)}>{d.dessins.toileVoir}</a>
+          </>
+        ) : (
+          <>
+            <p>{d.dessins.toileCommande}</p>
+            <p class="option-toile__nom">{d.dessins.toilePrix(PRIX_TOILE)}</p>
+            <p>{d.dessins.toileDelai(DELAI_TOILE_SUR_COMMANDE[lang])}</p>
+            <p>{d.dessins.toileLot}</p>
+            <a class="bouton bouton--vert" href={`${chemin('contact', lang)}?sujet=toile-commande&dessin=${dessin.id}`}>{d.dessins.toileDemander}</a>
+          </>
+        )}
+        <p class="option-toile__note">{d.dessins.toileNote}</p>
       </div>
-    </section>
-  )}
+    </div>
+  </section>
   <section class="section section--orange">
     <div class="contenu"><Etapes titre={d.dessins.etapesTitre} etapes={d.dessins.etapes} /></div>
   </section>
@@ -121,8 +138,10 @@ const jsonld = {
   .option-toile { display: grid; grid-template-columns: 110px 1fr; gap: 20px; align-items: center; max-width: 760px; padding: 18px 20px; }
   .option-toile h2 { font-size: clamp(1.7rem, 1.4rem + 1.2vw, 2.3rem); margin-bottom: 0.2em; }
   .option-toile p { margin: 0 0 10px; }
-  .option-toile__image img { width: 100%; height: auto; border-radius: 3px; box-shadow: 0 0 0 2px #c3c9cd, 0 8px 14px -4px rgba(60, 40, 20, 0.35); transform: rotate(-2deg); }
+  .option-toile__image :global(img) { width: 100%; height: auto; border-radius: 3px; box-shadow: 0 0 0 2px #c3c9cd, 0 8px 14px -4px rgba(60, 40, 20, 0.35); transform: rotate(-2deg); }
   .option-toile__nom { font-family: var(--titre); font-size: 1.3rem; color: var(--orange-fonce); }
+  .option-toile__note { margin: 16px 0 0; font-size: 0.95rem; color: var(--encre-douce); }
+  .option-toile .bouton { margin-top: 4px; }
   .suite { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 28px; }
   .suite :global(.carte) { margin: 0; }
   /* Mobile : le dessin, son titre, son prix et le bouton tiennent dans un seul écran. */
