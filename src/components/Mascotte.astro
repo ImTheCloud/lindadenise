@@ -10,7 +10,9 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
     <p class="mascotte__texte"><span class="mascotte__cache"></span><span class="mascotte__vu" aria-hidden="true"></span></p>
     <button class="mascotte__muet" type="button" aria-label={m.fermer}>×</button>
-    <button class="mascotte__silence" type="button" aria-label={m.silence} title={m.silence}><span aria-hidden="true">zZz</span></button>
+    <button class="mascotte__silence" type="button" aria-label={m.silence} title={m.silence}>
+      <svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h9l-9 11h9" stroke-width="2.6" /><path d="M13 5h7l-7 8h7" stroke-width="2.2" /><path d="M20 1.5h5l-5 5.5h5" stroke-width="1.9" /></g></svg>
+    </button>
   </div>
   <p class="mascotte__invite" aria-hidden="true">{m.invite}</p>
   <div class="mascotte__coeurs" aria-hidden="true"></div>
@@ -239,7 +241,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__corps:focus-visible { outline-offset: 2px; }
   .mascotte-svg { width: 100%; height: auto; overflow: visible; display: block; }
 
-  .mascotte__bulle { position: absolute; right: 8%; bottom: calc(100% - 6px); width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 12px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
+  .mascotte__bulle { position: absolute; right: 8%; bottom: calc(100% - 6px); width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 28px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
   .mascotte__bulle[hidden] { display: none; }
   .mascotte__bulle::after { content: ''; position: absolute; right: 30px; bottom: -14px; width: 18px; height: 18px; background: #fff; border-right: var(--trait) solid var(--vert-fonce); border-bottom: var(--trait) solid var(--vert-fonce); transform: rotate(45deg) skew(8deg, 8deg); }
   .mascotte__bulle.pop { animation: mascotte-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1); }
@@ -247,8 +249,9 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__cache { opacity: 0; }
   .mascotte__vu { position: absolute; inset: 0; }
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
-  .mascotte__silence { display: block; margin: 0 -8px -6px auto; min-width: 44px; min-height: 36px; padding: 4px 10px; border: 0; background: none; font-family: var(--titre); font-size: 1.15rem; line-height: 1; letter-spacing: 0.04em; color: var(--vert-fonce); opacity: 0.6; cursor: pointer; transition: opacity 0.15s, color 0.15s; }
-  .mascotte__silence:hover, .mascotte__silence:focus-visible { opacity: 1; color: var(--orange-fonce); }
+  /* Pastille collée au bas de la bulle : trois Z dessinés qui montent, comme ceux du chat endormi */
+  .mascotte__silence { position: absolute; left: 14px; bottom: -22px; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; color: var(--orange-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; box-shadow: 0 3px 0 rgba(43, 110, 58, 0.15); cursor: pointer; transition: transform 0.2s cubic-bezier(0.3, 1.5, 0.5, 1), background 0.15s; }
+  .mascotte__silence:hover, .mascotte__silence:focus-visible { background: var(--orange-creme); transform: rotate(-8deg) scale(1.08); }
   .mascotte.silence .mascotte__invite { display: none; }
   .mascotte.silence .mascotte__silence { display: none; }
   .mascotte.sans-anim .m-couche-pose { animation: none !important; }
