@@ -1,6 +1,6 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-09 (7 nouveaux dessins, vidéo d'impression). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné).
+Dernière mise à jour : 2026-10-09 (7 nouveaux dessins, vidéo d'impression). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : comment lui écrire sans mots techniques, heures déjà annoncées, ce qu'elle sait déjà, questions en attente, emails envoyés.
 
 ## Où on en est
 
