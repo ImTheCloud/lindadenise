@@ -20,13 +20,6 @@ const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
           <button type="button" class="filtre" data-filtre={r} aria-pressed="false">{d.rubriques[r].court} <span>{parRubrique(r).length}</span></button>
         ))}
       </div>
-      <div class="tri">
-        <label for="tri">{d.dessins.tri}</label>
-        <select id="tri">
-          <option value="linda">{d.dessins.triLinda}</option>
-          <option value="az">{d.dessins.triAz}</option>
-        </select>
-      </div>
       <div class="mur" id="mur">
         {dessins.map((x, i) => <CarteDessin dessin={x} lang={lang} priorite={i < 4} />)}
       </div>
@@ -48,15 +41,6 @@ const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
       history.replaceState(null, '', f === 'tous' ? location.pathname : `#${f}`);
     }),
   );
-  const mur = document.querySelector<HTMLElement>('#mur');
-  const ordreLinda = [...cartes];
-  const titreDe = (c: HTMLElement) => c.querySelector('.carte__titre')?.textContent ?? '';
-  document.querySelector<HTMLSelectElement>('#tri')?.addEventListener('change', (e) => {
-    const az = (e.target as HTMLSelectElement).value === 'az';
-    const lang = document.documentElement.lang;
-    const ordre = az ? [...cartes].sort((a, b) => titreDe(a).localeCompare(titreDe(b), lang)) : ordreLinda;
-    mur?.append(...ordre);
-  });
   const depart = location.hash.slice(1);
   if (depart && [...boutons].some((b) => b.dataset.filtre === depart)) appliquer(depart);
 </script>
@@ -74,8 +58,6 @@ const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
     .filtres { gap: 8px; margin: 16px 0 22px; }
     .filtre { font-size: 1.1rem; padding: 0.45em 0.85em; border-radius: 14px 8px 14px 8px / 8px 14px 8px 14px; }
   }
-  .tri { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: -10px 0 18px; font-family: var(--titre); font-size: 1.2rem; color: var(--vert-fonce); }
-  .tri select { font: inherit; padding: 0.3em 0.7em; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 14px 8px 14px 8px / 8px 14px 8px 14px; cursor: pointer; }
   .mur { column-count: 2; column-gap: 22px; }
   @media (min-width: 700px) { .mur { column-count: 3; } }
   @media (min-width: 1000px) { .mur { column-count: 4; } }
