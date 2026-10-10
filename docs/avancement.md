@@ -34,18 +34,26 @@ Fait et validé par Claudiu :
 3. **Phase 3 : boutique** Stripe (Bancontact) + téléchargement sécurisé, seulement après la réponse sur le statut légal.
 4. Fin de projet : checklist (`docs/checklist-fin-de-projet.md`), achat du domaine `lindadenise.be`, mise en ligne en un seul déploiement, README à mettre à jour. Idées de fonctionnalités à proposer à Claudiu à ce moment-là : page Psaumes, livre d'or, liens réseaux, newsletter.
 
-## En cours : un Tilleul plus avancé (prototype)
+## En pause : nouveau Tilleul animé (prototype, état au 2026-10-10)
 
-Souhait de Claudiu (2026-10-10) : un chat « ultra beau, stylé, qui fait des choses », qui **se déplace**. La performance n'est plus une contrainte. Rive et Spine écartés : export payant (outils gratuits uniquement) et fichiers que Claude ne peut pas modifier. Choix : animation calculée en direct, en SVG redessiné à chaque image.
+Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui se déplace. La performance n'est plus une contrainte. Rive et Spine écartés (export payant, fichiers que Claude ne peut pas modifier). Choix : animation calculée en direct, SVG redessiné à chaque image. **Le site publié garde l'ancien Tilleul** tant que le nouveau n'est pas validé.
 
-**Prototype fait le 2026-10-10, à faire juger par Claudiu** : page d'essai http://localhost:4321/essai-tilleul/, servie par `npm run dev` seulement (route ajoutée dans `astro.config.mjs`, jamais construite ni publiée). Code : `essais/tilleul.astro` (boutons, pilote automatique, squelette, loupe) et `essais/tilleul/chat.ts` (le moteur).
-- Tilleul vu de profil : colonne souple (le contour du corps est recalculé autour d'elle), pattes à deux os qui se posent sans glisser, queue en ressorts, tête en 3/4 (petit repère 3D) qui se tourne vers le visiteur et suit le pointeur. Mêmes couleurs, yeux verts, museau crème, rayures.
-- Il marche, fait demi-tour (tête de face, corps qui pivote derrière), s'assoit (queue autour des pattes), se couche, dort (zzz), s'étire, chasse une feuille de tilleul (approche, se tapit, remue l'arrière-train, bondit dessus). Touché : petit saut, cœurs, yeux plissés. Pilote automatique pour enchaîner tout seul.
-- Mouvement réduit demandé : il reste assis. Calcul : environ 0,6 ms par image.
-- 1ers retours de Claudiu appliqués : taille de base validée ; tête réduite (82 %) ; contour en trait arrondi au lieu du filtre (les pointes d'oreilles ne sont plus coupées) ; queue toujours derrière le corps (plus d'effet de transparence) ; yeux découpés par des formes fixes et paupière de fourrure (fin du scintillement) ; demi-tour : la tête se tourne d'abord, puis le corps pivote vite sur un petit saut.
-- 2e série de retours appliquée : le corps est un volume (chaîne de boules) qui pivote autour d'un axe vertical en passant face au visiteur, en piétinant (fin de l'effet « téléporté ») ; queue en ressorts d'angle, un segment posé au sol reste du côté où il s'est posé (plus aucun basculement), toujours derrière le corps, en crosse quand il est assis ; œil dessiné seulement sous la paupière, avec un fin trait autour (fin du liseré blanc et du scintillement) ; rose des oreilles et joues qui s'effacent en douceur.
-- 3e série de retours appliquée : contour du corps calculé en une seule courbe (plus de tremblement) ; chaussettes sans contour propre ; œil qui suit la courbe de la tête et ne dépasse plus, iris qui remplit l'œil vu de biais, blanc posé sur un fond brun (plus de traits blancs) ; yeux fermés pendant l'étirement ; pattes arrière immobiles à l'affût.
-- Suite si validé : remplacer `Mascotte.astro` en gardant bulle, silence, textes et accueil ; puis supprimer la page d'essai et sa route. Idées : toilette (se lèche la patte), ronronnement, aller à l'étang, chasser les feuilles qui tombent déjà sur le site.
+**Où le voir** : `npm run dev`, puis http://localhost:4321/essai-tilleul/ (page servie en dev seulement, route ajoutée dans `astro.config.mjs`, jamais construite ni publiée). Boutons d'ordres, « Lâcher une feuille », pilote automatique, squelette, loupe. Code : `essais/tilleul.astro` et `essais/tilleul/chat.ts` (le moteur, environ 750 lignes).
+
+**Ce qu'il fait** : il marche (pas réglés sur la distance, sans glisser), fait demi-tour en pivotant en volume face au visiteur, s'assoit (queue en crosse derrière), se couche, dort (zzz), s'étire (yeux fermés), chasse une feuille de tilleul (approche, se tapit, bondit). Touché : saut, cœurs, yeux plissés. La tête (82 % de la taille d'origine) suit le pointeur et cligne. Mouvement réduit demandé : il reste assis. Taille de base validée par Claudiu.
+
+**Comment il est construit** (à garder si on y retouche) :
+- Squelette dans le plan du profil : colonne, pattes à deux os, queue en ressorts d'angle. Le corps est une chaîne de boules projetée selon l'angle du corps (`phi`) : c'est ce qui permet le demi-tour sans retourner le dessin.
+- Un seul contour par forme : le contour du corps est une seule courbe calculée autour des boules. Plusieurs cercles superposés faisaient trembler le bord.
+- Découpes (yeux, rayures) et masque des pattes fixes dans `<defs>` : on ne change que leurs mesures. Les recréer à chaque image fait scintiller.
+- Œil : seule la partie visible est peinte, sur un fond brun. L'iris remplit l'œil vu de biais, sans aucun filet blanc qui toucherait la fourrure.
+- Queue : un segment posé au sol reste du côté où il s'est posé (jamais de basculement). Elle reste toujours derrière le corps.
+
+**Corrigé suite aux retours de Claudiu** : oreilles coupées, tête trop grosse, queue vue par transparence, queue saccadée assis, demi-tour « téléporté », scintillement et traits blancs des yeux, contour qui tremble, pattes arrière qui bougeaient à l'affût, yeux pendant l'étirement.
+
+**À vérifier à la reprise** (la dernière série de corrections n'a pas encore été vue par Claudiu) : plus de scintillement des yeux, en particulier l'œil du fond ; contour du corps stable ; demi-tour jugé « pro ». Claude ne voit pas l'animation en temps réel quand le navigateur intégré est masqué : il teste en faisant avancer le temps à la main. Les captures de Claudiu restent le meilleur juge.
+
+**Ensuite, une fois validé** : remplacer `Mascotte.astro` par le nouveau moteur en gardant la bulle, le bouton de silence, les textes et l'accueil, puis supprimer `essais/` et la route d'essai. Idées pour plus tard : toilette (se lèche la patte), ronronnement, aller jusqu'à l'étang, chasser les feuilles qui tombent déjà sur le site.
 
 ## Manière de travailler (rappels pratiques)
 
