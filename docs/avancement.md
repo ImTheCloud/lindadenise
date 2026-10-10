@@ -1,6 +1,61 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-10 (nouveau Tilleul intégré au site, non publié). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+Dernière mise à jour : 2026-10-11 (mission Toiles en cours, non publiée : voir la section « Mission Toiles » juste en dessous). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+
+## Mission Toiles (2026-10-11, non publiée)
+
+Consigne complète : `docs/prive/prompt-toiles.md`. Trois phases, un commit `[skip ci]` à la fin de chacune.
+
+- **Phase 1 : faite** (doublons, photos redressées, page Toiles FR + NL, menu, sélection de lot, vue « à l'échelle »).
+- **Phase 2 : à faire** (option toile sur les 76 fiches, licence et conditions, formulaire, documentation).
+- **Phase 3 : à faire** (vidéos motion design FR + NL, musique, intégration, documentation finale).
+
+Démarrage : Remote Control activé. Le maintien du Mac éveillé (`request_keep_awake`) a été refusé par le mode automatique : la mission a continué sans.
+
+**Où est le code** : page `src/components/pages/PageToiles.astro` (`/toiles/`, `/nl/doeken/`), textes `toiles` dans `src/i18n/fr.ts` et `nl.ts`, prix et remises dans `src/data/vente.ts` (prix 200 €, envoi 12 €, envoi offert dès 2, remises, délai des toiles sur commande), données `src/data/toiles.json`, images `public/toiles/` (AVIF + WebP en 400, 800 et 1000 px, JPEG 800 de repli), script `scripts/preparer-toiles.mjs` (`npm run toiles`, lit `~/Downloads`). Titres, traductions, descriptions et coins des photos se changent dans le script. **« vendue »** se change à la main dans `src/data/toiles.json` (le script garde la valeur).
+
+**La page** : mur de galerie dessiné (enduit, lumière du haut, clou, ombres, bord aluminium, cartel sous chaque toile avec titre et prix), hauteurs et pentes légèrement différentes, relief et reflet qui suivent la souris ou le doigt (rien en mouvement réduit). Téléphone : une toile par écran, le défilement s'arrête doucement sur chacune. Clic : fiche plein écran (précédent / suivant, flèches du clavier, glisser du doigt, Échap), adresse `/toiles/#id` (les fiches des dessins y renvoient). « Voir à l'échelle » : la toile A3 dans un salon dessiné en centimètres (canapé, plante, règle de 50 cm, cotes 29,7 et 42 cm). Sélection : case dans la fiche, barre fixe en bas (nombre, remise, envoi, total, « Demander ces toiles »), gardée le temps de la visite (`sessionStorage`). Toile vendue : grisée, rond « Vendue ». Calculs vérifiés : 1 toile 212 €, 2 → 360 €, 3 → 480 €, 5 → 800 €.
+
+**Photos** : les coins ont été trouvés par ordinateur (OpenCV, hors dépôt) puis vérifiés sur planche contact ; 4 photos corrigées à la main (Frangipanier et Iris posés contre un mur beige, Bouleaux en hiver, Timé gambade). Trois photos étaient prises couchées (Bois de Hal, Chat à l'île de Bréhat, Fleurs bleues) : remises droites (signature « LB » en bas à droite). Plusieurs photos coupent déjà un bord de la toile : on garde ce qui est visible, recadré au ratio A3 sans déformation. Correction des blancs limitée à +10 %.
+
+### Toiles et dessins du site (comparaison du 2026-10-11)
+
+Méthode : comparaison automatique (points communs OpenCV ORB + RANSAC, hors dépôt) avec les 80 originaux de `~/Desktop/DessinsLinda`, puis vérification à l'œil côte à côte. Une vraie correspondance donne plus de 1 200 points communs ; sans correspondance, jamais plus de 24.
+
+| Toile | Dessin du site | Certitude |
+|---|---|---|
+| Bois de Hal | Jacinthe sauvage dans le bois | certaine (1 628 points) |
+| Bouleaux en hiver | Bouleaux en hiver | certaine (1 245) |
+| Chat à l'île de Bréhat | Chats en Bretagne | certaine (1 296) |
+| Chats camouflés | Rêve de chats québécois en hiver | certaine (1 353, le titre est écrit sur la toile) |
+| Frangipanier | Frangipanier | certaine (1 971) |
+| Iris | Iris bleus | certaine (1 746) |
+| Le tournesol | Tournesol | certaine (1 818) |
+| Sweet | Coucou | certaine (1 395) |
+| Tournesols | Prélude à Amsterdam | certaine (1 824) |
+| Vieux cerisier | Arbre à Saint-Brieuc | certaine (1 917) |
+| Narcisses | Joie de Pâques | certaine (1 305) |
+| Chat au repos, Fleurs bleues, Jonquilles, L'oiseau, La clôture, Le chemin de forêt, Mauves, Montagne et tournesols, Printemps, Sous bois, Timé gambade, Timé s'amuse | aucun | certaine (24 points au plus) |
+
+Les 11 toiles liées renvoient vers le dessin numérique, et la fiche du dessin propose « Déjà imprimée en toile ». Les 12 autres ne sont **pas** ajoutées au catalogue numérique (il faudrait l'accord de Linda et ses fichiers HD).
+
+### Frais d'envoi (recherche du 2026-10-11)
+
+Colis plat d'environ 30 × 42 cm bien emballé, jusqu'à 2 kg, en Belgique. Source principale : observatoire des prix de l'IBPT (régulateur belge), colis national de 2 kg livré à domicile, tarifs 2025 : PostNL 9,60 €, GLS 11,10 €, DPD 11,43 €, bpost Economy 11,60 €, UPS 11,64 €, Mondial Relay 13,39 €, bpost Standard 16,50 € (express exclus). **Moyenne : 12,18 €, arrondie à 12 €** (constante `FRAIS_ENVOI`). Pour comparaison, bpost en ligne avec un compte : 5,40 € à 6,95 € (blog Margeo, juillet 2026), et bpost annonce une hausse au 1er janvier 2027. Sources : https://bipt.be/operators/postal/observatory/price/parcel-up-to-2-kg , https://margeoapp.com/blog/vinted-belgique-frais-livraison . Le site dit seulement que le transporteur est choisi par Linda et que les détails arrivent par e-mail (rien sur la rapidité ni la marque).
+
+### À valider (Claudiu)
+
+- Frais d'envoi : 12 € (moyenne réelle) au lieu des 15 € attendus ; une ligne à changer dans `src/data/vente.ts` si besoin.
+- Livraison offerte dès 2 toiles (valeur par défaut de la consigne).
+- Titres NL : « Bois de Hal » traduit par son vrai nom néerlandais, **Hallerbos** ; « Jonquilles » → « Paasbloemen », « Mauves » → « Kaasjeskruid », « Sweet » reste « Sweet ». Le fichier « narcisses » est affiché avec une majuscule (« Narcisses »).
+- Les descriptions des toiles (textes alternatifs) décrivent seulement ce qu'on voit sur la photo.
+- Le bloc « Un mur pour mes toiles » est écrit à la première personne (Linda parle, comme sur la page À propos), signé « Linda ».
+- Les 12 toiles sans dessin du site ne sont pas dans le catalogue numérique : à proposer à Linda (il faudrait ses fichiers HD).
+- Le parquet, le canapé et la plante de la vue « à l'échelle » sont un décor dessiné ; seules les mesures de la toile (A3) et la règle de 50 cm sont exactes.
+
+### À poser à Linda (par Claudiu, jamais dans un e-mail de questions : voir `docs/prive/emails-linda.md`)
+
+Épaisseur et poids d'une toile ; finition (mate ou brillante) ; type de crochet, et si les toiles faites sur commande en ont aussi un ; signature (au dos ou devant) ; transporteur choisi, délai d'expédition, assurance ; retours, rétractation, garantie ; statut de vendeur (particulier ou activité) et conditions légales de la vente à distance ; confirmation du tableau des correspondances ci-dessus ; si elle veut mettre les 23 toiles aussi en dessin numérique (alors fournir les originaux HD) ; délai et prix réels d'une toile sur commande, et à partir de combien de commandes elle en fait imprimer ; si elle veut proposer d'autres formats ; conditions d'un dépôt dans un lieu (commission, durée, assurance) et zones géographiques souhaitées pour les expositions ; accord pour montrer ses toiles et sa ville d'origine dans les vidéos.
 
 ## Où on en est
 

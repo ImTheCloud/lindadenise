@@ -4,7 +4,7 @@ import Etang from '../Etang.astro';
 import Feuilles from '../Feuilles.astro';
 import Etapes from '../Etapes.astro';
 import Apercu from '../Apercu.astro';
-import { t, chemin, cheminDessin, dessins, parRubrique, RUBRIQUES, type Lang } from '../../i18n';
+import { t, chemin, cheminDessin, dessins, toiles, parRubrique, RUBRIQUES, type Lang } from '../../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
@@ -84,7 +84,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     <div class="contenu impression">
       <div class="apparait impression__texte">
         <h2>{a.impressionTitre}</h2>
-        <p class="chapeau">{a.impressionTexte}</p>
+        <p class="chapeau">{a.impressionTexte(toiles.length)}</p>
         <p>{a.impressionTexte2}</p>
       </div>
       <figure class="impression__video apparait cadre">
@@ -93,7 +93,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
           {a.impressionLecture}
         </video>
       </figure>
-      <p class="impression__cta apparait"><a class="bouton bouton--vert" href={chemin('contact', lang)}>{a.impressionCta}</a></p>
+      <p class="impression__cta apparait"><a class="bouton bouton--vert" href={chemin('toiles', lang)}>{a.impressionCta}</a></p>
     </div>
   </section>
 

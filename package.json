@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "dessins": "node scripts/preparer-dessins.mjs"
+    "dessins": "node scripts/preparer-dessins.mjs",
+    "toiles": "node scripts/preparer-toiles.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

@@ -1,0 +1,434 @@
+---
+import Base from '../../layouts/Base.astro';
+import Etapes from '../Etapes.astro';
+import { t, chemin, cheminDessin, dessins, toiles, type Lang } from '../../i18n';
+import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, REMISES, calculLot } from '../../data/vente';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const tt = d.toiles;
+const chemins = { fr: chemin('toiles', 'fr'), nl: chemin('toiles', 'nl') };
+const contact = chemin('contact', lang);
+const remises = [...REMISES].sort((a, b) => a.des - b.des);
+const disponibles = toiles.filter((x) => !x.vendue).length;
+const liste = toiles.map((x) => {
+  const dessin = x.dessin ? dessins.find((y) => y.id === x.dessin) : undefined;
+  return {
+    id: x.id,
+    titre: x.titre[lang],
+    alt: tt.altDe(x.titre[lang], x.description[lang]),
+    vendue: x.vendue,
+    dessin: dessin ? { href: cheminDessin(dessin.id, lang), texte: tt.dessinLie(dessin.titre[lang]) } : null,
+  };
+});
+// Résumé de la sélection pour chaque nombre de toiles, calculé ici pour que les textes restent dans les dictionnaires.
+const resumes = Array.from({ length: disponibles + 1 }, (_, n) => {
+  const c = calculLot(n);
+  const detail = [c.pourcent ? tt.selection.remise(c.pourcent) : '', c.envoi ? tt.selection.envoi(c.envoi) : tt.selection.envoiOffert].filter(Boolean);
+  return { nombre: tt.selection.nombre(n), detail: detail.join(' · '), total: tt.selection.total(c.total) };
+});
+// Accrochage : chaque toile un peu plus haut ou plus bas, et très légèrement penchée.
+const pente = (i: number) => (((i * 37) % 9) - 4) * 0.28;
+const hauteur = (i: number) => (((i * 53) % 7) - 3) * 5;
+const sources = (id: string, format: string) => [400, 800, 1000].map((l) => `/toiles/${id}-${l}.${format} ${l}w`).join(', ');
+// Salon dessiné, en centimètres : la toile A3 (29,7 x 42) au-dessus d'un canapé.
+const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
+---
+<Base lang={lang} titre={tt.titre} description={tt.meta} chemins={chemins} image={`/toiles/${toiles[0].id}-800.jpg`}>
+  <section class="section toiles-haut">
+    <div class="contenu centre">
+      <p class="surtitre">{tt.surtitre}</p>
+      <h1>{tt.titre}</h1>
+      <p class="chapeau">{tt.intro(toiles.length)}</p>
+      <p class="histoire">{tt.histoire}</p>
+      <ul class="pastilles">
+        <li>{tt.prixTexte(PRIX_TOILE)}</li>
+        {remises.map((r) => <li>{tt.remise(r.des, r.pourcent)}</li>)}
+        <li>{tt.envoiOffert(ENVOI_OFFERT_DES)}</li>
+      </ul>
+      <p class="aide">{tt.murAide}</p>
+    </div>
+  </section>
+
+  <section class="mur" aria-label={tt.murTitre} data-mur data-toiles={JSON.stringify(liste)} data-resumes={JSON.stringify(resumes)} data-contact={`${contact}?toiles=`}>
+    <svg class="mur__bord" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0,24 C160,8 320,34 480,20 C640,6 800,32 960,18 C1120,6 1280,30 1440,16 L1440,40 L0,40 Z" /></svg>
+    <ul class="contenu mur__liste">
+      {liste.map((x, i) => (
+        <li class:list={['accroche', 'apparait', x.vendue && 'vendue']} data-accroche={x.id} style={`--r:${pente(i).toFixed(2)}deg;--h:${hauteur(i)}px;transition-delay:${(i % 4) * 80}ms`}>
+          <span class="accroche__clou" aria-hidden="true"></span>
+          <button type="button" class="toile" data-index={i}>
+            <picture>
+              <source type="image/avif" srcset={sources(x.id, 'avif')} sizes="(min-width: 1200px) 260px, (min-width: 640px) 40vw, 80vw" />
+              <source type="image/webp" srcset={sources(x.id, 'webp')} sizes="(min-width: 1200px) 260px, (min-width: 640px) 40vw, 80vw" />
+              <img src={`/toiles/${x.id}-800.jpg`} width="400" height="566" alt={x.alt} loading="lazy" decoding="async" />
+            </picture>
+            <span class="toile__reflet" aria-hidden="true"></span>
+            <span class="toile__choisie" aria-hidden="true">✓</span>
+            {x.vendue && <span class="toile__vendue">{tt.vendue}</span>}
+          </button>
+          <p class="cartel"><span class="cartel__titre">{x.titre}</span> <span class="cartel__prix">{x.vendue ? tt.vendue : tt.prix(PRIX_TOILE)}</span></p>
+        </li>
+      ))}
+    </ul>
+    <div class="mur__plinthe" aria-hidden="true"></div>
+  </section>
+
+  <section class="section">
+    <div class="contenu infos">
+      <article class="info cadre apparait">
+        <h2>{tt.qualiteTitre}</h2>
+        <ul class="coches">{tt.qualite.map((q) => <li>{q}</li>)}</ul>
+      </article>
+      <article class="info info--prix cadre apparait">
+        <h2>{tt.prixTitre}</h2>
+        <p class="info__montant">{tt.prix(PRIX_TOILE)}</p>
+        <p>{tt.envoi(FRAIS_ENVOI)}</p>
+        <h3>{tt.lotTitre}</h3>
+        <ul class="coches">
+          {remises.map((r) => <li>{tt.remise(r.des, r.pourcent)} : {tt.exemple(r.des, calculLot(r.des).total)}</li>)}
+          <li>{tt.envoiOffert(ENVOI_OFFERT_DES)}</li>
+        </ul>
+        <p class="info__note">{tt.livraison} {tt.paiement}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section section--orange">
+    <div class="contenu etapes-toiles apparait"><Etapes titre={tt.commanderTitre} etapes={tt.etapes} /></div>
+  </section>
+
+  <section class="section">
+    <div class="contenu expo apparait">
+      <h2>{tt.expoTitre}</h2>
+      <p class="chapeau">{tt.expoTexte}</p>
+      <p>{tt.expoTexte2}</p>
+      <p class="expo__signature">Linda</p>
+      <a class="bouton bouton--vert" href={`${contact}?sujet=exposition`}>{tt.expoCta}</a>
+    </div>
+  </section>
+
+  <div class="selection" data-selection hidden>
+    <p class="selection__resume"><strong data-sel-nombre></strong> <span data-sel-detail></span></p>
+    <p class="selection__total" data-sel-total></p>
+    <a class="bouton selection__bouton" data-sel-demander href={contact}>{tt.selection.demander}</a>
+    <button type="button" class="selection__vider" data-sel-vider aria-label={tt.selection.vider} title={tt.selection.vider}>×</button>
+  </div>
+
+  <dialog class="fiche" id="fiche" aria-labelledby="fiche-titre">
+    <div class="fiche__boite">
+      <button type="button" class="fiche__fermer" data-fermer aria-label={tt.fermer}>×</button>
+      <div class="fiche__vue" data-vue>
+        <picture class="fiche__image" data-image>
+          <source type="image/avif" sizes="(min-width: 900px) 50vw, 92vw" />
+          <source type="image/webp" sizes="(min-width: 900px) 50vw, 92vw" />
+          <img width="1000" height="1414" alt="" />
+        </picture>
+        <figure class="salon" data-salon hidden>
+          <svg viewBox="0 0 320 200" role="img" aria-labelledby="salon-legende">
+            <defs>
+              <linearGradient id="salon-mur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf7ef" /><stop offset="1" stop-color="#efe7d8" /></linearGradient>
+              <filter id="salon-ombre" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.4" flood-color="#3a2a18" flood-opacity="0.35" /></filter>
+            </defs>
+            <rect width="320" height="177" fill="url(#salon-mur)" />
+            <ellipse cx="160" cy="20" rx="70" ry="48" fill="#fffaf0" opacity="0.8" />
+            <rect y="177" width="320" height="8" fill="#fdfcf9" stroke="#d9cfbf" stroke-width="0.6" />
+            <rect y="185" width="320" height="15" fill="#e6cba0" />
+            <path d="M0 191 H320 M0 196 H320" stroke="#d4b685" stroke-width="0.5" />
+            <g stroke="#2b6e3a" stroke-width="1" stroke-linejoin="round">
+              <path d="M70 104 q0 -5 5 -5 h170 q5 0 5 5 v34 h-180 z" fill="#8cc49a" />
+              <rect x="80" y="104" width="76" height="33" rx="7" fill="#fff4e3" />
+              <rect x="164" y="104" width="76" height="33" rx="7" fill="#fff4e3" />
+              <rect x="62" y="134" width="196" height="22" rx="5" fill="#7bb989" />
+              <rect x="56" y="118" width="18" height="52" rx="7" fill="#6aac79" />
+              <rect x="246" y="118" width="18" height="52" rx="7" fill="#6aac79" />
+              <rect x="62" y="156" width="196" height="14" fill="#5d9e6c" />
+              <path d="M70 170 l2 15 h4 l1 -15 M244 170 l2 15 h4 l1 -15" fill="#9a6b3d" />
+              <path d="M200 112 q14 -6 24 4 q-2 14 -16 18 q-12 -6 -8 -22 z" fill="#f28a1e" />
+            </g>
+            <g stroke="#2b6e3a" stroke-width="0.9" stroke-linejoin="round">
+              <path d="M272 150 h26 l-3 35 h-20 z" fill="#c56b2c" />
+              <path d="M285 150 q-20 -30 -10 -58 q10 20 10 58 M285 150 q4 -40 18 -52 q2 28 -18 52 M285 150 q-22 -12 -28 -34 q20 4 28 34 M285 150 q16 -10 26 -26 q2 18 -26 26" fill="#3e9a47" />
+            </g>
+            <g>
+              <rect x="22" y="135" width="7" height="50" rx="1" fill="#f6d77c" stroke="#9a7a2a" stroke-width="0.6" />
+              <path d="M22 145 h3 M22 155 h3 M22 165 h3 M22 175 h3 M22 140 h1.6 M22 150 h1.6 M22 160 h1.6 M22 170 h1.6 M22 180 h1.6" stroke="#6b5212" stroke-width="0.5" />
+              <text x="33" y="162" class="salon__texte">50 cm</text>
+            </g>
+            <circle cx={TOILE.x + TOILE.l / 2} cy={TOILE.y + 3} r="0.7" fill="#888" />
+            <g filter="url(#salon-ombre)">
+              <image data-salon-image x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} preserveAspectRatio="xMidYMid slice" />
+              <rect x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} fill="none" stroke="#a9b0b5" stroke-width="0.5" />
+            </g>
+            <g class="salon__cote" stroke="#b05200" stroke-width="0.5" fill="none">
+              <path d={`M${TOILE.x} ${TOILE.y - 5} h${TOILE.l} M${TOILE.x} ${TOILE.y - 7} v4 M${TOILE.x + TOILE.l} ${TOILE.y - 7} v4`} />
+              <path d={`M${TOILE.x + TOILE.l + 5} ${TOILE.y} v${TOILE.h} M${TOILE.x + TOILE.l + 3} ${TOILE.y} h4 M${TOILE.x + TOILE.l + 3} ${TOILE.y + TOILE.h} h4`} />
+            </g>
+            <text x={TOILE.x + TOILE.l / 2} y={TOILE.y - 7.5} text-anchor="middle" class="salon__texte salon__texte--cote">29,7 cm</text>
+            <text x={TOILE.x + TOILE.l + 8} y={TOILE.y + TOILE.h / 2 + 2} class="salon__texte salon__texte--cote">42 cm</text>
+          </svg>
+          <figcaption id="salon-legende">{tt.echelleLegende}</figcaption>
+        </figure>
+        <button type="button" class="fiche__fleche fiche__fleche--prec" data-prec aria-label={tt.precedent}>‹</button>
+        <button type="button" class="fiche__fleche fiche__fleche--suiv" data-suiv aria-label={tt.suivant}>›</button>
+      </div>
+      <div class="fiche__infos">
+        <h2 id="fiche-titre" data-titre></h2>
+        <p class="fiche__carac">{tt.caracteristiques}</p>
+        <p class="fiche__vendue" data-vendue hidden>{tt.vendueTexte}</p>
+        <div data-dispo>
+          <p class="fiche__prix">{tt.prix(PRIX_TOILE)}</p>
+          <p class="fiche__envoi">{tt.envoi(FRAIS_ENVOI)}<br />{tt.envoiOffert(ENVOI_OFFERT_DES)}</p>
+          <p class="case"><input id="fiche-ajout" type="checkbox" data-ajout /><label for="fiche-ajout">{tt.ajouter}</label></p>
+          <p><a class="bouton" data-demander href={contact}>{tt.demander}</a></p>
+        </div>
+        <p><button type="button" class="bouton bouton--contour" data-echelle aria-pressed="false" data-texte={tt.echelle} data-retour={tt.echelleRetour}>{tt.echelle}</button></p>
+        <p class="fiche__dessin" data-dessin hidden><a href=""></a></p>
+      </div>
+    </div>
+  </dialog>
+</Base>
+
+<script>
+  interface ToileVue { id: string; titre: string; alt: string; vendue: boolean; dessin: { href: string; texte: string } | null }
+  interface Resume { nombre: string; detail: string; total: string }
+  const mur = document.querySelector<HTMLElement>('[data-mur]');
+  const fiche = document.querySelector<HTMLDialogElement>('#fiche');
+  if (mur && fiche) {
+    const liste = JSON.parse(mur.dataset.toiles ?? '[]') as ToileVue[];
+    const resumes = JSON.parse(mur.dataset.resumes ?? '[]') as Resume[];
+    const contact = mur.dataset.contact ?? '';
+    const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const el = <T extends Element>(racine: ParentNode, s: string) => racine.querySelector<T>(s)!;
+
+    // Sélection : gardée le temps de la visite seulement (sessionStorage), sans cookie.
+    const CLE = 'toiles-selection';
+    let selection: string[] = [];
+    try { selection = (JSON.parse(sessionStorage.getItem(CLE) ?? '[]') as string[]).filter((id) => liste.some((x) => x.id === id && !x.vendue)); } catch { /* stockage indisponible */ }
+    const barre = el<HTMLElement>(document, '[data-selection]');
+    const ajout = el<HTMLInputElement>(fiche, '[data-ajout]');
+    let courant = 0;
+
+    function majSelection() {
+      try { sessionStorage.setItem(CLE, JSON.stringify(selection)); } catch { /* stockage indisponible */ }
+      mur!.querySelectorAll<HTMLElement>('[data-accroche]').forEach((li) => li.classList.toggle('choisie', selection.includes(li.dataset.accroche!)));
+      const r = resumes[selection.length];
+      barre.hidden = selection.length === 0;
+      el(barre, '[data-sel-nombre]').textContent = r.nombre;
+      el(barre, '[data-sel-detail]').textContent = r.detail;
+      el(barre, '[data-sel-total]').textContent = r.total;
+      el<HTMLAnchorElement>(barre, '[data-sel-demander]').href = contact + selection.join(',');
+      ajout.checked = selection.includes(liste[courant].id);
+    }
+
+    // Fiche d'une toile (zoom plein écran avec précédent / suivant).
+    const image = el<HTMLPictureElement>(fiche, '[data-image]');
+    const salon = el<HTMLElement>(fiche, '[data-salon]');
+    const echelle = el<HTMLButtonElement>(fiche, '[data-echelle]');
+    function vueEchelle(active: boolean) {
+      salon.hidden = !active;
+      image.hidden = active;
+      echelle.setAttribute('aria-pressed', String(active));
+      echelle.textContent = (active ? echelle.dataset.retour : echelle.dataset.texte) ?? '';
+    }
+    function ouvrir(i: number) {
+      courant = (i + liste.length) % liste.length;
+      const x = liste[courant];
+      const [avif, webp] = image.querySelectorAll('source');
+      const srcset = (f: string) => [400, 800, 1000].map((l) => `/toiles/${x.id}-${l}.${f} ${l}w`).join(', ');
+      avif.srcset = srcset('avif');
+      webp.srcset = srcset('webp');
+      const img = el<HTMLImageElement>(image, 'img');
+      img.src = `/toiles/${x.id}-800.jpg`;
+      img.alt = x.alt;
+      el<SVGImageElement>(salon, '[data-salon-image]').setAttribute('href', `/toiles/${x.id}-400.webp`);
+      el(fiche!, '[data-titre]').textContent = x.titre;
+      el<HTMLElement>(fiche!, '[data-vendue]').hidden = !x.vendue;
+      el<HTMLElement>(fiche!, '[data-dispo]').hidden = x.vendue;
+      el<HTMLAnchorElement>(fiche!, '[data-demander]').href = contact + x.id;
+      const dessin = el<HTMLElement>(fiche!, '[data-dessin]');
+      dessin.hidden = !x.dessin;
+      if (x.dessin) {
+        const a = el<HTMLAnchorElement>(dessin, 'a');
+        a.href = x.dessin.href;
+        a.textContent = x.dessin.texte;
+      }
+      ajout.checked = selection.includes(x.id);
+      vueEchelle(false);
+      if (!fiche!.open) fiche!.showModal();
+      history.replaceState(null, '', `#${x.id}`);
+    }
+    mur.querySelectorAll<HTMLButtonElement>('.toile').forEach((b) => b.addEventListener('click', () => ouvrir(Number(b.dataset.index))));
+    el(fiche, '[data-prec]').addEventListener('click', () => ouvrir(courant - 1));
+    el(fiche, '[data-suiv]').addEventListener('click', () => ouvrir(courant + 1));
+    el(fiche, '[data-fermer]').addEventListener('click', () => fiche.close());
+    echelle.addEventListener('click', () => vueEchelle(salon.hidden));
+    fiche.addEventListener('click', (e) => { if (e.target === fiche) fiche.close(); });
+    fiche.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') ouvrir(courant - 1);
+      if (e.key === 'ArrowRight') ouvrir(courant + 1);
+    });
+    fiche.addEventListener('close', () => history.replaceState(null, '', location.pathname + location.search));
+    // Glisser le doigt sur l'image : toile précédente ou suivante.
+    let depart: number | null = null;
+    const vue = el<HTMLElement>(fiche, '[data-vue]');
+    vue.addEventListener('pointerdown', (e) => { depart = e.clientX; });
+    vue.addEventListener('pointerup', (e) => {
+      if (depart !== null && Math.abs(e.clientX - depart) > 60) ouvrir(courant + (e.clientX < depart ? 1 : -1));
+      depart = null;
+    });
+    ajout.addEventListener('change', () => {
+      const id = liste[courant].id;
+      selection = ajout.checked ? [...selection.filter((s) => s !== id), id] : selection.filter((s) => s !== id);
+      majSelection();
+    });
+    el(barre, '[data-sel-vider]').addEventListener('click', () => { selection = []; majSelection(); });
+
+    // Relief et reflet doux qui suivent le doigt ou la souris.
+    if (!reduit) {
+      mur.querySelectorAll<HTMLElement>('.toile').forEach((b) => {
+        const bouge = (e: PointerEvent) => {
+          const r = b.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width - 0.5;
+          const py = (e.clientY - r.top) / r.height - 0.5;
+          b.style.setProperty('--tx', `${(px * 7).toFixed(2)}deg`);
+          b.style.setProperty('--ty', `${(-py * 7).toFixed(2)}deg`);
+          b.style.setProperty('--reflet', `${(px * 100 + 50).toFixed(0)}%`);
+        };
+        b.addEventListener('pointermove', bouge);
+        b.addEventListener('pointerdown', bouge);
+        b.addEventListener('pointerleave', () => { b.style.removeProperty('--tx'); b.style.removeProperty('--ty'); });
+      });
+    }
+
+    majSelection();
+    const depuisLien = liste.findIndex((x) => `#${x.id}` === location.hash);
+    if (depuisLien >= 0) ouvrir(depuisLien);
+  }
+</script>
+
+<style>
+  .toiles-haut { padding-bottom: 28px; }
+  .histoire { max-width: 46ch; margin: 18px auto 0; font-family: var(--titre); font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.7rem); line-height: 1.3; color: var(--vert-fonce); }
+  .pastilles { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; margin: 24px 0 0; padding: 0; }
+  .pastilles li { padding: 6px 14px; background: var(--orange-creme); color: var(--orange-fonce); border: 2px solid var(--orange-fonce); border-radius: var(--rayon-petit); font-size: 1rem; line-height: 1.3; }
+  .aide { margin: 22px 0 0; color: var(--encre-douce); font-size: 1rem; }
+
+  /* Le mur de galerie : enduit clair, lumière qui tombe du haut, plinthe et parquet. */
+  .mur {
+    --enduit: #f3eee4;
+    position: relative;
+    overflow-x: clip;
+    background-color: var(--enduit);
+    background-image:
+      radial-gradient(120% 40% at 50% 0%, rgba(255, 251, 240, 0.95), rgba(255, 251, 240, 0) 75%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .36 0 0 0 0 .28 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    padding-top: 40px;
+  }
+  .mur__bord { position: absolute; top: -1px; left: 0; width: 100%; height: 34px; transform: scaleY(-1); }
+  .mur__bord path { fill: #fff; }
+  .mur__liste { list-style: none; margin: 0 auto; display: grid; grid-template-columns: 1fr; justify-items: center; gap: 64px; padding-top: 40px; padding-bottom: 72px; }
+  .mur__plinthe { height: 46px; background: linear-gradient(#fdfcf9 0 18px, #d9cfbf 18px 20px, #e6cba0 20px); box-shadow: inset 0 3px 6px -2px rgba(80, 60, 30, 0.18); }
+
+  .accroche { position: relative; width: min(80vw, 340px); padding-top: 16px; scroll-snap-align: center; }
+  .accroche::before { content: ''; position: absolute; left: 50%; top: -60px; width: 170%; height: calc(100% + 60px); translate: -50% 0; background: radial-gradient(ellipse 48% 42% at 50% 34%, rgba(255, 249, 230, 0.9), rgba(255, 249, 230, 0) 72%); pointer-events: none; }
+  .accroche__clou { position: absolute; left: 50%; top: calc(var(--h) + 2px); width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #a3a3a3 55%, #6b6b6b); box-shadow: 1px 2px 2px rgba(60, 40, 20, 0.35); }
+
+  .toile {
+    position: relative; display: block; width: 100%; padding: 0; border: 0; border-radius: 3px; background: #dfe3e6; cursor: zoom-in;
+    transform-origin: 50% -12px;
+    transform: translateY(var(--h)) perspective(900px) rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg)) rotate(var(--r));
+    box-shadow: 0 0 0 1px #c3c9cd, 0 0 0 2px #eef1f3, 0 0 0 3px #9aa2a8, 0 2px 3px rgba(60, 40, 20, 0.2), 0 14px 18px -6px rgba(60, 40, 20, 0.3), 0 32px 42px -14px rgba(60, 40, 20, 0.3);
+    transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15), box-shadow 0.5s;
+  }
+  .toile img { width: 100%; height: auto; aspect-ratio: 297 / 420; border-radius: 3px; }
+  .toile::after { content: ''; position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 40%); pointer-events: none; }
+  .toile__reflet { position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(110deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.32) 50%, rgba(255, 255, 255, 0) 62%) no-repeat; background-size: 260% 100%; background-position: var(--reflet, 120%) 0; opacity: 0; transition: opacity 0.4s; pointer-events: none; }
+  .toile:hover, .toile:focus-visible { transform: translateY(calc(var(--h) - 6px)) perspective(900px) rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg)) rotate(0deg) scale(1.02); box-shadow: 0 0 0 1px #c3c9cd, 0 0 0 2px #eef1f3, 0 0 0 3px #9aa2a8, 0 4px 6px rgba(60, 40, 20, 0.2), 0 22px 26px -8px rgba(60, 40, 20, 0.32), 0 44px 56px -16px rgba(60, 40, 20, 0.32); }
+  .toile:hover .toile__reflet, .toile:active .toile__reflet { opacity: 1; }
+  .toile__choisie { position: absolute; top: -14px; right: -14px; display: none; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--vert-fonce); color: #fff; font-size: 1.3rem; border: 3px solid #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25); }
+  .choisie .toile__choisie { display: grid; }
+  .vendue .toile picture { filter: grayscale(0.9) opacity(0.7); }
+  .toile__vendue { position: absolute; right: -12px; bottom: -12px; display: grid; place-items: center; width: 68px; height: 68px; border-radius: 50%; background: var(--orange-fonce); color: #fff; font-family: var(--titre); font-size: 1.1rem; transform: rotate(-12deg); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25); }
+  .cartel { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; width: max-content; max-width: 100%; margin: calc(var(--h) + 30px) auto 0; padding: 6px 14px; background: #fff; border: 1px solid #e3dccd; box-shadow: 0 2px 5px rgba(60, 40, 20, 0.1); font-size: 0.95rem; line-height: 1.3; }
+  .cartel__titre { font-family: var(--titre); font-size: 1.2rem; color: var(--vert-fonce); }
+  .cartel__prix { color: var(--orange-fonce); white-space: nowrap; }
+
+  .infos { display: grid; gap: 28px; }
+  .info { padding: 8px 24px 18px; }
+  .info h2 { margin-top: 0.5em; }
+  .info h3 { font-size: 1.4rem; margin-top: 1em; }
+  .info--prix { border-color: var(--orange-fonce); }
+  .info__montant { font-family: var(--titre); font-size: 2.6rem; line-height: 1.1; color: var(--orange-fonce); margin: 0; }
+  .info__note { margin: 0; color: var(--encre-douce); }
+  .coches { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
+  .coches li { position: relative; padding-left: 28px; line-height: 1.4; }
+  .coches li::before { content: '✓'; position: absolute; left: 0; color: var(--orange-fonce); font-weight: 700; }
+  .etapes-toiles { max-width: 980px; }
+  .expo { max-width: 760px; text-align: center; }
+  .expo .chapeau { margin-inline: auto; }
+  .expo__signature { font-family: var(--titre); font-size: 1.8rem; color: var(--orange-titre); margin: -6px 0 18px; }
+
+  .selection { position: fixed; left: 50%; bottom: 12px; translate: -50% 0; z-index: 61; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; width: min(calc(100% - 20px), 760px); padding: 10px 50px 10px 18px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: 0 5px 0 rgba(43, 110, 58, 0.2), 0 12px 30px rgba(0, 0, 0, 0.14); }
+  .selection[hidden] { display: none; }
+  .selection p { margin: 0; line-height: 1.3; }
+  .selection__resume { flex: 1 1 200px; font-size: 1rem; }
+  .selection__resume strong { font-family: var(--titre); font-weight: 400; font-size: 1.3rem; color: var(--vert-fonce); }
+  .selection__total { font-family: var(--titre); font-size: 1.6rem; color: var(--orange-fonce); }
+  .selection__bouton { font-size: 1.15rem; padding: 0.55em 1em; }
+  .selection__vider { position: absolute; top: 4px; right: 4px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--vert-fonce); font-size: 1.6rem; line-height: 1; cursor: pointer; }
+
+  .fiche { border: 0; padding: 0; background: transparent; width: 100%; max-width: 100vw; height: 100%; max-height: 100svh; overflow: auto; }
+  .fiche::backdrop { background: rgba(28, 34, 26, 0.9); }
+  .fiche[open] { display: grid; place-items: center; }
+  .fiche__boite { position: relative; display: grid; gap: 14px; width: min(100%, 1100px); padding: 56px 14px 24px; }
+  .fiche__fermer { position: fixed; top: 10px; right: 12px; z-index: 2; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #fff; color: var(--vert-fonce); font-size: 2rem; line-height: 1; cursor: pointer; }
+  .fiche__vue { position: relative; display: grid; place-items: center; touch-action: pan-y; }
+  .fiche__image img { width: auto; height: auto; max-width: 100%; max-height: 62svh; border-radius: 4px; box-shadow: 0 0 0 3px #c9ced2, 0 18px 40px rgba(0, 0, 0, 0.4); }
+  .fiche__image[hidden], .salon[hidden] { display: none; }
+  .salon { margin: 0; width: 100%; background: #fff; border-radius: var(--rayon); overflow: hidden; }
+  .salon svg { width: 100%; height: auto; max-height: 62svh; }
+  .salon figcaption { padding: 8px 14px 12px; font-size: 0.95rem; color: var(--encre-douce); text-align: center; }
+  .salon__texte { font-family: var(--titre); font-size: 6px; fill: #6b5212; }
+  .salon__texte--cote { font-size: 5px; fill: var(--orange-fonce); }
+  .fiche__fleche { position: absolute; top: 50%; translate: 0 -50%; width: 48px; height: 48px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: var(--vert-fonce); font-size: 2.2rem; line-height: 1; cursor: pointer; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25); }
+  .fiche__fleche--prec { left: 0; }
+  .fiche__fleche--suiv { right: 0; }
+  .fiche__infos { background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 16px 20px 6px; }
+  .fiche__infos h2 { margin-bottom: 0.2em; }
+  .fiche__infos p { margin: 0 0 12px; }
+  .fiche__carac { color: var(--encre-douce); }
+  .fiche__vendue { font-family: var(--titre); font-size: 1.5rem; color: var(--orange-fonce); }
+  .fiche__prix { font-family: var(--titre); font-size: 2.4rem; line-height: 1.1; color: var(--orange-fonce); }
+  .fiche__envoi { font-size: 1rem; }
+  .fiche__dessin a { font-weight: 600; }
+  .case { display: flex; gap: 12px; align-items: center; }
+  .case input { appearance: none; -webkit-appearance: none; flex: none; width: 30px; height: 30px; margin: 0; cursor: pointer; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 12px 6px 11px 7px / 7px 11px 6px 12px; display: grid; place-items: center; }
+  .case input:checked { background: var(--vert-creme); }
+  .case input:checked::after { content: ''; width: 18px; height: 11px; margin-top: -4px; border-left: 4.5px solid var(--orange-fonce); border-bottom: 4.5px solid var(--orange-fonce); border-radius: 2px 0 3px 2px; transform: rotate(-48deg); }
+  .case label { cursor: pointer; }
+
+  /* Téléphone : un mur qui défile toile par toile. */
+  @media (max-width: 639px) {
+    :global(html:has(.mur)) { scroll-snap-type: y proximity; }
+    .selection { padding: 8px 10px 10px 14px; gap: 6px 12px; }
+    .selection__resume { flex-basis: 100%; padding-right: 34px; }
+    .selection__bouton { flex: 1; justify-content: center; white-space: nowrap; font-size: 1.05rem; }
+  }
+  @media (min-width: 640px) {
+    .mur__liste { grid-template-columns: repeat(2, minmax(0, 300px)); justify-content: center; gap: 72px 56px; }
+    .accroche { width: 100%; }
+  }
+  @media (min-width: 900px) {
+    .infos { grid-template-columns: 1fr 1fr; }
+    .fiche__boite { grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr); align-items: center; padding: 40px 24px; }
+    .fiche__image img, .salon svg { max-height: 86svh; }
+    .fiche__fleche--prec { left: -6px; }
+    .fiche__fleche--suiv { right: -6px; }
+  }
+  @media (min-width: 960px) { .mur__liste { grid-template-columns: repeat(3, minmax(0, 280px)); gap: 84px 64px; } }
+  @media (min-width: 1240px) { .mur__liste { grid-template-columns: repeat(4, minmax(0, 260px)); } }
+  @media (prefers-reduced-motion: reduce) {
+    .toile, .toile:hover, .toile:focus-visible { transform: translateY(var(--h)) rotate(var(--r)); }
+    .toile__reflet { display: none; }
+  }
+</style>
