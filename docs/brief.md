@@ -40,7 +40,7 @@ Français par défaut, néerlandais en second (`/nl/`).
 
 - Logo : lotus en pastille verte (piste 2). Les autres pistes sont gardées dans `design/logos/`.
 - Écriture dessinée partout (Gochi Hand pour les titres, Itim pour le texte), dans l'esprit des lettres LD du logo 3.
-- Mascotte : Tilleul (FR) / Linde (NL), chat roux aux yeux verts inspiré de Tiroux, un des chats des dessins de Linda. Dessiné en SVG, animé par parties : il salue, parle, cligne des yeux, suit le pointeur du regard, s'endort sans activité, ronronne et fait des cœurs quand on le touche. Textes écrits à l'avance (pas d'IA). Nom proposé, à faire valider par Linda. L'ancien écureuil (Noisette) est conservé dans le tag git `v1-ecureuil`.
+- Mascotte : Tilleul (même nom en français et en néerlandais), chat roux aux yeux verts inspiré de Tiroux, un des chats des dessins de Linda. Dessiné en SVG, animé par parties : il salue, parle, cligne des yeux, suit le pointeur du regard, s'endort sans activité, ronronne et fait des cœurs quand on le touche. Textes écrits à l'avance (pas d'IA). L'ancien écureuil (Noisette) est conservé dans le tag git `v1-ecureuil`.
 - Décor : étang dessiné avec lotus qui flottent, feuilles de tilleul qui tombent.
 - Photo de Linda sur l'accueil et la page À propos.
 

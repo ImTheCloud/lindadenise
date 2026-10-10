@@ -30,7 +30,6 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Vérifier la mascotte, le formulaire et le menu sur téléphone
 
 ## Contenu et légal
-- Relecture du néerlandais par un néerlandophone
 - Mentions légales complètes (adresse, numéro d'entreprise selon le statut de Linda), conditions d'utilisation relues
 - Titres des dessins : dernière relecture avec Linda
 - Formulaire : notifications email dans Netlify, premier message « Non spam », test d'une vraie demande
