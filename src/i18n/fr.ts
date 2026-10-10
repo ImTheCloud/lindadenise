@@ -185,6 +185,7 @@ export const fr = {
     reveiller: 'Réveiller Tilleul',
     dodo: 'Zzz… Touchez-moi quand vous voudrez me réveiller.',
     invite: 'Touchez-moi !',
+    jouer: 'Jouer avec moi',
     accueil: 'Bonjour, je suis Tilleul ! Bienvenue chez Linda, entrez, je vous fais visiter.',
     anecdotes: [
       'Prrr… vous savez que Linda dessine avec son doigt ?',

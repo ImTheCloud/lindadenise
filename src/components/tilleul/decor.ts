@@ -5,16 +5,20 @@ import type { Decor, FeuilleDecor } from './chat';
 const heros = () => document.querySelector<HTMLElement>('.heros');
 
 export const decorAccueil: Decor = {
-  // les lotus ne sont à regarder que si l'étang est au bas de l'écran, là où le chat se promène
+  // les lotus ne sont à regarder que si l'étang est à l'écran (le chat vit sur son bord)
   lotus() {
     const etang = heros()?.querySelector('.etang');
     if (!etang) return [];
     const r = etang.getBoundingClientRect();
-    if (r.top > innerHeight - 70 || r.bottom < innerHeight - 150) return [];
+    if (r.top > innerHeight - 70 || r.bottom < 100) return [];
     return [...etang.querySelectorAll('.flotte')].map((g) => {
       const b = g.getBoundingClientRect();
       return { x: b.left + b.width / 2, y: b.top + b.height * 0.3 };
     });
+  },
+  decalage() {
+    const etang = heros()?.querySelector('.etang');
+    return etang ? Math.max(0, innerHeight - etang.getBoundingClientRect().bottom) : 0;
   },
   feuilles() {
     const jeu = document.querySelector<HTMLElement>('[data-jeu]');

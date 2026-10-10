@@ -69,6 +69,8 @@ Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui 
 
 **Ajouts du 2026-10-10 (soir)** : hors page de jeu il ne marche que devant l'étang de l'accueil (plus de promenade par-dessus le texte quand on défile) ; page « Jouer avec Tilleul » (lien dans le pied de page) avec boutons marcher, s'asseoir, se coucher, dormir, s'étirer, toilette et « lâcher une feuille » (vraie feuille qui tombe, qu'il chasse) ; bouton zzz de la bulle placé du côté opposé à la pointe.
 
+**Corrections suite aux retours (2026-10-10, soir)** : sur l'accueil le chat vit sur le bord de l'étang et monte avec la page quand on défile (`decor.decalage()`), au lieu de rester collé à l'écran ; sur la page de jeu il ignore le « visiteur occupé » (sinon un toucher sur un bouton annulait la marche) ; la bulle contient un bouton « Jouer avec moi » vers la page de jeu.
+
 **À tester par Claudiu** (non vérifié à la main) : téléphone réel (taille, toucher, défilement), la toilette et le bâillement à l'œil, l'étang à différentes tailles d'écran (il n'y va que si l'étang est visible en bas), la chasse aux feuilles (fenêtre courte : la feuille s'estompe en fin de chute), la page en néerlandais.
 
 **Comment il est construit** (à garder si on y retouche) :

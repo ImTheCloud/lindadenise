@@ -398,6 +398,7 @@ ${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" 
 export interface FeuilleDecor { el: HTMLElement; x: number; y: number }
 export interface Decor {
   lotus(): V[];
+  decalage(): number; // de combien l'étang est remonté au-dessus du bas de l'écran (le chat l'accompagne quand on défile)
   feuilles(): FeuilleDecor[];
 }
 
@@ -546,8 +547,10 @@ export class Chat {
     this.sautV = 300;
   }
 
+  private decal = 0;
+
   private get haut() {
-    return innerHeight - this.H;
+    return innerHeight - this.H - this.decal;
   }
 
   private lancer() {
@@ -620,7 +623,7 @@ export class Chat {
   }
 
   private calme() {
-    return performance.now() - this.geste > CALME;
+    return this.o.libre || performance.now() - this.geste > CALME;
   }
 
   // Hors de la page de jeu, il ne marche que sur l'herbe devant l'étang (accueil, étang visible en bas de l'écran) ; ailleurs il reste sur place
@@ -738,6 +741,9 @@ export class Chat {
   private image(dt: number): string {
     const s = this.s;
     this.t += dt;
+    // sur l'accueil, il vit sur le bord de l'étang : quand on défile, il monte avec lui et sort de l'écran
+    const decal = Math.round(this.o.decor.decalage());
+    if (decal !== this.decal) { this.decal = decal; this.scene.style.transform = decal ? `translateY(${-decal}px)` : ''; }
     const cap = Math.cos(this.phi) >= 0 ? 1 : -1; // côté vers lequel le corps est tourné
 
     // déplacement : il freine pour s'arrêter pile ; pendant un demi-tour en marchant, sa vitesse suit son orientation

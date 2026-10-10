@@ -187,6 +187,7 @@ export const nl: Dico = {
     reveiller: 'Tilleul wakker maken',
     dodo: 'Zzz… Tik me aan wanneer je me wakker wilt maken.',
     invite: 'Aai me!',
+    jouer: 'Speel met mij',
     accueil: 'Goedendag, ik ben Tilleul! Welkom bij Linda, kom binnen, ik geef je een rondleiding.',
     anecdotes: [
       'Prrr… wist je dat Linda met haar vinger tekent?',

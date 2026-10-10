@@ -1,5 +1,5 @@
 ---
-import { t, type Lang } from '../i18n';
+import { t, chemin, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const m = t(lang).mascotte;
@@ -9,6 +9,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   <svg class="mascotte__scene" aria-hidden="true"></svg>
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
     <p class="mascotte__texte"><span class="mascotte__cache"></span><span class="mascotte__vu" aria-hidden="true"></span></p>
+    <a class="mascotte__jouer" href={chemin('jeu', lang)}>{m.jouer}</a>
     <button class="mascotte__muet" type="button" aria-label={m.fermer}>×</button>
     <button class="mascotte__silence" type="button" aria-label={m.silence} title={m.silence}>
       <svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h9l-9 11h9" stroke-width="2.6" /><path d="M13 5h7l-7 8h7" stroke-width="2.2" /><path d="M20 1.5h5l-5 5.5h5" stroke-width="1.9" /></g></svg>
@@ -63,6 +64,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     let repere: Reperes | undefined;
 
     racine.classList.toggle('touche', touche);
+    racine.classList.toggle('jeu', !!document.querySelector('[data-jeu]'));
 
     // Silence : Tilleul dort, ne dit plus rien tant qu'on ne le touche pas
     const regler = () => {
@@ -204,6 +206,10 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__texte { position: relative; margin: 0; color: var(--encre); }
   .mascotte__cache { opacity: 0; }
   .mascotte__vu { position: absolute; inset: 0; }
+  /* Chemin vers la page de jeu, dans la bulle : discret sur la page de jeu elle-même (inutile) */
+  .mascotte__jouer { display: inline-block; margin-top: 10px; padding: 6px 14px; font-family: var(--titre); font-size: 1.05rem; line-height: 1.1; color: #fff; background: var(--orange-fonce); border-radius: 18px 10px 16px 10px / 10px 16px 10px 18px; text-decoration: none; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18); }
+  .mascotte__jouer:hover, .mascotte__jouer:focus-visible { background: var(--vert-fonce); }
+  .mascotte.jeu .mascotte__jouer, .mascotte.silence .mascotte__jouer { display: none; }
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
   /* Pastille collée au bas de la bulle, du côté opposé à la queue (sinon elle cache la pointe) : trois Z dessinés qui montent, comme ceux du chat endormi */
   .mascotte__silence { position: absolute; left: 14px; bottom: -22px; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; color: var(--orange-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; box-shadow: 0 3px 0 rgba(43, 110, 58, 0.15); cursor: pointer; transition: transform 0.2s cubic-bezier(0.3, 1.5, 0.5, 1), background 0.15s; }
