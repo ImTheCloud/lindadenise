@@ -22,6 +22,8 @@ const prefill = Object.fromEntries(dessins.map((x) => [x.id, c.prefill(x.titre[l
         <input id="nom" name="nom" type="text" autocomplete="name" required />
         <label for="email">{c.email}</label>
         <input id="email" name="email" type="email" autocomplete="email" required />
+        <label for="tel">{c.tel}</label>
+        <input id="tel" name="tel" type="tel" autocomplete="tel" />
         <label for="dessin">{c.dessin}</label>
         <select id="dessin" name="dessin">
           <option value="">{c.aucun}</option>

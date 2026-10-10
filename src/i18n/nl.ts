@@ -94,6 +94,7 @@ export const nl: Dico = {
     intro: 'Een vraag, een tekening die je bevalt, zin in een tekening die niet op de site staat? Schrijf haar, ze antwoordt je persoonlijk.',
     nom: 'Je voor- en achternaam',
     email: 'Je e-mailadres',
+    tel: 'Je telefoonnummer (optioneel)',
     dessin: 'Betreffende tekening (optioneel)',
     aucun: '— Geen bepaalde tekening —',
     message: 'Je bericht',

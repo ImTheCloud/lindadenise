@@ -92,6 +92,7 @@ export const fr = {
     intro: 'Une question, un dessin qui vous plaît, l’envie d’un dessin qui n’est pas sur le site ? Écrivez-lui, elle vous répond personnellement.',
     nom: 'Votre prénom et nom',
     email: 'Votre adresse email',
+    tel: 'Votre numéro de téléphone (facultatif)',
     dessin: 'Dessin concerné (facultatif)',
     aucun: '— Aucun dessin en particulier —',
     message: 'Votre message',
