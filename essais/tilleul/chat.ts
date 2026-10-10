@@ -352,6 +352,7 @@ const DEFS = `<defs>
 <radialGradient id="t-fondu"><stop offset=".45" stop-color="#000"/><stop offset="1" stop-color="#fff"/></radialGradient>
 <clipPath id="t-c-corps"><path/></clipPath>
 <mask id="t-m-pattes" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><g clip-path="url(#t-c-corps)"><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/></g></mask>
+<mask id="t-m-hors-corps" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><g clip-path="url(#t-c-corps)"><rect x="-300" y="-300" width="600" height="600" fill="#000"/></g></mask>
 ${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><path fill="#000"/></mask>`).join('')}
 <filter id="t-flou"><feGaussianBlur stdDeviation="3"/></filter>
 <filter id="t-flou-ombre" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="4"/></filter>
@@ -758,7 +759,9 @@ export class Chat {
       // rien ne se voit à travers.
       const visible = z * cphi > 0;
       const sombre = 0.1 * clamp((profCorps - profondeur) / 12, 0, 1);
-      const dessin = visible ? silhouette(formes, EP, 't-m-pattes') : silhouette(formes) + (sombre > 0.005 ? `<g fill="${CONTOUR}" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
+      // patte arrière : son contour n'est tracé que hors du corps (elle sort de sous le ventre) ; aucun trait sur le buste
+      // qui disparaîtrait puis réapparaîtrait pendant un demi-tour
+      const dessin = visible ? silhouette(formes, EP, k < 2 ? 't-m-pattes' : 't-m-hors-corps') : silhouette(formes) + (sombre > 0.005 ? `<g fill="${CONTOUR}" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
       // pattes avant et arrière traitées de la même façon : le contour s'efface vers l'attache
       return { k, profondeur, profAncre, visible, dessin, ancre: proj(add(A, { x: 0, y: -6 }), z), rayon: 24 };
     }).sort((a, b) => a.profondeur - b.profondeur);
