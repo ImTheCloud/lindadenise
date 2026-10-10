@@ -162,18 +162,18 @@ class Ressort {
   }
 }
 
-// Une pose : hanche (h), épaule (s), cou (c), pieds avant (av) et arrière (ar), queue (q), pattes arrière repliées (repli)
-const CLES = ['hx', 'hy', 'sx', 'sy', 'arc', 'cx', 'cy', 'incl', 'tour', 'avX', 'avY', 'av2X', 'arX', 'arY', 'ar2X', 'qBase', 'qCourbe', 'qVague', 'yeux', 'resp', 'repli'] as const;
+// Une pose : hanche (h), épaule (s), cou (c), pieds avant (av) et arrière (ar), queue (q)
+const CLES = ['hx', 'hy', 'sx', 'sy', 'arc', 'cx', 'cy', 'incl', 'tour', 'avX', 'avY', 'av2X', 'arX', 'arY', 'ar2X', 'qBase', 'qCourbe', 'qVague', 'yeux', 'resp'] as const;
 type Cle = (typeof CLES)[number];
 type Pose = Record<Cle, number>;
 
-const DEBOUT: Pose = { hx: -36, hy: -58, sx: 34, sy: -62, arc: 5, cx: 14, cy: -33, incl: 0, tour: 0.7, avX: 38, avY: -7, av2X: 45, arX: -30, arY: -7, ar2X: -23, qBase: -2.1, qCourbe: 0.12, qVague: 0.08, yeux: 1, resp: 0.012, repli: 0 };
-const ASSIS: Pose = { hx: -20, hy: -27, sx: 15, sy: -66, arc: -3, cx: 9, cy: -31, incl: 0, tour: 0.6, avX: 22, avY: -7, av2X: 29, arX: 10, arY: -7, ar2X: 16, qBase: 2.35, qCourbe: 0.17, qVague: 0.1, yeux: 1, resp: 0.012, repli: 1 };
-const COUCHE: Pose = { hx: -36, hy: -27, sx: 30, sy: -29, arc: 8, cx: 20, cy: -26, incl: -4, tour: 0.6, avX: 66, avY: -6, av2X: 73, arX: -4, arY: -6, ar2X: 3, qBase: 2.75, qCourbe: 0.12, qVague: 0.06, yeux: 1, resp: 0.016, repli: 1 };
+const DEBOUT: Pose = { hx: -36, hy: -58, sx: 34, sy: -62, arc: 5, cx: 14, cy: -33, incl: 0, tour: 0.7, avX: 38, avY: -7, av2X: 45, arX: -30, arY: -7, ar2X: -23, qBase: -2.1, qCourbe: 0.12, qVague: 0.08, yeux: 1, resp: 0.012 };
+const ASSIS: Pose = { hx: -20, hy: -27, sx: 15, sy: -66, arc: -3, cx: 9, cy: -31, incl: 0, tour: 0.6, avX: 22, avY: -7, av2X: 29, arX: 10, arY: -7, ar2X: 16, qBase: 2.35, qCourbe: 0.17, qVague: 0.1, yeux: 1, resp: 0.012 };
+const COUCHE: Pose = { hx: -36, hy: -27, sx: 30, sy: -29, arc: 8, cx: 20, cy: -26, incl: -4, tour: 0.6, avX: 66, avY: -6, av2X: 73, arX: -4, arY: -6, ar2X: 3, qBase: 2.75, qCourbe: 0.12, qVague: 0.06, yeux: 1, resp: 0.016 };
 const DORT: Pose = { ...COUCHE, cx: 30, cy: -12, incl: 12, tour: 0.35, qCourbe: 0.06, qVague: 0.015, yeux: 0, resp: 0.035 };
 const ETIRE: Pose = { ...DEBOUT, hx: -34, hy: -60, sx: 36, sy: -33, arc: -10, cx: 22, cy: -18, incl: -8, tour: 0.6, avX: 80, avY: -6, av2X: 87, arX: -28, ar2X: -21, qBase: -1.9, qCourbe: 0.06, yeux: 0 };
 // à l'affût : arrière-train haut, poitrail au ras du sol ; en plein bond : tout le corps étiré
-const GUETTE: Pose = { ...DEBOUT, hx: -32, hy: -44, sx: 30, sy: -34, arc: -4, cx: 22, cy: -20, incl: 4, tour: 0.9, avX: 46, av2X: 52, arX: -24, ar2X: -18, qBase: 3.05, qCourbe: 0.07, qVague: 0.22, repli: 0.6 };
+const GUETTE: Pose = { ...DEBOUT, hx: -32, hy: -44, sx: 30, sy: -34, arc: -4, cx: 22, cy: -20, incl: 4, tour: 0.9, avX: 46, av2X: 52, arX: -24, ar2X: -18, qBase: 3.05, qCourbe: 0.07, qVague: 0.22 };
 const BOND: Pose = { ...DEBOUT, hx: -44, hy: -54, sx: 44, sy: -58, arc: 2, cx: 12, cy: -33, incl: 8, tour: 0.9, avX: 86, avY: -12, av2X: 92, arX: -80, arY: -14, ar2X: -74, qBase: 3.05, qCourbe: 0.03, qVague: 0.02 };
 const RAIDEUR: Partial<Record<Cle, number>> = { cx: 60, cy: 60, incl: 50, yeux: 140, qBase: 14, qCourbe: 14, avX: 80, av2X: 80, arX: 80, ar2X: 80, avY: 80, arY: 80 };
 
@@ -656,8 +656,8 @@ export class Chat {
     const pattes = [
       { j: patte(ancreAv, pied(p.avX, p.avY, 0.25, this.r.avX), 26, 26, 1), z: FLANC, r: [12, 9.5, 9] },
       { j: patte(add(ancreAv, { x: 4, y: -2 }), pied(p.av2X, p.avY, 0.75, this.r.av2X), 26, 26, 1), z: -FLANC, r: [11.5, 9, 8.6] },
-      { j: patte(ancreAr, pied(p.arX, p.arY, 0, this.r.arX), 22, 27, -1), z: FLANC, r: [19, 11, 9] },
-      { j: patte(add(ancreAr, { x: 4, y: -2 }), pied(p.ar2X, p.arY, 0.5, this.r.ar2X), 22, 27, -1), z: -FLANC, r: [18, 10.5, 8.6] },
+      { j: patte(ancreAr, pied(p.arX, p.arY, 0, this.r.arX), 22, 27, -1), z: FLANC, r: [12, 9.5, 9] },
+      { j: patte(add(ancreAr, { x: 4, y: -2 }), pied(p.ar2X, p.arY, 0.5, this.r.ar2X), 22, 27, -1), z: -FLANC, r: [11.5, 9, 8.6] },
     ];
 
     // queue : chaque segment suit le précédent avec un temps de retard (ressorts d'angle) ;
@@ -759,17 +759,8 @@ export class Chat {
       const visible = z * cphi > 0;
       const sombre = 0.1 * clamp((profCorps - profondeur) / 12, 0, 1);
       const dessin = visible ? silhouette(formes, EP, 't-m-pattes') : silhouette(formes) + (sombre > 0.005 ? `<g fill="${CONTOUR}" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
-      // le contour s'efface vers l'attache ; pour une patte arrière repliée (assis, couché, à l'affût), sur le dessus
-      // et l'arrière de la cuisse : on ne garde que sa courbe avant et basse (sinon son bord trace un trait en travers
-      // du ventre). Le réglage suit la pose, pas les pas ni le demi-tour : le trait de la hanche ne change pas en marchant.
-      let fondu = add(A, k < 2 ? { x: 0, y: -6 } : { x: -6, y: -8 });
-      if (k >= 2 && p.repli > 0.01) {
-        const u = sub(J, A), l = Math.hypot(u.x, u.y) || 1;
-        let n = { x: -u.y / l, y: u.x / l };
-        if (n.x + n.y > 0) n = mul(n, -1);
-        fondu = mix(fondu, add(mix(A, J, 0.45), mul(n, r1 * 0.7)), p.repli);
-      }
-      return { k, profondeur, profAncre, visible, dessin, ancre: proj(fondu, z), rayon: k < 2 ? 24 : 30 };
+      // pattes avant et arrière traitées de la même façon : le contour s'efface vers l'attache
+      return { k, profondeur, profAncre, visible, dessin, ancre: proj(add(A, { x: 0, y: -6 }), z), rayon: 24 };
     }).sort((a, b) => a.profondeur - b.profondeur);
     // une patte du côté visible est cachée par la partie du corps plus proche du visiteur ; cette partie grandit doucement
     // à mesure qu'il se tourne (aucune patte ne change de plan d'un coup)
