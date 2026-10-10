@@ -8,7 +8,7 @@
 type V = { x: number; y: number };
 type V3 = { x: number; y: number; z: number };
 
-const f = (n: number) => Math.round(n * 10) / 10;
+const f = (n: number) => Math.round(n * 100) / 100; // au centième : les mouvements lents restent continus
 const pt = (p: V) => `${f(p.x)},${f(p.y)}`;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
@@ -82,6 +82,20 @@ function tube(c: V[], r: number[]) {
   return { contour: [...haut, ...bout(n - 1, ang(n - 1)), ...[...bas].reverse(), ...bout(0, ang(0) + Math.PI)], nor };
 }
 
+// Contour d'une union de boules : depuis un point intérieur, le bord le plus lointain dans chaque direction.
+// Une seule courbe, stable d'une image à l'autre (des cercles superposés feraient trembler le bord).
+function enveloppe(boules: { c: V; r: number }[], centre: V, n = 120): V[] {
+  return Array.from({ length: n }, (_, k) => {
+    const u = dir((TAU * k) / n);
+    let t = 0;
+    for (const b of boules) {
+      const m = sub(b.c, centre), q = m.x * u.x + m.y * u.y, disc = q * q - (m.x * m.x + m.y * m.y - b.r * b.r);
+      if (disc >= 0) t = Math.max(t, q + Math.sqrt(disc));
+    }
+    return add(centre, mul(u, t));
+  });
+}
+
 // Patte à deux os : articulation (coude ou genou) et pied atteignable ; sens +1 plie vers l'arrière
 function patte(A: V, cible: V, l1: number, l2: number, sens: number) {
   const d0 = dist(A, cible);
@@ -128,7 +142,7 @@ const DEBOUT: Pose = { hx: -36, hy: -58, sx: 34, sy: -62, arc: 5, cx: 14, cy: -3
 const ASSIS: Pose = { hx: -20, hy: -27, sx: 15, sy: -66, arc: -3, cx: 9, cy: -31, incl: 0, tour: 0.2, avX: 22, avY: -7, av2X: 29, arX: 10, arY: -7, ar2X: 16, qBase: 2.35, qCourbe: 0.17, qVague: 0.1, yeux: 1, resp: 0.012 };
 const COUCHE: Pose = { hx: -36, hy: -27, sx: 30, sy: -29, arc: 8, cx: 20, cy: -26, incl: -4, tour: 0.35, avX: 66, avY: -6, av2X: 73, arX: -4, arY: -6, ar2X: 3, qBase: 2.75, qCourbe: 0.12, qVague: 0.06, yeux: 1, resp: 0.016 };
 const DORT: Pose = { ...COUCHE, cx: 30, cy: -12, incl: 12, tour: 0.1, qCourbe: 0.06, qVague: 0.015, yeux: 0, resp: 0.035 };
-const ETIRE: Pose = { ...DEBOUT, hx: -34, hy: -60, sx: 36, sy: -33, arc: -10, cx: 22, cy: -18, incl: -8, tour: 0.3, avX: 80, avY: -6, av2X: 87, arX: -28, ar2X: -21, qBase: -1.9, qCourbe: 0.06, yeux: 0.25 };
+const ETIRE: Pose = { ...DEBOUT, hx: -34, hy: -60, sx: 36, sy: -33, arc: -10, cx: 22, cy: -18, incl: -8, tour: 0.3, avX: 80, avY: -6, av2X: 87, arX: -28, ar2X: -21, qBase: -1.9, qCourbe: 0.06, yeux: 0 };
 // à l'affût : arrière-train haut, poitrail au ras du sol ; en plein bond : tout le corps étiré
 const GUETTE: Pose = { ...DEBOUT, hx: -32, hy: -44, sx: 30, sy: -34, arc: -4, cx: 22, cy: -20, incl: 4, tour: 0.9, avX: 46, av2X: 52, arX: -24, ar2X: -18, qBase: 3.05, qCourbe: 0.07, qVague: 0.22 };
 const BOND: Pose = { ...DEBOUT, hx: -44, hy: -54, sx: 44, sy: -58, arc: 2, cx: 12, cy: -33, incl: 8, tour: 0.9, avX: 86, avY: -12, av2X: 92, arX: -80, arY: -14, ar2X: -74, qBase: 3.05, qCourbe: 0.03, qVague: 0.02 };
@@ -230,13 +244,15 @@ function tete(v: Visage) {
     if (fj > 0) s += `<ellipse cx="${f(j.x)}" cy="${f(j.y)}" rx="${f(9 * Math.max(0.2, fj))}" ry="5" fill="#FF8E7A" opacity="${f(0.45 * clamp(fj * 5, 0, 1))}" filter="url(#t-flou)"/>`;
   }
 
-  // yeux : seule la partie visible sous la paupière est peinte, entourée d'un fin trait qui couvre ses bords
-  // (une paupière posée par-dessus laisserait un liseré blanc qui scintille quand la tête bouge)
+  // yeux : seule la partie visible sous la paupière est peinte, posée sur un fond brun un peu plus grand,
+  // pour qu'aucun bord blanc ne touche la fourrure (sinon un liseré blanc scintille quand la tête bouge).
+  // Les bords de l'œil suivent la courbe de la tête : près du bord il s'amincit, sans jamais dépasser.
   const yeux: { cote: number; d: string }[] = [];
+  const bordTete = (q: V3) => (q.z > 0 ? clamp(q.x, -W * 0.93, W * 0.93) : Math.sign(q.x) * W * 0.93);
   for (const cote of [-1, 1]) {
-    const o3 = surf(cote * 0.43, 0.05), fs = face(cote * 0.43);
-    if (fs < 0.08) continue;
-    const rx = 11.5 * fs, ry = 13.5, cx = o3.x, cy = o3.y;
+    const xg = bordTete(surf(cote * 0.43 - 0.23, 0.05)), xd = bordTete(surf(cote * 0.43 + 0.23, 0.05));
+    const rx = Math.abs(xd - xg) / 2, ry = 13.5, cx = (xg + xd) / 2, cy = surf(cote * 0.43, 0.05).y, fs = rx / 11.5;
+    if (rx < 1) continue;
     if (v.joie) {
       s += `<path d="M${f(cx - rx)},${f(cy + 3)}Q${f(cx)},${f(cy - ry)} ${f(cx + rx)},${f(cy + 3)}" fill="none" stroke="${TRAIT_OEIL}" stroke-width="3.4" stroke-linecap="round"/>`;
     } else if (v.yeux < 0.12) {
@@ -252,12 +268,12 @@ function tete(v: Visage) {
       }
       yeux.push({ cote, d });
       const ix = cx + v.regard.x * rx * 0.3, iy = cy + 1.2 + v.regard.y * ry * 0.22;
-      s += `<path d="${d}" fill="#fff"/><g clip-path="url(#t-oeil-${cote > 0 ? 'd' : 'g'})">`;
-      s += `<ellipse cx="${f(ix)}" cy="${f(iy)}" rx="${f(rx * 0.84)}" ry="${f(ry * 0.84)}" fill="url(#t-oeil)"/>`;
+      s += `<path d="${d}" fill="${TRAIT_OEIL}" stroke="${TRAIT_OEIL}" stroke-width="2.4" stroke-linejoin="round"/><path d="${d}" fill="#fff"/><g clip-path="url(#t-oeil-${cote > 0 ? 'd' : 'g'})">`;
+      // un œil vu de biais est rempli par l'iris : pas de filet blanc d'un pixel qui scintillerait
+      s += `<ellipse cx="${f(ix)}" cy="${f(iy)}" rx="${f(rx * Math.min(1.05, 0.84 + 0.35 * (1 - fs)))}" ry="${f(ry * 0.84)}" fill="url(#t-oeil)"/>`;
       s += `<ellipse cx="${f(ix)}" cy="${f(iy + 0.5)}" rx="${f(4.3 * fs * v.pupille)}" ry="${f(9 + 1.5 * (v.pupille - 1))}" fill="#1B2A14"/>`;
-      s += `<circle cx="${f(ix + 4 * fs)}" cy="${f(iy - 4.6)}" r="3.8" fill="#fff"/><circle cx="${f(ix - 3.2 * fs)}" cy="${f(iy + 5)}" r="1.7" fill="#fff" opacity=".9"/></g>`;
-      s += `<path d="${d}" fill="none" stroke="${TRAIT_OEIL}" stroke-width="1.4"/>`;
-      s += `<path d="${haut}M${pt(coin)}l${f(cote * 3.5)},-3.5" fill="none" stroke="${TRAIT_OEIL}" stroke-width="2.6" stroke-linecap="round"/>`;
+      s += `<ellipse cx="${f(ix + 4 * fs)}" cy="${f(iy - 4.6)}" rx="${f(3.8 * fs)}" ry="3.8" fill="#fff"/><ellipse cx="${f(ix - 3.2 * fs)}" cy="${f(iy + 5)}" rx="${f(1.7 * fs)}" ry="1.7" fill="#fff" opacity=".9"/></g>`;
+      s += `<path d="${haut}M${pt(coin)}l${f(cote * 3.5 * fs)},${f(-3.5 * fs)}" fill="none" stroke="${TRAIT_OEIL}" stroke-width="2.6" stroke-linecap="round"/>`;
     }
   }
 
@@ -561,9 +577,7 @@ export class Chat {
     const hauteurPas = Math.max(w, pietine * 0.8);
 
     // corps : une chaîne de boules le long de la colonne (de profil un boudin, de face une boule)
-    // juste avant de bondir, il remue l'arrière-train
-    const remue = this.etat === 'guette' ? clamp(1 - this.attente, 0, 1) * 3 * Math.sin(this.t * TAU * 3.4) : 0;
-    const H = { x: p.hx + remue, y: p.hy + 1.8 * w * Math.sin(TAU * 2 * this.phase) };
+    const H = { x: p.hx, y: p.hy + 1.8 * w * Math.sin(TAU * 2 * this.phase) };
     const S = { x: p.sx, y: p.sy + 1.8 * w * Math.sin(TAU * 2 * (this.phase + 0.25)) };
     const souffle = Math.sin((this.t * TAU) / 3.4) * p.resp;
     const col = colonne(H, S, p.arc + 1.2 * w * Math.sin(TAU * this.phase), NC);
@@ -571,7 +585,8 @@ export class Chat {
     const rB = col.map((_, i) => { const t = i / NC; return ((t < 0.45 ? lerp(26, 26.5, t / 0.45) : lerp(26.5, 29, lisse((t - 0.45) / 0.55))) + 3.5 * Math.sin(Math.PI * t)) * (1 + souffle); });
     const nor = col.map((_, i) => { const a = col[Math.max(0, i - 1)], b = col[Math.min(NC, i + 1)], l = dist(a, b) || 1; return { x: (b.y - a.y) / l, y: -(b.x - a.x) / l }; });
     const boules = col.map((c, i) => ({ c: sub(c, mul(nor[i], (rB[i] - rH[i]) / 2)), r: (rH[i] + rB[i]) / 2 }));
-    const dCorps = boules.map((b) => ovale(proj(b.c), b.r)).join('');
+    const vues3d = boules.map((b) => ({ c: proj(b.c), r: b.r }));
+    const dCorps = courbe(enveloppe(vues3d, vues3d[NC / 2].c), true);
 
     // pattes : la marche décale les pieds, un pied qui se déplace hors de la marche se lève un peu
     const pied = (x: number, y: number, o: number, rv: Ressort): V => {
@@ -667,8 +682,7 @@ export class Chat {
       const doigts = [proj({ x: P.x + 3, y: P.y + 2 }, z - 3), proj({ x: P.x + 7, y: P.y + 1 }, z + 3)];
       const formes: Forme[] = [
         { d: os(a, r1, jj, r2), fond: 'url(#t-pelage)' },
-        { d: os(jj, r2, pp, r3), fond: 'url(#t-pelage)' },
-        { d: os(mix(pp, jj, 0.42), r3 * 0.98, pp, r3), fond: 'url(#t-creme)' },
+        { d: os(jj, r2, pp, r3), fond: 'url(#t-pelage)', apres: `<path d="${os(mix(pp, jj, 0.42), r3, pp, r3)}" fill="url(#t-creme)"/>` },
         { d: ovale(proj({ x: P.x + 3, y: P.y }, z), Math.hypot(10.5 * cphi, 8 * sphi), 7.2), fond: '#FFF3E2', apres: `<path d="${doigts.map((q) => `M${pt(q)}v4.5`).join('')}" stroke="${CONTOUR}" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>` },
       ];
       const sombre = 0.16 * clamp((profCorps - profondeur) / 12, 0, 1);
@@ -686,10 +700,9 @@ export class Chat {
     const queue = silhouette([{ d: dQueue, fond: 'url(#t-pelage)', apres: `<path d="${rayuresQueue}" stroke="${RAYURE}" stroke-width="5" opacity=".6" clip-path="url(#t-c-queue)"/>` }]);
 
     // corps : ventre et plastron crème, rayures du dos, reflet, touffes du poitrail, ombre de la tête
-    const ventre = boules.slice(3).map((b, k) => {
-      const i = k + 3, rc = b.r * lerp(0.3, 0.78, lisse((i / NC - 0.15) / 0.85));
-      return ovale(proj(sub(b.c, mul(nor[i], b.r - rc + 2))), rc);
-    }).join('');
+    const ventre: V[] = [];
+    for (let i = 5; i <= NC; i++) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] + 3))));
+    for (let i = NC; i >= 5; i--) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] - lerp(3, rB[i] * 0.95, lisse((i / NC - 0.25) / 0.75))))));
     const fin = col[NC], noF = nor[NC], tgF = { x: -noF.y, y: noF.x };
     const angF = Math.atan2(tgF.y, tgF.x);
     const plastron = proj(sub(add(fin, mul(tgF, 12)), mul(noF, 8)));
@@ -706,7 +719,7 @@ export class Chat {
     }
     const ombreTete = proj(add(teteC, { x: -4, y: 28 }));
     const corps = silhouette([{ d: dCorps, fond: 'url(#t-pelage)' }, { d: touffes, fond: '#FFF3E2' }])
-      + `<g clip-path="url(#t-c-corps)"><path d="${ventre}" fill="url(#t-creme)"/><path d="${ovale(plastron, 20)}" fill="url(#t-creme)"/>`
+      + `<g clip-path="url(#t-c-corps)"><path d="${courbe(ventre, true)}" fill="url(#t-creme)"/><path d="${ovale(plastron, 20)}" fill="url(#t-creme)"/>`
       + `<path d="${rayures}" fill="${RAYURE}" opacity=".55"/><path d="${reflet}" fill="none" stroke="#FFD59A" stroke-width="4.5" stroke-linecap="round" opacity=".5"/>`
       + `<ellipse cx="${f(ombreTete.x)}" cy="${f(ombreTete.y)}" rx="36" ry="18" fill="#7A2E0A" opacity=".22" filter="url(#t-flou-doux)"/></g>`;
 
