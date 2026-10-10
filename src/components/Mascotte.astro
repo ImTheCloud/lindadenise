@@ -10,10 +10,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   <div class="mascotte__bulle" role="status" aria-live="polite" hidden>
     <p class="mascotte__texte"><span class="mascotte__cache"></span><span class="mascotte__vu" aria-hidden="true"></span></p>
     <button class="mascotte__muet" type="button" aria-label={m.fermer}>×</button>
-    <button class="mascotte__silence" type="button">
-      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" fill="currentColor" /></svg>
-      <span>{m.silence}</span>
-    </button>
+    <button class="mascotte__silence" type="button" aria-label={m.silence} title={m.silence}><span aria-hidden="true">zZz</span></button>
   </div>
   <p class="mascotte__invite" aria-hidden="true">{m.invite}</p>
   <div class="mascotte__coeurs" aria-hidden="true"></div>
@@ -250,8 +247,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__cache { opacity: 0; }
   .mascotte__vu { position: absolute; inset: 0; }
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
-  .mascotte__silence { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; min-height: 40px; padding: 4px 14px 4px 11px; font-family: var(--titre); font-size: 1rem; line-height: 1; white-space: nowrap; color: var(--vert-fonce); background: var(--vert-creme); border: var(--trait) solid var(--vert-fonce); border-radius: 16px 9px 14px 9px / 9px 14px 9px 16px; cursor: pointer; transition: transform 0.15s, background 0.15s; }
-  .mascotte__silence:hover, .mascotte__silence:focus-visible { background: var(--orange-creme); color: var(--orange-fonce); border-color: var(--orange-fonce); transform: rotate(-1.5deg); }
+  .mascotte__silence { display: block; margin: 0 -8px -6px auto; min-width: 44px; min-height: 36px; padding: 4px 10px; border: 0; background: none; font-family: var(--titre); font-size: 1.15rem; line-height: 1; letter-spacing: 0.04em; color: var(--vert-fonce); opacity: 0.6; cursor: pointer; transition: opacity 0.15s, color 0.15s; }
+  .mascotte__silence:hover, .mascotte__silence:focus-visible { opacity: 1; color: var(--orange-fonce); }
   .mascotte.silence .mascotte__invite { display: none; }
   .mascotte.silence .mascotte__silence { display: none; }
   .mascotte.sans-anim .m-couche-pose { animation: none !important; }
@@ -330,7 +327,6 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 
   @media (max-width: 700px) {
     .mascotte { width: 112px; right: 4px; }
-    .mascotte__silence { margin-right: -34px; }
     .mascotte__bulle { right: 2px; font-size: 0.98rem; max-width: min(240px, calc(100vw - 20px)); }
     .mascotte__invite { font-size: 1rem; padding: 5px 11px; bottom: 26%; }
   }
