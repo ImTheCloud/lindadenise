@@ -86,11 +86,13 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 
     // Il parle : la bulle s'écrit lettre après lettre, et sa bouche bouge tant que le texte s'écrit
     let frappe: number | undefined;
+    let ecrit = false;
     const dire = (message: string, lecture = 6500, adieu = false) => {
       if (!message) return;
       if (!adieu && (muet || racine.dataset.etat === 'dort' || racine.dataset.etat === 'couche')) return;
       window.clearInterval(frappe);
       window.clearTimeout(minuteurBulle);
+      ecrit = false;
       cache.textContent = message;
       vu.textContent = '';
       bulle.hidden = false;
@@ -98,11 +100,13 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       void bulle.offsetWidth;
       bulle.classList.add('pop');
       const terminer = () => {
+        ecrit = false;
         if (racine.dataset.etat === 'parle') etat(muet ? 'dort' : 'repos');
         minuteurBulle = window.setTimeout(() => (bulle.hidden = true), lecture);
       };
       if (moinsDeMouvement) { vu.textContent = message; terminer(); return; }
       etat('parle');
+      ecrit = true;
       let i = 0;
       frappe = window.setInterval(() => {
         i += 1;
@@ -110,7 +114,14 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
         if (i >= message.length) { window.clearInterval(frappe); terminer(); }
       }, 34);
     };
-    const taire = () => { window.clearInterval(frappe); bulle.hidden = true; };
+    // Il se tait pour de bon : plus de bulle, plus de bouche qui bouge
+    const taire = () => {
+      window.clearInterval(frappe);
+      window.clearTimeout(minuteurBulle);
+      ecrit = false;
+      bulle.hidden = true;
+      if (racine.dataset.etat === 'parle') etat(muet ? 'dort' : 'repos');
+    };
 
     const faireDesCoeurs = (n: number) => {
       if (moinsDeMouvement) return;
@@ -173,10 +184,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     };
     window.setTimeout(habitude, 6000);
 
-    fermer.addEventListener('click', () => {
-      taire();
-      if (racine.dataset.etat === 'parle') etat('repos');
-    });
+    fermer.addEventListener('click', taire);
 
     silence.addEventListener('click', () => {
       muet = true;
@@ -207,7 +215,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     });
     racine.addEventListener('mouseenter', () => window.clearTimeout(minuteurBulle));
     racine.addEventListener('mouseleave', () => {
-      if (!bulle.hidden) minuteurBulle = window.setTimeout(() => (bulle.hidden = true), 3500);
+      if (!bulle.hidden && !ecrit) minuteurBulle = window.setTimeout(() => (bulle.hidden = true), 3500);
     });
 
     // Il ne parle qu'à la toute première visite, puis seulement quand on le touche
