@@ -82,6 +82,8 @@ Retours suivants appliqués (« on voit les traits des pattes cachées », « pa
 
 **Ce que Claudiu aime et n'aime pas** (à respecter pour toute retouche) : rien qui scintille ou tremble ; aucune transparence (on ne doit jamais voir une patte ou un trait à travers une autre) ; aucun saut d'une image à l'autre ni trait qui apparaît, disparaît puis revient ; des gestes de vrai chat (regarde devant lui, ne bouge pas les pattes arrière avant de bondir) ; les traits de contour sur le corps sont plus beaux que sans.
 
+**Décidé par Claudiu (2026-10-10)** : ajouter la toilette (se lèche la patte puis l'oreille), le bâillement avant de dormir, et l'étang de l'accueil (s'arrêter au bord, regarder un lotus, chasser les vraies feuilles du décor `Feuilles.astro`) ; puis intégrer le chat au site. À faire dans une nouvelle conversation.
+
 **Ensuite, une fois validé** : remplacer `Mascotte.astro` par le nouveau moteur en gardant la bulle, le bouton de silence, les textes et l'accueil, puis supprimer `essais/` et la route d'essai. Idées pour plus tard : toilette (se lèche la patte), ronronnement, aller jusqu'à l'étang, chasser les feuilles qui tombent déjà sur le site.
 
 ## Manière de travailler (rappels pratiques)
