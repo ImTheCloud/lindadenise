@@ -10,6 +10,8 @@ Consigne complète : `docs/prive/prompt-toiles.md`. Trois phases, un commit `[sk
 - **Phase 2 : faite** (option toile sur les 76 fiches, licence et conditions, formulaire, documentation).
 - **Phase 3 : faite** (vidéos motion design FR + NL, musique, intégration, documentation finale).
 
+**À regarder en premier (Claudiu)** : la page `/toiles/` sur téléphone (mur, fiche, « Voir à l'échelle », sélection), les deux films (accueil et page Toiles, avec le son), puis la liste « À valider » ci-dessous (frais d'envoi 12 €, titres NL, phrase sur la suppression des messages). Vérifié aussi en mode « réduire les animations » : toiles affichées tout de suite, aucun reflet, aucune vidéo chargée.
+
 Démarrage : Remote Control activé. Le maintien du Mac éveillé (`request_keep_awake`) a été refusé par le mode automatique : la mission a continué sans.
 
 **Où est le code** : page `src/components/pages/PageToiles.astro` (`/toiles/`, `/nl/doeken/`), textes `toiles` dans `src/i18n/fr.ts` et `nl.ts`, prix et remises dans `src/data/vente.ts` (prix 200 €, envoi 12 €, envoi offert dès 2, remises, délai des toiles sur commande), données `src/data/toiles.json`, images `public/toiles/` (AVIF + WebP en 400, 800 et 1000 px, JPEG 800 de repli), script `scripts/preparer-toiles.mjs` (`npm run toiles`, lit `~/Downloads`). Titres, traductions, descriptions et coins des photos se changent dans le script. **« vendue »** se change à la main dans `src/data/toiles.json` (le script garde la valeur).
