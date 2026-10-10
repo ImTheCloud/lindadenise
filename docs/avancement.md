@@ -74,6 +74,8 @@ Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui 
 
 **Banc d'essai hors navigateur** : `node --experimental-transform-types essais/tilleul/banc.mjs <scenario> [dossier]` (scénarios : poses, demitour, yeux, transitions, chasse, caresse) écrit des planches SVG image par image ; `qlmanage -t -s 1000 -o <dossier> <dossier>/<scenario>.svg` les convertit en image. Il ne dépend pas du navigateur intégré (qui ne dessine rien quand il est masqué). Validé ainsi : toutes les poses et transitions, demi-tour, fermeture des yeux, chasse, caresse ; 10 min de pilote automatique sur 375, 900 et 1600 px sans erreur, sans valeur invalide, sans basculement de queue ni sortie d'écran.
 
+Demi-tour revu encore (« les pattes et l'arrière du buste font un truc bizarre ») : une patte reste du côté où elle est attachée ; celles du côté visible sont cachées progressivement par la partie du corps qui passe devant elles (un masque par patte) ; le fondu du haut des pattes est limité à la partie posée sur le corps (sinon on voyait le fond à travers) ; ventre, rayures et reflet du profil s'estompent de face.
+
 **À vérifier par Claudiu** : le rendu en temps réel (demi-tour, yeux, regard) sur ordinateur et sur téléphone.
 
 **Ensuite, une fois validé** : remplacer `Mascotte.astro` par le nouveau moteur en gardant la bulle, le bouton de silence, les textes et l'accueil, puis supprimer `essais/` et la route d'essai. Idées pour plus tard : toilette (se lèche la patte), ronronnement, aller jusqu'à l'étang, chasser les feuilles qui tombent déjà sur le site.

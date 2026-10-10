@@ -324,7 +324,8 @@ const DEFS = `<defs>
 <radialGradient id="t-fondu"><stop offset=".45" stop-color="#000"/><stop offset="1" stop-color="#fff"/></radialGradient>
 <clipPath id="t-oeil-g"><path/></clipPath><clipPath id="t-oeil-d"><path/></clipPath>
 <clipPath id="t-c-corps"><path/></clipPath><clipPath id="t-c-queue"><path/></clipPath>
-<mask id="t-m-pattes" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/></mask>
+<mask id="t-m-pattes" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><g clip-path="url(#t-c-corps)"><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/></g></mask>
+${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><path fill="#000"/></mask>`).join('')}
 <filter id="t-flou"><feGaussianBlur stdDeviation="3"/></filter>
 <filter id="t-flou-doux" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
 <filter id="t-flou-ombre" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="4"/></filter>
@@ -336,7 +337,7 @@ export class Chat {
   auto = true;
   squelette = false;
   private calque: SVGGElement;
-  private fixes: { corps: Element; queue: Element; oeilG: Element; oeilD: Element; ronds: Element[] };
+  private fixes: { corps: Element; queue: Element; oeilG: Element; oeilD: Element; ronds: Element[]; caches: Element[] };
   private W = 0;
   private H = 280;
   private loupe = 1;
@@ -390,7 +391,7 @@ export class Chat {
     scene.innerHTML = `${DEFS}<g class="t-dessin"></g>`;
     this.calque = scene.querySelector<SVGGElement>('.t-dessin')!;
     const q = (sel: string) => scene.querySelector(sel)!;
-    this.fixes = { corps: q('#t-c-corps path'), queue: q('#t-c-queue path'), oeilG: q('#t-oeil-g path'), oeilD: q('#t-oeil-d path'), ronds: [...scene.querySelectorAll('#t-m-pattes circle')] };
+    this.fixes = { corps: q('#t-c-corps path'), queue: q('#t-c-queue path'), oeilG: q('#t-oeil-g path'), oeilD: q('#t-oeil-d path'), ronds: [...scene.querySelectorAll('#t-m-pattes circle')], caches: [0, 1, 2, 3].map((k) => q(`#t-m-cache-${k} path`)) };
     this.mesurer();
     addEventListener('resize', () => this.mesurer());
     const suivre = (e: PointerEvent) => { this.pointeur = { x: e.clientX, y: e.clientY - (innerHeight - this.H) }; };
@@ -718,7 +719,7 @@ export class Chat {
     const vues = pattes.map((pa, k) => {
       const { A, J, P } = pa.j, z = pa.z;
       const a = proj(A, z), jj = proj(J, z), pp = proj(P, z), [r1, r2, r3] = pa.r;
-      const profondeur = prof(mix(A, P, 0.5), z);
+      const profondeur = prof(mix(A, P, 0.5), z), profAncre = prof(A, z);
       const doigts = [proj({ x: P.x + 3, y: P.y + 2 }, z - 3), proj({ x: P.x + 7, y: P.y + 1 }, z + 3)];
       const formes: Forme[] = [
         { d: os(a, r1, jj, r2), fond: 'url(#t-pelage)' },
@@ -727,10 +728,21 @@ export class Chat {
       ];
       const sombre = 0.16 * clamp((profCorps - profondeur) / 12, 0, 1);
       const dessin = silhouette(formes) + (sombre > 0.005 ? `<g fill="#6B2E12" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
-      return { k, profondeur, dessin, ancre: proj(add(A, { x: pa.fondu.dx, y: pa.fondu.dy }), z), rayon: pa.fondu.r };
+      return { k, profondeur, profAncre, visible: z * cphi > 0, dessin, ancre: proj(add(A, { x: pa.fondu.dx, y: pa.fondu.dy }), z), rayon: pa.fondu.r };
     }).sort((a, b) => a.profondeur - b.profondeur);
-    const derriere = vues.filter((v) => v.profondeur < profCorps), devant = vues.filter((v) => v.profondeur >= profCorps);
-    // le haut des pattes de devant se fond dans le corps, sans contour
+    // une patte reste du côté où elle est attachée : celles du côté caché passent derrière le corps ; celles du côté visible
+    // passent devant, sauf là où une partie du corps plus proche du visiteur les cache. Cette partie grandit doucement
+    // à mesure qu'il se tourne : aucune patte ne change de plan d'un coup.
+    const derriere = vues.filter((v) => !v.visible), devant = vues.filter((v) => v.visible);
+    const tranches = boules.map((b) => ({ c: proj(b.c), r: b.r + EP / 2, prof: prof(b.c) }));
+    this.fixes.caches.forEach((cache, i) => {
+      const v = devant.find((x) => x.k === i);
+      const devantElle = v ? tranches.map((t) => ({ c: t.c, r: t.r * clamp((t.prof - v.profAncre) / 4, 0, 1) })).filter((t) => t.r > 0.5) : [];
+      const centre = devantElle.reduce((m, t) => (t.r > m.r ? t : m), { c: { x: 0, y: 0 }, r: 0 }).c;
+      mesures(cache, { d: devantElle.length ? courbe(enveloppe(devantElle, centre), true) : '' });
+    });
+    // le haut des pattes de devant se fond dans le corps, sans contour ; seulement là où le corps est derrière
+    // (le fondu est découpé par le corps), sinon on verrait le fond à travers la patte
     this.fixes.ronds.forEach((rond, i) => {
       const v = devant.find((x) => x.k === i);
       mesures(rond, v ? { cx: f(v.ancre.x), cy: f(v.ancre.y), r: v.rayon } : { r: 0 });
@@ -739,7 +751,8 @@ export class Chat {
     const rayuresQueue = [0.28, 0.44, 0.6, 0.76, 0.92].map((t) => { const i = Math.round(t * NQ), c = qp[i], no = tq.nor[i]; return `M${pt(add(c, mul(no, 11)))}L${pt(sub(c, mul(no, 11)))}`; }).join('');
     const queue = silhouette([{ d: dQueue, fond: 'url(#t-pelage)', apres: `<path d="${rayuresQueue}" stroke="${RAYURE}" stroke-width="5" opacity=".6" clip-path="url(#t-c-queue)"/>` }]);
 
-    // corps : ventre et plastron crème, rayures du dos, reflet, touffes du poitrail, ombre de la tête
+    // corps : ventre et plastron crème, rayures du dos, reflet, touffes du poitrail, ombre de la tête ;
+    // le ventre, les rayures et le reflet sont dessinés pour le profil et s'estompent quand il passe de face
     const ventre: V[] = [];
     for (let i = 5; i <= NC; i++) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] + 3))));
     for (let i = NC; i >= 5; i--) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] - lerp(3, rB[i] * 0.95, lisse((i / NC - 0.25) / 0.75))))));
@@ -759,13 +772,14 @@ export class Chat {
     }
     const ombreTete = proj(add(teteC, { x: -4, y: 28 }));
     const corps = silhouette([{ d: dCorps, fond: 'url(#t-pelage)' }, { d: touffes, fond: '#FFF3E2' }])
-      + `<g clip-path="url(#t-c-corps)"><path d="${courbe(ventre, true)}" fill="url(#t-creme)"/><path d="${ovale(plastron, 20)}" fill="url(#t-creme)"/>`
-      + `<path d="${rayures}" fill="${RAYURE}" opacity=".55"/><path d="${reflet}" fill="none" stroke="#FFD59A" stroke-width="4.5" stroke-linecap="round" opacity=".5"/>`
+      + `<g clip-path="url(#t-c-corps)"><g opacity="${f(cphi * cphi)}"><path d="${courbe(ventre, true)}" fill="url(#t-creme)"/>`
+      + `<path d="${rayures}" fill="${RAYURE}" opacity=".55"/><path d="${reflet}" fill="none" stroke="#FFD59A" stroke-width="4.5" stroke-linecap="round" opacity=".5"/></g>`
+      + `<path d="${ovale(plastron, 20)}" fill="url(#t-creme)"/>`
       + `<ellipse cx="${f(ombreTete.x)}" cy="${f(ombreTete.y)}" rx="36" ry="18" fill="#7A2E0A" opacity=".22" filter="url(#t-flou-doux)"/></g>`;
 
     svg += `<g class="t-chat" transform="translate(${f(this.x)},${f(this.sol - leve)}) scale(${sv.toFixed(4)})">`;
     svg += derriere.map((v) => v.dessin).join('') + queue + corps;
-    svg += `<g mask="url(#t-m-pattes)">${devant.map((v) => v.dessin).join('')}</g>`;
+    svg += devant.map((v) => `<g mask="url(#t-m-cache-${v.k})"><g mask="url(#t-m-pattes)">${v.dessin}</g></g>`).join('');
     if (this.squelette) {
       const os2 = pattes.map(({ j, z }) => `M${pt(proj(j.A, z))}L${pt(proj(j.J, z))}L${pt(proj(j.P, z))}`).join('');
       svg += `<g fill="none" stroke="#1d6fd6" stroke-width="2" opacity=".9"><path d="${courbe(col.map((q) => proj(q)), false)}"/><path d="${os2}"/><path d="M${qp.map(pt).join('L')}"/></g>`;

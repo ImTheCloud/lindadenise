@@ -33,6 +33,7 @@ const pas = (sec) => { for (let i = 0; i < Math.round(sec * 60); i++) { t += 100
 const image = () => {
   let defs = scene.innerHTML.replace('<g class="t-dessin"></g>', '');
   for (const id of ['t-oeil-g', 't-oeil-d', 't-c-corps', 't-c-queue']) defs = defs.replace(`<clipPath id="${id}"><path/></clipPath>`, `<clipPath id="${id}"><path d="${fake('#' + id + ' path').attrs.d ?? ''}"/></clipPath>`);
+  for (let m = 0; m < 4; m++) defs = defs.replace(`<mask id="t-m-cache-${m}" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><path fill="#000"/></mask>`, `<mask id="t-m-cache-${m}" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><path fill="#000" d="${fake('#t-m-cache-' + m + ' path').attrs.d ?? ''}"/></mask>`);
   let k = 0;
   defs = defs.replace(/<circle fill="url\(#t-fondu\)"\/>/g, () => { const a = fake('#t-m-pattes circle' + k++).attrs; return `<circle fill="url(#t-fondu)" cx="${a.cx ?? 0}" cy="${a.cy ?? 0}" r="${a.r ?? 0}"/>`; });
   const x = parseFloat(calque.innerHTML.match(/class="t-chat" transform="translate\(([-\d.]+)/)[1]);
@@ -67,8 +68,8 @@ const sc = {
     c.taille(1.4); pas(5); c.ordre('debout'); pas(1.5);
     c.etat = 'marche'; c.cibleX = c.x + 300;
     const x0 = c.x, im = [];
-    for (let i = 0; i < 9; i++) { pas(0.11); const m = image(); m.centre = x0; m.legende = `t=${((i + 1) * 0.11).toFixed(2)}s`; im.push(m); }
-    planche(im, 'demitour', 360, 230, 3);
+    for (let i = 0; i < 12; i++) { pas(0.08); const m = image(); m.centre = x0; m.legende = `t=${((i + 1) * 0.08).toFixed(2)}s`; im.push(m); }
+    planche(im, 'demitour', 300, 230, 3);
   },
   yeux() {
     c.taille(3); pas(5); c.ordre('debout'); pas(2);
