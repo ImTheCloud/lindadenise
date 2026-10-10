@@ -1,12 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { t, chemin, type Lang, type Page } from '../../i18n';
+import { t, chemin, ADRESSE, NUMERO_ENTREPRISE, type Lang, type Page } from '../../i18n';
 interface Props { lang: Lang; page: 'mentions' | 'confidentialite' | 'licence' }
 const { lang, page } = Astro.props;
 const d = t(lang);
 const chemins = { fr: chemin(page as Page, 'fr'), nl: chemin(page as Page, 'nl') };
 const contenu = d[page];
 const blocs = 'blocs' in contenu ? contenu.blocs : [];
+const lignesEditrice = page === 'mentions'
+  ? [ADRESSE && d.mentions.adresse + ADRESSE, NUMERO_ENTREPRISE && d.mentions.numero + NUMERO_ENTREPRISE].filter(Boolean)
+  : [];
 const licence = page === 'licence' ? d.licence : null;
 ---
 <Base lang={lang} titre={contenu.titre} description={contenu.meta} chemins={chemins}>
@@ -23,10 +26,10 @@ const licence = page === 'licence' ? d.licence : null;
           <p>{licence.fin} <a href={chemin('contact', lang)}>{d.nav.contact}</a></p>
         </>
       )}
-      {blocs.map((b) => (
+      {blocs.map((b, i) => (
         <section>
           <h2>{b.titre}</h2>
-          {b.texte.map((p) => <p>{p}</p>)}
+          {[...b.texte, ...(i === 0 ? lignesEditrice : [])].map((p) => <p>{p}</p>)}
         </section>
       ))}
     </div>

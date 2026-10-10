@@ -13,7 +13,7 @@ Site de Linda Denise (retraitée belge, dessins numériques faits au doigt sur s
 - **Les originaux haute définition ne vont jamais dans git** (dossier source : `~/Desktop/DessinsLinda`). Seuls des aperçus filigranés basse définition sont publics.
 - **Ne jamais inventer d'information** sur Linda. Rien de provisoire visible sur le site.
 - **Pas de paiement en ligne** tant que son statut légal n'est pas confirmé : Linda se renseigne elle-même (voir `docs/prive/suivi-client.md`).
-- Textes en FR (par défaut) et NL. Vouvoiement, phrases courtes, ton apaisant, pas de superlatifs vides.
+- Textes en FR (par défaut) et NL. Vouvoiement en FR (le NL garde le « je »), phrases courtes, ton apaisant, pas de superlatifs vides.
 - Outils gratuits uniquement. Stripe est le seul coût (frais par vente, phase 3).
 - Pas de cookies de suivi, polices hébergées sur le site.
 - Linda n'est pas technique : l'admin doit être très simple, pensé pour son téléphone.

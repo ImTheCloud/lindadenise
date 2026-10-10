@@ -37,3 +37,6 @@ export const autreLangue = (lang: Lang): Lang => (lang === 'fr' ? 'nl' : 'fr');
 export const parRubrique = (r: Rubrique) => dessins.filter((d) => d.rubrique === r);
 export const SITE = 'https://lindadenise.be';
 export const EMAIL = 'teugelslinda@yahoo.fr';
+// À remplir quand Linda les aura : affichés dans les mentions légales seulement s'ils ne sont pas vides.
+export const ADRESSE = '';
+export const NUMERO_ENTREPRISE = '';

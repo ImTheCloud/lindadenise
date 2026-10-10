@@ -71,6 +71,11 @@ export const nl: Dico = {
     autres: 'Nog meer tekeningen om te ontdekken',
     precedent: 'Vorige',
     suivant: 'Volgende',
+    agrandir: 'Tekening vergroten',
+    fermer: 'Sluiten',
+    tri: 'Sorteren',
+    triLinda: 'Volgorde van Linda',
+    triAz: 'Van A tot Z',
     altDe: (t: string) => `Tekening “${t}” van Linda Denise`,
   },
   apropos: {
@@ -118,6 +123,8 @@ export const nl: Dico = {
   mentions: {
     titre: 'Juridische informatie',
     meta: 'Juridische informatie over de site van Linda Denise.',
+    adresse: 'Adres: ',
+    numero: 'Ondernemingsnummer: ',
     blocs: [
       { titre: 'Uitgeefster van de site', texte: ['Linda Teugels, die tekent onder de naam Linda Denise.', 'Land: België.', 'Contact: teugelslinda@yahoo.fr'] },
       { titre: 'Hosting', texte: ['Netlify, Inc., 512 2nd Street, Suite 200, San Francisco, CA 94107, Verenigde Staten.'] },

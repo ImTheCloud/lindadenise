@@ -69,6 +69,11 @@ export const fr = {
     autres: 'D’autres dessins à découvrir',
     precedent: 'Précédent',
     suivant: 'Suivant',
+    agrandir: 'Agrandir le dessin',
+    fermer: 'Fermer',
+    tri: 'Trier',
+    triLinda: 'Ordre de Linda',
+    triAz: 'De A à Z',
     altDe: (t: string) => `Dessin « ${t} » de Linda Denise`,
   },
   apropos: {
@@ -116,6 +121,8 @@ export const fr = {
   mentions: {
     titre: 'Mentions légales',
     meta: 'Mentions légales du site de Linda Denise.',
+    adresse: 'Adresse : ',
+    numero: 'Numéro d’entreprise : ',
     blocs: [
       { titre: 'Éditrice du site', texte: ['Linda Teugels, qui dessine sous le nom de Linda Denise.', 'Pays : Belgique.', 'Contact : teugelslinda@yahoo.fr'] },
       { titre: 'Hébergement', texte: ['Netlify, Inc., 512 2nd Street, Suite 200, San Francisco, CA 94107, États-Unis.'] },
