@@ -1,6 +1,6 @@
 // Banc d'essai hors navigateur : fait tourner le moteur du chat image par image et enregistre des planches SVG.
 // Usage : node --experimental-transform-types essais/tilleul/banc.mjs <scenario> [dossier]
-// Scénarios : poses, demitour, yeux, transitions, chasse, caresse. Les planches SVG s'ouvrent dans un navigateur,
+// Scénarios : poses, pattes, demitour, yeux (endormissement, réveil, étirement), transitions, chasse, caresse. Les planches SVG s'ouvrent dans un navigateur,
 // ou se convertissent en image avec : qlmanage -t -s 1000 -o <dossier> <dossier>/<scenario>.svg
 import fs from 'node:fs';
 import os from 'node:os';
@@ -32,7 +32,7 @@ const pas = (sec) => { for (let i = 0; i < Math.round(sec * 60); i++) { t += 100
 // une image : défs (avec les mesures des découpes) + dessin
 const image = () => {
   let defs = scene.innerHTML.replace('<g class="t-dessin"></g>', '');
-  for (const id of ['t-oeil-g', 't-oeil-d', 't-c-corps', 't-c-queue']) defs = defs.replace(`<clipPath id="${id}"><path/></clipPath>`, `<clipPath id="${id}"><path d="${fake('#' + id + ' path').attrs.d ?? ''}"/></clipPath>`);
+  for (const id of ['t-c-corps']) defs = defs.replace(`<clipPath id="${id}"><path/></clipPath>`, `<clipPath id="${id}"><path d="${fake('#' + id + ' path').attrs.d ?? ''}"/></clipPath>`);
   for (let m = 0; m < 4; m++) defs = defs.replace(`<mask id="t-m-cache-${m}" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><path fill="#000"/></mask>`, `<mask id="t-m-cache-${m}" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><path fill="#000" d="${fake('#t-m-cache-' + m + ' path').attrs.d ?? ''}"/></mask>`);
   let k = 0;
   defs = defs.replace(/<circle fill="url\(#t-fondu\)"\/>/g, () => { const a = fake('#t-m-pattes circle' + k++).attrs; return `<circle fill="url(#t-fondu)" cx="${a.cx ?? 0}" cy="${a.cy ?? 0}" r="${a.r ?? 0}"/>`; });
@@ -76,12 +76,30 @@ const sc = {
     const im = [];
     c.ordre('dort');
     for (let i = 0; i < 6; i++) { pas(0.06); const m = image(); m.legende = `dort +${((i + 1) * 0.06).toFixed(2)}s`; im.push(m); }
-    pas(2); c.ordre('etire');
+    pas(2); c.ordre('couche');
+    for (let i = 0; i < 6; i++) { pas(0.06); const m = image(); m.legende = `reveil +${((i + 1) * 0.06).toFixed(2)}s`; im.push(m); }
+    c.ordre('dort'); pas(2); c.ordre('etire');
     for (let i = 0; i < 6; i++) { pas(0.06); const m = image(); m.legende = `etire +${((i + 1) * 0.06).toFixed(2)}s`; im.push(m); }
     // recadrage sur la tête
     for (const m of im) { const g = m.dessin.match(/class="t-chat" transform="translate\(([-\d.]+),([-\d.]+)\) scale\(([\d.]+)\) rotate/); m.centre = +g[1]; m.y0 = +g[2] - 55; }
     planche(im, 'yeux', 150, 100, 3);
   },
+};
+// gros plan sur le poitrail et les pattes (assis, debout, couché) : traits qui se croisent, transparences
+sc.pattes = () => {
+  c.taille(2.6); pas(5);
+  const im = [];
+  for (const o of ['assis', 'debout', 'couche']) { c.ordre(o); c.attente = 99; pas(3); const m = image(); m.legende = o; im.push(m); }
+  c.ordre('assis'); pas(3); c.squelette = true; pas(1 / 60); const m = image(); m.legende = 'assis, squelette'; im.push(m); c.squelette = false;
+  planche(im, 'pattes', 260, 230, 2);
+};
+// gros plan sur les pattes arrière pendant le demi-tour
+sc.genou = () => {
+  c.taille(3); pas(5); c.ordre('debout'); pas(1.5);
+  c.etat = 'marche'; c.cibleX = c.x + 600;
+  const im = [];
+  for (const t of [0.24, 0.08, 0.24, 0.08]) { pas(t); const m = image(); m.legende = `t=${(c.retour).toFixed(2)}s`; m.y0 = scene.attrs.viewBox.split(' ').map(Number)[3] - 170; im.push(m); }
+  planche(im, 'genou', 300, 170, 2);
 };
 sc.transitions = () => {
   c.taille(1.3); pas(5); c.ordre('debout'); pas(1.5);

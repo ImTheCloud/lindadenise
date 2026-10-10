@@ -47,8 +47,9 @@ const ovale = (c: V, rx: number, ry = rx) => `M${f(c.x - rx)},${f(c.y)}a${f(rx)}
 // arrondis. Un seul tracé pour tout le contour : des traits superposés additionneraient leurs bords et feraient scintiller.
 const EP = 5.2;
 interface Forme { d: string; fond: string; apres?: string }
-function silhouette(formes: Forme[], ep = EP): string {
-  return `<path d="${formes.map((x) => x.d).join('')}" fill="${CONTOUR}" stroke="${CONTOUR}" stroke-width="${f(ep)}" stroke-linejoin="round"/>`
+function silhouette(formes: Forme[], ep = EP, masqueContour = ''): string {
+  const contour = `<path d="${formes.map((x) => x.d).join('')}" fill="${CONTOUR}" stroke="${CONTOUR}" stroke-width="${f(ep)}" stroke-linejoin="round"/>`;
+  return (masqueContour ? `<g mask="url(#${masqueContour})">${contour}</g>` : contour)
     + formes.map((x) => `<path d="${x.d}" fill="${x.fond}"/>${x.apres ?? ''}`).join('');
 }
 
@@ -95,6 +96,33 @@ function enveloppe(boules: { c: V; r: number }[], centre: V, n = 120): V[] {
     }
     return add(centre, mul(u, t));
   });
+}
+
+// Polygones : un ovale échantillonné, un arc d'ovale (angles en radians, y vers le bas)
+const ovalePts = (c: V, rx: number, ry: number, n = 28): V[] => Array.from({ length: n }, (_, i) => add(c, { x: rx * Math.cos((TAU * i) / n), y: ry * Math.sin((TAU * i) / n) }));
+const arcPts = (c: V, rx: number, ry: number, t0: number, t1: number, n: number): V[] => Array.from({ length: n + 1 }, (_, i) => { const t = lerp(t0, t1, i / n); return add(c, { x: rx * Math.cos(t), y: ry * Math.sin(t) }); });
+const polygone = (p: V[]) => (p.length > 2 ? `M${p.map(pt).join('L')}Z` : '');
+
+// Partie d'un polygone quelconque située dans un polygone convexe (Sutherland-Hodgman). Sert à découper l'iris,
+// la pupille et les reflets par la partie visible de l'œil sans clipPath : une découpe que le navigateur doit
+// recalculer à chaque image le fait scintiller.
+function couper(sujet: V[], convexe: V[]): V[] {
+  let aire = 0;
+  convexe.forEach((a, i) => { const b = convexe[(i + 1) % convexe.length]; aire += a.x * b.y - b.x * a.y; });
+  const signe = aire >= 0 ? 1 : -1;
+  let sortie = sujet;
+  for (let i = 0; i < convexe.length && sortie.length; i++) {
+    const a = convexe[i], b = convexe[(i + 1) % convexe.length];
+    const cote = (q: V) => signe * ((b.x - a.x) * (q.y - a.y) - (b.y - a.y) * (q.x - a.x));
+    const entree = sortie;
+    sortie = [];
+    entree.forEach((q, j) => {
+      const r = entree[(j + 1) % entree.length], cq = cote(q), cr = cote(r);
+      if (cq >= 0) sortie.push(q);
+      if ((cq >= 0) !== (cr >= 0)) sortie.push(mix(q, r, cq / (cq - cr)));
+    });
+  }
+  return sortie;
 }
 
 // Patte à deux os : articulation (coude ou genou) et pied atteignable ; sens +1 plie vers l'arrière
@@ -250,7 +278,6 @@ function tete(v: Visage) {
   // pour qu'aucun bord blanc ne touche la fourrure (sinon un liseré blanc scintille quand la tête bouge).
   // Le trait du dessus suit toujours le haut de la partie visible : l'œil se ferme et s'ouvre d'un seul mouvement,
   // sans saut. Les bords de l'œil suivent la courbe de la tête.
-  const yeux: { cote: number; d: string }[] = [];
   const bordTete = (q: V3) => (q.z > 0 ? clamp(q.x, -W * 0.93, W * 0.93) : Math.sign(q.x) * W * 0.93);
   for (const cote of [-1, 1]) {
     const xg = bordTete(surf(cote * 0.43 - 0.23, 0.05)), xd = bordTete(surf(cote * 0.43 + 0.23, 0.05));
@@ -263,27 +290,27 @@ function tete(v: Visage) {
     // fermeture en deux temps continus : la paupière descend jusqu'au milieu de l'œil (bord légèrement creusé),
     // puis le trait devient une courbe d'un coin à l'autre qui se creuse jusqu'au « ‿ » du sommeil,
     // pendant que la paupière du bas remonte à sa rencontre
-    const o = clamp(v.yeux, 0, 1), creux0 = 0.12 * ry, creuxFerme = 0.32 * ry;
-    let d: string, haut: string;
+    const o = clamp(v.yeux, 0, 1), creux0 = 0.12 * ry, creuxFerme = 0.32 * ry, c0 = { x: cx, y: cy };
+    let visible: V[], haut: string;
     if (o >= 0.5) {
       const u = (o - 0.5) / 0.5, yh = lerp(cy, cy - ry, u), dh = rx * Math.sqrt(Math.max(0, 1 - ((yh - cy) / ry) ** 2)), creux = lerp(creux0, 0.5, u);
-      const bord = `A${f(dh)},${f(creux)} 0 0 0 ${f(cx + dh)},${f(yh)}`;
-      d = dh < 0.5 ? ovale({ x: cx, y: cy }, rx, ry) : `M${f(cx - dh)},${f(yh)}${bord}A${f(rx)},${f(ry)} 0 1 1 ${f(cx - dh)},${f(yh)}Z`;
-      haut = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(ry)} 0 0 1 ${f(cx - dh)},${f(yh)}${bord}A${f(rx)},${f(ry)} 0 0 1 ${f(cx + rx)},${f(cy)}`;
+      const th = Math.atan2((yh - cy) / ry, dh / rx);
+      visible = dh < 0.5 ? ovalePts(c0, rx, ry, 48) : [...arcPts({ x: cx, y: yh }, dh, creux, Math.PI, 0, 12), ...arcPts(c0, rx, ry, th, Math.PI - th, 36)];
+      haut = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(ry)} 0 0 1 ${f(cx - dh)},${f(yh)}A${f(dh)},${f(creux)} 0 0 0 ${f(cx + dh)},${f(yh)}A${f(rx)},${f(ry)} 0 0 1 ${f(cx + rx)},${f(cy)}`;
     } else {
       const u = o / 0.5, creuxH = lerp(creuxFerme, creux0, u), creuxB = lerp(creuxFerme, ry, u);
-      d = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(creuxH)} 0 0 0 ${f(cx + rx)},${f(cy)}A${f(rx)},${f(creuxB)} 0 0 1 ${f(cx - rx)},${f(cy)}Z`;
+      visible = [...arcPts(c0, rx, creuxH, Math.PI, 0, 20), ...arcPts(c0, rx, creuxB, 0, Math.PI, 20)];
       haut = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(creuxH)} 0 0 0 ${f(cx + rx)},${f(cy)}`;
     }
     if (o > 0.02) {
-      yeux.push({ cote, d });
+      const d = polygone(visible), dans = (forme: V[]) => polygone(couper(visible, forme));
       const ix = cx + v.regard.x * rx * 0.3, iy = cy + 1.2 + v.regard.y * ry * 0.22;
-      // presque fermé, le blanc s'efface dans le trait sombre au lieu de rester en filet
-      s += `<path d="${d}" fill="${TRAIT_OEIL}" stroke="${TRAIT_OEIL}" stroke-width="2.4" stroke-linejoin="round"/><g opacity="${f(clamp((o - 0.02) / 0.18, 0, 1))}"><path d="${d}" fill="#fff"/><g clip-path="url(#t-oeil-${cote > 0 ? 'd' : 'g'})">`;
-      // un œil vu de biais est rempli par l'iris : pas de filet blanc d'un pixel qui scintillerait
-      s += `<ellipse cx="${f(ix)}" cy="${f(iy)}" rx="${f(rx * Math.min(1.05, 0.84 + 0.35 * (1 - fs)))}" ry="${f(ry * 0.84)}" fill="url(#t-oeil)"/>`;
-      s += `<ellipse cx="${f(ix)}" cy="${f(iy + 0.5)}" rx="${f(4.3 * fs * v.pupille)}" ry="${f(9 + 1.5 * (v.pupille - 1))}" fill="#1B2A14"/>`;
-      s += `<ellipse cx="${f(ix + 4 * fs)}" cy="${f(iy - 4.6)}" rx="${f(3.8 * fs)}" ry="3.8" fill="#fff"/><ellipse cx="${f(ix - 3.2 * fs)}" cy="${f(iy + 5)}" rx="${f(1.7 * fs)}" ry="1.7" fill="#fff" opacity=".9"/></g></g>`;
+      // presque fermé, le blanc s'efface dans le trait sombre au lieu de rester en filet ;
+      // un œil vu de biais est rempli par l'iris (pas de filet blanc d'un pixel qui scintillerait)
+      s += `<path d="${d}" fill="${TRAIT_OEIL}" stroke="${TRAIT_OEIL}" stroke-width="2.4" stroke-linejoin="round"/><g opacity="${f(clamp((o - 0.02) / 0.18, 0, 1))}"><path d="${d}" fill="#fff"/>`;
+      s += `<path d="${dans(ovalePts({ x: ix, y: iy }, rx * Math.min(1.05, 0.84 + 0.35 * (1 - fs)), ry * 0.84))}" fill="url(#t-oeil)"/>`;
+      s += `<path d="${dans(ovalePts({ x: ix, y: iy + 0.5 }, 4.3 * fs * v.pupille, 9 + 1.5 * (v.pupille - 1)))}" fill="#1B2A14"/>`;
+      s += `<path d="${dans(ovalePts({ x: ix + 4 * fs, y: iy - 4.6 }, 3.8 * fs, 3.8, 16))}" fill="#fff"/><path d="${dans(ovalePts({ x: ix - 3.2 * fs, y: iy + 5 }, 1.7 * fs, 1.7, 12))}" fill="#fff" opacity=".9"/></g>`;
     }
     s += `<path d="${haut}M${f(cx + cote * rx)},${f(cy)}l${f(cote * 3.5 * fs)},${f(-3.5 * fs)}" fill="none" stroke="${TRAIT_OEIL}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
@@ -309,11 +336,11 @@ function tete(v: Visage) {
     const a = rot({ x: cote * 13, y: 15.5 + j * 3.2, z: RZ - 1 }), b = rot({ x: cote * 64, y: 15 + j * 10, z: RZ - 24 });
     mo += `M${pt(a)}Q${pt(add(mix(a, b, 0.5), { x: 0, y: -3 }))} ${pt(b)}`;
   }
-  return { formes, details: s, yeux, moustaches: `<path d="${mo}" fill="none" stroke="${CONTOUR}" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>` };
+  return { formes, details: s, moustaches: `<path d="${mo}" fill="none" stroke="${CONTOUR}" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>` };
 }
 
 // ---------- dessin fixe ----------
-// Les découpes (yeux, rayures) et le masque des pattes restent les mêmes éléments : on ne change que leurs mesures
+// Les découpes (rayures) et les masques des pattes restent les mêmes éléments : on ne change que leurs mesures
 // à chaque image. Les recréer à chaque image fait clignoter certains navigateurs.
 
 const DEFS = `<defs>
@@ -321,13 +348,12 @@ const DEFS = `<defs>
 <linearGradient id="t-tete" gradientUnits="userSpaceOnUse" x1="0" y1="-60" x2="0" y2="46"><stop offset="0" stop-color="#FAAA58"/><stop offset="1" stop-color="#E5742A"/></linearGradient>
 <linearGradient id="t-creme" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF8EC"/><stop offset="1" stop-color="#FFE0B8"/></linearGradient>
 <radialGradient id="t-oeil" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#9BE37C"/><stop offset="1" stop-color="#2F9A47"/></radialGradient>
+<radialGradient id="t-ombre" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="36" gradientTransform="scale(1 .5)"><stop offset="0" stop-color="#7A2E0A" stop-opacity=".3"/><stop offset="1" stop-color="#7A2E0A" stop-opacity="0"/></radialGradient>
 <radialGradient id="t-fondu"><stop offset=".45" stop-color="#000"/><stop offset="1" stop-color="#fff"/></radialGradient>
-<clipPath id="t-oeil-g"><path/></clipPath><clipPath id="t-oeil-d"><path/></clipPath>
-<clipPath id="t-c-corps"><path/></clipPath><clipPath id="t-c-queue"><path/></clipPath>
+<clipPath id="t-c-corps"><path/></clipPath>
 <mask id="t-m-pattes" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><g clip-path="url(#t-c-corps)"><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/><circle fill="url(#t-fondu)"/></g></mask>
 ${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600"><rect x="-300" y="-300" width="600" height="600" fill="#fff"/><path fill="#000"/></mask>`).join('')}
 <filter id="t-flou"><feGaussianBlur stdDeviation="3"/></filter>
-<filter id="t-flou-doux" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
 <filter id="t-flou-ombre" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="4"/></filter>
 </defs>`;
 
@@ -337,7 +363,7 @@ export class Chat {
   auto = true;
   squelette = false;
   private calque: SVGGElement;
-  private fixes: { corps: Element; queue: Element; oeilG: Element; oeilD: Element; ronds: Element[]; caches: Element[] };
+  private fixes: { corps: Element; ronds: Element[]; caches: Element[] };
   private W = 0;
   private H = 280;
   private loupe = 1;
@@ -391,7 +417,7 @@ export class Chat {
     scene.innerHTML = `${DEFS}<g class="t-dessin"></g>`;
     this.calque = scene.querySelector<SVGGElement>('.t-dessin')!;
     const q = (sel: string) => scene.querySelector(sel)!;
-    this.fixes = { corps: q('#t-c-corps path'), queue: q('#t-c-queue path'), oeilG: q('#t-oeil-g path'), oeilD: q('#t-oeil-d path'), ronds: [...scene.querySelectorAll('#t-m-pattes circle')], caches: [0, 1, 2, 3].map((k) => q(`#t-m-cache-${k} path`)) };
+    this.fixes = { corps: q('#t-c-corps path'), ronds: [...scene.querySelectorAll('#t-m-pattes circle')], caches: [0, 1, 2, 3].map((k) => q(`#t-m-cache-${k} path`)) };
     this.mesurer();
     addEventListener('resize', () => this.mesurer());
     const suivre = (e: PointerEvent) => { this.pointeur = { x: e.clientX, y: e.clientY - (innerHeight - this.H) }; };
@@ -619,7 +645,7 @@ export class Chat {
     const nor = col.map((_, i) => { const a = col[Math.max(0, i - 1)], b = col[Math.min(NC, i + 1)], l = dist(a, b) || 1; return { x: (b.y - a.y) / l, y: -(b.x - a.x) / l }; });
     const boules = col.map((c, i) => ({ c: sub(c, mul(nor[i], (rB[i] - rH[i]) / 2)), r: (rH[i] + rB[i]) / 2 }));
     const vues3d = boules.map((b) => ({ c: proj(b.c), r: b.r }));
-    const dCorps = courbe(enveloppe(vues3d, vues3d[NC / 2].c), true);
+    const contourCorps = enveloppe(vues3d, vues3d[NC / 2].c), dCorps = courbe(contourCorps, true);
 
     // pattes : la marche décale les pieds, un pied qui se déplace hors de la marche se lève un peu
     const pied = (x: number, y: number, o: number, rv: Ressort): V => {
@@ -628,10 +654,10 @@ export class Chat {
     };
     const ancreAv = add(S, { x: -2, y: 9 }), ancreAr = add(H, { x: 5, y: 6 });
     const pattes = [
-      { j: patte(ancreAv, pied(p.avX, p.avY, 0.25, this.r.avX), 26, 26, 1), z: FLANC, r: [12, 9.5, 9], fondu: { dx: 0, dy: -6, r: 24 } },
-      { j: patte(add(ancreAv, { x: 4, y: -2 }), pied(p.av2X, p.avY, 0.75, this.r.av2X), 26, 26, 1), z: -FLANC, r: [11.5, 9, 8.6], fondu: { dx: 0, dy: -6, r: 24 } },
-      { j: patte(ancreAr, pied(p.arX, p.arY, 0, this.r.arX), 22, 27, -1), z: FLANC, r: [19, 11, 9], fondu: { dx: -6, dy: -8, r: 30 } },
-      { j: patte(add(ancreAr, { x: 4, y: -2 }), pied(p.ar2X, p.arY, 0.5, this.r.ar2X), 22, 27, -1), z: -FLANC, r: [18, 10.5, 8.6], fondu: { dx: -6, dy: -8, r: 30 } },
+      { j: patte(ancreAv, pied(p.avX, p.avY, 0.25, this.r.avX), 26, 26, 1), z: FLANC, r: [12, 9.5, 9] },
+      { j: patte(add(ancreAv, { x: 4, y: -2 }), pied(p.av2X, p.avY, 0.75, this.r.av2X), 26, 26, 1), z: -FLANC, r: [11.5, 9, 8.6] },
+      { j: patte(ancreAr, pied(p.arX, p.arY, 0, this.r.arX), 22, 27, -1), z: FLANC, r: [19, 11, 9] },
+      { j: patte(add(ancreAr, { x: 4, y: -2 }), pied(p.ar2X, p.arY, 0.5, this.r.ar2X), 22, 27, -1), z: -FLANC, r: [18, 10.5, 8.6] },
     ];
 
     // queue : chaque segment suit le précédent avec un temps de retard (ressorts d'angle) ;
@@ -707,7 +733,6 @@ export class Chat {
 
     // ---------- dessin ----------
     mesures(this.fixes.corps, { d: dCorps });
-    mesures(this.fixes.queue, { d: dQueue });
 
     // ombre au sol
     const milieu = proj(mix(H, S, 0.5)), ombre = 1 - Math.min(0.45, leve / 160);
@@ -719,49 +744,65 @@ export class Chat {
     const vues = pattes.map((pa, k) => {
       const { A, J, P } = pa.j, z = pa.z;
       const a = proj(A, z), jj = proj(J, z), pp = proj(P, z), [r1, r2, r3] = pa.r;
-      const profondeur = prof(mix(A, P, 0.5), z), profAncre = prof(A, z);
+      // sur un même côté, la patte avant passe devant la patte arrière
+      const profondeur = prof(mix(A, P, 0.5), z) + (k < 2 ? 0.01 : 0), profAncre = prof(A, z);
       const doigts = [proj({ x: P.x + 3, y: P.y + 2 }, z - 3), proj({ x: P.x + 7, y: P.y + 1 }, z + 3)];
+      const pied = proj({ x: P.x + 3, y: P.y }, z), rxPied = Math.hypot(10.5 * cphi, 8 * sphi);
       const formes: Forme[] = [
         { d: os(a, r1, jj, r2), fond: 'url(#t-pelage)' },
         { d: os(jj, r2, pp, r3), fond: 'url(#t-pelage)', apres: `<path d="${os(mix(pp, jj, 0.42), r3, pp, r3)}" fill="url(#t-creme)"/>` },
-        { d: ovale(proj({ x: P.x + 3, y: P.y }, z), Math.hypot(10.5 * cphi, 8 * sphi), 7.2), fond: '#FFF3E2', apres: `<path d="${doigts.map((q) => `M${pt(q)}v4.5`).join('')}" stroke="${CONTOUR}" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>` },
+        { d: ovale(pied, rxPied, 7.2), fond: '#FFF3E2', apres: `<path d="${doigts.map((q) => `M${pt(q)}v4.5`).join('')}" stroke="${CONTOUR}" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>` },
       ];
-      const sombre = 0.16 * clamp((profCorps - profondeur) / 12, 0, 1);
-      const dessin = silhouette(formes) + (sombre > 0.005 ? `<g fill="#6B2E12" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
-      return { k, profondeur, profAncre, visible: z * cphi > 0, dessin, ancre: proj(add(A, { x: pa.fondu.dx, y: pa.fondu.dy }), z), rayon: pa.fondu.r };
+      // une patte reste du côté où elle est attachée : celles du côté caché passent derrière le corps (plus sombres),
+      // celles du côté visible devant. Devant, la patte est opaque et seul son contour s'efface vers l'attache :
+      // rien ne se voit à travers.
+      const visible = z * cphi > 0;
+      const sombre = 0.1 * clamp((profCorps - profondeur) / 12, 0, 1);
+      const dessin = visible ? silhouette(formes, EP, 't-m-pattes') : silhouette(formes) + (sombre > 0.005 ? `<g fill="${CONTOUR}" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
+      // le contour s'efface vers l'attache ; pour une patte arrière, sur le dessus et l'arrière de la cuisse :
+      // on ne garde que sa courbe avant et basse (sinon, cuisse repliée, son bord trace un trait en travers du ventre).
+      // Quand il se tourne, toute la cuisse se fond dans le corps (sinon son bord double celui de la croupe).
+      let fondu = add(A, { x: 0, y: -6 });
+      if (k >= 2) {
+        const u = sub(J, A), l = Math.hypot(u.x, u.y) || 1;
+        let n = { x: -u.y / l, y: u.x / l };
+        if (n.x + n.y > 0) n = mul(n, -1);
+        fondu = add(mix(A, J, 0.45), mul(n, r1 * 0.7));
+      }
+      return { k, profondeur, profAncre, visible, dessin, ancre: proj(fondu, z), rayon: k < 2 ? 24 : 30 + 34 * Math.abs(sphi) };
     }).sort((a, b) => a.profondeur - b.profondeur);
-    // une patte reste du côté où elle est attachée : celles du côté caché passent derrière le corps ; celles du côté visible
-    // passent devant, sauf là où une partie du corps plus proche du visiteur les cache. Cette partie grandit doucement
-    // à mesure qu'il se tourne : aucune patte ne change de plan d'un coup.
+    // une patte du côté visible est cachée par la partie du corps plus proche du visiteur ; cette partie grandit doucement
+    // à mesure qu'il se tourne (aucune patte ne change de plan d'un coup)
     const derriere = vues.filter((v) => !v.visible), devant = vues.filter((v) => v.visible);
-    const tranches = boules.map((b) => ({ c: proj(b.c), r: b.r + EP / 2, prof: prof(b.c) }));
+    const tranches = boules.map((b) => ({ c: proj(b.c), r: b.r, prof: prof(b.c) }));
     this.fixes.caches.forEach((cache, i) => {
       const v = devant.find((x) => x.k === i);
-      const devantElle = v ? tranches.map((t) => ({ c: t.c, r: t.r * clamp((t.prof - v.profAncre) / 4, 0, 1) })).filter((t) => t.r > 0.5) : [];
-      const centre = devantElle.reduce((m, t) => (t.r > m.r ? t : m), { c: { x: 0, y: 0 }, r: 0 }).c;
-      mesures(cache, { d: devantElle.length ? courbe(enveloppe(devantElle, centre), true) : '' });
+      const devantElle = v ? tranches.map((t) => ({ c: t.c, r: t.r, w: clamp((t.prof - v.profAncre) / 4, 0, 1) })).filter((t) => t.w * t.r > 0.5) : [];
+      if (!v || !devantElle.length) { mesures(cache, { d: '' }); return; }
+      const centre = devantElle.reduce((m, t) => (t.w * t.r > m.w * m.r ? t : m)).c;
+      mesures(cache, { d: courbe(enveloppe(devantElle.map((t) => ({ c: t.c, r: (t.r + EP / 2) * t.w })), centre), true) });
     });
-    // le haut des pattes de devant se fond dans le corps, sans contour ; seulement là où le corps est derrière
-    // (le fondu est découpé par le corps), sinon on verrait le fond à travers la patte
+    // le contour du haut des pattes de devant s'efface vers l'attache, là où le corps est derrière
     this.fixes.ronds.forEach((rond, i) => {
       const v = devant.find((x) => x.k === i);
       mesures(rond, v ? { cx: f(v.ancre.x), cy: f(v.ancre.y), r: v.rayon } : { r: 0 });
     });
 
-    const rayuresQueue = [0.28, 0.44, 0.6, 0.76, 0.92].map((t) => { const i = Math.round(t * NQ), c = qp[i], no = tq.nor[i]; return `M${pt(add(c, mul(no, 11)))}L${pt(sub(c, mul(no, 11)))}`; }).join('');
-    const queue = silhouette([{ d: dQueue, fond: 'url(#t-pelage)', apres: `<path d="${rayuresQueue}" stroke="${RAYURE}" stroke-width="5" opacity=".6" clip-path="url(#t-c-queue)"/>` }]);
+    const rayuresQueue = [0.28, 0.44, 0.6, 0.76, 0.92].map((t) => { const i = Math.round(t * NQ), c = qp[i], no = tq.nor[i]; const r = lerp(8.5, 6.2, i / NQ) - 0.6; return `M${pt(add(c, mul(no, r)))}L${pt(sub(c, mul(no, r)))}`; }).join('');
+    const queue = silhouette([{ d: dQueue, fond: 'url(#t-pelage)', apres: `<path d="${rayuresQueue}" stroke="${RAYURE}" stroke-width="5" opacity=".6"/>` }]);
 
     // corps : ventre et plastron crème, rayures du dos, reflet, touffes du poitrail, ombre de la tête ;
-    // le ventre, les rayures et le reflet sont dessinés pour le profil et s'estompent quand il passe de face
+    // le ventre, les rayures et le reflet sont dessinés pour le profil et s'estompent quand il passe de face.
+    // Tout tombe dans le corps par le calcul (pas de découpe que le navigateur referait à chaque image)
     const ventre: V[] = [];
-    for (let i = 5; i <= NC; i++) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] + 3))));
+    for (let i = 5; i <= NC; i++) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] - 0.8))));
     for (let i = NC; i >= 5; i--) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] - lerp(3, rB[i] * 0.95, lisse((i / NC - 0.25) / 0.75))))));
     const fin = col[NC], noF = nor[NC], tgF = { x: -noF.y, y: noF.x };
     const angF = Math.atan2(tgF.y, tgF.x);
     const plastron = proj(sub(add(fin, mul(tgF, 12)), mul(noF, 8)));
     const rayures = [0.1, 0.22, 0.34, 0.46, 0.58, 0.7].map((t) => {
       const i = Math.round(t * NC), c = col[i], no = nor[i], tg = { x: -no.y, y: no.x };
-      const b = add(c, mul(no, rH[i] + 2)), tip = add(add(c, mul(no, rH[i] - (15 - t * 5))), mul(tg, -3));
+      const b = add(c, mul(no, rH[i] - 0.8)), tip = add(add(c, mul(no, rH[i] - (15 - t * 5))), mul(tg, -3));
       return `M${pt(proj(add(b, mul(tg, -5))))}L${pt(proj(tip))}L${pt(proj(add(b, mul(tg, 5))))}Z`;
     }).join('');
     const reflet = courbe(col.slice(2, 16).map((c, k) => proj(add(c, mul(nor[k + 2], rH[k + 2] - 5)))), false);
@@ -772,14 +813,14 @@ export class Chat {
     }
     const ombreTete = proj(add(teteC, { x: -4, y: 28 }));
     const corps = silhouette([{ d: dCorps, fond: 'url(#t-pelage)' }, { d: touffes, fond: '#FFF3E2' }])
-      + `<g clip-path="url(#t-c-corps)"><g opacity="${f(cphi * cphi)}"><path d="${courbe(ventre, true)}" fill="url(#t-creme)"/>`
+      + `<g opacity="${f(cphi * cphi)}"><path d="${courbe(ventre, true)}" fill="url(#t-creme)"/>`
       + `<path d="${rayures}" fill="${RAYURE}" opacity=".55"/><path d="${reflet}" fill="none" stroke="#FFD59A" stroke-width="4.5" stroke-linecap="round" opacity=".5"/></g>`
-      + `<path d="${ovale(plastron, 20)}" fill="url(#t-creme)"/>`
-      + `<ellipse cx="${f(ombreTete.x)}" cy="${f(ombreTete.y)}" rx="36" ry="18" fill="#7A2E0A" opacity=".22" filter="url(#t-flou-doux)"/></g>`;
+      + `<path d="${polygone(couper(contourCorps, ovalePts(plastron, 20)))}" fill="url(#t-creme)"/>`
+      + `<path transform="translate(${pt(ombreTete)})" d="${polygone(couper(contourCorps, ovalePts(ombreTete, 36, 18)).map((q) => sub(q, ombreTete)))}" fill="url(#t-ombre)"/>`;
 
     svg += `<g class="t-chat" transform="translate(${f(this.x)},${f(this.sol - leve)}) scale(${sv.toFixed(4)})">`;
     svg += derriere.map((v) => v.dessin).join('') + queue + corps;
-    svg += devant.map((v) => `<g mask="url(#t-m-cache-${v.k})"><g mask="url(#t-m-pattes)">${v.dessin}</g></g>`).join('');
+    svg += devant.map((v) => `<g mask="url(#t-m-cache-${v.k})">${v.dessin}</g>`).join('');
     if (this.squelette) {
       const os2 = pattes.map(({ j, z }) => `M${pt(proj(j.A, z))}L${pt(proj(j.J, z))}L${pt(proj(j.P, z))}`).join('');
       svg += `<g fill="none" stroke="#1d6fd6" stroke-width="2" opacity=".9"><path d="${courbe(col.map((q) => proj(q)), false)}"/><path d="${os2}"/><path d="M${qp.map(pt).join('L')}"/></g>`;
@@ -788,7 +829,6 @@ export class Chat {
     svg += '</g>';
 
     const visage = tete({ tour: this.tour.x, yeux: clamp(p.yeux, 0, 1) * paupiere, regard: { x: this.regardX.x, y: this.regardY.x }, pupille: this.pupille.pas(this.feuille && this.etat !== 'dort' ? 1.7 : 1, dt), joie: this.joie > 0, miaou: this.miaou, oreilles });
-    for (const o of visage.yeux) mesures(o.cote > 0 ? this.fixes.oeilD : this.fixes.oeilG, { d: o.d });
     svg += `<g class="t-chat" transform="translate(${pt(teteMonde)}) scale(${(sv * TETE).toFixed(4)}) rotate(${f(p.incl * cphi)})">${silhouette(visage.formes, EP / TETE)}${visage.details}${visage.moustaches}</g>`;
     if (this.squelette) svg += `<circle cx="${f(teteMonde.x)}" cy="${f(teteMonde.y)}" r="3" fill="#1d6fd6"/>`;
 
