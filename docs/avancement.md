@@ -1,6 +1,6 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-09 (7 nouveaux dessins, vidéo d'impression). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+Dernière mise à jour : 2026-10-10 (prototype du nouveau Tilleul, page 404 corrigée). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
 ## Où on en est
 
@@ -34,15 +34,19 @@ Fait et validé par Claudiu :
 3. **Phase 3 : boutique** Stripe (Bancontact) + téléchargement sécurisé, seulement après la réponse sur le statut légal.
 4. Fin de projet : checklist (`docs/checklist-fin-de-projet.md`), achat du domaine `lindadenise.be`, mise en ligne en un seul déploiement, README à mettre à jour. Idées de fonctionnalités à proposer à Claudiu à ce moment-là : page Psaumes, livre d'or, liens réseaux, newsletter.
 
-## En discussion : un Tilleul plus avancé
+## En cours : un Tilleul plus avancé (prototype)
 
-Souhait de Claudiu (2026-10-10) : un chat « ultra beau, stylé, qui fait des choses », qui **se déplace** (marche le long de l'écran, va se coucher ailleurs, rejoint l'étang). La performance n'est plus une contrainte. Rive et Spine écartés : export payant (outils gratuits uniquement) et fichiers que Claude ne peut pas modifier.
+Souhait de Claudiu (2026-10-10) : un chat « ultra beau, stylé, qui fait des choses », qui **se déplace**. La performance n'est plus une contrainte. Rive et Spine écartés : export payant (outils gratuits uniquement) et fichiers que Claude ne peut pas modifier. Choix : animation calculée en direct, en SVG redessiné à chaque image.
 
-Aujourd'hui Tilleul est un SVG découpé en parties animées en CSS (voir `CLAUDE.md`, section Mascotte) : deux poses (assis, couché), pas de marche ni de gestes riches. Pistes pour aller plus loin : (1) squelette en SVG avec parties imbriquées et pivots, cycle de marche en CSS ou en JavaScript ; (2) animation image par image (planche de dessins) ; (3) outil d'animation dédié (Rive, Lottie, Spine) avec fichier exporté joué sur le site ; (4) canvas / WebGL pour un vrai rig. À comparer sur : poids de la page (chat léger, site Lighthouse 96-100), respect de `prefers-reduced-motion`, effort de dessin de chaque pose, maintenance par Claude (le SVG est généré par script, pas édité à la main).
+**Prototype fait le 2026-10-10, à faire juger par Claudiu** : page d'essai http://localhost:4321/essai-tilleul/, servie par `npm run dev` seulement (route ajoutée dans `astro.config.mjs`, jamais construite ni publiée). Code : `essais/tilleul.astro` (boutons, pilote automatique, squelette, loupe) et `essais/tilleul/chat.ts` (le moteur).
+- Tilleul vu de profil : colonne souple (le contour du corps est recalculé autour d'elle), pattes à deux os qui se posent sans glisser, queue en ressorts, tête en 3/4 (petit repère 3D) qui se tourne vers le visiteur et suit le pointeur. Mêmes couleurs, yeux verts, museau crème, rayures.
+- Il marche, fait demi-tour (tête de face, corps qui pivote derrière), s'assoit (queue autour des pattes), se couche, dort (zzz), s'étire, chasse une feuille de tilleul (approche, se tapit, remue l'arrière-train, bondit dessus). Touché : petit saut, cœurs, yeux plissés. Pilote automatique pour enchaîner tout seul.
+- Mouvement réduit demandé : il reste assis. Calcul : environ 0,6 ms par image.
+- Suite si validé : remplacer `Mascotte.astro` en gardant bulle, silence, textes et accueil ; puis supprimer la page d'essai et sa route. Idées : toilette (se lèche la patte), ronronnement, aller à l'étang, chasser les feuilles qui tombent déjà sur le site.
 
 ## Manière de travailler (rappels pratiques)
 
-- **Voir le site** : `npm run dev` dans ce dossier, puis http://localhost:4321 (la barre d'outils Astro est désactivée). Le serveur se lance en arrière-plan et reste actif.
+- **Voir le site** : `npm run dev` dans ce dossier (ou la configuration « site » de `.claude/launch.json`), puis http://localhost:4321 (la barre d'outils Astro est désactivée). Astro 7 n'accepte qu'un serveur de dev à la fois : `npx astro dev stop` arrête l'ancien.
 - **Git** : git de GitHub Desktop (voir `CLAUDE.md`), commit et push à chaque modification, **toujours `[skip ci]` à la fin du message** pour ne pas déclencher de déploiement Netlify (15 crédits par déploiement, 300 par mois). Un seul commit sans `[skip ci]` pour publier, uniquement sur demande de Claudiu.
 - **Netlify** : projet `lindadenise` branché sur GitHub (adresse `lindadenise.netlify.app`). La version en ligne est celle du 2026-10-10 (commit sans `[skip ci]`). L'ancien projet `lindadenise-ancien` est supprimé.
 - **Catalogue** : titres, rubriques et traductions des dessins dans `scripts/preparer-dessins.mjs` (`npm run dessins`). Les originaux restent sur le Bureau de Claudiu (`~/Desktop/DessinsLinda`), jamais dans git.

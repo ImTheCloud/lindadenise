@@ -1,0 +1,63 @@
+---
+// Page d'essai du nouveau Tilleul (servie par `npm run dev` seulement, voir astro.config.mjs)
+import '@fontsource/gochi-hand';
+import '@fontsource/itim';
+import '../src/styles/global.css';
+
+const ordres = [
+  ['marche', 'Marcher'],
+  ['assis', "S'asseoir"],
+  ['couche', 'Se coucher'],
+  ['dort', 'Dormir'],
+  ['etire', "S'étirer"],
+];
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Essai : nouveau Tilleul</title>
+  </head>
+  <body>
+    <main class="contenu essai">
+      <p class="surtitre">Page d'essai, jamais publiée</p>
+      <h1>Le nouveau Tilleul</h1>
+      <p class="chapeau">Il se promène en bas de l'écran, s'assoit, se couche et s'endort tout seul. De temps en temps, une feuille de tilleul tombe et il la chasse. Les boutons lui donnent un ordre. Touchez-le pour le caresser.</p>
+      <div class="commandes">
+        {ordres.map(([o, libelle]) => <button class="bouton bouton--contour" type="button" data-ordre={o}>{libelle}</button>)}
+        <button class="bouton" type="button" data-feuille>Lâcher une feuille</button>
+      </div>
+      <div class="options">
+        <label><input type="checkbox" data-option="auto" checked /> Pilote automatique</label>
+        <label><input type="checkbox" data-option="squelette" /> Voir le squelette</label>
+        <label>Taille <input type="range" min="1" max="3" step="0.25" value="1" data-taille /></label>
+      </div>
+    </main>
+    <svg class="t-scene" aria-hidden="true"></svg>
+
+    <script>
+      import { Chat, type Etat } from './tilleul/chat';
+      const chat = new Chat(document.querySelector<SVGSVGElement>('.t-scene')!);
+      document.querySelector('[data-feuille]')!.addEventListener('click', () => chat.lacherFeuille());
+      document.querySelectorAll<HTMLButtonElement>('[data-ordre]').forEach((b) => b.addEventListener('click', () => chat.ordre(b.dataset.ordre as Etat)));
+      document.querySelectorAll<HTMLInputElement>('[data-option]').forEach((c) =>
+        c.addEventListener('change', () => {
+          if (c.dataset.option === 'auto') chat.auto = c.checked;
+          else chat.squelette = c.checked;
+        }),
+      );
+      const taille = document.querySelector<HTMLInputElement>('[data-taille]')!;
+      taille.addEventListener('input', () => chat.taille(Number(taille.value)));
+    </script>
+    <style>
+      .essai { padding-block: 32px 320px; }
+      .commandes { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 8px 16px; }
+      .options { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+      .options input[type='checkbox'] { width: 20px; height: 20px; vertical-align: -3px; accent-color: var(--vert-fonce); }
+      .t-scene { position: fixed; left: 0; bottom: 0; width: 100%; height: 280px; overflow: hidden; pointer-events: none; z-index: 60; }
+      :global(.t-chat) { pointer-events: visiblePainted; cursor: pointer; }
+    </style>
+  </body>
+</html>
