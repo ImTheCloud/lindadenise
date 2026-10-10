@@ -57,7 +57,7 @@ Image d'aperçu de partage (WhatsApp, Facebook), Lighthouse et contrastes, test 
 
 Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui se déplace. La performance n'est plus une contrainte. Rive et Spine écartés (export payant, fichiers que Claude ne peut pas modifier). Choix : animation calculée en direct, SVG redessiné à chaque image. **Le site publié garde l'ancien Tilleul** tant que le nouveau n'est pas validé.
 
-**Où le voir** : `npm run dev`, puis http://localhost:4321/essai-tilleul/ (page servie en dev seulement, route ajoutée dans `astro.config.mjs`, jamais construite ni publiée). Boutons d'ordres, « Lâcher une feuille », pilote automatique, squelette, loupe. Code : `essais/tilleul.astro` et `essais/tilleul/chat.ts` (le moteur, environ 750 lignes).
+**Où le voir** : `npm run dev`, puis http://localhost:4321/essai-tilleul/ (page servie en dev seulement, route ajoutée dans `astro.config.mjs`, jamais construite ni publiée). Boutons d'ordres, « Lâcher une feuille », pilote automatique, squelette, loupe. Code : `essais/tilleul.astro`, `essais/tilleul/chat.ts` (le moteur) et `essais/tilleul/banc.mjs` (banc d'essai).
 
 **Ce qu'il fait** : il marche (pas réglés sur la distance, sans glisser), fait demi-tour en pivotant en volume face au visiteur, s'assoit (queue en crosse derrière), se couche, dort (zzz), s'étire (yeux fermés), chasse une feuille de tilleul (approche, se tapit, bondit). Touché : saut, cœurs, yeux plissés. La tête (82 % de la taille d'origine) suit le pointeur et cligne. Mouvement réduit demandé : il reste assis. Taille de base validée par Claudiu.
 
@@ -70,12 +70,11 @@ Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui 
 
 **Corrigé suite aux retours de Claudiu** : oreilles coupées, tête trop grosse, queue vue par transparence, queue saccadée assis, demi-tour « téléporté », scintillement et traits blancs des yeux, contour qui tremble, pattes arrière qui bougeaient à l'affût, yeux pendant l'étirement.
 
-**À faire en premier à la reprise** (demandé par Claudiu le 2026-10-10) :
-1. **Demi-tour** : pendant le pivot, il place son corps bizarrement. Trouver une autre façon de changer de direction, plus propre. Piste : un petit demi-cercle en marchant, vers le visiteur, au lieu de pivoter sur place.
-2. **Paupières et sourcils** : chaque fois qu'il ferme ou ouvre les yeux (s'endort, se réveille, s'étire), le trait du dessus de l'œil monte puis redescend. Cause probable : le passage brusque, sous 0,12 d'ouverture, entre le bord de paupière (alors tout en bas de l'œil) et l'arc de l'œil fermé (dessiné au milieu). Il faut que l'œil fermé soit à la même place que la paupière tout en bas, sans saut.
-3. **Regard** : il doit plus souvent regarder devant lui, assis comme dans les autres actions, et ne se tourner vers le visiteur que de temps en temps.
+**Reprise du 2026-10-10 (après-midi), faite** : demi-tour en marchant (petit arc vers le visiteur, de vrais pas, au lieu du pivot sur place, gardé seulement à l'affût) ; paupières en deux temps continus, le trait du dessus ne saute plus et l'œil fermé est un « ‿ » ; il regarde devant lui (3/4 dans sa direction) dans toutes les poses, avec un coup d'œil vers le visiteur toutes les 5 à 12 s et quand on le caresse ; « zzz » seulement une fois les yeux fermés ; destinations toujours à l'écran (téléphone compris) ; contour de chaque groupe tracé d'un seul trait (fin des bords qui s'additionnent).
 
-**À vérifier à la reprise** (la dernière série de corrections n'a pas encore été vue par Claudiu) : plus de scintillement des yeux, en particulier l'œil du fond ; contour du corps stable ; demi-tour jugé « pro ». Claude ne voit pas l'animation en temps réel quand le navigateur intégré est masqué : il teste en faisant avancer le temps à la main. Les captures de Claudiu restent le meilleur juge.
+**Banc d'essai hors navigateur** : `node --experimental-transform-types essais/tilleul/banc.mjs <scenario> [dossier]` (scénarios : poses, demitour, yeux, transitions, chasse, caresse) écrit des planches SVG image par image ; `qlmanage -t -s 1000 -o <dossier> <dossier>/<scenario>.svg` les convertit en image. Il ne dépend pas du navigateur intégré (qui ne dessine rien quand il est masqué). Validé ainsi : toutes les poses et transitions, demi-tour, fermeture des yeux, chasse, caresse ; 10 min de pilote automatique sur 375, 900 et 1600 px sans erreur, sans valeur invalide, sans basculement de queue ni sortie d'écran.
+
+**À vérifier par Claudiu** : le rendu en temps réel (demi-tour, yeux, regard) sur ordinateur et sur téléphone.
 
 **Ensuite, une fois validé** : remplacer `Mascotte.astro` par le nouveau moteur en gardant la bulle, le bouton de silence, les textes et l'accueil, puis supprimer `essais/` et la route d'essai. Idées pour plus tard : toilette (se lèche la patte), ronronnement, aller jusqu'à l'étang, chasser les feuilles qui tombent déjà sur le site.
 
