@@ -78,7 +78,9 @@ Demi-tour revu encore (« les pattes et l'arrière du buste font un truc bizarre
 
 Retours suivants appliqués (« on voit les traits des pattes cachées », « pattes arrière pas encore bonnes au demi-tour », « les yeux scintillent 2 s au réveil ») : pattes opaques, seul leur contour s'efface vers l'attache (plus rien ne se voit à travers) ; sur un même côté la patte avant passe devant l'arrière ; contour de la cuisse arrière estompé sur le dessus et l'arrière (plus de trait en travers du ventre), toute la cuisse se fond dans le corps quand il se tourne ; plus aucune découpe recalculée par le navigateur pour les yeux, les rayures, le ventre, le plastron, l'ombre sous la tête et la queue : tout est calculé (Sutherland-Hodgman pour l'iris, la pupille, les reflets). Seuls restent les masques des pattes.
 
-**À vérifier par Claudiu** : le rendu en temps réel (demi-tour, pattes arrière, yeux au réveil) sur ordinateur et sur téléphone.
+**Validé par Claudiu le 2026-10-10** : demi-tour et pattes arrière. Pattes arrière : même cuisse fine et même contour que les pattes avant ; hors du corps leur contour est toujours tracé ; sur le buste, il s'estompe d'un coup doux quand il passe de face (au lieu d'être balayé par le corps).
+
+**Ce que Claudiu aime et n'aime pas** (à respecter pour toute retouche) : rien qui scintille ou tremble ; aucune transparence (on ne doit jamais voir une patte ou un trait à travers une autre) ; aucun saut d'une image à l'autre ni trait qui apparaît, disparaît puis revient ; des gestes de vrai chat (regarde devant lui, ne bouge pas les pattes arrière avant de bondir) ; les traits de contour sur le corps sont plus beaux que sans.
 
 **Ensuite, une fois validé** : remplacer `Mascotte.astro` par le nouveau moteur en gardant la bulle, le bouton de silence, les textes et l'accueil, puis supprimer `essais/` et la route d'essai. Idées pour plus tard : toilette (se lèche la patte), ronronnement, aller jusqu'à l'étang, chasser les feuilles qui tombent déjà sur le site.
 
