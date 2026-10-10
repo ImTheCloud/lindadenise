@@ -48,3 +48,15 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Newsletter ou alerte « nouveau dessin »
 - Dessin du mois, favoris, partage d'un dessin par carte postale numérique
 - Espace admin (ajouter, modifier, supprimer) et boutique Stripe : déjà prévus
+
+## Relecture des textes (FR et NL)
+- À refaire à la toute fin, tout le site : dictionnaires `src/i18n/fr.ts` et `nl.ts`, page 404, textes de la mascotte, formulaire, messages d'erreur, mentions légales, licence, confidentialité.
+- Vérifier : orthographe, ton (vouvoiement en FR, « je » en NL), cohérence entre FR et NL, aucune information inventée sur Linda, textes à jour avec les nouvelles fonctions (admin, abonnement, boutique, mentions légales remplies).
+- Première relecture complète faite le 2026-10-10.
+
+## Sécurité (à faire en fin de projet, avec l'admin)
+- En-têtes de sécurité dans `netlify.toml` (voir plus haut), à écrire une fois l'admin et Stripe en place : leurs domaines doivent être autorisés dans la Content-Security-Policy.
+- Admin : connexion de Linda seule, droits par ligne (RLS) testés, aucune clé secrète dans le dépôt public, clé Supabase publique seulement côté site.
+- Boutique : liens de téléchargement signés et à durée limitée, webhooks Stripe vérifiés, originaux jamais accessibles publiquement.
+- Formulaire et abonnement : anti-spam, pas de données superflues.
+- Test d'intrusion de base (accès direct aux fichiers, aux routes admin, aux originaux) avant la mise en ligne.

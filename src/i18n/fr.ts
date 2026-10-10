@@ -11,7 +11,7 @@ export const fr = {
   rubriques: {
     chats: { nom: 'Les chats', court: 'Chats', texte: 'Les chats d’un ami québécois : ils grimpent, rêvent et se prélassent.' },
     nature: { nom: 'La nature', court: 'Nature', texte: 'Arbres, forêts, rivières et bord de mer, tels que Linda les voit.' },
-    fleurs: { nom: 'Les fleurs', court: 'Fleurs', texte: 'Tournesols, tulipes, lys et glaïeuls en pleine couleur.' },
+    fleurs: { nom: 'Les fleurs', court: 'Fleurs', texte: 'Tournesols, tulipes, lys et glaïeuls en pleines couleurs.' },
     animaux: { nom: 'Les animaux', court: 'Animaux', texte: 'Écureuils, paon, tortue et petites bêtes du jardin.' },
   },
   accueil: {
@@ -77,9 +77,9 @@ export const fr = {
     meta: 'Linda Denise dessine avec le doigt sur son smartphone : la nature, les fleurs et les chats. Découvrez son histoire.',
     titre: 'Bonjour, je suis Linda',
     paragraphes: [
-      'Je vis en Belgique. J’ai longtemps été professeure de cuisine et de cours ménagers, jusqu’aux dernières années passées à enseigner la cuisine.',
+      'Je vis en Belgique. J’ai longtemps été professeure de cuisine et de cours ménagers, puis, ces dernières années, de cuisine seulement.',
       'En 2022, j’ai eu mon premier smartphone, et j’y ai découvert qu’on pouvait dessiner avec le doigt. J’aime toucher l’écran, choisir les couleurs et corriger facilement mon dessin. Depuis, j’adore dessiner.',
-      'À travers mes créations, je cherche à dessiner la beauté de la nature et les chats. J’aime que ce soit esthétique, apaisant, naïf, joyeux, coloré, vibrant et singulier.',
+      'À travers mes créations, je cherche à dessiner la beauté de la nature et des chats. J’aime que ce soit esthétique, apaisant, naïf, joyeux, coloré, vibrant et singulier.',
       'Chaque dessin est inspiré par ce que je vois dans la nature : les arbres, la forêt, les fleurs, le jardin. Les chats viennent de photos d’un ami québécois. Je dessine de façon intuitive et instinctive.',
       'Vous trouverez ici une partie de mes créations. Si vous désirez d’autres dessins qui ne sont pas sur le site, n’hésitez pas à me contacter.',
     ],
@@ -89,7 +89,7 @@ export const fr = {
   contact: {
     meta: 'Écrire à Linda Denise : une question, un dessin qui vous plaît ou une envie de dessin sur mesure.',
     titre: 'Écrire à Linda',
-    intro: 'Une question, un dessin qui vous plaît, l’envie d’un dessin qui n’est pas sur le site ? Écrivez-moi, je vous réponds personnellement.',
+    intro: 'Une question, un dessin qui vous plaît, l’envie d’un dessin qui n’est pas sur le site ? Écrivez-lui, elle vous répond personnellement.',
     nom: 'Votre prénom et nom',
     email: 'Votre adresse email',
     dessin: 'Dessin concerné (facultatif)',
@@ -135,7 +135,7 @@ export const fr = {
   licence: {
     titre: 'Conditions d’utilisation',
     meta: 'Ce que vous pouvez faire, ou non, avec un dessin de Linda Denise.',
-    intro: 'Lorsque vous recevez un dessin, vous recevez le droit de l’utiliser à titre privé. Le droit d’auteur reste à Linda Denise.',
+    intro: 'Lorsque vous recevez un dessin, vous obtenez le droit de l’utiliser à titre privé. Le droit d’auteur reste à Linda Denise.',
     ouiTitre: 'Vous pouvez',
     oui: [
       'l’afficher sur tous vos écrans, par exemple en fond d’écran ;',
@@ -176,7 +176,6 @@ export const fr = {
       'Prrr… vous savez que Linda dessine avec son doigt ?',
       'Mon pelage roux, je le tiens de Tiroux, un des chats de ses dessins.',
       'Linda s’inspire des arbres, des forêts, des fleurs et du jardin.',
-      'Je fais partie des dessins de Linda, vous savez ! Cherchez Tiroux dans la galerie : il me ressemble beaucoup.',
       'Miaou ! Encore une caresse, s’il vous plaît.',
       'Les chats de Linda sont inspirés de photos d’un ami québécois.',
     ],

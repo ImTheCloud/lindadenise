@@ -5,13 +5,13 @@ import { chemin } from '../i18n';
 <Base lang="fr" titre="Page introuvable" chemins={{ fr: '/', nl: '/nl/' }} noindex>
   <section class="section centre">
     <div class="contenu">
-      <h1>Oups, cette page n’existe pas</h1>
-      <p class="chapeau">Tilleul a cherché partout, sans succès. Retournons à l’accueil ou à la galerie.</p>
+      <h1>Cette page n’existe pas</h1>
+      <p class="chapeau">Tilleul a cherché partout, sans succès. Retournez à l’accueil ou à la galerie.</p>
       <p class="chapeau" lang="nl">Tilleul heeft overal gezocht, zonder succes. Terug naar de startpagina?</p>
       <p>
         <a class="bouton bouton--vert" href={chemin('accueil', 'fr')}>Accueil</a>
         <a class="bouton bouton--contour" href={chemin('dessins', 'fr')}>Les dessins</a>
-        <a class="bouton bouton--contour" href={chemin('accueil', 'nl')}>Home (NL)</a>
+        <a class="bouton bouton--contour" href={chemin('accueil', 'nl')}>Nederlands</a>
       </p>
     </div>
   </section>
