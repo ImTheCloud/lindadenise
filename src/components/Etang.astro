@@ -44,10 +44,10 @@ const lotus = [
     </g>
     <g fill="#2B6E3A"><ellipse cx="40" cy="154" rx="9" ry="22" /><ellipse cx="70" cy="170" rx="8" ry="19" /><ellipse cx="1402" cy="160" rx="9" ry="22" /><ellipse cx="1372" cy="178" rx="8" ry="19" /></g>
 
-    <!-- eau -->
-    <path class="eau eau--fond" d="M0,120 C180,100 300,140 480,118 C660,96 780,140 960,118 C1140,96 1280,136 1440,112 L1440,280 L0,280 Z" fill="#DFF0DF" />
-    <path class="eau eau--milieu" d="M0,160 C200,140 320,180 520,158 C720,136 820,180 1020,158 C1200,138 1320,172 1440,152 L1440,280 L0,280 Z" fill="#C6E5C6" />
-    <path class="eau eau--avant" d="M0,214 C240,196 380,232 600,214 C820,196 960,232 1180,212 C1300,202 1380,214 1440,208 L1440,280 L0,280 Z" fill="#3E9A47" />
+    <!-- eau : les nappes dépassent du cadre pour que leur va-et-vient ne laisse jamais de bande blanche sur les côtés -->
+    <path class="eau eau--fond" d="M-40,120 L0,120 C180,100 300,140 480,118 C660,96 780,140 960,118 C1140,96 1280,136 1440,112 L1480,112 L1480,280 L-40,280 Z" fill="#DFF0DF" />
+    <path class="eau eau--milieu" d="M-40,160 L0,160 C200,140 320,180 520,158 C720,136 820,180 1020,158 C1200,138 1320,172 1440,152 L1480,152 L1480,280 L-40,280 Z" fill="#C6E5C6" />
+    <path class="eau eau--avant" d="M-40,214 L0,214 C240,196 380,232 600,214 C820,196 960,232 1180,212 C1300,202 1380,214 1440,208 L1480,208 L1480,280 L-40,280 Z" fill="#3E9A47" />
 
     <!-- rides -->
     <g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".85">
