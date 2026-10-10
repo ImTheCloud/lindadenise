@@ -67,6 +67,8 @@ Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui 
 
 **Sur le site** : il vit en bas de l'écran, sur toutes les pages ; seul son dessin réagit au doigt. Il ne parle qu'à la première visite, puis seulement quand on le touche. « Laisser Tilleul dormir » : il se couche, bâille, dort, silence mémorisé ; un toucher le réveille (il s'étire). Discret : il ne se promène que quand le visiteur ne défile ni ne tape depuis 2,5 s (défilement : il s'arrête et s'assoit) ; une bulle ouverte le retient. Ordinateur : toute la largeur de l'écran ; téléphone : petite taille (0,72) et courtes promenades. Endormi : redessiné 15 fois par seconde ; onglet caché : arrêt complet. Mouvement réduit : assis, une seule image, sans cœurs ni saut.
 
+**Ajouts du 2026-10-10 (soir)** : hors page de jeu il ne marche que devant l'étang de l'accueil (plus de promenade par-dessus le texte quand on défile) ; page « Jouer avec Tilleul » (lien dans le pied de page) avec boutons marcher, s'asseoir, se coucher, dormir, s'étirer, toilette et « lâcher une feuille » (vraie feuille qui tombe, qu'il chasse) ; bouton zzz de la bulle placé du côté opposé à la pointe.
+
 **À tester par Claudiu** (non vérifié à la main) : téléphone réel (taille, toucher, défilement), la toilette et le bâillement à l'œil, l'étang à différentes tailles d'écran (il n'y va que si l'étang est visible en bas), la chasse aux feuilles (fenêtre courte : la feuille s'estompe en fin de chute), la page en néerlandais.
 
 **Comment il est construit** (à garder si on y retouche) :

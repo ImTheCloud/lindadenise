@@ -95,6 +95,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 
     const chat = new Chat(scene, {
       decor: decorAccueil,
+      libre: !!document.querySelector('[data-jeu]'),
       reduit: moinsDeMouvement,
       dort: muet,
       toucher: () => toucher(),
@@ -154,6 +155,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       window.setTimeout(() => dire(anecdotes[rang++ % anecdotes.length], 5000), 450);
     };
     corps.addEventListener('click', () => chat.caresse());
+    // La page de jeu donne ses ordres par cet événement
+    addEventListener('tilleul-ordre', (e) => chat.ordre((e as CustomEvent).detail));
 
     fermer.addEventListener('click', taire);
 
@@ -202,9 +205,9 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__cache { opacity: 0; }
   .mascotte__vu { position: absolute; inset: 0; }
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
-  /* Pastille collée au bas de la bulle, du côté opposé à la queue : trois Z dessinés qui montent, comme ceux du chat endormi */
+  /* Pastille collée au bas de la bulle, du côté opposé à la queue (sinon elle cache la pointe) : trois Z dessinés qui montent, comme ceux du chat endormi */
   .mascotte__silence { position: absolute; left: 14px; bottom: -22px; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; color: var(--orange-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; box-shadow: 0 3px 0 rgba(43, 110, 58, 0.15); cursor: pointer; transition: transform 0.2s cubic-bezier(0.3, 1.5, 0.5, 1), background 0.15s; }
-  .mascotte__bulle:not(.queue-gauche) .mascotte__silence { left: auto; right: 14px; }
+  .mascotte__bulle.queue-gauche .mascotte__silence { left: auto; right: 14px; }
   .mascotte__silence:hover, .mascotte__silence:focus-visible { background: var(--orange-creme); transform: rotate(-8deg) scale(1.08); }
   .mascotte.silence .mascotte__invite { display: none; }
   .mascotte.silence .mascotte__silence { display: none; }

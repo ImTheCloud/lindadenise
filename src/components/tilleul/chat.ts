@@ -404,6 +404,7 @@ export interface Decor {
 export interface Reperes { x: number; sol: number; s: number; tete: V }
 export interface Options {
   decor: Decor;
+  libre: boolean; // page de jeu : il se promène partout (sinon seulement devant l'étang de l'accueil)
   reduit: boolean; // mouvement réduit : il reste assis, sans marcher
   dort: boolean; // il démarre endormi (silence demandé)
   toucher(): void; // le visiteur l'a touché
@@ -622,6 +623,24 @@ export class Chat {
     return performance.now() - this.geste > CALME;
   }
 
+  // Hors de la page de jeu, il ne marche que sur l'herbe devant l'étang (accueil, étang visible en bas de l'écran) ; ailleurs il reste sur place
+  private promener() {
+    if (this.o.libre || this.o.decor.lotus().length) this.marcher();
+    else this.mettre('assis');
+  }
+
+  // Ordres de la page de jeu
+  ordre(o: 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'toilette' | 'chasse') {
+    this.dodo = false;
+    this.feuille = null;
+    this.lotus = null;
+    if (o === 'marche') this.marcher();
+    else if (o === 'chasse') this.chasserUneFeuille();
+    else if (o === 'dort') this.dormir();
+    else { this.mettre(o); this.attente = 25; }
+    if (this.fige) { if (o === 'dort') this.mettre('dort'); else if (this.etat === 'marche') this.mettre('assis'); this.stabiliser(); }
+  }
+
   private marcher() {
     this.lotus = null;
     let x = this.x;
@@ -645,6 +664,7 @@ export class Chat {
 
   // Une feuille du décor est assez haute pour qu'il ait le temps de la guetter : il va se placer et se tapir
   private chasserUneFeuille() {
+    if (!this.o.libre && !this.o.decor.lotus().length) return false;
     const portee = this.haut + this.sol - PORTEE * this.s;
     const chute = 0.055 * innerHeight; // vitesse de chute des feuilles, en pixels par seconde
     const f = this.o.decor.feuilles()
@@ -686,13 +706,13 @@ export class Chat {
     const r = Math.random();
     const decor = () => (r < 0.5 ? this.chasserUneFeuille() || this.allerAuLotus() : this.allerAuLotus() || this.chasserUneFeuille());
     switch (this.etat) {
-      case 'debout': if (r < 0.3) this.mettre('assis'); else if (r < 0.4) this.mettre('couche'); else if (r < 0.6 && decor()) break; else this.marcher(); break;
-      case 'assis': if (r < 0.3) this.marcher(); else if (r < 0.5) this.mettre('toilette'); else if (r < 0.65) this.mettre('couche'); else if (!decor()) this.marcher(); break;
+      case 'debout': if (r < 0.3) this.mettre('assis'); else if (r < 0.4) this.mettre('couche'); else if (r < 0.6 && decor()) break; else this.promener(); break;
+      case 'assis': if (r < 0.3) this.promener(); else if (r < 0.5) this.mettre('toilette'); else if (r < 0.65) this.mettre('couche'); else if (!decor()) this.promener(); break;
       case 'toilette': this.mettre('assis'); break;
       case 'couche': if (r < 0.6) this.mettre('baille'); else this.mettre('debout'); break;
       case 'baille': this.mettre('dort'); break;
       case 'dort': this.mettre('etire'); break;
-      case 'etire': this.marcher(); break;
+      case 'etire': this.promener(); break;
     }
   }
 

@@ -1,0 +1,49 @@
+---
+import Base from '../../layouts/Base.astro';
+import { t, chemin, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const j = t(lang).jeu;
+const chemins = { fr: chemin('jeu', 'fr'), nl: chemin('jeu', 'nl') };
+const ordres = ['marche', 'assis', 'couche', 'dort', 'etire', 'toilette'] as const;
+const FEUILLE = 'M50,6 C64,28 88,40 83,64 C80,80 62,85 50,75 C38,85 20,80 17,64 C12,40 36,28 50,6 Z';
+---
+<Base lang={lang} titre={j.titre} description={j.meta} chemins={chemins}>
+  <section class="section jeu" data-jeu>
+    <div class="contenu centre">
+      <h1>{j.titre}</h1>
+      <p class="chapeau">{j.intro}</p>
+      <div class="jeu__ordres">
+        {ordres.map((o) => <button class="bouton bouton--contour" type="button" data-ordre={o}>{j[o]}</button>)}
+        <button class="bouton" type="button" data-ordre="feuille">{j.feuille}</button>
+      </div>
+    </div>
+    <div class="jeu__feuilles" aria-hidden="true" data-forme={FEUILLE}></div>
+  </section>
+</Base>
+<script>
+  // Une vraie feuille tombe du haut de l'écran ; Tilleul la chasse comme celles de l'accueil
+  const conteneur = document.querySelector<HTMLElement>('.jeu__feuilles')!;
+  const lacher = () => {
+    const x = 12 + Math.random() * 76;
+    conteneur.insertAdjacentHTML('beforeend', `<svg class="feuille" viewBox="0 0 100 100" style="left:${x}%"><path d="${conteneur.dataset.forme}" fill="#3E9A47"/><path d="M50,74 L50,26 M50,56 L36,42 M50,56 L64,42" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".6"/></svg>`);
+    const feuille = conteneur.lastElementChild as SVGElement;
+    feuille.addEventListener('animationend', () => feuille.remove());
+    window.setTimeout(() => dispatchEvent(new CustomEvent('tilleul-ordre', { detail: 'chasse' })), 150);
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-ordre]').forEach((b) =>
+    b.addEventListener('click', () => (b.dataset.ordre === 'feuille' ? lacher() : dispatchEvent(new CustomEvent('tilleul-ordre', { detail: b.dataset.ordre })))),
+  );
+</script>
+<style>
+  .jeu { min-height: 70svh; }
+  .jeu__ordres { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 24px; }
+  .jeu__feuilles { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+  .jeu__feuilles :global(.feuille) { position: absolute; top: 0; width: 34px; height: 34px; animation: jeu-feuille 17s linear forwards; }
+  @keyframes jeu-feuille {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 0.9; }
+    50% { transform: translate(-45px, 47vh) rotate(180deg); }
+    92% { opacity: 0.9; }
+    100% { transform: translate(40px, 95vh) rotate(380deg); opacity: 0; }
+  }
+</style>

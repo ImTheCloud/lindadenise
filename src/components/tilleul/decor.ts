@@ -1,5 +1,5 @@
 // Le décor de l'accueil lu tel qu'il est à l'écran : l'étang (Etang.astro) et les feuilles qui tombent (Feuilles.astro)
-// vivent dans la section du haut. Sur les autres pages, ou quand cette section n'est plus visible, il n'y a rien à regarder.
+// vivent dans la section du haut ; sur la page de jeu, les feuilles sont lâchées par les boutons. Sur les autres pages, ou quand cette section n'est plus visible, il n'y a rien à regarder.
 import type { Decor, FeuilleDecor } from './chat';
 
 const heros = () => document.querySelector<HTMLElement>('.heros');
@@ -17,10 +17,11 @@ export const decorAccueil: Decor = {
     });
   },
   feuilles() {
-    const h = heros();
+    const jeu = document.querySelector<HTMLElement>('[data-jeu]');
+    const h = jeu ?? heros();
     if (!h) return [];
     const r = h.getBoundingClientRect();
-    if (r.bottom < innerHeight * 0.5 || r.top > innerHeight * 0.5) return [];
+    if (!jeu && (r.bottom < innerHeight * 0.5 || r.top > innerHeight * 0.5)) return [];
     return [...h.querySelectorAll<HTMLElement>('.feuille')].filter((el) => el.style.visibility !== 'hidden' && Number(getComputedStyle(el).opacity) > 0.5).map((el): FeuilleDecor => {
       const b = el.getBoundingClientRect();
       return { el, x: b.left + b.width / 2, y: b.top + b.height / 2 };

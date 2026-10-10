@@ -23,6 +23,7 @@ const chemins = {
   dessins: { fr: '/dessins/', nl: '/nl/tekeningen/' },
   apropos: { fr: '/a-propos/', nl: '/nl/over-mij/' },
   contact: { fr: '/contact/', nl: '/nl/contact/' },
+  jeu: { fr: '/jouer/', nl: '/nl/spelen/' },
   merci: { fr: '/merci/', nl: '/nl/bedankt/' },
   mentions: { fr: '/mentions-legales/', nl: '/nl/juridische-info/' },
   licence: { fr: '/licence/', nl: '/nl/gebruiksvoorwaarden/' },
