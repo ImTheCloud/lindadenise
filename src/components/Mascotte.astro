@@ -242,6 +242,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte-svg { width: 100%; height: auto; overflow: visible; display: block; }
 
   .mascotte__bulle { position: absolute; right: 8%; bottom: calc(100% - 6px); width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 28px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
+  .mascotte__bulle { transition: bottom 0.5s ease; }
+  .mascotte[data-etat='couche'] .mascotte__bulle, .mascotte[data-etat='dort'] .mascotte__bulle { bottom: calc(64% + 4px); }
   .mascotte__bulle[hidden] { display: none; }
   .mascotte__bulle::after { content: ''; position: absolute; right: 30px; bottom: -14px; width: 18px; height: 18px; background: #fff; border-right: var(--trait) solid var(--vert-fonce); border-bottom: var(--trait) solid var(--vert-fonce); transform: rotate(45deg) skew(8deg, 8deg); }
   .mascotte__bulle.pop { animation: mascotte-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1); }
