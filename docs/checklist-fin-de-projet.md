@@ -2,6 +2,12 @@
 
 Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du projet.
 
+## Formulaire de contact (à ne pas oublier au déploiement final)
+- Le formulaire échoue en ligne tant qu'aucun déploiement n'a eu lieu depuis l'activation de la détection (Netlify affiche 0 formulaire détecté). Décision de Claudiu (2026-10-10) : attendre le déploiement final.
+- Après ce déploiement : vérifier dans Netlify (Forms) que `contact` est détecté, envoyer un message de test, vérifier l'email reçu (aussi dans les indésirables), marquer « Not spam » si besoin.
+- La notification email est déjà réglée (Forms → Form submission notifications) sur l'adresse de Claudiu : y mettre ou y ajouter celle de Linda quand elle sera prête.
+- Champ téléphone facultatif ajouté (2026-10-10).
+
 ## Référencement (SEO) et Google
 - Acheter `lindadenise.be`, brancher le DNS sur Netlify, activer HTTPS, rediriger `www`
 - Remplacer l'adresse de test `lindadenise.netlify.app` : vérifier que canonical, sitemap et robots pointent bien vers `lindadenise.be`
