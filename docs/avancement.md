@@ -34,6 +34,10 @@ Fait et validé par Claudiu :
 3. **Phase 3 : boutique** Stripe (Bancontact) + téléchargement sécurisé, seulement après la réponse sur le statut légal.
 4. Fin de projet : checklist (`docs/checklist-fin-de-projet.md`), achat du domaine `lindadenise.be`, mise en ligne en un seul déploiement, README à mettre à jour. Idées de fonctionnalités à proposer à Claudiu à ce moment-là : page Psaumes, livre d'or, liens réseaux, newsletter.
 
+## Idée à discuter (autre conversation) : animer Tilleul davantage
+
+Aujourd'hui Tilleul est un SVG découpé en parties animées en CSS (voir `CLAUDE.md`, section Mascotte) : deux poses (assis, couché), pas de marche ni de gestes riches. Pistes pour aller plus loin : (1) squelette en SVG avec parties imbriquées et pivots, cycle de marche en CSS ou en JavaScript ; (2) animation image par image (planche de dessins) ; (3) outil d'animation dédié (Rive, Lottie, Spine) avec fichier exporté joué sur le site ; (4) canvas / WebGL pour un vrai rig. À comparer sur : poids de la page (chat léger, site Lighthouse 96-100), respect de `prefers-reduced-motion`, effort de dessin de chaque pose, maintenance par Claude (le SVG est généré par script, pas édité à la main).
+
 ## Manière de travailler (rappels pratiques)
 
 - **Voir le site** : `npm run dev` dans ce dossier, puis http://localhost:4321 (la barre d'outils Astro est désactivée). Le serveur se lance en arrière-plan et reste actif.
