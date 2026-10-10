@@ -194,7 +194,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 <style is:global>
   /* La bande où vit le chat couvre le bas de l'écran mais ne reçoit aucun clic : seul le dessin du chat réagit */
   .mascotte { position: fixed; left: 0; bottom: 0; width: 100%; height: 0; z-index: 60; pointer-events: none; }
-  .mascotte__scene { position: fixed; left: 0; bottom: 0; width: 100%; overflow: hidden; pointer-events: none; }
+  .mascotte__scene { position: fixed; left: 0; bottom: 0; width: 100%; height: 280px; overflow: hidden; pointer-events: none; }
   .mascotte .t-chat { pointer-events: visiblePainted; cursor: pointer; }
   .mascotte__corps { position: fixed; left: 0; top: 0; padding: 0; border: 0; border-radius: 24px; background: none; pointer-events: none; }
   .mascotte__corps:focus-visible { outline-offset: 2px; }

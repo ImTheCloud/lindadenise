@@ -34,6 +34,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Liens cassés (tout le site, FR et NL) et validité du HTML
 - En-têtes de sécurité (securityheaders.com) : à ajouter dans `netlify.toml` (Content-Security-Policy, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS)
 - Poids des images : remesurer après le passage en AVIF
+- Vidéos (`public/video/`, chargées au clic seulement) : 4,8 à 8 Mo chacune ; si le prix, les remises ou un texte des vidéos changent, les refaire (`scripts/video/`, voir `docs/avancement.md`)
 
 ## Accessibilité
 - axe (extension navigateur), navigation au clavier seul, VoiceOver sur iPhone

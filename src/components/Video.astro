@@ -1,0 +1,59 @@
+---
+// Vidéo chargée seulement au clic : d'abord une affiche (AVIF, repli WebP), puis le lecteur, avec le son si la vidéo en a.
+import { t, type Lang } from '../i18n';
+interface Props {
+  lang: Lang;
+  nom: string; // /video/{nom}.mp4 et son affiche /video/{nom}.avif / .webp
+  largeur: number;
+  hauteur: number;
+  description: string;
+  son?: boolean;
+}
+const { lang, nom, largeur, hauteur, description, son = false } = Astro.props;
+const v = t(lang).video;
+---
+<div class="video" data-video={`/video/${nom}.mp4`} data-son={son ? '' : undefined} data-couper={v.couper} data-remettre={v.remettre} style={`aspect-ratio:${largeur} / ${hauteur}`}>
+  <button type="button" class="video__lancer" aria-label={`${v.lancer} : ${description}`}>
+    <picture>
+      <source type="image/avif" srcset={`/video/${nom}.avif`} />
+      <img src={`/video/${nom}.webp`} width={largeur} height={hauteur} alt="" loading="lazy" decoding="async" />
+    </picture>
+    <span class="video__icone" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M14 9 L32 20 L14 31 Z" fill="currentColor" /></svg></span>
+  </button>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-video]').forEach((boite) => {
+    const lancer = boite.querySelector<HTMLButtonElement>('.video__lancer')!;
+    lancer.addEventListener('click', () => {
+      const video = document.createElement('video');
+      video.src = boite.dataset.video!;
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.setAttribute('aria-label', lancer.getAttribute('aria-label') ?? '');
+      video.muted = boite.dataset.son === undefined; // vidéo sans son : rien ne l'empêche de démarrer
+      lancer.replaceWith(video);
+      void video.play().catch(() => { /* le lecteur reste affiché, le visiteur peut relancer */ });
+      video.focus();
+      if (boite.dataset.son === undefined) return;
+      const son = document.createElement('button');
+      son.type = 'button';
+      son.className = 'video__son';
+      const majSon = () => { son.textContent = (video.muted ? boite.dataset.remettre : boite.dataset.couper) ?? ''; son.setAttribute('aria-pressed', String(video.muted)); };
+      son.addEventListener('click', () => { video.muted = !video.muted; majSon(); });
+      video.addEventListener('volumechange', majSon);
+      majSon();
+      boite.after(son);
+    });
+  });
+</script>
+<style>
+  .video { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
+  .video :global(video), .video__lancer, .video__lancer img { display: block; width: 100%; height: 100%; }
+  .video :global(video) { object-fit: contain; background: #000; }
+  .video__lancer { position: relative; padding: 0; border: 0; background: none; cursor: pointer; }
+  .video__lancer img { object-fit: cover; }
+  .video__icone { position: absolute; left: 50%; top: 72%; translate: -50% -50%; display: grid; place-items: center; width: 84px; height: 84px; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+  .video__lancer:hover .video__icone, .video__lancer:focus-visible .video__icone { transform: scale(1.08) rotate(-4deg); }
+  :global(.video__son) { margin: 10px auto 0; display: block; font-family: var(--titre); font-size: 1.15rem; padding: 6px 16px; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); cursor: pointer; }
+</style>

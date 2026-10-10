@@ -4,6 +4,7 @@ import Etang from '../Etang.astro';
 import Feuilles from '../Feuilles.astro';
 import Etapes from '../Etapes.astro';
 import Apercu from '../Apercu.astro';
+import Video from '../Video.astro';
 import { t, chemin, cheminDessin, dessins, toiles, parRubrique, RUBRIQUES, type Lang } from '../../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -88,10 +89,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
         <p>{a.impressionTexte2}</p>
       </div>
       <figure class="impression__video apparait cadre">
-        <video controls playsinline preload="none" poster="/video/impressions.webp" width="478" height="850" aria-label={a.impressionAlt}>
-          <source src="/video/impressions.mp4" type="video/mp4" />
-          {a.impressionLecture}
-        </video>
+        <Video lang={lang} nom={`toiles-court-${lang}`} largeur={1080} hauteur={1920} description={a.impressionAlt} son />
       </figure>
       <p class="impression__cta apparait"><a class="bouton bouton--vert" href={chemin('toiles', lang)}>{a.impressionCta}</a></p>
     </div>
@@ -151,7 +149,6 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .impression { display: grid; gap: 32px; align-items: center; }
   .impression__cta { margin: 0; text-align: center; }
   .impression__video { width: min(78%, 320px); margin: 0 auto; padding: 10px; background: var(--vert-pale); transform: rotate(2deg); }
-  .impression__video video { display: block; width: 100%; height: auto; aspect-ratio: 478 / 850; border-radius: 10px; background: #000; }
   .apropos { display: grid; gap: 36px; align-items: center; }
   .apropos__photo { width: min(78%, 360px); margin-inline: auto; background: var(--vert-pale); padding: 10px; border: var(--trait) solid var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; box-shadow: var(--ombre); transform: rotate(-3deg); }
   .apropos__photo img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }

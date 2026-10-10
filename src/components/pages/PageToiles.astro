@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Etapes from '../Etapes.astro';
+import Video from '../Video.astro';
 import { t, chemin, cheminDessin, dessins, toiles, resumeLot, type Lang } from '../../i18n';
 import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, REMISES, calculLot } from '../../data/vente';
 interface Props { lang: Lang }
@@ -90,6 +91,20 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
         <p class="info__note">{tt.livraison} {tt.paiement}</p>
         <p class="info__note"><a href={chemin('conditionsToiles', lang)}>{tt.conditions}</a></p>
       </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="contenu videos">
+      <h2 class="centre apparait">{tt.videoTitre}</h2>
+      <figure class="videos__film apparait">
+        <Video lang={lang} nom={`toiles-${lang}`} largeur={1920} hauteur={1080} description={tt.videoFilmAlt} son />
+        <figcaption>{tt.videoFilm}</figcaption>
+      </figure>
+      <figure class="videos__vraies apparait">
+        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} />
+        <figcaption>{tt.videoVraies}</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -364,6 +379,10 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
   .coches li { position: relative; padding-left: 28px; line-height: 1.4; }
   .coches li::before { content: '✓'; position: absolute; left: 0; color: var(--orange-fonce); font-weight: 700; }
   .etapes-toiles { max-width: 980px; }
+  .videos { display: grid; gap: 28px; justify-items: center; }
+  .videos figure { margin: 0; width: 100%; padding: 10px; background: var(--vert-pale); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  .videos__vraies { max-width: 340px; }
+  .videos figcaption { padding: 8px 4px 0; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--vert-fonce); }
   .expo { max-width: 760px; text-align: center; }
   .expo .chapeau { margin-inline: auto; }
   .expo__signature { font-family: var(--titre); font-size: 1.8rem; color: var(--orange-titre); margin: -6px 0 18px; }
@@ -420,6 +439,8 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
   }
   @media (min-width: 900px) {
     .infos { grid-template-columns: 1fr 1fr; }
+    .videos { grid-template-columns: 2.6fr 1fr; align-items: center; }
+    .videos h2 { grid-column: 1 / -1; }
     .fiche__boite { grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr); align-items: center; padding: 40px 24px; }
     .fiche__image img, .salon svg { max-height: 86svh; }
     .fiche__fleche--prec { left: -6px; }

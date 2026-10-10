@@ -1,0 +1,525 @@
+<!doctype html>
+<!-- Scène des vidéos « Les toiles » : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Gochi Hand'; src: url('../../node_modules/@fontsource/gochi-hand/files/gochi-hand-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Itim'; src: url('../../node_modules/@fontsource/itim/files/itim-latin-400-normal.woff2') format('woff2'); }
+  html, body { margin: 0; padding: 0; background: #fff; overflow: hidden; }
+  svg { display: block; }
+  text { font-family: 'Gochi Hand'; }
+  .st { font-family: 'Itim'; }
+</style>
+</head>
+<body>
+<svg id="racine" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const P = new URLSearchParams(location.search);
+const LANG = P.get('lang') || 'fr';
+const VERT = P.get('format') === 'v';
+const W = VERT ? 1080 : 1920, H = VERT ? 1920 : 1080;
+const REPO = new URL('../..', location.href).href.replace(/\/$/, '');
+const NS = 'http://www.w3.org/2000/svg';
+const racine = document.getElementById('racine');
+racine.setAttribute('width', W); racine.setAttribute('height', H); racine.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+const T = {
+  fr: {
+    titre: 'Les toiles', sous: 'de Linda Denise',
+    st: ['Des dessins faits au doigt, imprimés sur aluminium.', 'Format A3, 29,7 × 42 cm. Chaque toile est unique.', 'Elles ont été imprimées pour une exposition à Ostende.', 'Le lieu a fermé avant l’accrochage.', 'Elles cherchent aujourd’hui un nouveau mur.'],
+    stCourt: ['Des dessins imprimés sur aluminium, au format A3.', 'Chaque toile est unique.', 'Elles cherchent aujourd’hui un nouveau mur.'],
+    prix: '200 €', parToile: 'la toile', belgique: 'Livraison en Belgique', lot: '−10 % dès 2 toiles, −20 % dès 3',
+    court: '200 € la toile · Belgique', fin: 'Les toiles',
+  },
+  nl: {
+    titre: 'De doeken', sous: 'van Linda Denise',
+    st: ['Tekeningen met de vinger, gedrukt op aluminium.', 'A3-formaat, 29,7 × 42 cm. Elk doek is uniek.', 'Ze werden gedrukt voor een tentoonstelling in Oostende.', 'De plek sloot nog voor ze opgehangen werden.', 'Vandaag zoeken ze een nieuwe muur.'],
+    stCourt: ['Tekeningen gedrukt op aluminium, in A3-formaat.', 'Elk doek is uniek.', 'Vandaag zoeken ze een nieuwe muur.'],
+    prix: '200 €', parToile: 'per doek', belgique: 'Levering in België', lot: '−10 % vanaf 2 doeken, −20 % vanaf 3',
+    court: '200 € per doek · België', fin: 'De doeken',
+  },
+}[LANG];
+
+// ---------- outils ----------
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const io = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const out = (x) => 1 - Math.pow(1 - x, 3);
+const outBack = (x) => { const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const lerp = (a, b, x) => a + (b - a) * x;
+function el(tag, attrs = {}, parent = racine) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+let uid = 0;
+const id = (p) => `${p}${uid++}`;
+
+const defs = el('defs');
+// texture d'enduit, calculée une seule fois
+function texture() {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const x = c.getContext('2d'); const img = x.createImageData(256, 256);
+  for (let i = 0; i < img.data.length; i += 4) { const v = 200 + Math.random() * 55; img.data[i] = v; img.data[i + 1] = v * 0.96; img.data[i + 2] = v * 0.88; img.data[i + 3] = 22; }
+  x.putImageData(img, 0, 0); return c.toDataURL();
+}
+const motif = el('pattern', { id: 'enduit', width: 256, height: 256, patternUnits: 'userSpaceOnUse' }, defs);
+el('image', { href: texture(), width: 256, height: 256 }, motif);
+const ombre = el('filter', { id: 'ombre', x: '-20%', y: '-15%', width: '140%', height: '145%' }, defs);
+el('feDropShadow', { dx: 0, dy: 14, stdDeviation: 16, 'flood-color': '#3a2a18', 'flood-opacity': 0.32 }, ombre);
+const flou = el('filter', { id: 'flou', x: '-50%', y: '-50%', width: '200%', height: '200%' }, defs);
+el('feGaussianBlur', { stdDeviation: 6 }, flou);
+const gReflet = el('linearGradient', { id: 'reflet', x1: 0, y1: 0, x2: 1, y2: 0.35 }, defs);
+[[0, 0], [0.42, 0], [0.5, 0.42], [0.58, 0], [1, 0]].forEach(([o, a]) => el('stop', { offset: o, 'stop-color': '#fff', 'stop-opacity': a }, gReflet));
+const gLumiere = el('radialGradient', { id: 'lumiere', cx: 0.5, cy: 0, r: 0.75 }, defs);
+el('stop', { offset: 0, 'stop-color': '#fffaf0', 'stop-opacity': 0.95 }, gLumiere);
+el('stop', { offset: 1, 'stop-color': '#fffaf0', 'stop-opacity': 0 }, gLumiere);
+
+// ---------- les toiles ----------
+const TOILES = {
+  frangipanier: { fr: 'Frangipanier', nl: 'Frangipani' },
+  iris: { fr: 'Iris', nl: 'Iris' },
+  'le-tournesol': { fr: 'Le tournesol', nl: 'De zonnebloem' },
+  'bouleaux-en-hiver': { fr: 'Bouleaux en hiver', nl: 'Berken in de winter' },
+  'chat-a-l-ile-de-brehat': { fr: 'Chat à l’île de Bréhat', nl: 'Kat op het eiland Bréhat' },
+  tournesols: { fr: 'Tournesols', nl: 'Zonnebloemen' },
+  sweet: { fr: 'Sweet', nl: 'Sweet' },
+  mauves: { fr: 'Mauves', nl: 'Kaasjeskruid' },
+  'vieux-cerisier': { fr: 'Vieux cerisier', nl: 'Oude kersenboom' },
+  'time-gambade': { fr: 'Timé gambade', nl: 'Timé huppelt' },
+};
+
+// Une toile accrochée à un clou : se peint au pinceau, se balance doucement, reçoit un reflet.
+function toile(parent, nom, largeur) {
+  const l = largeur, h = Math.round(largeur * 420 / 297);
+  const g = el('g', {}, parent);
+  const corps = el('g', { filter: 'url(#ombre)' }, g);
+  const masque = el('mask', { id: id('m'), maskUnits: 'userSpaceOnUse', x: -l, y: -h * 0.2, width: l * 3, height: h * 1.6 }, defs);
+  // trait de pinceau en zigzag qui couvre la toile
+  const rangs = 5, ep = h / rangs * 1.5;
+  let d = '';
+  for (let i = 0; i < rangs; i++) {
+    const y = 18 + h * (i + 0.5) / rangs;
+    const [a, b] = i % 2 ? [l * 1.08 - l / 2, -l * 1.08 + l / 2] : [-l * 0.58, l * 0.58];
+    d += (i ? ` L${a},${y}` : `M${a},${y}`) + ` Q${(a + b) / 2},${y + (i % 2 ? -18 : 18)} ${b},${y}`;
+  }
+  const trait = el('path', { d, fill: 'none', stroke: '#fff', 'stroke-width': ep, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1 }, masque);
+  const peint = el('g', { mask: `url(#${masque.id})` }, corps);
+  el('rect', { x: -l / 2 - 3, y: 15, width: l + 6, height: h + 6, rx: 3, fill: '#c9ced2' }, peint);
+  el('image', { href: `${REPO}/public/toiles/${nom}-800.webp`, x: -l / 2, y: 18, width: l, height: h, preserveAspectRatio: 'xMidYMid slice' }, peint);
+  el('rect', { x: -l / 2, y: 18, width: l, height: h, fill: 'none', stroke: '#9aa2a8', 'stroke-width': 2 }, peint);
+  const clip = el('clipPath', { id: id('c') }, defs);
+  el('rect', { x: -l / 2, y: 18, width: l, height: h }, clip);
+  const reflet = el('rect', { x: -l / 2 - l, y: 18, width: l * 1.2, height: h, fill: 'url(#reflet)', 'clip-path': `url(#${clip.id})`, opacity: 0 }, peint);
+  const clou = el('g', {}, g);
+  el('circle', { cx: 1.5, cy: 3, r: 7, fill: '#000', opacity: 0.18, filter: 'url(#flou)' }, clou);
+  el('circle', { cx: 0, cy: 0, r: 6.5, fill: '#9a9a9a' }, clou);
+  el('circle', { cx: -1.8, cy: -1.8, r: 2.6, fill: '#fff', opacity: 0.85 }, clou);
+  return {
+    l, h, g,
+    // p : avancement du pinceau (0 à 1), b : temps depuis la fin de la peinture (balancement), r : position du reflet (0 à 1)
+    maj({ x, y, p = 1, b = 99, r = -1, echelle = 1, pente = 0, opacite = 1 }) {
+      const angle = pente + 4.5 * Math.exp(-b / 0.9) * Math.cos(b * 5.2);
+      g.setAttribute('transform', `translate(${x},${y}) scale(${echelle})`);
+      g.setAttribute('opacity', opacite);
+      corps.setAttribute('transform', `rotate(${angle.toFixed(3)})`);
+      trait.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
+      clou.setAttribute('opacity', p > 0 ? 1 : 0);
+      reflet.setAttribute('opacity', r >= 0 && r <= 1 ? 1 : 0);
+      reflet.setAttribute('x', (-l / 2 - l * 1.2 + r * l * 2.4).toFixed(1));
+    },
+  };
+}
+
+// ---------- décor ----------
+const FEUILLE = 'M50,6 C64,28 88,40 83,64 C80,80 62,85 50,75 C38,85 20,80 17,64 C12,40 36,28 50,6 Z';
+function feuilles(parent, n, seed) {
+  const liste = [];
+  for (let i = 0; i < n; i++) {
+    const g = el('g', {}, parent);
+    const c = ['#3E9A47', '#F28A1E', '#FFB347', '#2B6E3A'][(i + seed) % 4];
+    el('path', { d: FEUILLE, fill: c }, g);
+    el('path', { d: 'M50,74 L50,26 M50,56 L36,42 M50,56 L64,42', stroke: '#fff', 'stroke-width': 4, 'stroke-linecap': 'round', fill: 'none', opacity: 0.6 }, g);
+    const k = (i * 9301 + seed * 49297) % 233280 / 233280;
+    liste.push({ g, x0: (i + 0.5) / n * W + (k - 0.5) * 120, taille: 0.45 + k * 0.45, vitesse: 70 + k * 60, dephasage: k * 30, dx: 40 + k * 60 });
+  }
+  return (t) => liste.forEach((f) => {
+    const y = ((t * f.vitesse + f.dephasage * 37) % (H + 200)) - 100;
+    const x = f.x0 + Math.sin(t * 0.9 + f.dephasage) * f.dx;
+    f.g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${(t * 40 + f.dephasage * 20) % 360} ) scale(${f.taille}) translate(-50,-50)`);
+  });
+}
+
+const PET = 'M0,0 C-27,-18 -29,-60 0,-94 C29,-60 27,-18 0,0 Z';
+const PETALES = [[-80, 0.78, '#FFB347'], [80, 0.78, '#FFB347'], [-52, 0.92, '#F28A1E'], [52, 0.92, '#F28A1E'], [-24, 1, '#F7992B'], [24, 1, '#F7992B'], [0, 1.06, '#F28A1E']];
+function lotus(parent, x, y, s) {
+  const g = el('g', {}, parent);
+  el('ellipse', { cx: 0, cy: 6, rx: 95, ry: 20, fill: '#3e9a47' }, g);
+  el('path', { d: 'M0,6 L95,0 L60,22 Z', fill: '#8fcfb4' }, g);
+  for (const [a, k, c] of PETALES) {
+    const p = el('g', { transform: `rotate(${a}) scale(${k})` }, g);
+    el('path', { d: PET, fill: c }, p);
+    el('path', { d: 'M0,-10 C-4,-36 -3,-62 0,-82', fill: 'none', stroke: '#FFD9A3', 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.6 }, p);
+  }
+  return (t, ph) => g.setAttribute('transform', `translate(${x},${y + Math.sin(t * 1.3 + ph) * 5}) rotate(${Math.sin(t * 0.8 + ph) * 3}) scale(${s})`);
+}
+function etang(parent, y0) {
+  const g = el('g', {}, parent);
+  if (!document.getElementById('eau')) {
+    const grad = el('linearGradient', { id: 'eau', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    el('stop', { offset: 0, 'stop-color': '#bfe6d3' }, grad); el('stop', { offset: 1, 'stop-color': '#7cc3a4' }, grad);
+  }
+  const eau = el('path', { fill: 'url(#eau)' }, g);
+  const roseaux = el('g', { stroke: '#2B6E3A', 'stroke-width': 6, 'stroke-linecap': 'round', fill: 'none' }, g);
+  [[0.06, 1], [0.09, -1], [0.93, 1], [0.96, -1]].forEach(([fx, s]) => {
+    const x = fx * W; el('path', { d: `M${x},${H} C${x - 6 * s},${y0 - 30} ${x + 8 * s},${y0 - 80} ${x},${y0 - 140}` }, roseaux);
+    el('ellipse', { cx: x, cy: y0 - 150, rx: 9, ry: 24, fill: '#2B6E3A', stroke: 'none' }, roseaux);
+  });
+  const fleurs = [[0.22, 40, 0.55, 0], [0.5, 70, 0.8, 2], [0.78, 35, 0.6, 4]].map(([fx, dy, s, ph]) => [lotus(g, fx * W, y0 + dy, s), ph]);
+  return (t) => {
+    let d = `M0,${H} L0,${y0}`;
+    for (let x = 0; x <= W; x += 40) d += ` L${x},${(y0 + Math.sin(x / 140 + t * 1.4) * 7).toFixed(1)}`;
+    eau.setAttribute('d', d + ` L${W},${H} Z`);
+    fleurs.forEach(([f, ph]) => f(t, ph));
+  };
+}
+
+// Pan de mur dessiné (bord irrégulier), pour la scène de Tilleul
+function panneau(parent, x, y, l, h) {
+  const g = el('g', {}, parent);
+  const d = `M${x},${y + 8} C${x + l * 0.3},${y - 6} ${x + l * 0.7},${y + 12} ${x + l},${y} C${x + l + 8},${y + h * 0.4} ${x + l - 6},${y + h * 0.7} ${x + l + 4},${y + h} C${x + l * 0.6},${y + h + 10} ${x + l * 0.3},${y + h - 8} ${x},${y + h + 4} C${x - 8},${y + h * 0.6} ${x + 6},${y + h * 0.3} ${x},${y + 8} Z`;
+  el('path', { d, fill: '#f3eee4' }, g);
+  el('path', { d, fill: 'url(#enduit)' }, g);
+  el('path', { d, fill: 'url(#lumiere)', opacity: 0.9 }, g);
+  const bord = el('path', { d, fill: 'none', stroke: '#2B6E3A', 'stroke-width': 5, 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': '1 1' }, g);
+  return (p) => bord.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
+}
+
+// Mur de galerie : enduit, lumière du haut, plinthe
+function mur(parent, x, y, l, h) {
+  const g = el('g', {}, parent);
+  el('rect', { x, y, width: l, height: h, fill: '#f3eee4' }, g);
+  el('rect', { x, y, width: l, height: h, fill: 'url(#enduit)' }, g);
+  el('rect', { x, y, width: l, height: h * 0.8, fill: 'url(#lumiere)' }, g);
+  el('rect', { x, y: y + h - 70, width: l, height: 30, fill: '#fdfcf9' }, g);
+  el('rect', { x, y: y + h - 42, width: l, height: 4, fill: '#d9cfbf' }, g);
+  el('rect', { x, y: y + h - 38, width: l, height: 38, fill: '#e6cba0' }, g);
+  return g;
+}
+
+// Texte écrit lettre à lettre (chaque lettre monte et apparaît)
+function ecrit(parent, texte, x, y, taille, couleur, ancre = 'middle', classe = '') {
+  const t = el('text', { x, y, 'font-size': taille, fill: couleur, 'text-anchor': ancre, class: classe }, parent);
+  const lettres = [...texte].map((c) => { const s = el('tspan', {}, t); s.textContent = c; return s; });
+  return (p) => {
+    const n = lettres.length;
+    lettres.forEach((s, i) => {
+      const k = clamp(p * (n + 6) - i, 0, 6) / 6;
+      s.setAttribute('opacity', out(k).toFixed(3));
+      s.setAttribute('dy', i === 0 ? 0 : 0);
+    });
+    t.setAttribute('transform', `translate(0,${(1 - out(clamp(p * 1.4, 0, 1))) * 14})`);
+  };
+}
+
+// Sous-titre incrusté : bandeau blanc arrondi en bas, texte en Itim
+function sousTitre(parent) {
+  const g = el('g', { opacity: 0 }, parent);
+  const fond = el('rect', { rx: 26, fill: '#fff', stroke: '#2B6E3A', 'stroke-width': 3, opacity: 0.94 }, g);
+  const t = el('text', { x: W / 2, y: 0, 'font-size': VERT ? 46 : 44, fill: '#2b3b2b', 'text-anchor': 'middle', class: 'st' }, g);
+  let actuel = '';
+  const lignes = (txt) => {
+    if (!VERT || txt.length < 34) return [txt];
+    const mots = txt.split(' '); const a = []; let l = '';
+    for (const m of mots) { if ((l + ' ' + m).trim().length > 32 && l) { a.push(l); l = m; } else l = (l + ' ' + m).trim(); }
+    a.push(l); return a;
+  };
+  return (txt, p, yb) => {
+    g.setAttribute('opacity', (p <= 0 ? 0 : Math.min(1, p * 6, (1 - p) * 8)).toFixed(3));
+    if (txt !== actuel) {
+      actuel = txt; t.textContent = '';
+      lignes(txt).forEach((l, i) => { const s = el('tspan', { x: W / 2, dy: i ? (VERT ? 58 : 54) : 0 }, t); s.textContent = l; });
+    }
+    const n = t.childNodes.length, lh = VERT ? 58 : 54;
+    t.setAttribute('y', yb - (n - 1) * lh);
+    const bb = t.getBBox();
+    fond.setAttribute('x', bb.x - 34); fond.setAttribute('y', bb.y - 16); fond.setAttribute('width', bb.width + 68); fond.setAttribute('height', bb.height + 32);
+    g.setAttribute('transform', `translate(0,${(1 - out(clamp(p * 6, 0, 1))) * 20})`);
+  };
+}
+
+// Grand coup de pinceau qui traverse l'écran (transition entre deux scènes)
+function coupDePinceau(parent, couleur) {
+  const d = `M${-W * 0.2},${H * 0.25} C${W * 0.3},${H * 0.05} ${W * 0.55},${H * 0.55} ${W * 1.2},${H * 0.3} M${W * 1.2},${H * 0.62} C${W * 0.6},${H * 0.85} ${W * 0.3},${H * 0.45} ${-W * 0.2},${H * 0.8}`;
+  const p = el('path', { d, fill: 'none', stroke: couleur, 'stroke-width': Math.max(W, H) * 0.42, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1 }, parent);
+  // x : 0 → 0,5 le trait couvre l'écran, 0,5 → 1 il s'efface par l'autre bout
+  return (x) => {
+    if (x <= 0 || x >= 1) { p.setAttribute('opacity', 0); return; }
+    p.setAttribute('opacity', 1);
+    if (x < 0.5) { p.setAttribute('stroke-dasharray', '1 1'); p.setAttribute('stroke-dashoffset', (1 - io(x * 2)).toFixed(4)); }
+    else { const k = io((x - 0.5) * 2); p.setAttribute('stroke-dasharray', `${(1 - k).toFixed(4)} 1`); p.setAttribute('stroke-dashoffset', (-k).toFixed(4)); }
+  };
+}
+
+function logo(parent) {
+  const g = el('g', {}, parent);
+  el('image', { href: `${REPO}/public/favicon.svg`, x: -110, y: -110, width: 220, height: 220 }, g);
+  return g;
+}
+
+// Grain de lumière : petites poussières dorées qui flottent dans la lumière
+function poussieres(parent, n) {
+  const l = [];
+  for (let i = 0; i < n; i++) {
+    const k = ((i * 7919) % 1000) / 1000;
+    const c = el('circle', { r: 2 + k * 3.5, fill: '#ffe2a8', filter: 'url(#flou)' }, parent);
+    l.push({ c, x: k * W, y: ((i * 3571) % 1000) / 1000 * H * 0.7, v: 6 + k * 14, ph: k * 20 });
+  }
+  return (t, op) => l.forEach((p) => {
+    p.c.setAttribute('cx', (p.x + Math.sin(t * 0.3 + p.ph) * 40).toFixed(1));
+    p.c.setAttribute('cy', ((p.y - t * p.v) % (H * 0.7) + H * 0.7) % (H * 0.7));
+    p.c.setAttribute('opacity', (op * (0.35 + 0.35 * Math.sin(t * 1.7 + p.ph))).toFixed(3));
+  });
+}
+
+// ---------- Tilleul (moteur du site, inchangé) ----------
+const porteChat = el('g', {});
+const scene = el('svg', { width: W, height: 280, overflow: 'visible' }, porteChat);
+const chat = new Tilleul.Chat(scene, { decor: { lotus: () => [], decalage: () => 0, feuilles: () => [] }, libre: true, reduit: false, dort: false, toucher() {}, suit() {} });
+scene.setAttribute('width', W); scene.setAttribute('height', 280);
+racine.removeChild(porteChat);
+let chatPret = false;
+// Positions dans le repère du moteur (largeur de l'écran, bande de 280 de haut)
+function chatEntre(depart, cible) {
+  chat.ordre('assis');
+  chat.x = depart; chat.cibleX = cible; chat.etat = depart === cible ? 'assis' : 'marche';
+}
+// Il suit le pointeur du regard : on « pointe » la toile
+function regarde(x, y) { window.dispatchEvent(new PointerEvent('pointermove', { clientX: x, clientY: y })); }
+
+// ================= Montage =================
+const calques = { fond: el('g'), scene: el('g'), texte: el('g'), pinceau: el('g') };
+el('rect', { width: W, height: H, fill: '#fff' }, calques.fond);
+let rendre;
+
+if (!VERT) {
+  // ---- Version longue 16:9 ----
+  const intro = el('g', {}, calques.scene);
+  const tombe = feuilles(intro, 9, 1);
+  const lg = logo(intro);
+  const bassinIntro = etang(intro, 905);
+  const titre = ecrit(intro, T.titre, W / 2, 560, 150, '#2B6E3A');
+  const sous = ecrit(intro, T.sous, W / 2, 660, 76, '#e0780c');
+  const souligne = el('path', { d: `M${W / 2 - 260},700 C${W / 2 - 100},680 ${W / 2 + 120},716 ${W / 2 + 270},692`, fill: 'none', stroke: '#F28A1E', 'stroke-width': 10, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1' }, intro);
+
+  // galerie : un long mur qu'on longe
+  const galerie = el('g', {}, calques.scene);
+  const camera = el('g', {}, galerie);
+  const PAN = 6 * 560 + 380 - W + 380;
+  mur(camera, -200, -300, PAN + W + 400, H + 300);
+  const decalage = (t) => io(prog(t, 5.0, 14.6)) * PAN;
+  const accroches = ['frangipanier', 'iris', 'le-tournesol', 'bouleaux-en-hiver', 'chat-a-l-ile-de-brehat', 'tournesols', 'sweet'].map((nom, i) => {
+    const x = 380 + i * 560;
+    let debut = 5.5;
+    while (debut < 14 && x - decalage(debut) > W * 0.8) debut += 0.05;
+    return { t: toile(camera, nom, 400), x, y: 120 + (i % 2 ? 34 : 0), pente: [-0.8, 0.6, -0.3, 0.9, -0.6, 0.4, -0.5][i], debut: Math.max(5.5 + i * 0.35, debut - 0.6) };
+  });
+  const grain = poussieres(galerie, 26);
+
+  // gros plans
+  const gros = el('g', {}, calques.scene);
+  mur(gros, 0, 0, W, H);
+  const plans = ['mauves', 'vieux-cerisier', 'time-gambade'].map((nom) => ({ nom, t: toile(gros, nom, 470) }));
+  const cartels = plans.map((p) => ecrit(gros, TOILES[p.nom][LANG], W * 0.72, 560, 84, '#2B6E3A'));
+
+  // un nouveau mur : Tilleul, l'étang et une toile
+  const nouveau = el('g', {}, calques.scene);
+  el('rect', { width: W, height: H, fill: '#fff' }, nouveau);
+  const tombe2 = feuilles(nouveau, 6, 3);
+  const murDessine = panneau(nouveau, W * 0.22, 70, W * 0.42, 690);
+  const seule = toile(nouveau, 'frangipanier', 330);
+  const bassin = etang(nouveau, 830);
+  nouveau.appendChild(porteChat);
+
+  // prix
+  const prix = el('g', {}, calques.scene);
+  el('rect', { width: W, height: H, fill: '#fff4e3' }, prix);
+  const tombe3 = feuilles(prix, 8, 5);
+  const carte = el('g', {}, prix);
+  el('path', { d: 'M-430,-250 C-150,-268 170,-244 432,-256 C446,-80 426,90 440,252 C150,268 -160,240 -436,258 C-448,80 -424,-90 -430,-250 Z', fill: '#fff', stroke: '#b05200', 'stroke-width': 6 }, carte);
+  const prixMontant = ecrit(carte, T.prix, 0, -40, 200, '#b05200');
+  const prixParToile = ecrit(carte, T.parToile, 0, 50, 70, '#2B6E3A');
+  const prixBelgique = ecrit(carte, T.belgique, 0, 140, 52, '#2b3b2b', 'middle', 'st');
+  const prixLot = ecrit(carte, T.lot, 0, 205, 40, '#4d5d4d', 'middle', 'st');
+
+  // fin
+  const fin = el('g', {}, calques.scene);
+  el('rect', { width: W, height: H, fill: '#fff' }, fin);
+  const tombe4 = feuilles(fin, 9, 7);
+  const bassinFin = etang(fin, 925);
+  const lgFin = logo(fin);
+  const finNom = ecrit(fin, 'Linda Denise', W / 2, 700, 130, '#2B6E3A');
+  const finSous = ecrit(fin, T.fin, W / 2, 800, 80, '#e0780c');
+
+  const st = sousTitre(calques.texte);
+  const pinceaux = [coupDePinceau(calques.pinceau, '#3E9A47'), coupDePinceau(calques.pinceau, '#F28A1E'), coupDePinceau(calques.pinceau, '#fff4e3'), coupDePinceau(calques.pinceau, '#3E9A47')];
+
+  const montrer = (g, v) => g.setAttribute('display', v ? 'inline' : 'none');
+  rendre = (t) => {
+    // 0 – 5,6 : titre
+    montrer(intro, t < 5.6);
+    if (t < 5.6) {
+      tombe(t); bassinIntro(t);
+      const k = outBack(prog(t, 0.2, 1.3));
+      lg.setAttribute('transform', `translate(${W / 2},${270 + Math.sin(t * 1.2) * 6}) scale(${k * 0.95}) rotate(${(1 - k) * -40})`);
+      titre(prog(t, 1.0, 2.4)); sous(prog(t, 2.2, 3.3));
+      souligne.setAttribute('stroke-dashoffset', 1 - io(prog(t, 3.1, 3.9)));
+    }
+    // 5,6 – 14,2 : on longe le mur, les toiles se peignent et se balancent
+    montrer(galerie, t >= 4.9 && t < 14.6);
+    if (t >= 4.9 && t < 14.6) {
+      camera.setAttribute('transform', `translate(${-decalage(t)},0)`);
+      accroches.forEach((a) => {
+        const p = io(prog(t, a.debut, a.debut + 1.1));
+        a.t.maj({ x: a.x, y: a.y, p, b: t - a.debut - 1.1, pente: a.pente, r: prog(t, a.debut + 1.5, a.debut + 2.6) });
+      });
+      grain(t, 1);
+    }
+    // 14,2 – 22,4 : gros plans, l'histoire d'Ostende
+    montrer(gros, t >= 13.9 && t < 22.7);
+    if (t >= 13.9 && t < 22.7) {
+      plans.forEach((p, i) => {
+        const a = 14.2 + i * 2.75, b = a + 2.75;
+        const vis = t >= a - 0.3 && t < b + 0.3;
+        const k = prog(t, a - 0.3, b + 0.3);
+        p.t.maj({ x: W * 0.36 + (k - 0.5) * 120, y: 120 - (k - 0.5) * 20, p: io(prog(t, a - 0.3, a + 0.7)), b: t - a - 0.7, echelle: 1 + k * 0.08, pente: (i % 2 ? 0.7 : -0.7), r: prog(t, a + 0.8, a + 2.2), opacite: vis ? Math.min(1, (b + 0.3 - t) * 3) : 0 });
+        cartels[i](vis ? prog(t, a + 0.3, a + 1.2) * Math.min(1, (b + 0.3 - t) * 3) : 0);
+      });
+    }
+    // 22,4 – 28,8 : un nouveau mur ; Tilleul arrive et regarde la toile
+    montrer(nouveau, t >= 22.1 && t < 29.1);
+    if (t >= 22.1 && t < 29.1) {
+      if (!chatPret) { chatEntre(1520, 1207); chatPret = true; }
+      if (t > 28 && chat.etat !== 'assis') chat.ordre('assis');
+      regarde(970, 780);
+      tombe2(t);
+      murDessine(io(prog(t, 22.3, 23.5)));
+      seule.maj({ x: W * 0.43, y: 150, p: io(prog(t, 22.9, 24.0)), b: t - 24.0, pente: -0.5, r: prog(t, 26.5, 27.8) });
+      bassin(t);
+      porteChat.setAttribute('transform', `translate(-1190,${826 - 276 * 2.1}) scale(2.1)`);
+    }
+    // 28,8 – 34,4 : le prix
+    montrer(prix, t >= 28.5 && t < 34.7);
+    if (t >= 28.5 && t < 34.7) {
+      tombe3(t);
+      const k = outBack(prog(t, 28.8, 29.8));
+      carte.setAttribute('transform', `translate(${W / 2},${H / 2 - 20}) scale(${0.6 + 0.4 * k}) rotate(${-1.2 + (1 - k) * 6})`);
+      carte.setAttribute('opacity', prog(t, 28.8, 29.2));
+      prixMontant(prog(t, 29.2, 30.0)); prixParToile(prog(t, 29.9, 30.6)); prixBelgique(prog(t, 30.6, 31.6)); prixLot(prog(t, 31.5, 32.8));
+    }
+    // 34,4 – 39 : fin
+    montrer(fin, t >= 34.1);
+    if (t >= 34.1) {
+      tombe4(t); bassinFin(t);
+      const k = outBack(prog(t, 34.6, 35.6));
+      lgFin.setAttribute('transform', `translate(${W / 2},${400}) scale(${k * 1.1})`);
+      finNom(prog(t, 35.3, 36.6)); finSous(prog(t, 36.4, 37.4));
+      fin.setAttribute('opacity', 1 - prog(t, 38.2, 39));
+    }
+    // sous-titres
+    const temps = [[5.8, 9.9], [10.0, 14.0], [14.3, 18.3], [18.4, 22.3], [23.0, 28.6]];
+    const i = temps.findIndex(([a, b]) => t >= a && t < b);
+    st(i >= 0 ? T.st[i] : '', i >= 0 ? prog(t, temps[i][0], temps[i][1]) : 0, H - 70);
+    // transitions au pinceau
+    pinceaux[0](prog(t, 4.6, 5.9)); pinceaux[1](prog(t, 21.8, 23.0)); pinceaux[2](prog(t, 28.0, 29.3)); pinceaux[3](prog(t, 33.8, 35.0));
+  };
+  window.DUREE = 39;
+} else {
+  // ---- Version courte 9:16 ----
+  const intro = el('g', {}, calques.scene);
+  const tombe = feuilles(intro, 7, 2);
+  const lg = logo(intro);
+  const bassinIntro = etang(intro, 1660);
+  const titre = ecrit(intro, T.titre, W / 2, 1010, 150, '#2B6E3A');
+  const sous = ecrit(intro, T.sous, W / 2, 1110, 76, '#e0780c');
+
+  const galerie = el('g', {}, calques.scene);
+  const camera = el('g', {}, galerie);
+  mur(camera, -100, -200, W + 200, H * 2.1);
+  const pile = ['iris', 'le-tournesol', 'bouleaux-en-hiver'].map((nom, i) => ({ t: toile(camera, nom, 540), x: W / 2 + (i % 2 ? 90 : -90), y: 150 + i * 860, pente: [-0.7, 0.8, -0.4][i], debut: 3.2 + i * 1.2 }));
+  const grain = poussieres(galerie, 18);
+
+  const gros = el('g', {}, calques.scene);
+  mur(gros, 0, 0, W, H);
+  const grande = toile(gros, 'chat-a-l-ile-de-brehat', 700);
+
+  const nouveau = el('g', {}, calques.scene);
+  el('rect', { width: W, height: H, fill: '#fff' }, nouveau);
+  const seule = toile(nouveau, 'sweet', 400);
+  const bassin = etang(nouveau, 1500);
+  nouveau.appendChild(porteChat);
+
+  const fin = el('g', {}, calques.scene);
+  el('rect', { width: W, height: H, fill: '#fff4e3' }, fin);
+  const tombe4 = feuilles(fin, 7, 6);
+  const bassinFin = etang(fin, 1660);
+  const lgFin = logo(fin);
+  const finNom = ecrit(fin, 'Linda Denise', W / 2, 1030, 120, '#2B6E3A');
+  const finPrix = ecrit(fin, T.court, W / 2, 1150, 62, '#b05200');
+
+  const st = sousTitre(calques.texte);
+  const pinceaux = [coupDePinceau(calques.pinceau, '#3E9A47'), coupDePinceau(calques.pinceau, '#F28A1E'), coupDePinceau(calques.pinceau, '#3E9A47')];
+  const montrer = (g, v) => g.setAttribute('display', v ? 'inline' : 'none');
+  rendre = (t) => {
+    montrer(intro, t < 3.2);
+    if (t < 3.2) {
+      tombe(t); bassinIntro(t);
+      const k = outBack(prog(t, 0.1, 1.0));
+      lg.setAttribute('transform', `translate(${W / 2},${720}) scale(${k})`);
+      titre(prog(t, 0.6, 1.7)); sous(prog(t, 1.5, 2.4));
+    }
+    montrer(galerie, t >= 2.7 && t < 9.0);
+    if (t >= 2.7 && t < 9.0) {
+      const k = io(prog(t, 3.0, 9.0));
+      camera.setAttribute('transform', `translate(0,${-k * 1720})`);
+      pile.forEach((a) => a.t.maj({ x: a.x, y: a.y, p: io(prog(t, a.debut, a.debut + 1.0)), b: t - a.debut - 1.0, pente: a.pente, r: prog(t, a.debut + 1.3, a.debut + 2.3) }));
+      grain(t, 1);
+    }
+    montrer(gros, t >= 8.8 && t < 12.9);
+    if (t >= 8.8 && t < 12.9) {
+      const k = prog(t, 8.8, 12.9);
+      grande.maj({ x: W / 2, y: 330 - k * 30, p: io(prog(t, 8.8, 9.8)), b: t - 9.8, echelle: 1 + k * 0.06, pente: 0.5, r: prog(t, 10.2, 11.6) });
+    }
+    montrer(nouveau, t >= 12.6 && t < 16.4);
+    if (t >= 12.6 && t < 16.4) {
+      if (!chatPret) { chatEntre(659, 659); chatPret = true; }
+      if (t > 14.2 && t < 14.25) chat.salue();
+      regarde(543, 1570);
+      seule.maj({ x: W / 2 - 90, y: 360, p: io(prog(t, 12.8, 13.8)), b: t - 13.8, pente: -0.6 });
+      bassin(t);
+      porteChat.setAttribute('transform', `translate(-800,${1496 - 276 * 2.3}) scale(2.3)`);
+    }
+    montrer(fin, t >= 16.1);
+    if (t >= 16.1) {
+      tombe4(t); bassinFin(t);
+      const k = outBack(prog(t, 16.4, 17.3));
+      lgFin.setAttribute('transform', `translate(${W / 2},${740}) scale(${k * 1.05})`);
+      finNom(prog(t, 16.9, 17.9)); finPrix(prog(t, 17.6, 18.5));
+      fin.setAttribute('opacity', 1 - prog(t, 19.2, 20));
+    }
+    const temps = [[3.4, 8.7], [9.2, 12.6], [13.0, 16.2]];
+    const i = temps.findIndex(([a, b]) => t >= a && t < b);
+    st(i >= 0 ? T.stCourt[i] : '', i >= 0 ? prog(t, temps[i][0], temps[i][1]) : 0, H - 170);
+    pinceaux[0](prog(t, 2.4, 3.6)); pinceaux[1](prog(t, 12.0, 13.2)); pinceaux[2](prog(t, 15.6, 16.8));
+  };
+  window.DUREE = 20;
+}
+
+window.image = (t) => { avancer(1000 / 30); rendre(t); };
+const hrefs = [...new Set([...racine.querySelectorAll('image')].map((i) => i.getAttribute('href')).filter((h) => h.startsWith('file:')))];
+window.pret = Promise.all([document.fonts.load('80px "Gochi Hand"'), document.fonts.load('40px Itim'), ...hrefs.map((h) => new Promise((ok) => { const i = new Image(); i.onload = i.onerror = ok; i.src = h; }))]).then(() => true);
+</script>
+</body>
+</html>

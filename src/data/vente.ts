@@ -1,4 +1,5 @@
 // Prix et conditions des toiles : à changer ici seulement (les textes FR et NL les reprennent).
+// Les vidéos montrent aussi le prix et les remises (scripts/video/scene.html) : les refaire si on les change.
 export const PRIX_TOILE = 200;
 // Moyenne arrondie des tarifs d'un colis de 2 kg livré à domicile en Belgique (voir docs/avancement.md).
 export const FRAIS_ENVOI = 12;

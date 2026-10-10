@@ -2,6 +2,9 @@
 import '@fontsource/gochi-hand';
 import '@fontsource/itim';
 import '../styles/global.css';
+// Polices préchargées : le texte s'affiche tout de suite dans sa police, sans décaler la page.
+import policeTitre from '@fontsource/gochi-hand/files/gochi-hand-latin-400-normal.woff2?url';
+import policeTexte from '@fontsource/itim/files/itim-latin-400-normal.woff2?url';
 import Entete from '../components/Entete.astro';
 import PiedDePage from '../components/PiedDePage.astro';
 import Mascotte from '../components/Mascotte.astro';
@@ -30,6 +33,8 @@ const canonique = SITE + chemins[lang];
     <title>{titrePage}</title>
     <meta name="description" content={desc} />
     <meta name="theme-color" content="#3e9a47" />
+    <link rel="preload" href={policeTitre} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={policeTexte} as="font" type="font/woff2" crossorigin />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonique} />
     <link rel="alternate" hreflang="fr" href={SITE + chemins.fr} />

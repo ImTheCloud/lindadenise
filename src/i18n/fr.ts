@@ -45,8 +45,7 @@ export const fr = {
     impressionTexte: (n: number) => `Un dessin ne vit pas seulement sur un écran. Linda a fait imprimer ${n} de ses dessins sur aluminium, au format A3 : de vraies toiles, que l’on tient dans les mains et que l’on accroche chez soi. Chacune est une pièce unique.`,
     impressionTexte2: 'Le trait du doigt et les couleurs y prennent une tout autre ampleur. Regardez.',
     impressionCta: 'Voir les toiles',
-    impressionAlt: 'Vidéo : dessins de Linda imprimés en grand format, posés dans un salon',
-    impressionLecture: 'Votre navigateur ne lit pas cette vidéo.',
+    impressionAlt: 'film de 20 secondes sur les toiles de Linda, avec Tilleul, textes à l’écran et musique douce, sans voix',
     aproposTitre: 'Rencontrez Linda',
     aproposTexte:
       'Après avoir longtemps enseigné la cuisine, Linda a reçu son premier smartphone en 2022 et y a découvert un plaisir tout simple : dessiner avec le doigt. Elle y cherche la beauté de la nature et des chats, avec des couleurs vibrantes et beaucoup de douceur.',
@@ -147,6 +146,11 @@ export const fr = {
     expoTexte: 'Je cherche d’autres occasions de montrer mes toiles : une exposition, un dépôt dans une galerie, un café, un lieu d’accueil ou un commerce.',
     expoTexte2: 'Vous avez un mur qui les attend ? Écrivez-moi.',
     expoCta: 'Proposer un lieu',
+    videoTitre: 'Les toiles en vidéo',
+    videoFilm: 'Les toiles en musique',
+    videoFilmAlt: 'film de 39 secondes : les toiles accrochées sur un mur dessiné, l’histoire d’Ostende et Tilleul, avec textes à l’écran et musique douce, sans voix',
+    videoVraies: 'Les vraies toiles, filmées une à une',
+    videoVraiesAlt: 'vidéo sans son de 49 secondes : les 23 toiles posées dans une maison, filmées une à une',
   },
   apropos: {
     meta: 'Linda Denise dessine avec le doigt sur son smartphone : la nature, les fleurs et les chats. Découvrez son histoire.',
@@ -306,6 +310,7 @@ export const fr = {
       { titre: 'Vos droits', texte: ['Vous pouvez demander à tout moment l’accès, la correction ou la suppression de vos données en écrivant à teugelslinda@yahoo.fr.'] },
     ],
   },
+  video: { lancer: 'Lancer la vidéo', couper: 'Couper le son', remettre: 'Remettre le son' },
   mascotte: {
     nom: 'Tilleul',
     parler: 'Caresser Tilleul, le chat de Linda',

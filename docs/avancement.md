@@ -1,6 +1,6 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-11 (mission Toiles en cours, non publiée : voir la section « Mission Toiles » juste en dessous). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+Dernière mise à jour : 2026-10-11 (mission Toiles terminée, non publiée : voir la section « Mission Toiles » juste en dessous). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
 ## Mission Toiles (2026-10-11, non publiée)
 
@@ -8,7 +8,7 @@ Consigne complète : `docs/prive/prompt-toiles.md`. Trois phases, un commit `[sk
 
 - **Phase 1 : faite** (doublons, photos redressées, page Toiles FR + NL, menu, sélection de lot, vue « à l'échelle »).
 - **Phase 2 : faite** (option toile sur les 76 fiches, licence et conditions, formulaire, documentation).
-- **Phase 3 : à faire** (vidéos motion design FR + NL, musique, intégration, documentation finale).
+- **Phase 3 : faite** (vidéos motion design FR + NL, musique, intégration, documentation finale).
 
 Démarrage : Remote Control activé. Le maintien du Mac éveillé (`request_keep_awake`) a été refusé par le mode automatique : la mission a continué sans.
 
@@ -24,6 +24,17 @@ Démarrage : Remote Control activé. Le maintien du Mac éveillé (`request_keep
 - Nouvelle page **Conditions de vente des toiles** (`/conditions-toiles/`, `/nl/verkoopvoorwaarden-doeken/`, lien dans le pied de page, la page Toiles et le formulaire) : pièce unique, prix et remises (tirés de `vente.ts`), pas de paiement sur le site, Belgique uniquement, emballage par Linda, transporteur de son choix et détails par e-mail, « Les conditions de retour seront précisées avant tout paiement. », droit d'auteur. Aucune règle de retour, rétractation ou garantie inventée.
 - Confidentialité : adresse de livraison (seulement pour une toile), durée (« le temps de traiter votre demande et l'envoi, puis supprimées »), stockage chez Netlify (États-Unis), sélection gardée dans le navigateur le temps de la visite. Mentions légales inchangées.
 - Formulaire `contact` : liste « Votre demande » (question, dessin numérique, toile, toile sur commande, exposition ou dépôt), toiles à cocher (pré-cochées depuis la sélection), total calculé, adresse de livraison obligatoire pour une toile (code postal belge à 4 chiffres ; « Un autre pays » bloque l'envoi avec « Les toiles sont livrées uniquement en Belgique. »), case des conditions de vente pour une toile, message pré-écrit selon le sujet (jamais par-dessus ce que le visiteur a écrit). Liens : `?toiles=a,b`, `?sujet=toile-commande&dessin=id`, `?sujet=exposition`, `?dessin=id`. Envoi en arrière-plan inchangé, repli vers Merci. Merci : « pas d'e-mail automatique, la réponse vient de Linda ». Testé (envoi simulé, rien n'est parti) : 3 toiles → « 480 € (3 toiles · remise −20 % · envoi offert) ».
+
+**Phase 3 (vidéos)** :
+- **Les deux vidéos de Linda** regardées image par image : la nouvelle (WhatsApp du 2026-10-10, 117 s) est meilleure que l'ancienne `impressions.mp4` (71 s) : toiles montrées une par une, plus près, fond calme (mur beige, canapé), moins de tremblements ; l'ancienne montre des toiles posées au sol au milieu d'objets (peluches, plantes, câbles) et bouge beaucoup. Son de la nouvelle : seulement des bruits de manipulation, retiré. **Décision** : l'ancienne est supprimée ; la nouvelle est coupée en `public/video/vraies-toiles.mp4` (49 s, 8 Mo, sans son) : pour chacune des 23 toiles, le passage le plus net et le plus stable (repéré par ordinateur), 2,5 s chacun, fondus doux. Elle est sur la page Toiles (« Les vraies toiles, filmées une à une »).
+- **Motion design** (fait par code, outils gratuits) : scène SVG animée (mur de galerie, toiles qui se peignent au pinceau, se balancent sur leur clou et reçoivent un reflet, grands coups de pinceau entre les scènes, feuilles de tilleul, poussières de lumière, étang et lotus, titres écrits lettre à lettre, sous-titres incrustés), avec **le vrai Tilleul du site** (moteur `chat.ts` inchangé, piloté par ses ordres habituels) qui arrive au bord de l'étang et regarde la toile. Rendue image par image dans Chrome, assemblée avec ffmpeg en H.264 1080p. Pas de voix.
+  - `toiles-fr.mp4` / `toiles-nl.mp4` : 39 s, 16:9, 7,7 Mo, page Toiles (« Les toiles en musique »). Titre, « Des dessins faits au doigt, imprimés sur aluminium », « Format A3, 29,7 × 42 cm. Chaque toile est unique », l'histoire d'Ostende (les trois phrases validées), Tilleul, le prix (200 €, livraison en Belgique, remises de lot), fin.
+  - `toiles-court-fr.mp4` / `toiles-court-nl.mp4` : 20 s, 9:16, 4,8 Mo, accueil (section « Aussi en grand format », texte mis à jour : 23 dessins sur aluminium A3, pièces uniques, bouton « Voir les toiles ») et réseaux.
+  - **Musique originale** composée et synthétisée par code (numpy, aucune bibliothèque sous licence) : marimba, piano doux, cordes pincées, nappe ; fa majeur, 76 BPM, grille fa – ré mineur – si bémol – do ; fondus d'entrée et de sortie ; réverbération et aigus adoucis ; son normalisé à −16 LUFS (crête −1,5 dB).
+- **Sur le site** (`src/components/Video.astro`) : affiche AVIF (repli WebP), la vidéo ne se charge qu'au clic (rien avant), lecture avec le son (le clic du visiteur), bouton « Couper le son » / « Remettre le son », sous-titres incrustés, jamais de lecture automatique.
+- **Refaire les vidéos** (si un texte, le prix ou les remises changent) : sources dans `scripts/video/` (`scene.html`, `rendu.mjs`, `musique.py`, `assembler.py`, `vraies-toiles.mjs`), mode d'emploi en tête de `rendu.mjs`. Il faut Chrome, ffmpeg, python3 avec numpy et `npm i --no-save puppeteer-core`. Rendu : environ 4 minutes par vidéo.
+- **Lighthouse** (version construite, mobile, 2026-10-11) : page Toiles FR et NL 97 / 100 / 100 / 100, accueil 99 / 100 / 100 / 100, fiche d'un dessin 99 / 100 / 100 / 100, contact 99 / 100 / 100 / 100. Deux corrections pour y arriver : les polices Gochi Hand et Itim sont préchargées dans `Base.astro` (le haut de la page Toiles changeait de hauteur quand elles arrivaient, et poussait le mur), et le dessin de Tilleul a sa hauteur (280 px) dès le premier affichage dans `Mascotte.astro` (CSS seulement, moteur inchangé).
+- En fin de mission, macOS a refusé l'accès à `~/Downloads` à cette session : `vraies-toiles.mjs` n'a pas pu être relancé depuis le dépôt (la vidéo a été faite avec les mêmes réglages, en deux passes, juste avant).
 
 ### Toiles et dessins du site (comparaison du 2026-10-11)
 
@@ -62,6 +73,7 @@ Colis plat d'environ 30 × 42 cm bien emballé, jusqu'à 2 kg, en Belgique. Sour
 - Confidentialité : la page promet que les messages sont supprimés après traitement. Il faudra le faire (Netlify → Forms), ou changer la phrase.
 - Délai des toiles sur commande : à renseigner dans `DELAI_TOILE_SUR_COMMANDE` (FR et NL) dès que Linda l'a donné.
 - La page Conditions de vente ne dit rien des retours, de la rétractation ni de la garantie (Linda ne sait pas encore) : à compléter avant tout paiement.
+- Vidéos : les regarder et les écouter en entier (FR et NL) ; la musique a été vérifiée par mesures (volume, spectre), pas à l'oreille. L'accord de Linda pour montrer ses toiles et Ostende dans les vidéos est à demander (voir ci-dessous).
 - Le formulaire envoie maintenant le sujet en clair (« Une toile », etc.) et les champs `toiles`, `total`, `rue`, `code_postal`, `localite`, `pays`, `conditions_toile` : à vérifier dans Netlify au déploiement final.
 
 ### À poser à Linda (par Claudiu, jamais dans un e-mail de questions : voir `docs/prive/emails-linda.md`)
