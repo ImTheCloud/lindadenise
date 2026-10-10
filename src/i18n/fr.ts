@@ -72,7 +72,7 @@ export const fr = {
     agrandir: 'Agrandir le dessin',
     fermer: 'Fermer',
     tri: 'Trier',
-    triLinda: 'Ordre de Linda',
+    triLinda: 'Par défaut',
     triAz: 'De A à Z',
     altDe: (t: string) => `Dessin « ${t} » de Linda Denise`,
   },

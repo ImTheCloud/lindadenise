@@ -74,7 +74,7 @@ export const nl: Dico = {
     agrandir: 'Tekening vergroten',
     fermer: 'Sluiten',
     tri: 'Sorteren',
-    triLinda: 'Volgorde van Linda',
+    triLinda: 'Standaard',
     triAz: 'Van A tot Z',
     altDe: (t: string) => `Tekening “${t}” van Linda Denise`,
   },
