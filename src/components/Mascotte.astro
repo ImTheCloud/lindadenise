@@ -68,10 +68,10 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     const etat = (e: string) => { racine.dataset.etat = e; };
 
     // Silence : Tilleul dort, ne dit plus rien et ne bouge plus tant qu'on ne le réveille pas
-    const regler = () => {
+    const regler = (coucher = true) => {
       racine.classList.toggle('silence', muet);
       corps.setAttribute('aria-label', muet ? libelleReveil : parler);
-      if (muet) etat('dort');
+      if (muet && coucher) etat('dort');
     };
     regler();
 
@@ -185,7 +185,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       window.clearTimeout(minuteurDodo);
       racine.classList.remove('sans-anim');
       taire();
-      regler();
+      regler(false);
       dire(dodo, 4500, true);
     });
 
@@ -244,7 +244,6 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
   .mascotte__silence { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; min-height: 40px; padding: 4px 14px 4px 11px; font-family: var(--titre); font-size: 1rem; line-height: 1; white-space: nowrap; color: var(--vert-fonce); background: var(--vert-creme); border: var(--trait) solid var(--vert-fonce); border-radius: 16px 9px 14px 9px / 9px 14px 9px 16px; cursor: pointer; transition: transform 0.15s, background 0.15s; }
   .mascotte__silence:hover, .mascotte__silence:focus-visible { background: var(--orange-creme); color: var(--orange-fonce); border-color: var(--orange-fonce); transform: rotate(-1.5deg); }
-  .mascotte.silence { width: clamp(84px, 9vw, 130px); }
   .mascotte.silence .mascotte__invite { display: none; }
   .mascotte.silence .mascotte__silence { display: none; }
   .mascotte.sans-anim .m-couche-pose { animation: none !important; }
