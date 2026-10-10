@@ -47,10 +47,11 @@ const ovale = (c: V, rx: number, ry = rx) => `M${f(c.x - rx)},${f(c.y)}a${f(rx)}
 // arrondis. Un seul tracé pour tout le contour : des traits superposés additionneraient leurs bords et feraient scintiller.
 const EP = 5.2;
 interface Forme { d: string; fond: string; apres?: string }
+const contourDe = (formes: Forme[], ep = EP) => `<path d="${formes.map((x) => x.d).join('')}" fill="${CONTOUR}" stroke="${CONTOUR}" stroke-width="${f(ep)}" stroke-linejoin="round"/>`;
+const remplissages = (formes: Forme[]) => formes.map((x) => `<path d="${x.d}" fill="${x.fond}"/>${x.apres ?? ''}`).join('');
 function silhouette(formes: Forme[], ep = EP, masqueContour = ''): string {
-  const contour = `<path d="${formes.map((x) => x.d).join('')}" fill="${CONTOUR}" stroke="${CONTOUR}" stroke-width="${f(ep)}" stroke-linejoin="round"/>`;
-  return (masqueContour ? `<g mask="url(#${masqueContour})">${contour}</g>` : contour)
-    + formes.map((x) => `<path d="${x.d}" fill="${x.fond}"/>${x.apres ?? ''}`).join('');
+  const contour = contourDe(formes, ep);
+  return (masqueContour ? `<g mask="url(#${masqueContour})">${contour}</g>` : contour) + remplissages(formes);
 }
 
 const mesures = (el: Element, a: Record<string, number | string>) => { for (const k in a) el.setAttribute(k, String(a[k])); };
@@ -759,9 +760,11 @@ export class Chat {
       // rien ne se voit à travers.
       const visible = z * cphi > 0;
       const sombre = 0.1 * clamp((profCorps - profondeur) / 12, 0, 1);
-      // patte arrière : son contour n'est tracé que hors du corps (elle sort de sous le ventre) ; aucun trait sur le buste
-      // qui disparaîtrait puis réapparaîtrait pendant un demi-tour
-      const dessin = visible ? silhouette(formes, EP, k < 2 ? 't-m-pattes' : 't-m-hors-corps') : silhouette(formes) + (sombre > 0.005 ? `<g fill="${CONTOUR}" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
+      // patte arrière : hors du corps, son contour est toujours tracé ; sur le buste, il est tracé comme celui des pattes
+      // avant, mais s'estompe d'un coup doux quand il passe de face (au lieu d'être balayé par le corps qui passe devant)
+      const surBuste = lisse((Math.abs(cphi) - 0.55) / 0.4);
+      const arriere = `<g opacity="${f(surBuste)}"><g mask="url(#t-m-pattes)"><g clip-path="url(#t-c-corps)">${contourDe(formes)}</g></g></g><g mask="url(#t-m-hors-corps)">${contourDe(formes)}</g>${remplissages(formes)}`;
+      const dessin = visible ? (k < 2 ? silhouette(formes, EP, 't-m-pattes') : arriere) : silhouette(formes) + (sombre > 0.005 ? `<g fill="${CONTOUR}" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
       // pattes avant et arrière traitées de la même façon : le contour s'efface vers l'attache
       return { k, profondeur, profAncre, visible, dessin, ancre: proj(add(A, { x: 0, y: -6 }), z), rayon: 24 };
     }).sort((a, b) => a.profondeur - b.profondeur);
