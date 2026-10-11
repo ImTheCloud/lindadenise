@@ -1,9 +1,11 @@
-// Tilleul, le chat du site : animé en direct, redessiné à chaque image.
+// Tilleul, le chat du site : animé en direct.
 // Le squelette vit dans le plan du profil : colonne souple, pattes à deux os qui se posent au sol sans glisser,
 // queue en chaîne de points qui suit sa forme avec un temps de retard. Le corps est un volume (une chaîne de boules) :
 // pour faire demi-tour, tout pivote autour d'un axe vertical en passant face au visiteur, rien n'est retourné d'un coup.
 // La tête a son propre petit repère 3D et se tourne vers le visiteur.
 // Repère du corps : sol à y = 0, le chat regarde vers +x, z vers son flanc proche. La tête a son centre en 0,0.
+// Le mouvement avance par pas fixes de 1/120 s ; l'image affichée est prise entre les deux derniers pas, au temps exact
+// de l'écran. Le dessin est décrit à chaque image, puis reporté sur des éléments SVG créés une seule fois.
 
 type V = { x: number; y: number };
 type V3 = { x: number; y: number; z: number };
@@ -42,19 +44,60 @@ function courbe(p: V[], fermee: boolean): string {
 
 const ovale = (c: V, rx: number, ry = rx) => `M${f(c.x - rx)},${f(c.y)}a${f(rx)},${f(ry)} 0 1 0 ${f(2 * rx)},0a${f(rx)},${f(ry)} 0 1 0 ${f(-2 * rx)},0Z`;
 
+// ---------- éléments SVG ----------
+// Le dessin est décrit à chaque image (balise, attributs, enfants), puis reporté sur des éléments créés une seule fois :
+// seuls les attributs qui ont changé sont réécrits. Un élément garde sa place d'une image à l'autre (rien ne scintille,
+// et un geste commencé sur le dessin finit sur le même élément). Une place vide (null) garde le rang des suivantes.
+type Valeur = string | number;
+interface Noeud { t: string; a: Record<string, Valeur>; c?: Enfant[]; k?: string }
+type Enfant = Noeud | null;
+const h = (t: string, a: Record<string, Valeur>, c?: Enfant[], k?: string): Noeud => ({ t, a, c, k });
+const NS = 'http://www.w3.org/2000/svg';
+const ecrits = new WeakMap<Element, Record<string, string>>(); // attributs déjà écrits sur chaque élément
+const places = new WeakMap<Element, Map<string, Element>>(); // enfants de chaque groupe, par place (ou par nom)
+
+const mesures = (el: Element, a: Record<string, Valeur>) => {
+  const vieux = ecrits.get(el) ?? {};
+  for (const k in a) { const v = String(a[k]); if (vieux[k] !== v) { el.setAttribute(k, v); vieux[k] = v; } }
+  ecrits.set(el, vieux);
+};
+
+function peindre(parent: Element, enfants: Enfant[]) {
+  const avant = places.get(parent), apres = new Map<string, Element>(), ordre: Element[] = [];
+  enfants.forEach((e, i) => {
+    if (!e) return;
+    const cle = e.k ?? i + e.t;
+    let el = avant?.get(cle);
+    if (!el || el.localName !== e.t) el = document.createElementNS(NS, e.t);
+    const vieux = ecrits.get(el), neuf: Record<string, string> = {};
+    for (const n in e.a) { const v = String(e.a[n]); neuf[n] = v; if (vieux?.[n] !== v) el.setAttribute(n, v); }
+    if (vieux) for (const n in vieux) if (!(n in neuf)) el.removeAttribute(n);
+    ecrits.set(el, neuf);
+    if (e.c || places.has(el)) peindre(el, e.c ?? []);
+    apres.set(cle, el);
+    ordre.push(el);
+  });
+  let ref = parent.firstElementChild;
+  for (const el of ordre) {
+    if (el === ref) ref = ref.nextElementSibling;
+    else parent.insertBefore(el, ref);
+  }
+  while (ref) { const suite = ref.nextElementSibling; ref.remove(); ref = suite; }
+  places.set(parent, apres);
+}
+
 // Contour : toutes les formes d'un groupe sont d'abord tracées ensemble en brun, d'un seul trait épais, puis remplies
 // par-dessus. Les traits intérieurs disparaissent sous les remplissages : il ne reste que le tour de l'ensemble, aux angles
 // arrondis. Un seul tracé pour tout le contour : des traits superposés additionneraient leurs bords et feraient scintiller.
 const EP = 5.2;
-interface Forme { d: string; fond: string; apres?: string }
-const contourDe = (formes: Forme[], ep = EP) => `<path d="${formes.map((x) => x.d).join('')}" fill="${CONTOUR}" stroke="${CONTOUR}" stroke-width="${f(ep)}" stroke-linejoin="round"/>`;
-const remplissages = (formes: Forme[]) => formes.map((x) => `<path d="${x.d}" fill="${x.fond}"/>${x.apres ?? ''}`).join('');
-function silhouette(formes: Forme[], ep = EP, masqueContour = ''): string {
+interface Forme { d: string; fond: string; apres?: Enfant[] } // « apres » : toujours le même nombre de places pour une même forme
+const contourDe = (formes: Forme[], ep = EP) => h('path', { d: formes.map((x) => x.d).join(''), fill: CONTOUR, stroke: CONTOUR, 'stroke-width': f(ep), 'stroke-linejoin': 'round' });
+const remplissages = (formes: Forme[]): Enfant[] => formes.flatMap((x) => [h('path', { d: x.d, fill: x.fond }), ...(x.apres ?? [])]);
+function silhouette(formes: Forme[], ep = EP, masqueContour = ''): Enfant[] {
   const contour = contourDe(formes, ep);
-  return (masqueContour ? `<g mask="url(#${masqueContour})">${contour}</g>` : contour) + remplissages(formes);
+  return [masqueContour ? h('g', { mask: `url(#${masqueContour})` }, [contour]) : contour, ...remplissages(formes)];
 }
 
-const mesures = (el: Element, a: Record<string, number | string>) => { for (const k in a) el.setAttribute(k, String(a[k])); };
 
 // Os épais : enveloppe de deux cercles (rayon ra en A, rb en B)
 function os(A: V, ra: number, B: V, rb: number): string {
@@ -205,17 +248,20 @@ function toilette(tt: number) {
   return { pied, langue: leche ? 0.5 + 0.5 * lick : 0, cy: lerp(-22, -11, bascule), incl: lerp(9, 15, bascule) + (essuie ? frotte * 1.5 : 0), oreille: essuie ? 8 + 8 * frotte : 0 };
 }
 
-// Marche : le pas est réglé sur la distance parcourue, le pied au sol ne glisse jamais
+// Marche : le pas est réglé sur la distance parcourue, le pied au sol ne glisse jamais.
+// Le trot (mini-jeu) garde la même mécanique, avec une foulée et une cadence plus grandes : k va de 0 (pas) à 1 (trot).
 const VMAX = 62; // unités du dessin par seconde
 const ACCEL = 140;
 const CYCLE = 70; // distance parcourue pendant un cycle de pas
 const APPUI = 0.62; // part du cycle où le pied est au sol
-const BALAYAGE = APPUI * CYCLE;
 const LEVE = 11;
-function foulee(p: number): V {
-  if (p < APPUI) return { x: lerp(BALAYAGE / 2, -BALAYAGE / 2, p / APPUI), y: 0 };
-  const q = (p - APPUI) / (1 - APPUI);
-  return { x: lerp(-BALAYAGE / 2, BALAYAGE / 2, lisse(q)), y: -LEVE * Math.sin(Math.PI * q) };
+const TROT = { vmax: 125, accel: 260, cycle: 100, appui: 0.5, leve: 16 };
+const cycle = (k: number) => lerp(CYCLE, TROT.cycle, k);
+function foulee(p: number, k: number): V {
+  const appui = lerp(APPUI, TROT.appui, k), balayage = appui * cycle(k), leve = lerp(LEVE, TROT.leve, k);
+  if (p < appui) return { x: lerp(balayage / 2, -balayage / 2, p / appui), y: 0 };
+  const q = (p - appui) / (1 - appui);
+  return { x: lerp(-balayage / 2, balayage / 2, lisse(q)), y: -leve * Math.sin(Math.PI * q) };
 }
 
 const NQ = 11; // segments de la queue
@@ -249,12 +295,12 @@ function tete(v: Visage) {
     const cen = mul(add(add(b1, b2), tp), 1 / 3);
     const bombe = (p: V, q: V) => { const mi = mix(p, q, 0.5); return add(mi, mul(sub(mi, cen), 0.16)); };
     const deFace = ((tp.x - b1.x) * (b2.y - b1.y) - (tp.y - b1.y) * (b2.x - b1.x)) * cote / (dist(b1, tp) * dist(b1, b2));
-    let apres = '';
+    let rose: Enfant = null;
     if (deFace > 0) {
       const i1 = mix(b1, cen, 0.36), i2 = mix(b2, cen, 0.36), it = mix(tp, cen, 0.24);
-      apres = `<path d="M${pt(i1)}Q${pt(bombe(i1, it))} ${pt(it)}Q${pt(bombe(it, i2))} ${pt(i2)}Z" fill="#F9B8A8" opacity="${f(clamp(deFace * 4, 0, 1))}"/>`;
+      rose = h('path', { d: `M${pt(i1)}Q${pt(bombe(i1, it))} ${pt(it)}Q${pt(bombe(it, i2))} ${pt(i2)}Z`, fill: '#F9B8A8', opacity: f(clamp(deFace * 4, 0, 1)) });
     }
-    return { d: `M${pt(b1)}Q${pt(bombe(b1, tp))} ${pt(tp)}Q${pt(bombe(tp, b2))} ${pt(b2)}Z`, fond: 'url(#t-tete)', apres };
+    return { d: `M${pt(b1)}Q${pt(bombe(b1, tp))} ${pt(tp)}Q${pt(bombe(tp, b2))} ${pt(b2)}Z`, fond: 'url(#t-tete)', apres: [rose] };
   };
   const loin = th >= 0 ? 1 : -1;
 
@@ -270,17 +316,17 @@ function tete(v: Visage) {
     { d: courbe(Array.from({ length: 40 }, (_, i) => sil((TAU * i) / 40)), true), fond: 'url(#t-tete)' },
     { d: touffes, fond: 'url(#t-tete)' },
   ];
-  let s = '';
+  const s: Enfant[] = [];
 
   // reflet du front et rayures
   const fr = surf(-0.3, -0.55);
-  if (fr.z > 0) s += `<ellipse cx="${f(fr.x)}" cy="${f(fr.y)}" rx="${f(14 * Math.max(0.2, face(-0.3)))}" ry="8" fill="#FFC27E" opacity=".45"/>`;
+  s.push(fr.z > 0 ? h('ellipse', { cx: f(fr.x), cy: f(fr.y), rx: f(14 * Math.max(0.2, face(-0.3))), ry: 8, fill: '#FFC27E', opacity: '.45' }) : null);
   let ray = '';
   for (const phi of [-0.22, 0, 0.22]) {
     const a = surf(phi, -0.98), b = surf(phi * 0.75, -0.6);
     if (b.z > 0) ray += `M${pt(a)}L${pt(b)}`;
   }
-  s += `<path d="${ray}" fill="none" stroke="#B24E12" stroke-width="3.6" stroke-linecap="round" opacity=".55"/>`;
+  s.push(h('path', { d: ray, fill: 'none', stroke: '#B24E12', 'stroke-width': 3.6, 'stroke-linecap': 'round', opacity: '.55' }));
 
   // museau crème : posé sur la sphère de la tête, il suit la rotation ; les joues roses s'effacent doucement de profil
   const creme: V[] = [];
@@ -288,81 +334,85 @@ function tete(v: Visage) {
   for (let k = 1; k < 4; k++) creme.push(surf(0.66, lerp(0.27, 1.15, k / 4)));
   for (let k = 0; k <= 8; k++) creme.push(surf(lerp(0.66, -0.66, k / 8), 1.15));
   for (let k = 1; k < 4; k++) creme.push(surf(-0.66, lerp(1.15, 0.27, k / 4)));
-  s += `<path d="${courbe(creme, true)}" fill="url(#t-creme)"/>`;
+  s.push(h('path', { d: courbe(creme, true), fill: 'url(#t-creme)' }));
   for (const cote of [-1, 1]) {
     const m = rot({ x: cote * 9.5, y: 17, z: RZ + 2 }), fs = clamp(face(cote * 0.2), 0.3, 1);
-    s += `<ellipse cx="${f(m.x)}" cy="${f(m.y)}" rx="${f(10.5 * fs)}" ry="8" fill="#FFFBF3"/>`;
-    s += [[-3, -1.5], [1, -2.5], [-1, 2]].map(([dx, dy]) => `<circle cx="${f(m.x + dx * fs)}" cy="${f(m.y + dy)}" r="1.1" fill="#C98B6A"/>`).join('');
+    s.push(h('ellipse', { cx: f(m.x), cy: f(m.y), rx: f(10.5 * fs), ry: 8, fill: '#FFFBF3' }));
+    for (const [dx, dy] of [[-3, -1.5], [1, -2.5], [-1, 2]]) s.push(h('circle', { cx: f(m.x + dx * fs), cy: f(m.y + dy), r: 1.1, fill: '#C98B6A' }));
     const j = surf(cote * 0.8, 0.24), fj = face(cote * 0.8);
-    if (fj > 0) s += `<ellipse cx="${f(j.x)}" cy="${f(j.y)}" rx="${f(9 * Math.max(0.2, fj))}" ry="5" fill="#FF8E7A" opacity="${f(0.45 * clamp(fj * 5, 0, 1))}" filter="url(#t-flou)"/>`;
+    s.push(fj > 0 ? h('ellipse', { cx: f(j.x), cy: f(j.y), rx: f(9 * Math.max(0.2, fj)), ry: 5, fill: '#FF8E7A', opacity: f(0.45 * clamp(fj * 5, 0, 1)), filter: 'url(#t-flou)' }) : null);
   }
 
   // yeux : seule la partie visible entre les paupières est peinte, posée sur un fond brun un peu plus grand,
   // pour qu'aucun bord blanc ne touche la fourrure (sinon un liseré blanc scintille quand la tête bouge).
   // Le trait du dessus suit toujours le haut de la partie visible : l'œil se ferme et s'ouvre d'un seul mouvement,
-  // sans saut. Les bords de l'œil suivent la courbe de la tête.
+  // sans saut. Les bords de l'œil suivent la courbe de la tête. Chaque œil a son groupe : ses places ne bougent pas.
   const bordTete = (q: V3) => (q.z > 0 ? clamp(q.x, -W * 0.93, W * 0.93) : Math.sign(q.x) * W * 0.93);
   for (const cote of [-1, 1]) {
+    const oeil: Enfant[] = [];
     const xg = bordTete(surf(cote * 0.43 - 0.23, 0.05)), xd = bordTete(surf(cote * 0.43 + 0.23, 0.05));
     const rx = Math.abs(xd - xg) / 2, ry = 13.5, cx = (xg + xd) / 2, cy = surf(cote * 0.43, 0.05).y, fs = rx / 11.5;
-    if (rx < 1) continue;
-    if (v.joie) {
-      s += `<path d="M${f(cx - rx)},${f(cy + 3)}Q${f(cx)},${f(cy - ry)} ${f(cx + rx)},${f(cy + 3)}" fill="none" stroke="${TRAIT_OEIL}" stroke-width="3.4" stroke-linecap="round"/>`;
-      continue;
+    if (rx >= 1 && v.joie) {
+      oeil.push(h('path', { d: `M${f(cx - rx)},${f(cy + 3)}Q${f(cx)},${f(cy - ry)} ${f(cx + rx)},${f(cy + 3)}`, fill: 'none', stroke: TRAIT_OEIL, 'stroke-width': 3.4, 'stroke-linecap': 'round' }));
+    } else if (rx >= 1) {
+      // fermeture en deux temps continus : la paupière descend jusqu'au milieu de l'œil (bord légèrement creusé),
+      // puis le trait devient une courbe d'un coin à l'autre qui se creuse jusqu'au « ‿ » du sommeil,
+      // pendant que la paupière du bas remonte à sa rencontre
+      const o = clamp(v.yeux, 0, 1), creux0 = 0.12 * ry, creuxFerme = 0.32 * ry, c0 = { x: cx, y: cy };
+      let visible: V[], haut: string;
+      if (o >= 0.5) {
+        const u = (o - 0.5) / 0.5, yh = lerp(cy, cy - ry, u), dh = rx * Math.sqrt(Math.max(0, 1 - ((yh - cy) / ry) ** 2)), creux = lerp(creux0, 0.5, u);
+        const th = Math.atan2((yh - cy) / ry, dh / rx);
+        visible = dh < 0.5 ? ovalePts(c0, rx, ry, 48) : [...arcPts({ x: cx, y: yh }, dh, creux, Math.PI, 0, 12), ...arcPts(c0, rx, ry, th, Math.PI - th, 36)];
+        haut = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(ry)} 0 0 1 ${f(cx - dh)},${f(yh)}A${f(dh)},${f(creux)} 0 0 0 ${f(cx + dh)},${f(yh)}A${f(rx)},${f(ry)} 0 0 1 ${f(cx + rx)},${f(cy)}`;
+      } else {
+        const u = o / 0.5, creuxH = lerp(creuxFerme, creux0, u), creuxB = lerp(creuxFerme, ry, u);
+        visible = [...arcPts(c0, rx, creuxH, Math.PI, 0, 20), ...arcPts(c0, rx, creuxB, 0, Math.PI, 20)];
+        haut = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(creuxH)} 0 0 0 ${f(cx + rx)},${f(cy)}`;
+      }
+      if (o > 0.02) {
+        const d = polygone(visible), dans = (forme: V[]) => polygone(couper(visible, forme));
+        const ix = cx + v.regard.x * rx * 0.3, iy = cy + 1.2 + v.regard.y * ry * 0.22;
+        // presque fermé, le blanc s'efface dans le trait sombre au lieu de rester en filet ;
+        // un œil vu de biais est rempli par l'iris (pas de filet blanc d'un pixel qui scintillerait)
+        oeil.push(h('path', { d, fill: TRAIT_OEIL, stroke: TRAIT_OEIL, 'stroke-width': 2.4, 'stroke-linejoin': 'round' }), h('g', { opacity: f(clamp((o - 0.02) / 0.18, 0, 1)) }, [
+          h('path', { d, fill: '#fff' }),
+          h('path', { d: dans(ovalePts({ x: ix, y: iy }, rx * Math.min(1.05, 0.84 + 0.35 * (1 - fs)), ry * 0.84)), fill: 'url(#t-oeil)' }),
+          h('path', { d: dans(ovalePts({ x: ix, y: iy + 0.5 }, 4.3 * fs * v.pupille, 9 + 1.5 * (v.pupille - 1))), fill: '#1B2A14' }),
+          h('path', { d: dans(ovalePts({ x: ix + 4 * fs, y: iy - 4.6 }, 3.8 * fs, 3.8, 16)), fill: '#fff' }),
+          h('path', { d: dans(ovalePts({ x: ix - 3.2 * fs, y: iy + 5 }, 1.7 * fs, 1.7, 12)), fill: '#fff', opacity: '.9' }),
+        ]));
+      } else oeil.push(null, null);
+      oeil.push(h('path', { d: `${haut}M${f(cx + cote * rx)},${f(cy)}l${f(cote * 3.5 * fs)},${f(-3.5 * fs)}`, fill: 'none', stroke: TRAIT_OEIL, 'stroke-width': 2.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
     }
-    // fermeture en deux temps continus : la paupière descend jusqu'au milieu de l'œil (bord légèrement creusé),
-    // puis le trait devient une courbe d'un coin à l'autre qui se creuse jusqu'au « ‿ » du sommeil,
-    // pendant que la paupière du bas remonte à sa rencontre
-    const o = clamp(v.yeux, 0, 1), creux0 = 0.12 * ry, creuxFerme = 0.32 * ry, c0 = { x: cx, y: cy };
-    let visible: V[], haut: string;
-    if (o >= 0.5) {
-      const u = (o - 0.5) / 0.5, yh = lerp(cy, cy - ry, u), dh = rx * Math.sqrt(Math.max(0, 1 - ((yh - cy) / ry) ** 2)), creux = lerp(creux0, 0.5, u);
-      const th = Math.atan2((yh - cy) / ry, dh / rx);
-      visible = dh < 0.5 ? ovalePts(c0, rx, ry, 48) : [...arcPts({ x: cx, y: yh }, dh, creux, Math.PI, 0, 12), ...arcPts(c0, rx, ry, th, Math.PI - th, 36)];
-      haut = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(ry)} 0 0 1 ${f(cx - dh)},${f(yh)}A${f(dh)},${f(creux)} 0 0 0 ${f(cx + dh)},${f(yh)}A${f(rx)},${f(ry)} 0 0 1 ${f(cx + rx)},${f(cy)}`;
-    } else {
-      const u = o / 0.5, creuxH = lerp(creuxFerme, creux0, u), creuxB = lerp(creuxFerme, ry, u);
-      visible = [...arcPts(c0, rx, creuxH, Math.PI, 0, 20), ...arcPts(c0, rx, creuxB, 0, Math.PI, 20)];
-      haut = `M${f(cx - rx)},${f(cy)}A${f(rx)},${f(creuxH)} 0 0 0 ${f(cx + rx)},${f(cy)}`;
-    }
-    if (o > 0.02) {
-      const d = polygone(visible), dans = (forme: V[]) => polygone(couper(visible, forme));
-      const ix = cx + v.regard.x * rx * 0.3, iy = cy + 1.2 + v.regard.y * ry * 0.22;
-      // presque fermé, le blanc s'efface dans le trait sombre au lieu de rester en filet ;
-      // un œil vu de biais est rempli par l'iris (pas de filet blanc d'un pixel qui scintillerait)
-      s += `<path d="${d}" fill="${TRAIT_OEIL}" stroke="${TRAIT_OEIL}" stroke-width="2.4" stroke-linejoin="round"/><g opacity="${f(clamp((o - 0.02) / 0.18, 0, 1))}"><path d="${d}" fill="#fff"/>`;
-      s += `<path d="${dans(ovalePts({ x: ix, y: iy }, rx * Math.min(1.05, 0.84 + 0.35 * (1 - fs)), ry * 0.84))}" fill="url(#t-oeil)"/>`;
-      s += `<path d="${dans(ovalePts({ x: ix, y: iy + 0.5 }, 4.3 * fs * v.pupille, 9 + 1.5 * (v.pupille - 1)))}" fill="#1B2A14"/>`;
-      s += `<path d="${dans(ovalePts({ x: ix + 4 * fs, y: iy - 4.6 }, 3.8 * fs, 3.8, 16))}" fill="#fff"/><path d="${dans(ovalePts({ x: ix - 3.2 * fs, y: iy + 5 }, 1.7 * fs, 1.7, 12))}" fill="#fff" opacity=".9"/></g>`;
-    }
-    s += `<path d="${haut}M${f(cx + cote * rx)},${f(cy)}l${f(cote * 3.5 * fs)},${f(-3.5 * fs)}" fill="none" stroke="${TRAIT_OEIL}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+    s.push(h('g', {}, oeil));
   }
 
   // truffe et bouche
   const cn = clamp(c, 0.45, 1);
   const n = rot({ x: 0, y: 8.5, z: RZ + 4.5 });
-  s += `<path d="M${f(n.x - 5.5 * cn)},${f(n.y - 2.5)}Q${f(n.x)},${f(n.y - 4.8)} ${f(n.x + 5.5 * cn)},${f(n.y - 2.5)}Q${f(n.x + 4 * cn)},${f(n.y + 3)} ${f(n.x)},${f(n.y + 4.5)}Q${f(n.x - 4 * cn)},${f(n.y + 3)} ${f(n.x - 5.5 * cn)},${f(n.y - 2.5)}Z" fill="#F27C8C"/>`;
-  s += `<ellipse cx="${f(n.x - 1.5 * cn)}" cy="${f(n.y - 2)}" rx="${f(1.8 * cn)}" ry="1" fill="#fff" opacity=".7"/>`;
+  s.push(h('path', { d: `M${f(n.x - 5.5 * cn)},${f(n.y - 2.5)}Q${f(n.x)},${f(n.y - 4.8)} ${f(n.x + 5.5 * cn)},${f(n.y - 2.5)}Q${f(n.x + 4 * cn)},${f(n.y + 3)} ${f(n.x)},${f(n.y + 4.5)}Q${f(n.x - 4 * cn)},${f(n.y + 3)} ${f(n.x - 5.5 * cn)},${f(n.y - 2.5)}Z`, fill: '#F27C8C' }));
+  s.push(h('ellipse', { cx: f(n.x - 1.5 * cn), cy: f(n.y - 2), rx: f(1.8 * cn), ry: 1, fill: '#fff', opacity: '.7' }));
   const m0 = rot({ x: 0, y: 13, z: RZ + 3 }), m1 = rot({ x: 0, y: 16.5, z: RZ + 2.5 });
   const mg = rot({ x: -8.5, y: 19, z: RZ }), md = rot({ x: 8.5, y: 19, z: RZ });
   const cg = rot({ x: -3.5, y: 22.5, z: RZ + 2 }), cd = rot({ x: 3.5, y: 22.5, z: RZ + 2 });
   if (v.miaou > 0) {
     const o = rot({ x: 0, y: 21, z: RZ + 1.5 }), k = clamp(v.miaou * 4, 0, 1);
-    s += `<ellipse cx="${f(o.x)}" cy="${f(o.y)}" rx="${f(6.5 * cn)}" ry="${f(6 * k)}" fill="#8A2E1B" stroke="#6B2E12" stroke-width="2.2"/>`;
-    s += `<ellipse cx="${f(o.x)}" cy="${f(o.y + 3 * k)}" rx="${f(4 * cn)}" ry="${f(2.4 * k)}" fill="#FF8A80"/>`;
-  }
+    s.push(h('ellipse', { cx: f(o.x), cy: f(o.y), rx: f(6.5 * cn), ry: f(6 * k), fill: '#8A2E1B', stroke: '#6B2E12', 'stroke-width': 2.2 }));
+    s.push(h('ellipse', { cx: f(o.x), cy: f(o.y + 3 * k), rx: f(4 * cn), ry: f(2.4 * k), fill: '#FF8A80' }));
+  } else s.push(null, null);
   if (v.baille > 0.02) {
     // bâillement : bouche grande ouverte, langue au fond
     const k = v.baille, ry = 11 * k, o = rot({ x: 0, y: 17.5 + ry, z: RZ + 1.5 });
-    s += `<ellipse cx="${f(o.x)}" cy="${f(o.y)}" rx="${f(8 * cn * (0.7 + 0.3 * k))}" ry="${f(ry)}" fill="#8A2E1B" stroke="#6B2E12" stroke-width="2.2"/>`;
-    s += `<ellipse cx="${f(o.x)}" cy="${f(o.y + ry * 0.45)}" rx="${f(5 * cn * k)}" ry="${f(ry * 0.45)}" fill="#FF8A80"/>`;
-  }
+    s.push(h('ellipse', { cx: f(o.x), cy: f(o.y), rx: f(8 * cn * (0.7 + 0.3 * k)), ry: f(ry), fill: '#8A2E1B', stroke: '#6B2E12', 'stroke-width': 2.2 }));
+    s.push(h('ellipse', { cx: f(o.x), cy: f(o.y + ry * 0.45), rx: f(5 * cn * k), ry: f(ry * 0.45), fill: '#FF8A80' }));
+  } else s.push(null, null);
   if (v.langue > 0.02) {
     // petite langue qui sort pour lécher la patte
     const o = rot({ x: 4, y: 19 + 2 * v.langue, z: RZ + 1.5 });
-    s += `<ellipse cx="${f(o.x)}" cy="${f(o.y)}" rx="${f(3.4 * cn)}" ry="${f(5 * v.langue)}" fill="#FF8A80" stroke="#C9524A" stroke-width="1.4"/>`;
-  }
-  s += `<path d="M${pt(m0)}L${pt(m1)}M${pt(mg)}Q${pt(cg)} ${pt(m1)}Q${pt(cd)} ${pt(md)}" fill="none" stroke="#6B2E12" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    s.push(h('ellipse', { cx: f(o.x), cy: f(o.y), rx: f(3.4 * cn), ry: f(5 * v.langue), fill: '#FF8A80', stroke: '#C9524A', 'stroke-width': 1.4 }));
+  } else s.push(null);
+  s.push(h('path', { d: `M${pt(m0)}L${pt(m1)}M${pt(mg)}Q${pt(cg)} ${pt(m1)}Q${pt(cd)} ${pt(md)}`, fill: 'none', stroke: '#6B2E12', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
 
   // moustaches, hors du contour
   let mo = '';
@@ -370,7 +420,7 @@ function tete(v: Visage) {
     const a = rot({ x: cote * 13, y: 15.5 + j * 3.2, z: RZ - 1 }), b = rot({ x: cote * 64, y: 15 + j * 10, z: RZ - 24 });
     mo += `M${pt(a)}Q${pt(add(mix(a, b, 0.5), { x: 0, y: -3 }))} ${pt(b)}`;
   }
-  return { formes, details: s, moustaches: `<path d="${mo}" fill="none" stroke="${CONTOUR}" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>` };
+  return { formes, details: s, moustaches: h('path', { d: mo, fill: 'none', stroke: CONTOUR, 'stroke-width': 1.6, 'stroke-linecap': 'round', opacity: '.55' }) };
 }
 
 // ---------- dessin fixe ----------
@@ -394,43 +444,100 @@ ${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" 
 
 // ---------- le chat ----------
 
-// Le décor de la page (étang, feuilles) : le chat le lit tel qu'il est à l'écran, positions en pixels de la fenêtre
-export interface FeuilleDecor { el: HTMLElement; x: number; y: number }
+// Le décor de la page (étang, feuilles), tenu à jour par decor.ts : positions en pixels de l'écran, gardées en mémoire
+// (le chat ne lit jamais la mise en page lui-même)
+export interface FeuilleDecor { el: object; x: number; y: number; op?: number; attraper?(): void }
 export interface Decor {
+  haut?(): number; // où est le haut de la bande du chat à l'écran (par défaut : collée au bas de l'écran)
   lotus(): V[];
-  decalage(): number; // de combien l'étang est remonté au-dessus du bas de l'écran (le chat l'accompagne quand on défile)
   feuilles(): FeuilleDecor[];
 }
 
-export interface Reperes { x: number; sol: number; s: number; tete: V }
+// Repères donnés à la page à chaque image, dans la bande du chat : la boîte entoure le corps et la tête (zone à toucher)
+export interface Reperes { s: number; tete: V; boite: { x: number; y: number; l: number; h: number }; haut: number }
 export interface Options {
   decor: Decor;
   libre: boolean; // page de jeu : il se promène partout (sinon seulement devant l'étang de l'accueil)
   reduit: boolean; // mouvement réduit : il reste assis, sans marcher
   dort: boolean; // il démarre endormi (silence demandé)
   toucher(): void; // le visiteur l'a touché
-  suit(r: Reperes): void; // appelé à chaque image : où il est à l'écran
+  suit(r: Reperes): void; // appelé à chaque image : où il est
 }
+export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'toilette' | 'chasse' | 'viens' | 'etang';
+export interface Precision { x?: number; vite?: boolean } // « viens » : où aller (pixels de la bande), et s'il trotte
 
-const HAUT = 280; // hauteur de la bande où il vit
+export const HAUT = 280; // hauteur de la bande où il vit
 const CALME = 2500; // ms sans geste du visiteur avant qu'il se promène
 const APPROCHE = 130; // distance (unités du dessin) à laquelle il se tapit d'une feuille
 const PORTEE = 125; // hauteur (en unités du dessin) à laquelle une feuille est à sa portée : il bondit quand elle y passe
+const PAS = 1 / 120; // pas de temps fixe du mouvement, en secondes
+const ECART_MAX = 0.1; // au-delà (gros ralentissement), le temps perdu n'est pas rattrapé : pas de bond en avant
+
+// Tout ce qu'il faut pour dessiner une image : l'état du chat à la fin d'un pas de mouvement
+interface Cliche {
+  x: number; leve: number; phi: number; proche: number; pietine: number; w: number; phase: number; t: number; trot: number;
+  p: Pose; vPieds: number[]; q: number[];
+  tour: number; regardX: number; regardY: number; oreilles: [number, number]; yeux: number; pupille: number;
+  joie: boolean; miaou: number; baille: number; langue: number; toilette: boolean; zzz: boolean;
+  coeurs: { dx: number; vie: number }[];
+}
+
+// L'image affichée tombe entre deux pas : chaque mesure est prise au bon endroit entre les deux (u de 0 à 1)
+function melanger(a: Cliche, b: Cliche, u: number): Cliche {
+  if (u > 0.9999 || Math.abs(b.x - a.x) > 60) return b; // fin de pas, ou chat déplacé d'un coup (fenêtre redimensionnée)
+  const l = (x: number, y: number) => x + (y - x) * u;
+  const ang = (x: number, y: number) => x + ecart(y - x) * u;
+  const p = {} as Pose;
+  for (const k of CLES) p[k] = l(a.p[k], b.p[k]);
+  let dp = b.phase - a.phase;
+  if (dp < -0.5) dp += 1;
+  return {
+    ...b, x: l(a.x, b.x), leve: l(a.leve, b.leve), phi: l(a.phi, b.phi), proche: l(a.proche, b.proche), pietine: l(a.pietine, b.pietine),
+    w: l(a.w, b.w), phase: (a.phase + dp * u + 1) % 1, t: l(a.t, b.t), trot: l(a.trot, b.trot), p,
+    vPieds: b.vPieds.map((v, i) => l(a.vPieds[i], v)), q: b.q.map((v, i) => ang(a.q[i], v)),
+    tour: l(a.tour, b.tour), regardX: l(a.regardX, b.regardX), regardY: l(a.regardY, b.regardY),
+    oreilles: [l(a.oreilles[0], b.oreilles[0]), l(a.oreilles[1], b.oreilles[1])], yeux: l(a.yeux, b.yeux), pupille: l(a.pupille, b.pupille),
+    miaou: l(a.miaou, b.miaou), baille: l(a.baille, b.baille), langue: l(a.langue, b.langue),
+    coeurs: a.coeurs.length === b.coeurs.length ? b.coeurs.map((c, i) => ({ dx: c.dx, vie: l(a.coeurs[i].vie, c.vie) })) : b.coeurs,
+  };
+}
+
+// Corps pour une pose : hanche, épaule, colonne, rayons du dessus et du dessous de chaque boule, normales
+function squelette(p: Pose, w: number, phase: number, t: number) {
+  const H = { x: p.hx, y: p.hy + 1.8 * w * Math.sin(TAU * 2 * phase) };
+  const S = { x: p.sx, y: p.sy + 1.8 * w * Math.sin(TAU * 2 * (phase + 0.25)) };
+  const souffle = Math.sin((t * TAU) / 3.4) * p.resp;
+  const col = colonne(H, S, p.arc + 1.2 * w * Math.sin(TAU * phase), NC);
+  const rH = col.map((_, i) => { const u = i / NC; return (u < 0.45 ? lerp(27, 23.5, lisse(u / 0.45)) : lerp(23.5, 29, lisse((u - 0.45) / 0.55))) * (1 + souffle * 0.5); });
+  const rB = col.map((_, i) => { const u = i / NC; return ((u < 0.45 ? lerp(26, 26.5, u / 0.45) : lerp(26.5, 29, lisse((u - 0.45) / 0.55))) + 3.5 * Math.sin(Math.PI * u)) * (1 + souffle); });
+  const nor = col.map((_, i) => { const a = col[Math.max(0, i - 1)], b = col[Math.min(NC, i + 1)], l = dist(a, b) || 1; return { x: (b.y - a.y) / l, y: -(b.x - a.x) / l }; });
+  // attache de la queue, sous la hanche
+  const racine = add(add(H, mul(dir(Math.atan2(H.y - S.y, H.x - S.x)), rH[0] * 0.7)), mul(nor[0], 8));
+  return { H, S, col, rH, rB, nor, racine };
+}
 
 export class Chat {
   // ce que la page peut régler
   parle = false; // sa bouche bouge pendant qu'il parle
-  retenu = false; // une bulle est ouverte : il ne part pas se promener
+  retenu = false; // une bulle est ouverte : il ne part pas se promener de lui-même (hors page de jeu)
+  // réglés aussi par la vidéo (scripts/video/scene.html)
+  x = 0;
+  cibleX = 0;
+  etat: Etat = 'assis';
   private auto: boolean;
   private fige: boolean;
   private dodo: boolean; // silence demandé : il dort tant qu'on ne le touche pas
+  private ordonne = false; // il suit un ordre du visiteur : ni la bulle ni le visiteur occupé ne l'arrêtent
+  private vite = false; // il trotte (mini-jeu)
+  private enAttente: [Ordre, Precision] | null = null; // ordre donné en plein bond, suivi à l'atterrissage
+  private actif = true; // faux quand sa bande est hors de l'écran
   private calque: SVGGElement;
   private fixes: { corps: Element; ronds: Element[]; caches: Element[] };
   private W = 0;
+  private vh = 0;
   private H = HAUT;
   private sol = 0;
   private s = 1;
-  private x = 0;
   private vx = 0;
   private sens = -1; // direction voulue
   // rotation du corps autour de l'axe vertical : 0 de profil vers la droite, π vers la gauche, π/2 face au visiteur
@@ -442,16 +549,18 @@ export class Chat {
   private vArc = 0; // vitesse de marche pendant ce demi-tour
   private coupDoeil = 0; // temps restant d'un coup d'œil vers le visiteur
   private prochainCoupDoeil = 4;
-  private etat: Etat = 'assis';
-  private cibleX = 0;
   private phase = 0;
   private attente = 0;
   private t = 0;
+  private horloge = 0; // temps affiché (s)
+  private simT = 0; // temps simulé (s), toujours un pas au plus en avance sur l'affichage
   private avant = 0;
   private dernierDessin = 0;
   private raf = 0;
+  private saut = false; // la prochaine image ne mélange pas deux pas (redimensionnement)
   private geste = -Infinity; // dernier geste du visiteur (défilement, clavier, doigt)
   private allure = new Ressort(0, 60);
+  private trot = new Ressort(0, 30);
   private r = Object.fromEntries(CLES.map((c) => [c, new Ressort(DEBOUT[c], RAIDEUR[c] ?? 32)])) as Record<Cle, Ressort>;
   private qa = Array.from({ length: NQ }, (_, i) => DEBOUT.qBase + i * DEBOUT.qCourbe);
   private qv = new Array<number>(NQ).fill(0);
@@ -471,14 +580,15 @@ export class Chat {
   private sautV = 0;
   private coeurs: { dx: number; vie: number }[] = [];
   private pointeur: V | null = null;
-  private feuille: { el: HTMLElement; x: number; y: number; op: number } | null = null; // vraie feuille du décor qu'il chasse
+  private feuille: { el: object; x: number; y: number; op: number; attraper?(): void } | null = null; // vraie feuille du décor qu'il chasse
   private chasseT = 0;
   private lotus: V | null = null; // lotus qu'il regarde, assis au bord de l'étang
   private pupille = new Ressort(1, 60);
   private bondDe = 0;
   private bondA = 0;
   private bondT = 0;
-  private tete: V = { x: 0, y: 0 };
+  private c0!: Cliche; // avant-dernier pas
+  private c1!: Cliche; // dernier pas
 
   constructor(private scene: SVGSVGElement, private o: Options) {
     scene.innerHTML = `${DEFS}<g class="t-dessin"></g>`;
@@ -491,12 +601,11 @@ export class Chat {
     this.mesurer();
     this.x = this.W - 120 * this.s;
     this.cibleX = this.x;
-    addEventListener('resize', () => { this.mesurer(); if (this.fige) this.stabiliser(); });
+    addEventListener('resize', () => { this.mesurer(); this.saut = true; if (this.fige) this.stabiliser(); });
     const suivre = (e: PointerEvent) => { this.pointeur = { x: e.clientX, y: e.clientY - this.haut }; };
     addEventListener('pointermove', suivre, { passive: true });
     addEventListener('pointerdown', suivre, { passive: true });
-    // seul le chat réagit au doigt ; défilement, clavier et doigt posé disent au chat que le visiteur est occupé
-    scene.addEventListener('pointerdown', (e) => { if ((e.target as Element).closest('.t-chat')) this.caresse(); });
+    // défilement, clavier et doigt posé disent au chat que le visiteur est occupé
     for (const nom of ['scroll', 'wheel', 'keydown', 'touchstart']) addEventListener(nom, () => { this.geste = performance.now(); }, { passive: true });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) this.lancer(); });
     if (o.dort) { this.etat = 'dort'; this.attente = 15; }
@@ -508,6 +617,12 @@ export class Chat {
 
   get dort() {
     return this.etat === 'dort' || this.etat === 'baille' || this.etat === 'couche';
+  }
+
+  // Sa bande est sortie de l'écran (accueil défilé) : plus rien ne tourne jusqu'à son retour
+  veille(cache: boolean) {
+    this.actif = !cache;
+    this.lancer();
   }
 
   // Silence demandé : il se couche, bâille, s'endort et reste endormi
@@ -547,14 +662,39 @@ export class Chat {
     this.sautV = 300;
   }
 
-  private decal = 0;
+  // Ordres du visiteur : ils passent avant le pilote automatique et avant la bulle ouverte. En plein bond, l'ordre attend
+  // l'atterrissage. Un ordre impossible (rien à chasser, pas d'étang) est dit par un petit miaou, la tête vers le visiteur.
+  ordre(o: Ordre, q: Precision = {}) {
+    if (this.etat === 'bond') { this.enAttente = [o, q]; return true; }
+    const ok = this.executer(o, q);
+    if (!ok && !this.fige) { this.miaou = 0.6; this.coupDoeil = 1.6; }
+    return ok;
+  }
+
+  private executer(o: Ordre, q: Precision) {
+    this.dodo = false;
+    this.feuille = null;
+    this.lotus = null;
+    this.ordonne = true;
+    this.vite = !!q.vite;
+    let ok = true;
+    if (o === 'marche') this.marcher();
+    else if (o === 'viens') { this.cibleX = this.dansEcran(q.x ?? this.x); this.etat = 'marche'; }
+    else if (o === 'chasse') ok = this.chasserUneFeuille();
+    else if (o === 'etang') ok = this.allerAuLotus();
+    else if (o === 'dort') this.dormir();
+    else { this.mettre(o); this.attente = 25; }
+    if (!ok) this.ordonne = this.vite = false;
+    if (this.fige) { if (o === 'dort') this.mettre('dort'); else if (this.etat === 'marche') this.mettre('assis'); this.stabiliser(); }
+    return ok;
+  }
 
   private get haut() {
-    return innerHeight - this.H - this.decal;
+    return this.o.decor.haut?.() ?? this.vh - this.H;
   }
 
   private lancer() {
-    if (this.fige || this.raf) return;
+    if (this.fige || this.raf || !this.actif) return;
     this.avant = 0;
     this.raf = requestAnimationFrame((t) => this.boucle(t));
   }
@@ -566,15 +706,14 @@ export class Chat {
 
   // On laisse les ressorts (queue, tête) se stabiliser, puis on dessine une seule image : au démarrage, ou en mouvement réduit
   private stabiliser() {
-    let svg = '';
-    for (let i = 0; i < 90; i++) svg = this.image(1 / 30);
-    this.calque.innerHTML = svg;
-    this.o.suit({ x: this.x, sol: this.haut + this.sol, s: this.s, tete: { x: this.tete.x, y: this.haut + this.tete.y } });
+    for (let i = 0; i < 90; i++) this.pas(1 / 30);
+    this.c0 = this.c1;
+    this.dessiner(this.c1);
   }
 
   private chasser(f: FeuilleDecor) {
     this.lotus = null;
-    this.feuille = { el: f.el, x: f.x, y: f.y - this.haut, op: 1 };
+    this.feuille = { el: f.el, x: f.x, y: f.y - this.haut, op: 1, attraper: f.attraper };
     this.chasseT = 0;
     const d = Math.sign(f.x - this.x) || 1;
     this.cibleX = this.dansEcran(f.x - d * APPROCHE * this.s);
@@ -584,6 +723,7 @@ export class Chat {
 
   private abandonner() {
     this.feuille = null;
+    this.ordonne = this.vite = false;
     if (this.etat === 'marche') this.cibleX = this.x;
     else if (this.etat === 'guette') this.mettre('assis');
   }
@@ -595,17 +735,16 @@ export class Chat {
     this.mettre('bond');
   }
 
-  // Attrapée : la feuille disparaît du décor jusqu'à son prochain passage
+  // Attrapée : la feuille quitte le décor (decor.ts dit comment)
   private attraper() {
-    const el = this.feuille?.el;
+    const fe = this.feuille;
     this.feuille = null;
-    if (!el) return;
-    el.style.visibility = 'hidden';
-    el.addEventListener('animationiteration', () => { el.style.visibility = ''; }, { once: true });
+    fe?.attraper?.();
   }
 
   private mesurer() {
-    this.W = innerWidth;
+    this.W = document.documentElement.clientWidth || innerWidth;
+    this.vh = innerHeight;
     this.s = clamp(this.W / 1150, 0.72, 1.05);
     this.H = HAUT;
     this.sol = this.H - 4;
@@ -632,22 +771,14 @@ export class Chat {
     else this.mettre('assis');
   }
 
-  // Ordres de la page de jeu
-  ordre(o: 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'toilette' | 'chasse') {
-    this.dodo = false;
-    this.feuille = null;
-    this.lotus = null;
-    if (o === 'marche') this.marcher();
-    else if (o === 'chasse') this.chasserUneFeuille();
-    else if (o === 'dort') this.dormir();
-    else { this.mettre(o); this.attente = 25; }
-    if (this.fige) { if (o === 'dort') this.mettre('dort'); else if (this.etat === 'marche') this.mettre('assis'); this.stabiliser(); }
-  }
-
   private marcher() {
     this.lotus = null;
     let x = this.x;
-    if (this.W < 700) {
+    if (this.o.libre) {
+      // page de jeu : une vraie promenade, vers l'autre côté de l'écran
+      const bord = 70 * this.s + Math.random() * this.W * 0.12;
+      x = this.x < this.W / 2 ? this.W - bord : bord;
+    } else if (this.W < 700) {
       // sur téléphone : de courtes promenades
       const d = (Math.random() < 0.5 ? -1 : 1) * lerp(0.12, 0.3, Math.random()) * this.W;
       x = this.dansEcran(this.x + d);
@@ -665,19 +796,23 @@ export class Chat {
     return clamp(x, 70 * this.s, this.W - 70 * this.s);
   }
 
-  // Une feuille du décor est assez haute pour qu'il ait le temps de la guetter : il va se placer et se tapir
+  // Une feuille du décor est assez haute pour qu'il ait le temps de la guetter : il va se placer et se tapir.
+  // Sur la page de jeu, il trotte vers une feuille lointaine.
   private chasserUneFeuille() {
     if (!this.o.libre && !this.o.decor.lotus().length) return false;
     const portee = this.haut + this.sol - PORTEE * this.s;
-    const chute = 0.055 * innerHeight; // vitesse de chute des feuilles, en pixels par seconde
+    const chute = 0.055 * this.vh; // vitesse de chute des feuilles, en pixels par seconde
+    const loin = (l: FeuilleDecor) => Math.max(0, Math.abs(l.x - this.x) - APPROCHE * this.s);
+    const vitesse = (l: FeuilleDecor) => (this.o.libre && loin(l) > 250 ? TROT.vmax : VMAX) * this.s;
     const f = this.o.decor.feuilles()
       .filter((l) => {
         // elle doit être encore assez haute quand il sera en place : trajet, demi-tour et affût
-        const delai = Math.max(0, Math.abs(l.x - this.x) - APPROCHE * this.s) / (VMAX * this.s) + 3;
-        return l.y > 0 && l.y + chute * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
+        const delai = loin(l) / vitesse(l) + 3;
+        return (l.op ?? 1) > 0.5 && l.y > 0 && l.y + chute * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
       })
       .sort((a, b) => b.y - a.y)[0];
     if (!f) return false;
+    this.vite = this.o.libre && loin(f) > 250;
     this.chasser(f);
     return true;
   }
@@ -696,11 +831,12 @@ export class Chat {
 
   // Pilote automatique : une petite vie de chat. Quand le visiteur est occupé, il reste tranquille.
   private suivant() {
+    this.ordonne = this.vite = false;
     if (this.dodo) {
       this.mettre(this.etat === 'couche' ? 'baille' : this.etat === 'baille' || this.etat === 'dort' ? 'dort' : 'couche');
       return;
     }
-    if (this.retenu || !this.calme()) {
+    if ((this.retenu && !this.o.libre) || !this.calme()) {
       if (this.etat === 'dort') this.mettre('etire');
       else if (this.etat !== 'couche') this.mettre('assis');
       else this.mettre('baille');
@@ -719,45 +855,58 @@ export class Chat {
     }
   }
 
+  // Arrivé là où il allait : il se tapit (feuille), s'assoit (lotus) ou reste debout ; après un ordre, il reste un moment
+  private arrivee() {
+    this.vx = 0;
+    this.vite = false;
+    this.mettre(this.feuille ? 'guette' : this.lotus ? 'assis' : 'debout');
+    if (this.lotus) this.attente = lerp(9, 15, Math.random());
+    if (this.ordonne && !this.feuille) { this.attente = Math.max(this.attente, 6); this.ordonne = false; }
+  }
+
   private faireDesCoeurs() {
     for (let i = 0; i < 4; i++) this.coeurs.push({ dx: (Math.random() - 0.5) * 70, vie: 1 + i * 0.12 });
   }
 
+  // Une image : le mouvement avance par pas fixes jusqu'au temps de l'écran (sans rattraper un long arrêt),
+  // puis l'image est dessinée entre les deux derniers pas
   private boucle(t: number) {
     this.raf = 0;
-    if (document.hidden) return; // onglet caché : plus rien ne tourne (visibilitychange relance)
+    if (document.hidden || !this.actif) return; // onglet caché ou bande hors de l'écran : plus rien ne tourne
     // endormi, il est redessiné quinze fois par seconde seulement
     const dormant = this.etat === 'dort' && this.r.yeux.x < 0.05;
     if (!(dormant && t - this.dernierDessin < 66)) {
-      const dt = Math.min(dormant ? 0.07 : 1 / 30, (t - (this.avant || t)) / 1000);
+      this.horloge += this.avant ? Math.min(ECART_MAX, (t - this.avant) / 1000) : 0;
       this.avant = t;
       this.dernierDessin = t;
-      this.calque.innerHTML = this.image(dt);
-      this.o.suit({ x: this.x, sol: this.haut + this.sol, s: this.s, tete: { x: this.tete.x, y: this.haut + this.tete.y } });
+      while (this.simT < this.horloge - 1e-6) { this.pas(PAS); this.simT += PAS; }
+      this.dessiner(this.saut ? this.c1 : melanger(this.c0, this.c1, 1 - (this.simT - this.horloge) / PAS));
+      this.saut = false;
     }
     this.raf = requestAnimationFrame((u) => this.boucle(u));
   }
 
-  private image(dt: number): string {
+  // Un pas de mouvement : déplacement, pose, queue, regard, petites habitudes. Rien n'est dessiné ici.
+  private pas(dt: number) {
     const s = this.s;
     this.t += dt;
-    // sur l'accueil, il vit sur le bord de l'étang : quand on défile, il monte avec lui et sort de l'écran
-    const decal = Math.round(this.o.decor.decalage());
-    if (decal !== this.decal) { this.decal = decal; this.scene.style.transform = decal ? `translateY(${-decal}px)` : ''; }
     const cap = Math.cos(this.phi) >= 0 ? 1 : -1; // côté vers lequel le corps est tourné
+    const libre = this.o.libre || this.ordonne;
+    const k = this.trot.pas(this.vite ? 1 : 0, dt);
+    const vmax = lerp(VMAX, TROT.vmax, k), accel = lerp(ACCEL, TROT.accel, k);
 
     // déplacement : il freine pour s'arrêter pile ; pendant un demi-tour en marchant, sa vitesse suit son orientation
     if (this.etat === 'marche') {
-      // le visiteur défile ou tape : il s'arrête là où il est (une bulle ouverte le retient aussi)
-      if ((this.retenu || !this.calme()) && this.cibleX !== this.x && this.etat === 'marche') { this.feuille = null; this.lotus = null; this.cibleX = this.x; }
+      // le visiteur défile ou tape : il s'arrête là où il est (une bulle ouverte le retient aussi), sauf s'il suit un ordre
+      if (!libre && (this.retenu || !this.calme()) && this.cibleX !== this.x) { this.feuille = null; this.lotus = null; this.cibleX = this.x; }
       const d = this.cibleX - this.x;
       if (Math.abs(d) > 4 && Math.sign(d) !== this.sens) this.sens = Math.sign(d);
       if (this.retour >= 0 && this.enArc) this.vx = this.vArc * Math.cos(this.phi);
       else {
         const tourne = this.retour >= 0 || cap !== this.sens;
-        const voulu = tourne ? 0 : this.sens * Math.min(VMAX, Math.sqrt(2 * ACCEL * Math.max(0, Math.abs(d) / s - 1)));
-        this.vx += clamp(voulu - this.vx, -ACCEL * dt, ACCEL * dt);
-        if (!tourne && Math.abs(d) < 3 && Math.abs(this.vx) < 6) { this.vx = 0; this.mettre(this.feuille ? 'guette' : this.lotus ? 'assis' : 'debout'); if (this.lotus) this.attente = lerp(9, 15, Math.random()); }
+        const voulu = tourne ? 0 : this.sens * Math.min(vmax, Math.sqrt(2 * accel * Math.max(0, Math.abs(d) / s - 1)));
+        this.vx += clamp(voulu - this.vx, -accel * dt, accel * dt);
+        if (!tourne && Math.abs(d) < 3 && Math.abs(this.vx) < 6) this.arrivee();
       }
     } else {
       this.vx += clamp(-this.vx, -2 * ACCEL * dt, 2 * ACCEL * dt);
@@ -781,6 +930,8 @@ export class Chat {
           this.joie = 1.6;
           this.faireDesCoeurs();
           this.mettre('assis');
+          this.ordonne = false;
+          if (this.enAttente) { const [o, q] = this.enAttente; this.enAttente = null; this.ordre(o, q); }
         }
       } else if ((this.auto || this.dodo) && this.attente <= 0) this.suivant();
     }
@@ -789,12 +940,11 @@ export class Chat {
     // la vraie feuille du décor : il la suit des yeux ; si elle est perdue, il y renonce
     const fe = this.feuille;
     if (fe) {
-      const r = fe.el.getBoundingClientRect();
-      fe.x = r.left + r.width / 2;
-      fe.y = r.top + r.height / 2 - this.haut;
-      fe.op = Number(getComputedStyle(fe.el).opacity);
+      const l = this.o.decor.feuilles().find((x) => x.el === fe.el);
+      if (l) { fe.x = l.x; fe.y = l.y - this.haut; fe.op = l.op ?? 1; }
+      else fe.op = 0;
       this.chasseT += dt;
-      if (this.etat !== 'bond' && (fe.op < 0.3 || fe.y > this.sol + 10 || this.chasseT > 30 || this.retenu || !this.calme())) this.abandonner();
+      if (this.etat !== 'bond' && (fe.op < 0.3 || fe.y > this.sol + 10 || this.chasseT > 30 || (!libre && (this.retenu || !this.calme())))) this.abandonner();
     }
 
     // saut de joie
@@ -829,10 +979,8 @@ export class Chat {
       if (u >= 1) this.retour = -1;
     }
     const sv = s * (1 + 0.07 * proche); // de face, au milieu de l'arc, il est un peu plus près
-    const cphi = Math.cos(this.phi), sphi = Math.sin(this.phi);
-    // projection à l'écran et profondeur (positive = plus près du visiteur) d'un point du profil, décalé de z vers le flanc proche
-    const proj = (q: V, z = 0): V => ({ x: q.x * cphi - z * sphi, y: q.y });
-    const prof = (q: V, z = 0) => q.x * sphi + z * cphi;
+    const cphi = Math.cos(this.phi);
+    const proj = (q: V): V => ({ x: q.x * cphi, y: q.y });
 
     // pose : chaque réglage glisse vers celui de l'état voulu
     let cible: Pose = POSES[this.etat];
@@ -851,67 +999,36 @@ export class Chat {
     }
     const vit = this.retour >= 0 && this.enArc && this.etat === 'marche' ? this.vArc : Math.abs(this.vx);
     const w = this.allure.pas(clamp((vit / VMAX) * 1.4, 0, 1), dt);
-    this.phase = (this.phase + (vit * dt) / CYCLE + pietine * dt * 1.6) % 1;
-    const hauteurPas = Math.max(w, pietine * 0.8);
-
-    // corps : une chaîne de boules le long de la colonne (de profil un boudin, de face une boule)
-    const H = { x: p.hx, y: p.hy + 1.8 * w * Math.sin(TAU * 2 * this.phase) };
-    const S = { x: p.sx, y: p.sy + 1.8 * w * Math.sin(TAU * 2 * (this.phase + 0.25)) };
-    const souffle = Math.sin((this.t * TAU) / 3.4) * p.resp;
-    const col = colonne(H, S, p.arc + 1.2 * w * Math.sin(TAU * this.phase), NC);
-    const rH = col.map((_, i) => { const t = i / NC; return (t < 0.45 ? lerp(27, 23.5, lisse(t / 0.45)) : lerp(23.5, 29, lisse((t - 0.45) / 0.55))) * (1 + souffle * 0.5); });
-    const rB = col.map((_, i) => { const t = i / NC; return ((t < 0.45 ? lerp(26, 26.5, t / 0.45) : lerp(26.5, 29, lisse((t - 0.45) / 0.55))) + 3.5 * Math.sin(Math.PI * t)) * (1 + souffle); });
-    const nor = col.map((_, i) => { const a = col[Math.max(0, i - 1)], b = col[Math.min(NC, i + 1)], l = dist(a, b) || 1; return { x: (b.y - a.y) / l, y: -(b.x - a.x) / l }; });
-    const boules = col.map((c, i) => ({ c: sub(c, mul(nor[i], (rB[i] - rH[i]) / 2)), r: (rH[i] + rB[i]) / 2 }));
-    const vues3d = boules.map((b) => ({ c: proj(b.c), r: b.r }));
-    const contourCorps = enveloppe(vues3d, vues3d[NC / 2].c), dCorps = courbe(contourCorps, true);
-
-    // pattes : la marche décale les pieds, un pied qui se déplace hors de la marche se lève un peu
-    const pied = (x: number, y: number, o: number, rv: Ressort): V => {
-      const g = foulee((this.phase + o) % 1);
-      return { x: x + g.x * w, y: Math.min(-7, y + g.y * hauteurPas - Math.min(9, Math.abs(rv.v) * 0.12)) };
-    };
-    const ancreAv = add(S, { x: -2, y: 9 }), ancreAr = add(H, { x: 5, y: 6 });
-    const pattes = [
-      { j: patte(ancreAv, pied(p.avX, p.avY, 0.25, this.r.avX), 26, 26, 1), z: FLANC, r: [12, 9.5, 9] },
-      { j: patte(add(ancreAv, { x: 4, y: -2 }), pied(p.av2X, p.av2Y, 0.75, this.r.av2X), 26, 26, 1), z: -FLANC, r: [11.5, 9, 8.6] },
-      { j: patte(ancreAr, pied(p.arX, p.arY, 0, this.r.arX), 22, 27, -1), z: FLANC, r: [12, 9.5, 9] },
-      { j: patte(add(ancreAr, { x: 4, y: -2 }), pied(p.ar2X, p.arY, 0.5, this.r.ar2X), 22, 27, -1), z: -FLANC, r: [11.5, 9, 8.6] },
-    ];
+    this.phase = (this.phase + (vit * dt) / cycle(k) + pietine * dt * 1.6) % 1;
+    const { S, racine } = squelette(p, w, this.phase, this.t);
 
     // queue : chaque segment suit le précédent avec un temps de retard (ressorts d'angle) ;
-    // un segment qui touche le sol s'y couche du côté où il était à l'image précédente, sans jamais basculer
+    // un segment qui touche le sol s'y couche du côté où il était au pas précédent, sans jamais basculer
     const om = this.etat === 'marche' ? TAU * 1.5 : this.etat === 'guette' ? TAU * 2.2 : TAU / 2.6;
     for (let i = 0; i < NQ; i++) {
       let c = i === 0 ? this.qa[0] + ecart(p.qBase - this.qa[0]) : this.qa[i - 1] + p.qCourbe;
       c += p.qVague * Math.sin(this.t * om - i * 0.55) * (i === 0 ? 0.5 : 1);
-      const k = lerp(150, 55, i / (NQ - 1));
-      this.qv[i] += (k * (c - this.qa[i]) - 1.5 * Math.sqrt(k) * this.qv[i]) * dt;
+      const kq = lerp(150, 55, i / (NQ - 1));
+      this.qv[i] += (kq * (c - this.qa[i]) - 1.5 * Math.sqrt(kq) * this.qv[i]) * dt;
       this.qa[i] += this.qv[i] * dt;
     }
-    const racine = add(add(H, mul(dir(Math.atan2(H.y - S.y, H.x - S.x)), rH[0] * 0.7)), mul(nor[0], 8));
-    const pos: V[] = [racine];
+    let bout = racine;
     for (let i = 0; i < NQ; i++) {
       let a = this.qa[i];
-      if (pos[i].y + Math.sin(a) * LQ > -6.5) {
-        const a1 = Math.asin(clamp((-6.5 - pos[i].y) / LQ, -1, 1)), a2 = Math.PI - a1, avant = this.qRendu[i];
+      if (bout.y + Math.sin(a) * LQ > -6.5) {
+        const a1 = Math.asin(clamp((-6.5 - bout.y) / LQ, -1, 1)), a2 = Math.PI - a1, avant = this.qRendu[i];
         a = Math.abs(ecart(a1 - avant)) <= Math.abs(ecart(a2 - avant)) ? a1 : a2;
         a = this.qa[i] + ecart(a - this.qa[i]);
         this.qa[i] = a;
         this.qv[i] *= 0.6;
       }
       this.qRendu[i] = a;
-      pos.push(add(pos[i], mul(dir(a), LQ)));
+      bout = add(bout, mul(dir(a), LQ));
     }
-    const qp = pos.map((q) => proj(q));
-    const tq = tube(qp, qp.map((_, i) => lerp(8.5, 6.2, i / NQ)));
-    const dQueue = courbe(tq.contour, true);
 
     // tête : regarde le visiteur ; pendant un demi-tour elle regarde déjà vers la nouvelle direction
-    const teteC = add(S, { x: p.cx, y: p.cy + 1.3 * w * Math.sin(TAU * 2 * (this.phase + 0.1)) });
-    const tc = proj(teteC);
+    const tc = proj(add(S, { x: p.cx, y: p.cy + 1.3 * w * Math.sin(TAU * 2 * (this.phase + 0.1)) }));
     const teteMonde = { x: this.x + tc.x * sv, y: this.sol - leve + tc.y * sv };
-    this.tete = teteMonde;
     // regard : devant lui la plupart du temps ; de temps en temps (et quand on le caresse),
     // un coup d'œil vers le visiteur, ou vers le pointeur s'il y en a un
     this.prochainCoupDoeil -= dt;
@@ -954,13 +1071,66 @@ export class Chat {
     for (const c of this.coeurs) c.vie -= dt / 1.6;
     this.coeurs = this.coeurs.filter((c) => c.vie > 0);
 
+    this.c0 = this.c1;
+    this.c1 = {
+      x: this.x, leve, phi: this.phi, proche, pietine, w, phase: this.phase, t: this.t, trot: k, p,
+      vPieds: [this.r.avX.v, this.r.av2X.v, this.r.arX.v, this.r.ar2X.v], q: [...this.qRendu],
+      tour: this.tour.x, regardX: this.regardX.x, regardY: this.regardY.x, oreilles, yeux: clamp(p.yeux, 0, 1) * paupiere,
+      pupille: this.pupille.pas(this.feuille && !this.dort ? 1.7 : 1, dt), joie: this.joie > 0 || baille > 0.2,
+      miaou: this.parle ? 0.05 + 0.2 * Math.abs(Math.sin(this.t * 9)) : this.miaou, baille, langue: gesteToilette?.langue ?? 0,
+      toilette: !!gesteToilette, zzz: this.etat === 'dort' && p.yeux < 0.05, coeurs: this.coeurs.map((c) => ({ ...c })),
+    };
+  }
+
+  // Le dessin d'une image, reporté sur les éléments SVG existants
+  private dessiner(c: Cliche) {
+    const s = this.s, p = c.p, w = c.w, leve = c.leve;
+    const cap = Math.cos(c.phi) >= 0 ? 1 : -1;
+    const sv = s * (1 + 0.07 * c.proche);
+    const cphi = Math.cos(c.phi), sphi = Math.sin(c.phi);
+    // projection à l'écran et profondeur (positive = plus près du visiteur) d'un point du profil, décalé de z vers le flanc proche
+    const proj = (q: V, z = 0): V => ({ x: q.x * cphi - z * sphi, y: q.y });
+    const prof = (q: V, z = 0) => q.x * sphi + z * cphi;
+    const hauteurPas = Math.max(w, c.pietine * 0.8);
+
+    // corps : une chaîne de boules le long de la colonne (de profil un boudin, de face une boule)
+    const { H, S, col, rH, rB, nor, racine } = squelette(p, w, c.phase, c.t);
+    const boules = col.map((q, i) => ({ c: sub(q, mul(nor[i], (rB[i] - rH[i]) / 2)), r: (rH[i] + rB[i]) / 2 }));
+    const vues3d = boules.map((b) => ({ c: proj(b.c), r: b.r }));
+    const contourCorps = enveloppe(vues3d, vues3d[NC / 2].c), dCorps = courbe(contourCorps, true);
+
+    // pattes : la marche décale les pieds, un pied qui se déplace hors de la marche se lève un peu
+    const pied = (x: number, y: number, o: number, v: number): V => {
+      const g = foulee((c.phase + o) % 1, c.trot);
+      return { x: x + g.x * w, y: Math.min(-7, y + g.y * hauteurPas - Math.min(9, Math.abs(v) * 0.12)) };
+    };
+    const ancreAv = add(S, { x: -2, y: 9 }), ancreAr = add(H, { x: 5, y: 6 });
+    const pattes = [
+      { j: patte(ancreAv, pied(p.avX, p.avY, 0.25, c.vPieds[0]), 26, 26, 1), z: FLANC, r: [12, 9.5, 9] },
+      { j: patte(add(ancreAv, { x: 4, y: -2 }), pied(p.av2X, p.av2Y, 0.75, c.vPieds[1]), 26, 26, 1), z: -FLANC, r: [11.5, 9, 8.6] },
+      { j: patte(ancreAr, pied(p.arX, p.arY, 0, c.vPieds[2]), 22, 27, -1), z: FLANC, r: [12, 9.5, 9] },
+      { j: patte(add(ancreAr, { x: 4, y: -2 }), pied(p.ar2X, p.arY, 0.5, c.vPieds[3]), 22, 27, -1), z: -FLANC, r: [11.5, 9, 8.6] },
+    ];
+
+    // queue
+    const pos: V[] = [racine];
+    for (let i = 0; i < NQ; i++) pos.push(add(pos[i], mul(dir(c.q[i]), LQ)));
+    const qp = pos.map((q) => proj(q));
+    const tq = tube(qp, qp.map((_, i) => lerp(8.5, 6.2, i / NQ)));
+    const dQueue = courbe(tq.contour, true);
+
+    // tête
+    const teteC = add(S, { x: p.cx, y: p.cy + 1.3 * w * Math.sin(TAU * 2 * (c.phase + 0.1)) });
+    const tc = proj(teteC);
+    const teteMonde = { x: c.x + tc.x * sv, y: this.sol - leve + tc.y * sv };
+
     // ---------- dessin ----------
     mesures(this.fixes.corps, { d: dCorps });
 
     // ombre au sol
     const milieu = proj(mix(H, S, 0.5)), ombre = 1 - Math.min(0.45, leve / 160);
     const largeurOmbre = Math.hypot(((S.x - H.x) / 2 + 42) * cphi, 36 * sphi) * ombre;
-    let svg = `<ellipse cx="${f(this.x + milieu.x * sv)}" cy="${f(this.sol - 1)}" rx="${f(largeurOmbre * sv)}" ry="${f(6.5 * sv)}" fill="#2B6E3A" opacity=".18" filter="url(#t-flou-ombre)"/>`;
+    const dOmbre = h('ellipse', { cx: f(c.x + milieu.x * sv), cy: f(this.sol - 1), rx: f(largeurOmbre * sv), ry: f(6.5 * sv), fill: '#2B6E3A', opacity: '.18', filter: 'url(#t-flou-ombre)' });
 
     // une patte, projetée ; plus elle est loin derrière le corps, plus elle est sombre
     const profCorps = prof(mix(H, S, 0.5));
@@ -970,11 +1140,11 @@ export class Chat {
       // sur un même côté, la patte avant passe devant la patte arrière
       const profondeur = prof(mix(A, P, 0.5), z) + (k < 2 ? 0.01 : 0), profAncre = prof(A, z);
       const doigts = [proj({ x: P.x + 3, y: P.y + 2 }, z - 3), proj({ x: P.x + 7, y: P.y + 1 }, z + 3)];
-      const pied = proj({ x: P.x + 3, y: P.y }, z), rxPied = Math.hypot(10.5 * cphi, 8 * sphi);
+      const piedV = proj({ x: P.x + 3, y: P.y }, z), rxPied = Math.hypot(10.5 * cphi, 8 * sphi);
       const formes: Forme[] = [
         { d: os(a, r1, jj, r2), fond: 'url(#t-pelage)' },
-        { d: os(jj, r2, pp, r3), fond: 'url(#t-pelage)', apres: `<path d="${os(mix(pp, jj, 0.42), r3, pp, r3)}" fill="url(#t-creme)"/>` },
-        { d: ovale(pied, rxPied, 7.2), fond: '#FFF3E2', apres: `<path d="${doigts.map((q) => `M${pt(q)}v4.5`).join('')}" stroke="${CONTOUR}" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>` },
+        { d: os(jj, r2, pp, r3), fond: 'url(#t-pelage)', apres: [h('path', { d: os(mix(pp, jj, 0.42), r3, pp, r3), fill: 'url(#t-creme)' })] },
+        { d: ovale(piedV, rxPied, 7.2), fond: '#FFF3E2', apres: [h('path', { d: doigts.map((q) => `M${pt(q)}v4.5`).join(''), stroke: CONTOUR, 'stroke-width': 1.8, 'stroke-linecap': 'round', opacity: '.5' })] },
       ];
       // une patte reste du côté où elle est attachée : celles du côté caché passent derrière le corps (plus sombres),
       // celles du côté visible devant. Devant, la patte est opaque et seul son contour s'efface vers l'attache :
@@ -984,8 +1154,14 @@ export class Chat {
       // patte arrière : hors du corps, son contour est toujours tracé ; sur le buste, il est tracé comme celui des pattes
       // avant, mais s'estompe d'un coup doux quand il passe de face (au lieu d'être balayé par le corps qui passe devant)
       const surBuste = lisse((Math.abs(cphi) - 0.55) / 0.4);
-      const arriere = `<g opacity="${f(surBuste)}"><g mask="url(#t-m-pattes)"><g clip-path="url(#t-c-corps)">${contourDe(formes)}</g></g></g><g mask="url(#t-m-hors-corps)">${contourDe(formes)}</g>${remplissages(formes)}`;
-      const dessin = visible ? (k < 2 ? silhouette(formes, EP, 't-m-pattes') : arriere) : silhouette(formes) + (sombre > 0.005 ? `<g fill="${CONTOUR}" opacity="${sombre.toFixed(3)}">${formes.map((x) => `<path d="${x.d}"/>`).join('')}</g>` : '');
+      const arriere = (): Enfant[] => [
+        h('g', { opacity: f(surBuste) }, [h('g', { mask: 'url(#t-m-pattes)' }, [h('g', { 'clip-path': 'url(#t-c-corps)' }, [contourDe(formes)])])]),
+        h('g', { mask: 'url(#t-m-hors-corps)' }, [contourDe(formes)]),
+        ...remplissages(formes),
+      ];
+      const dessin: Enfant[] = visible
+        ? k < 2 ? silhouette(formes, EP, 't-m-pattes') : arriere()
+        : [...silhouette(formes), sombre > 0.005 ? h('g', { fill: CONTOUR, opacity: sombre.toFixed(3) }, formes.map((x) => h('path', { d: x.d }))) : null];
       // pattes avant et arrière traitées de la même façon : le contour s'efface vers l'attache
       return { k, profondeur, profAncre, visible, dessin, ancre: proj(add(A, { x: 0, y: -6 }), z), rayon: 24 };
     }).sort((a, b) => a.profondeur - b.profondeur);
@@ -1006,10 +1182,10 @@ export class Chat {
       mesures(rond, v ? { cx: f(v.ancre.x), cy: f(v.ancre.y), r: v.rayon } : { r: 0 });
     });
 
-    const rayuresQueue = [0.28, 0.44, 0.6, 0.76, 0.92].map((t) => { const i = Math.round(t * NQ), c = qp[i], no = tq.nor[i]; const r = lerp(8.5, 6.2, i / NQ) - 0.6; return `M${pt(add(c, mul(no, r)))}L${pt(sub(c, mul(no, r)))}`; }).join('');
-    const queue = silhouette([{ d: dQueue, fond: 'url(#t-pelage)', apres: `<path d="${rayuresQueue}" stroke="${RAYURE}" stroke-width="5" opacity=".6"/>` }]);
+    const rayuresQueue = [0.28, 0.44, 0.6, 0.76, 0.92].map((t) => { const i = Math.round(t * NQ), q = qp[i], no = tq.nor[i]; const r = lerp(8.5, 6.2, i / NQ) - 0.6; return `M${pt(add(q, mul(no, r)))}L${pt(sub(q, mul(no, r)))}`; }).join('');
+    const queue = silhouette([{ d: dQueue, fond: 'url(#t-pelage)', apres: [h('path', { d: rayuresQueue, stroke: RAYURE, 'stroke-width': 5, opacity: '.6' })] }]);
 
-    // corps : ventre et plastron crème, rayures du dos, reflet, touffes du poitrail, ombre de la tête ;
+    // corps : ventre crème, rayures du dos, reflet, touffes du poitrail, ombre de la tête ;
     // le ventre, les rayures et le reflet sont dessinés pour le profil et s'estompent quand il passe de face.
     // Tout tombe dans le corps par le calcul (pas de découpe que le navigateur referait à chaque image)
     const ventre: V[] = [];
@@ -1017,50 +1193,64 @@ export class Chat {
     for (let i = NC; i >= 5; i--) ventre.push(proj(sub(col[i], mul(nor[i], rB[i] - lerp(3, rB[i] * 0.95, lisse((i / NC - 0.25) / 0.75))))));
     const fin = col[NC], noF = nor[NC], tgF = { x: -noF.y, y: noF.x };
     const angF = Math.atan2(tgF.y, tgF.x);
-    const plastron = proj(sub(add(fin, mul(tgF, 12)), mul(noF, 8)));
     const rayures = [0.1, 0.22, 0.34, 0.46, 0.58, 0.7].map((t) => {
-      const i = Math.round(t * NC), c = col[i], no = nor[i], tg = { x: -no.y, y: no.x };
-      const b = add(c, mul(no, rH[i] - 0.8)), tip = add(add(c, mul(no, rH[i] - (15 - t * 5))), mul(tg, -3));
+      const i = Math.round(t * NC), q = col[i], no = nor[i], tg = { x: -no.y, y: no.x };
+      const b = add(q, mul(no, rH[i] - 0.8)), tip = add(add(q, mul(no, rH[i] - (15 - t * 5))), mul(tg, -3));
       return `M${pt(proj(add(b, mul(tg, -5))))}L${pt(proj(tip))}L${pt(proj(add(b, mul(tg, 5))))}Z`;
     }).join('');
-    const reflet = courbe(col.slice(2, 16).map((c, k) => proj(add(c, mul(nor[k + 2], rH[k + 2] - 5)))), false);
+    const reflet = courbe(col.slice(2, 16).map((q, k) => proj(add(q, mul(nor[k + 2], rH[k + 2] - 5)))), false);
     let touffes = '';
     for (let k = 1; k <= 3; k++) {
       const a0 = angF + k * 0.32, r = rB[NC];
       touffes += `M${pt(proj(add(fin, mul(dir(a0 - 0.12), r))))}L${pt(proj(add(fin, mul(dir(a0 + 0.06), r + 7))))}L${pt(proj(add(fin, mul(dir(a0 + 0.12), r))))}Z`;
     }
     const ombreTete = proj(add(teteC, { x: -4, y: 28 }));
-    const corps = silhouette([{ d: dCorps, fond: 'url(#t-pelage)' }, { d: touffes, fond: '#FFF3E2' }])
-      + `<g opacity="${f(cphi * cphi)}"><path d="${courbe(ventre, true)}" fill="url(#t-creme)"/>`
-      + `<path d="${rayures}" fill="${RAYURE}" opacity=".55"/><path d="${reflet}" fill="none" stroke="#FFD59A" stroke-width="4.5" stroke-linecap="round" opacity=".5"/></g>`
-      + `<path d="${polygone(couper(contourCorps, ovalePts(plastron, 20)))}" fill="url(#t-creme)"/>`
-      + `<path transform="translate(${pt(ombreTete)})" d="${polygone(couper(contourCorps, ovalePts(ombreTete, 36, 18)).map((q) => sub(q, ombreTete)))}" fill="url(#t-ombre)"/>`;
+    const corps: Enfant[] = [
+      ...silhouette([{ d: dCorps, fond: 'url(#t-pelage)' }, { d: touffes, fond: '#FFF3E2' }]),
+      h('g', { opacity: f(cphi * cphi) }, [
+        h('path', { d: courbe(ventre, true), fill: 'url(#t-creme)' }),
+        h('path', { d: rayures, fill: RAYURE, opacity: '.55' }),
+        h('path', { d: reflet, fill: 'none', stroke: '#FFD59A', 'stroke-width': 4.5, 'stroke-linecap': 'round', opacity: '.5' }),
+      ]),
+      h('path', { transform: `translate(${pt(ombreTete)})`, d: polygone(couper(contourCorps, ovalePts(ombreTete, 36, 18)).map((q) => sub(q, ombreTete))), fill: 'url(#t-ombre)' }),
+    ];
 
-    // à la toilette, la patte levée passe devant le visage : elle est dessinée après la tête
-    const corpsTransform = `translate(${f(this.x)},${f(this.sol - leve)}) scale(${sv.toFixed(4)})`;
-    const levee = gesteToilette ? devant.find((v) => v.k === kLeve) : undefined;
-    svg += `<g class="t-chat" transform="${corpsTransform}">`;
-    svg += derriere.map((v) => v.dessin).join('') + queue + corps;
-    svg += devant.filter((v) => v !== levee).map((v) => `<g mask="url(#t-m-cache-${v.k})">${v.dessin}</g>`).join('');
-    svg += '</g>';
-
-    const visage = tete({ tour: this.tour.x, yeux: clamp(p.yeux, 0, 1) * paupiere, regard: { x: this.regardX.x, y: this.regardY.x }, pupille: this.pupille.pas(this.feuille && !this.dort ? 1.7 : 1, dt), joie: this.joie > 0 || baille > 0.2, miaou: this.parle ? 0.05 + 0.2 * Math.abs(Math.sin(this.t * 9)) : this.miaou, baille, langue: gesteToilette?.langue ?? 0, oreilles });
-    svg += `<g class="t-chat" transform="translate(${pt(teteMonde)}) scale(${(sv * TETE).toFixed(4)}) rotate(${f(p.incl * cphi)})">${silhouette(visage.formes, EP / TETE)}${visage.details}${visage.moustaches}</g>`;
-    if (levee) svg += `<g class="t-chat" transform="${corpsTransform}"><g mask="url(#t-m-cache-${levee.k})">${levee.dessin}</g></g>`;
+    // à la toilette, la patte levée passe devant le visage : elle est dessinée après la tête.
+    // Chaque patte garde son groupe d'une image à l'autre, même quand elle change de plan.
+    const corpsTransform = `translate(${f(c.x)},${f(this.sol - leve)}) scale(${sv.toFixed(4)})`;
+    const levee = c.toilette ? devant.find((v) => v.k === (cphi >= 0 ? 0 : 1)) : undefined;
+    const groupe = (v: (typeof vues)[number], masque: boolean) => h('g', masque ? { mask: `url(#t-m-cache-${v.k})` } : {}, v.dessin, `p${v.k}`);
+    const visage = tete({ tour: c.tour, yeux: c.yeux, regard: { x: c.regardX, y: c.regardY }, pupille: c.pupille, joie: c.joie, miaou: c.miaou, baille: c.baille, langue: c.langue, oreilles: c.oreilles });
 
     // zzz quand il dort, cœurs quand on le caresse
-    if (this.etat === 'dort' && p.yeux < 0.05) {
+    const zzz: Enfant[] = [];
+    if (c.zzz) {
       for (let k = 0; k < 3; k++) {
-        const u = (this.t * 0.33 + k / 3) % 1;
+        const u = (c.t * 0.33 + k / 3) % 1;
         const zx = teteMonde.x + cap * (30 + u * 26) * s, zy = teteMonde.y - (40 + u * 48) * s;
-        svg += `<path transform="translate(${f(zx)},${f(zy)}) scale(${((0.8 + u * 0.7) * s).toFixed(3)})" d="M-5,-5h10l-10,10h10" fill="none" stroke="#2B6E3A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity="${f(Math.sin(Math.PI * u) * 0.9)}"/>`;
+        zzz.push(h('path', { transform: `translate(${f(zx)},${f(zy)}) scale(${((0.8 + u * 0.7) * s).toFixed(3)})`, d: 'M-5,-5h10l-10,10h10', fill: 'none', stroke: '#2B6E3A', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: f(Math.sin(Math.PI * u) * 0.9) }));
       }
     }
-    for (const c of this.coeurs) {
-      const u = 1 - Math.min(1, c.vie);
-      const cx = teteMonde.x + c.dx * u * s, cy = teteMonde.y - (50 + u * 90) * s;
-      svg += `<path transform="translate(${f(cx)},${f(cy)}) scale(${(s * (1.6 + u)).toFixed(3)})" d="M0,4C-8,-3 -4,-10 0,-5C4,-10 8,-3 0,4Z" fill="#F27C8C" opacity="${f(Math.min(1, c.vie) * Math.min(1, u * 6))}"/>`;
-    }
-    return svg;
+    const coeurs = c.coeurs.map((co) => {
+      const u = 1 - Math.min(1, co.vie);
+      const cx = teteMonde.x + co.dx * u * s, cy = teteMonde.y - (50 + u * 90) * s;
+      return h('path', { transform: `translate(${f(cx)},${f(cy)}) scale(${(s * (1.6 + u)).toFixed(3)})`, d: 'M0,4C-8,-3 -4,-10 0,-5C4,-10 8,-3 0,4Z', fill: '#F27C8C', opacity: f(Math.min(1, co.vie) * Math.min(1, u * 6)) });
+    });
+
+    peindre(this.calque, [
+      dOmbre,
+      h('g', { transform: corpsTransform }, [...derriere.map((v) => groupe(v, false)), h('g', {}, queue, 'queue'), h('g', {}, corps, 'corps'), ...devant.filter((v) => v !== levee).map((v) => groupe(v, true))]),
+      h('g', { transform: `translate(${pt(teteMonde)}) scale(${(sv * TETE).toFixed(4)}) rotate(${f(p.incl * cphi)})` }, [...silhouette(visage.formes, EP / TETE), ...visage.details, visage.moustaches]),
+      levee ? h('g', { transform: corpsTransform }, [groupe(levee, true)]) : null,
+      h('g', {}, zzz),
+      h('g', {}, coeurs),
+    ]);
+
+    // zone à toucher : le corps et la tête (pas la queue), dans la bande
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity;
+    for (const q of contourCorps) { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.y); }
+    const bas = this.sol - leve, rt = 50 * sv * TETE;
+    const gauche = Math.min(c.x + x0 * sv, teteMonde.x - rt), droite = Math.max(c.x + x1 * sv, teteMonde.x + rt), dessus = Math.min(bas + y0 * sv, teteMonde.y - 1.3 * rt);
+    this.o.suit({ s, tete: teteMonde, boite: { x: gauche, y: dessus, l: droite - gauche, h: bas + 4 - dessus }, haut: this.haut });
   }
 }

@@ -7,7 +7,7 @@ Dernière mise à jour : 2026-10-11 (mission Toiles terminée, non publiée : vo
 Consigne complète : `docs/prive/prompt-tilleul.md`. Quatre phases, un commit `[skip ci]` à la fin de chacune.
 
 - **Phase 1 : faite** (diagnostic chiffré, images de référence, tests des bugs).
-- Phase 2 : à faire (moteur et clics, dessin inchangé).
+- **Phase 2 : faite** (moteur et clics refaits, dessin inchangé).
 - Phase 3 : à faire (vraie page de jeu).
 - Phase 4 : à faire (accueil, reste du site, téléphone, documentation).
 
@@ -46,6 +46,39 @@ Première visite (bulle de bienvenue ouverte) : script 2,4 ms (ordinateur) et 4,
 - Confirmé : « Lâcher une feuille » ne vérifie pas que la chasse est possible ; sur grand écran, la feuille est trop loin ou déjà trop basse quand il arrive, et rien ne le dit.
 - Non reproduit dans Chrome : la caresse perdue (le moteur réagit au `pointerdown`, sur un nœud qui existe encore à cet instant). Risque réel sur Safari : le nœud touché est remplacé avant la fin du geste, et un `click` n'arrive jamais. La refonte le supprime de toute façon (zone de contact stable).
 - Pas de temps : `dt` plafonné à 1/30 s et redessin à 15 images/s endormi, sans à-coup mesuré ; le décalage de l'étang appliqué par `transform` à chaque image reste lié à une lecture de mise en page (voir plus haut).
+
+### Phase 2 : nouveau moteur (dessin inchangé)
+
+**Ce qui a changé** :
+- **Rendu** : le dessin est décrit à chaque image puis reporté sur des éléments SVG créés une seule fois (`peindre()` dans `chat.ts`) : seuls les attributs qui ont changé sont réécrits, chaque élément garde sa place (une place vide garde le rang des suivantes, chaque patte a son groupe nommé et se déplace sans être recréée). Plus aucun `innerHTML` dans la boucle. Masques et découpes de `<defs>` inchangés (attributs écrits seulement s'ils changent).
+- **Boucle** : le mouvement avance par pas fixes de 1/120 s (`pas()`), le dessin (`dessiner()`) est fait une fois par image, entre les deux derniers pas, au temps exact de l'écran (`melanger()`). Après un ralentissement, au plus 0,1 s est rattrapé ; après un onglet caché, rien. Endormi : 15 images/s. Onglet caché ou bande hors de l'écran (accueil défilé) : arrêt complet (`veille()`, observée par `IntersectionObserver`).
+- **Décor** (`decor.ts`, `lireDecor()`) : générique, repères `[data-decor]` (scène), `.etang` / `.flotte` (lotus), `.feuille`, `[data-tilleul-rail]`. Positions relevées au chargement, au redimensionnement (`ResizeObserver`) et au défilement ; feuilles qui tombent relevées au plus toutes les 200 ms, chute prolongée entre deux relevés. Le chat ne lit plus jamais la mise en page.
+- **Accueil** : la bande du chat est posée dans un rail au bord de l'étang (`position: sticky`, `overflow: clip` sur `.heros`) : collée au bas de l'écran puis elle monte avec l'étang, défilée par le navigateur lui-même (plus de `transform` recalculé à chaque image, donc plus de retard sur le défilement). Sans `overflow: clip` (Safari avant 16), elle reste au bord de l'étang.
+- **Toucher** : une zone stable (le bouton `.mascotte__corps`, invisible, au moins 44 px, qui suit le corps et la tête par `transform`) reçoit `pointerdown` / `pointerup` (appui bref sans glisser = caresse) et le clavier (`click` sans pointeur). Pas de double déclenchement, le doigt peut toujours faire défiler la page (`touch-action: manipulation`). Bulle et invitation placées par `transform` avec des tailles relevées par `ResizeObserver` (plus de lecture à chaque image).
+- **Ordres** (`ordre(o, { x, vite })`, événement `tilleul-ordre` : un nom ou `{ ordre, x, vite }`) : un ordre du visiteur passe avant le pilote automatique et la bulle ; sur la page de jeu, la bulle ne retient jamais le chat. Ordre donné en plein bond : suivi à l'atterrissage. Ordre impossible (rien à chasser, pas d'étang) : petit miaou, tête vers le visiteur (vers le bouton touché). Nouveaux ordres : `viens` (aller à un endroit), `etang` (regarder un lotus). « Marcher » sur la page de jeu : vers l'autre côté de l'écran. **Trot** (`vite`) : même mécanique de pas, foulée et cadence plus grandes (125 unités/s, cycle 100, appui 50 %, pied levé 16) ; sur la page de jeu, il trotte vers une feuille lointaine.
+- Retiré : le tracé du plastron crème, appelé avec une mesure manquante, n'a jamais été dessiné (tracé vide) : supprimé pour garder le dessin validé (voir « À valider »).
+- Vidéos : `scene.html` adaptée (décor sans `decalage`) ; `node scripts/video/rendu.mjs fr h essai 27` rend bien l'image (chat dessiné).
+
+**Comparaison avec les références** : avec un pas exact (1/128 s pour les deux moteurs, plus une première image d'1 ms), **26 images sur 28 identiques au pixel près**. Les deux autres ne diffèrent que par la position de la queue : « étire » (49 pixels, l'ancien moteur calculait sa toute première image avec un temps nul, ce qui amortissait la queue une fois de trop) et « dort » (l'ancien moteur calculait le sommeil par pas de 1/15 s). Au pas réel de 1/120 s : 22 sur 28 identiques, les autres sont les mêmes poses à un instant décalé par les arrondis.
+
+**Mesures après** (mêmes conditions que la phase 1, visiteur déjà venu) :
+
+| Page | Appareil | Images/s | 95e centile | > 33 ms | Tâches longues | Script du chat (moy. / 95e) | Mises en page forcées |
+|---|---|---|---|---|---|---|---|
+| Accueil | ordinateur | 60 | 16,7 ms | 0 | 0 | 1,5 / 2,4 ms (avant 1,55 / 2,1) | **0** (avant 0,85) |
+| Accueil | téléphone | 60 | 16,8 ms | 0 | 0 | **1,8 / 2,7 ms** (avant 4,2 / 5,3) | **0** (avant 1,7) |
+| Jouer | ordinateur | 60 | 16,8 ms | 0 | 0 | 1,1 / 1,6 ms (avant 1,35 / 1,9) | 0 |
+| Jouer | téléphone | 60 | 16,8 ms | 0 | 0 | **1,6 / 2,4 ms** (avant 3,6 / 4,8) | **0** (avant 0,88) |
+
+Première visite (bulle ouverte) : 0 mise en page forcée (avant 1,9). Travail du navigateur par image (téléphone simulé, accueil) : analyse HTML 0 (avant 0,73 ms), style 0,47 ms (avant 0,88), mise en page 0,2 ms, peinture 0,49 ms : environ 3,6 ms par image au lieu de 7,5.
+
+**Tests** : 10 sur 10. Ordinateur : « Marcher » bulle ouverte 523 px (avant 0), déjà venu 519 px, toucher 5/5 en 4 à 13 ms, feuille attrapée (avant jamais), se coucher 304 ms. Téléphone : 250 px (avant 0), 238 px (avant 36), toucher 5/5 en 41 à 44 ms, feuille attrapée, se coucher 411 ms.
+
+### À valider (mission Tilleul)
+
+- **Plastron crème** : le code prévoyait une tache crème sur le poitrail, jamais affichée (erreur de mesure). Retirée pour garder le dessin validé. Si Claudiu la veut, c'est une ligne à remettre (ovale de 20 × 20 sous le cou) : à regarder ensemble avant.
+- Zone à toucher : un rectangle aux coins arrondis autour du corps et de la tête (pas la queue), d'au moins 44 px. Toucher juste à côté du chat, dans ce rectangle, compte comme une caresse.
+- Sur Safari avant la version 16 (sans `overflow: clip`), le chat de l'accueil reste au bord de l'étang au lieu de coller au bas de l'écran quand l'étang est plus bas que l'écran.
 
 ## Mission Toiles (2026-10-11, non publiée)
 

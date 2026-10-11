@@ -16,7 +16,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     </button>
   </div>
   <p class="mascotte__invite" aria-hidden="true">{m.invite}</p>
-  <!-- Pour le clavier : un bouton invisible posé sur le chat (la souris et le doigt touchent le dessin lui-même) -->
+  <!-- Zone à toucher : un bouton invisible posé sur le chat, qui le suit (doigt, souris et clavier) -->
   <button class="mascotte__corps" type="button" aria-label={m.parler}></button>
 </aside>
 <!-- Exécuté avant l'affichage : un chat mis en silence apparaît sans invitation ni bouton de silence -->
@@ -27,8 +27,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 </script>
 
 <script>
-  import { Chat, type Reperes } from './tilleul/chat';
-  import { decorAccueil } from './tilleul/decor';
+  import { Chat, type Ordre, type Precision, type Reperes } from './tilleul/chat';
+  import { lireDecor } from './tilleul/decor';
 
   const racine = document.querySelector<HTMLElement>('.mascotte');
   if (racine) {
@@ -66,6 +66,11 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     racine.classList.toggle('touche', touche);
     racine.classList.toggle('jeu', !!document.querySelector('[data-jeu]'));
 
+    // Sur l'accueil, la bande du chat se pose au bord de l'étang : elle colle au bas de l'écran puis monte avec la page,
+    // sans calcul à chaque image (le navigateur s'en charge en défilant)
+    const decor = lireDecor();
+    if (decor.rail) { decor.rail.append(racine); racine.classList.add('sur-rail'); }
+
     // Silence : Tilleul dort, ne dit plus rien tant qu'on ne le touche pas
     const regler = () => {
       racine.classList.toggle('silence', muet);
@@ -73,36 +78,63 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     };
     regler();
 
-    // La bulle et l'invitation suivent sa tête, le bouton du clavier suit son corps
+    // Tailles de la bulle et de l'invitation, relevées seulement quand elles changent (la bulle est placée dès qu'elle est
+    // mesurée : le chat immobile, en mouvement réduit, ne redemande pas sa place)
+    const taille = new Map<Element, { l: number; h: number }>();
+    const mesure = new ResizeObserver((entrees) => {
+      entrees.forEach((e) => {
+        const el = e.target as HTMLElement;
+        taille.set(el, { l: el.offsetWidth, h: el.offsetHeight });
+      });
+      placer();
+    });
+    mesure.observe(bulle);
+    mesure.observe(invite);
+    let largeur = document.documentElement.clientWidth;
+    addEventListener('resize', () => { largeur = document.documentElement.clientWidth; });
+
+    // La zone à toucher, la bulle et l'invitation suivent le chat (positions dans sa bande, écritures seulement)
+    let zone = { l: 0, h: 0 }, queueBulle = -1;
+    const px = (n: number) => `${Math.round(n * 10) / 10}px`;
     const placer = () => {
       if (!repere) return;
-      const { x, sol, s, tete } = repere;
-      corps.style.width = `${130 * s}px`;
-      corps.style.height = `${110 * s}px`;
-      corps.style.transform = `translate(${x - 65 * s}px, ${sol - 110 * s}px)`;
+      const { s, tete, boite, haut } = repere;
+      // zone à toucher : le corps et la tête, jamais moins de 44 px de côté ; sa taille ne change que si l'écart est net
+      const l = Math.max(44, boite.l), h = Math.max(44, boite.h);
+      if (Math.abs(l - zone.l) > 8 || Math.abs(h - zone.h) > 8) {
+        zone = { l, h };
+        corps.style.width = px(l);
+        corps.style.height = px(h);
+      }
+      corps.style.transform = `translate(${px(boite.x + boite.l / 2 - zone.l / 2)}, ${px(boite.y + boite.h - zone.h)})`;
       if (!bulle.hidden) {
-        const l = bulle.offsetWidth, h = bulle.offsetHeight;
-        const gauche = Math.min(Math.max(8, tete.x - l + 60), innerWidth - l - 8);
-        const queue = Math.min(Math.max(tete.x - gauche, 26), l - 40);
-        bulle.style.left = `${gauche}px`;
-        bulle.style.top = `${Math.max(8, tete.y - 68 * s - h)}px`;
-        bulle.style.setProperty('--queue', `${queue}px`);
-        bulle.classList.toggle('queue-gauche', queue < l / 2);
+        const t = taille.get(bulle);
+        if (!t) return;
+        const gauche = Math.min(Math.max(8, tete.x - t.l + 60), largeur - t.l - 8);
+        const queue = Math.round(Math.min(Math.max(tete.x - gauche, 26), t.l - 40));
+        bulle.style.transform = `translate(${px(gauche)}, ${px(Math.max(8 - haut, tete.y - 68 * s - t.h))})`;
+        if (queue !== queueBulle) {
+          queueBulle = queue;
+          bulle.style.setProperty('--queue', `${queue}px`);
+        }
+        bulle.classList.toggle('queue-gauche', queue < t.l / 2);
       } else if (!racine.classList.contains('touche') && !racine.classList.contains('silence')) {
-        const l = invite.offsetWidth;
-        invite.style.left = `${Math.min(Math.max(4, tete.x - l / 2), innerWidth - l - 4)}px`;
-        invite.style.top = `${Math.max(4, tete.y - 62 * s - invite.offsetHeight)}px`;
+        const t = taille.get(invite);
+        if (!t) return;
+        invite.style.transform = `translate(${px(Math.min(Math.max(4, tete.x - t.l / 2), largeur - t.l - 4))}, ${px(Math.max(4 - haut, tete.y - 62 * s - t.h))})`;
       }
     };
 
     const chat = new Chat(scene, {
-      decor: decorAccueil,
+      decor,
       libre: !!document.querySelector('[data-jeu]'),
       reduit: moinsDeMouvement,
       dort: muet,
       toucher: () => toucher(),
       suit: (r) => { repere = r; placer(); },
     });
+    // Bande hors de l'écran (accueil défilé) : le chat ne travaille plus
+    new IntersectionObserver(([e]) => chat.veille(!e.isIntersecting)).observe(racine);
 
     // Il parle : la bulle s'écrit lettre après lettre, et sa bouche bouge tant que le texte s'écrit
     const cacherBulle = () => { bulle.hidden = true; chat.retenu = false; };
@@ -156,9 +188,22 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       racine.classList.add('touche');
       window.setTimeout(() => dire(anecdotes[rang++ % anecdotes.length], 5000), 450);
     };
-    corps.addEventListener('click', () => chat.caresse());
-    // La page de jeu donne ses ordres par cet événement
-    addEventListener('tilleul-ordre', (e) => chat.ordre((e as CustomEvent).detail));
+    // La zone à toucher ne change jamais d'élément : un appui bref (sans glisser) est une caresse ; le clavier passe par « click »
+    let appui: { id: number; x: number; y: number } | null = null;
+    corps.addEventListener('pointerdown', (e) => { appui = { id: e.pointerId, x: e.clientX, y: e.clientY }; });
+    corps.addEventListener('pointercancel', () => { appui = null; });
+    corps.addEventListener('pointerup', (e) => {
+      const a = appui;
+      appui = null;
+      if (a && a.id === e.pointerId && Math.hypot(e.clientX - a.x, e.clientY - a.y) < 12) chat.caresse();
+    });
+    corps.addEventListener('click', (e) => { if (e.detail === 0) chat.caresse(); });
+    // La page de jeu donne ses ordres par cet événement : un nom d'ordre, ou { ordre, x, vite }
+    addEventListener('tilleul-ordre', (e) => {
+      const d = (e as CustomEvent<Ordre | (Precision & { ordre: Ordre })>).detail;
+      if (typeof d === 'string') chat.ordre(d);
+      else chat.ordre(d.ordre, d);
+    });
 
     fermer.addEventListener('click', taire);
 
@@ -192,14 +237,18 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 </script>
 
 <style is:global>
-  /* La bande où vit le chat couvre le bas de l'écran mais ne reçoit aucun clic : seul le dessin du chat réagit */
-  .mascotte { position: fixed; left: 0; bottom: 0; width: 100%; height: 0; z-index: 60; pointer-events: none; }
-  .mascotte__scene { position: fixed; left: 0; bottom: 0; width: 100%; height: 280px; overflow: hidden; pointer-events: none; }
-  .mascotte .t-chat { pointer-events: visiblePainted; cursor: pointer; }
-  .mascotte__corps { position: fixed; left: 0; top: 0; padding: 0; border: 0; border-radius: 24px; background: none; pointer-events: none; }
+  /* La bande où vit le chat couvre le bas de l'écran mais ne reçoit aucun clic : seule la zone posée sur le chat réagit.
+     Sur l'accueil, elle est posée dans le rail du bord de l'étang ([data-tilleul-rail]) : collée au bas de l'écran, puis
+     elle monte avec l'étang quand on défile (sans « overflow: clip », elle reste au bord de l'étang). */
+  .mascotte { position: fixed; left: 0; bottom: 0; width: 100%; height: 280px; z-index: 60; pointer-events: none; }
+  .mascotte.sur-rail { position: sticky; flex: none; }
+  [data-tilleul-rail] { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; pointer-events: none; }
+  .mascotte__scene { position: absolute; left: 0; bottom: 0; width: 100%; height: 280px; overflow: hidden; pointer-events: none; }
+  /* Zone à toucher (et bouton du clavier) : un seul élément, qui suit le chat ; le doigt peut toujours faire défiler la page */
+  .mascotte__corps { position: absolute; left: 0; top: 0; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 40%; background: none; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
   .mascotte__corps:focus-visible { outline-offset: 2px; }
 
-  .mascotte__bulle { position: fixed; left: 8px; top: 8px; pointer-events: auto; width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 28px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
+  .mascotte__bulle { position: absolute; left: 0; top: 0; pointer-events: auto; width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 28px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
   .mascotte__bulle[hidden] { display: none; }
   .mascotte__bulle::after { content: ''; position: absolute; left: calc(var(--queue, 60px) - 9px); bottom: -14px; width: 18px; height: 18px; background: #fff; border-right: var(--trait) solid var(--vert-fonce); border-bottom: var(--trait) solid var(--vert-fonce); transform: rotate(45deg) skew(8deg, 8deg); }
   .mascotte__bulle.pop { animation: mascotte-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1); }
@@ -220,13 +269,13 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__muet:hover { background: var(--orange-creme); color: var(--orange-fonce); }
 
   /* Invitation à toucher le chat, au-dessus de sa tête, tant qu'on ne l'a pas fait */
-  .mascotte__invite { position: fixed; left: 0; top: 0; margin: 0; padding: 6px 14px; font-family: var(--titre); font-size: 1.15rem; line-height: 1.1; white-space: nowrap; color: #fff; background: var(--vert-fonce); border-radius: 18px 10px 16px 10px / 10px 16px 10px 18px; animation: mascotte-invite 1.6s ease-in-out infinite; pointer-events: none; }
+  .mascotte__invite { position: absolute; left: 0; top: 0; margin: 0; padding: 6px 14px; font-family: var(--titre); font-size: 1.15rem; line-height: 1.1; white-space: nowrap; color: #fff; background: var(--vert-fonce); border-radius: 18px 10px 16px 10px / 10px 16px 10px 18px; animation: mascotte-invite 1.6s ease-in-out infinite; pointer-events: none; }
   .mascotte__invite::after { content: ''; position: absolute; left: 50%; top: 100%; margin-left: -7px; border: 7px solid transparent; border-top-color: var(--vert-fonce); }
   .mascotte.touche .mascotte__invite { display: none; }
   .mascotte__bulle:not([hidden]) ~ .mascotte__invite { display: none; }
 
-  @keyframes mascotte-pop { from { transform: scale(0.6) rotate(-3deg); opacity: 0; } to { transform: none; opacity: 1; } }
-  @keyframes mascotte-invite { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes mascotte-pop { from { scale: 0.6; rotate: -3deg; opacity: 0; } to { scale: 1; rotate: 0deg; opacity: 1; } }
+  @keyframes mascotte-invite { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
 
   @media (max-width: 700px) {
     .mascotte__bulle { font-size: 0.98rem; max-width: min(240px, calc(100vw - 20px)); }
