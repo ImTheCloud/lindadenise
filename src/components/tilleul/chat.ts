@@ -469,6 +469,7 @@ export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'chasse' 
 export interface Precision { x?: number; cible?: object } // « viens » : où aller (pixels de la bande) ; « chasse » : quelle feuille
 
 export const HAUT = 280; // hauteur de la bande où il vit
+const COIN = 175; // sa place dans le coin : distance au bord droit (unités du dessin), pour que pattes et queue restent à l'écran
 const APPROCHE = 130; // distance (unités du dessin) à laquelle il se tapit d'une feuille
 const PORTEE = 125; // hauteur (en unités du dessin) à laquelle une feuille est à sa portée : il bondit quand elle y passe
 const PAS = 1 / 120; // pas de temps fixe du mouvement, en secondes
@@ -600,7 +601,7 @@ export class Chat {
     this.auto = !o.reduit;
     this.dodo = o.dort;
     this.mesurer();
-    this.x = this.W - 120 * this.s;
+    this.x = this.W - COIN * this.s;
     this.cibleX = this.x;
     addEventListener('resize', () => { this.mesurer(); this.saut = true; if (this.fige) this.stabiliser(); });
     const suivre = (e: PointerEvent) => { this.pointeur = { x: e.clientX, y: e.clientY - this.haut }; };
@@ -773,7 +774,7 @@ export class Chat {
     this.sol = this.H - 4;
     this.scene.style.height = `${this.H}px`;
     this.scene.setAttribute('viewBox', `0 0 ${this.W} ${this.H}`);
-    this.x = this.fige ? this.W - 120 * this.s : this.dansEcran(this.x);
+    this.x = this.fige ? this.W - COIN * this.s : this.dansEcran(this.x);
     this.cibleX = this.dansEcran(this.cibleX);
   }
 
