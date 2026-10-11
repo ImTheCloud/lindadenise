@@ -36,7 +36,7 @@ Démarrage : Remote Control activé. Le maintien du Mac éveillé (`request_keep
 - **Sur le site** (`src/components/Video.astro`) : affiche AVIF (repli WebP), la vidéo ne se charge qu'au clic (rien avant), lecture avec le son (le clic du visiteur), bouton « Couper le son » / « Remettre le son », sous-titres incrustés, jamais de lecture automatique.
 - **Refaire les vidéos** (si un texte, le prix ou les remises changent) : sources dans `scripts/video/` (`scene.html`, `rendu.mjs`, `musique.py`, `assembler.py`, `vraies-toiles.mjs`), mode d'emploi en tête de `rendu.mjs`. Il faut Chrome, ffmpeg, python3 avec numpy et `npm i --no-save puppeteer-core`. Rendu : environ 4 minutes par vidéo.
 - **Lighthouse** (version construite, mobile, 2026-10-11) : page Toiles FR et NL 97 / 100 / 100 / 100, accueil 99 / 100 / 100 / 100, fiche d'un dessin 99 / 100 / 100 / 100, contact 99 / 100 / 100 / 100. Deux corrections pour y arriver : les polices Gochi Hand et Itim sont préchargées dans `Base.astro` (le haut de la page Toiles changeait de hauteur quand elles arrivaient, et poussait le mur), et le dessin de Tilleul a sa hauteur (280 px) dès le premier affichage dans `Mascotte.astro` (CSS seulement, moteur inchangé).
-- En fin de mission, macOS a refusé l'accès à `~/Downloads` à cette session : `vraies-toiles.mjs` n'a pas pu être relancé depuis le dépôt (la vidéo a été faite avec les mêmes réglages, en deux passes, juste avant).
+- Reproductibilité vérifiée le 2026-10-11 : `node scripts/video/vraies-toiles.mjs` et `npm run toiles`, relancés depuis le dépôt, redonnent exactement les fichiers livrés (aucune différence dans git).
 
 ### Toiles et dessins du site (comparaison du 2026-10-11)
 
