@@ -235,7 +235,7 @@ const ACCEL = 140;
 const CYCLE = 70; // distance parcourue pendant un cycle de pas
 const APPUI = 0.62; // part du cycle où le pied est au sol
 const LEVE = 11;
-const TROT = { vmax: 125, accel: 260, cycle: 100, appui: 0.5, leve: 16 };
+const TROT = { vmax: 190, accel: 420, cycle: 120, appui: 0.5, leve: 17 };
 const cycle = (k: number) => lerp(CYCLE, TROT.cycle, k);
 function foulee(p: number, k: number): V {
   const appui = lerp(APPUI, TROT.appui, k), balayage = appui * cycle(k), leve = lerp(LEVE, TROT.leve, k);
