@@ -441,7 +441,7 @@ export interface Options {
   suit(r: Reperes): void; // appelé à chaque image : où il est
 }
 export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'chasse' | 'viens';
-export interface Precision { x?: number; cible?: object } // « viens » : où aller (pixels de la bande) ; « chasse » : quelle feuille
+export interface Precision { x?: number; vite?: boolean; cible?: object } // « viens » : où aller (pixels de la bande), s'il trotte ; « chasse » : quelle feuille
 
 export const HAUT = 280; // hauteur de la bande où il vit
 const COIN = 175; // sa place dans le coin : distance au bord droit (unités du dessin), pour que pattes et queue restent à l'écran
@@ -681,7 +681,7 @@ export class Chat {
     this.feuille = null;
     this.lotus = null;
     this.ordonne = true;
-    this.vite = false;
+    this.vite = !!q.vite;
     let ok = true;
     if (o === 'marche') this.marcher();
     else if (o === 'viens') { this.cibleX = this.dansEcran(q.x ?? this.x); this.etat = 'marche'; }

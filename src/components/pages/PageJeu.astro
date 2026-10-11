@@ -20,7 +20,7 @@ const icones: Record<(typeof ordres)[number], string> = {
   etire: '<path d="M5,20 H35 M5,20 l7,-7 M5,20 l7,7 M35,20 l-7,-7 M35,20 l-7,7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>',
   feuille: `<g transform="translate(20,20) rotate(-20) scale(.36) translate(-50,-50)"><path fill="currentColor" d="${FEUILLE}"/><path d="${NERVURES}" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/></g>`,
 };
-const textes = JSON.stringify({ fin0: j.fin0, fin1: j.fin1, finN: j.finN, meilleur: j.meilleur, poisson: j.poisson });
+const textes = JSON.stringify({ fin0: j.fin0, fin1: j.fin1, finN: j.finN, meilleur: j.meilleur });
 // touffes d'herbe au bord de l'étang (là où on touche pour appeler Tilleul)
 const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) * 9; return `M${x},40 C${x + 2},26 ${x + 6},18 ${x + 3},6 M${x + 9},40 C${x + 10},30 ${x + 14},24 ${x + 18},16 M${x + 16},40 C${x + 17},32 ${x + 22},28 ${x + 27},26`; }).join(' ');
 ---
@@ -69,7 +69,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
       <svg class="jeu__feuille" viewBox="0 0 100 100"><path d={FEUILLE} stroke="#245E31" stroke-width="7" stroke-linejoin="round" /><path d={NERVURES} stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".6" /></svg>
     </template>
     <template data-modele="poisson">
-      <button class="poisson" type="button" tabindex="-1">
+      <div class="poisson">
         <svg viewBox="0 0 60 36" aria-hidden="true">
           <path d="M10,18 L1,6 C5,12 5,24 1,30 Z" fill="#F7992B" stroke="#8B3E12" stroke-width="2" stroke-linejoin="round" />
           <path d="M24,9 C28,2 37,2 41,9 Z" fill="#F7992B" stroke="#8B3E12" stroke-width="2" stroke-linejoin="round" />
@@ -78,7 +78,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
           <path d="M22,14 C25,17 25,21 22,24 M29,13 C32,17 32,21 29,25" fill="none" stroke="#C8571B" stroke-width="1.6" stroke-linecap="round" />
           <circle cx="47" cy="15" r="2.4" fill="#2B3B2B" /><circle cx="47.8" cy="14.2" r=".8" fill="#fff" />
         </svg>
-      </button>
+      </div>
     </template>
   </section>
 </Base>
@@ -88,7 +88,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
 
   const scene = document.querySelector<HTMLElement>('.jeu');
   if (scene) {
-    const textes = JSON.parse(scene.dataset.textes ?? '{}') as { fin0: string; fin1: string; finN: string; meilleur: string; poisson: string };
+    const textes = JSON.parse(scene.dataset.textes ?? '{}') as { fin0: string; fin1: string; finN: string; meilleur: string };
     const ciel = scene.querySelector<HTMLElement>('.jeu__ciel')!;
     const sol = scene.querySelector<HTMLElement>('.jeu__sol')!;
     const couronne = scene.querySelector<SVGSVGElement>('[data-couronne]')!;
@@ -100,7 +100,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     const boutons = [...scene.querySelectorAll<HTMLButtonElement>('[data-ordre]')];
     const modele = (nom: string) => scene.querySelector<HTMLTemplateElement>(`[data-modele="${nom}"]`)!.content.firstElementChild!;
     const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const CLE = 'tilleul-record-poissons';
+    const CLE = 'tilleul-record-peche';
     const lireRecord = () => { try { return Number(localStorage.getItem(CLE)) || 0; } catch { return 0; } };
     const ecrireRecord = (n: number) => { try { localStorage.setItem(CLE, String(n)); } catch { /* sans stockage : record gardé le temps de la visite */ } };
     let record = lireRecord();
@@ -133,8 +133,9 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     // où est le chat (repères de Mascotte.astro), dans la scène : tête, sol, échelle
     const chat = () => {
       const r = lien.reperes;
-      if (!r) return { x: largeur / 2, sol: hauteur - 4, s: 0.72 };
-      return { x: r.tete.x, sol: r.haut - ecran(0) + 276, s: r.s };
+      if (!r) return { x: largeur / 2, tete: hauteur - 110, sol: hauteur - 4, s: 0.72 };
+      const y0 = r.haut - ecran(0);
+      return { x: r.tete.x, tete: y0 + r.tete.y, sol: y0 + 276, s: r.s };
     };
 
     // Une feuille : elle se détache du feuillage, prend de la vitesse puis tombe régulièrement en se balançant ;
@@ -172,10 +173,10 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
       else lien.chat?.ordre(o as Ordre);
     }));
 
-    // Toucher l'herbe : Tilleul vient ; une petite trace de patte montre l'endroit
+    // Toucher l'herbe : Tilleul vient (au trot pendant la pêche) ; une petite trace de patte montre l'endroit
     sol.addEventListener('pointerdown', (e) => {
       if (reduit || !lien.chat) return;
-      lien.chat.ordre('viens', { x: e.clientX });
+      lien.chat.ordre('viens', { x: e.clientX, vite: !!partie });
       const trace = document.createElement('div');
       trace.className = 'jeu__trace';
       trace.style.transform = `translate(${e.clientX}px, ${e.clientY - ecran(0)}px)`;
@@ -183,30 +184,19 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
       trace.addEventListener('animationend', () => trace.remove());
     });
 
-    // ---------- mini-jeu : attraper les poissons ----------
-    // Des poissons sautent de l'étang en arc ; on les touche avant qu'ils replongent. Tilleul les suit des yeux
-    // et fait un petit bond de joie à chaque poisson attrapé. De plus en plus de poissons, un peu plus rapides.
+    // ---------- mini-jeu : Tilleul pêcheur ----------
+    // Des poissons sautent de l'étang en arc. On touche l'herbe pour envoyer Tilleul (au trot) là où ils retombent :
+    // un poisson qui redescend sur lui est attrapé au vol (petit bond, deux cœurs). De plus en plus de poissons.
     interface Poisson { el: HTMLElement; x0: number; dx: number; y0: number; h: number; t: number; d: number }
     let poissons: Poisson[] = [];
     const DUREE = 30;
     let partie: { t: number; score: number; prochaine: number; temps: number } | null = null;
     const sauter = (u: number) => {
       const el = modele('poisson').cloneNode(true) as HTMLElement;
-      el.setAttribute('aria-label', textes.poisson);
       ciel.append(el);
-      const c = chat(), x0 = hasard(70, largeur - 70), dx = hasard(-0.18, 0.18) * largeur;
-      const p: Poisson = { el, x0, dx: Math.min(Math.max(x0 + dx, 50), largeur - 50) - x0, y0: c.sol - 18, h: hauteur * hasard(0.3, 0.52), t: 0, d: 2.3 - 0.8 * u };
+      const c = chat(), x0 = hasard(70, largeur - 70), dx = hasard(-0.22, 0.22) * largeur;
+      const p: Poisson = { el, x0, dx: Math.min(Math.max(x0 + dx, 60), largeur - 60) - x0, y0: c.sol - 18, h: hauteur * hasard(0.3, 0.48), t: 0, d: 2.8 - 0.7 * u };
       if (p.dx < 0) el.classList.add('poisson--gauche');
-      el.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        if (!partie || !poissons.includes(p)) return;
-        partie.score += 1;
-        scoreEl.textContent = String(partie.score);
-        el.classList.add('pris');
-        poissons = poissons.filter((x) => x !== p);
-        window.setTimeout(() => el.remove(), 400);
-        lien.chat?.fete();
-      });
       poissons.push(p);
     };
     const montrer = (enPartie: boolean) => {
@@ -244,6 +234,12 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     rejouer.addEventListener('click', commencer);
     arreter.addEventListener('click', () => terminer(false));
     retour.addEventListener('click', () => { montrer(false); lancer.focus(); });
+    // au clavier, pendant la pêche : les flèches envoient Tilleul à gauche ou à droite
+    addEventListener('keydown', (e) => {
+      if (!partie || !lien.chat || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      lien.chat.ordre('viens', { x: chat().x + (e.key === 'ArrowLeft' ? -1 : 1) * largeur * 0.2, vite: true });
+    });
 
     // ce qu'il suit des yeux : le poisson le plus haut, sinon la feuille la plus basse
     let regard: { x: number; y: number } | null = null;
@@ -261,25 +257,35 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
         const u = Math.min(1, partie.t / DUREE);
         if (partie.t >= partie.prochaine && partie.t < DUREE - 1.2) {
           sauter(u);
-          partie.prochaine += 1.05 - 0.5 * u;
+          partie.prochaine += 1.9 - 0.8 * u;
         }
         const reste = Math.max(0, Math.ceil(DUREE - partie.t));
         if (reste !== partie.temps) { partie.temps = reste; tempsEl.textContent = String(reste); }
         if (partie.t >= DUREE) terminer(true);
       }
 
-      // poissons : un arc, le nez suit la trajectoire ; celui qui retombe dans l'eau fait un rond
+      // poissons : un arc, le nez suit la trajectoire ; celui qui redescend sur Tilleul est attrapé,
+      // celui qui retombe dans l'eau fait un rond
       for (const p of [...poissons]) {
         p.t += dt;
         const k = p.t / p.d;
+        const px = p.x0 + p.dx * k, py = p.y0 - 4 * p.h * k * (1 - k);
+        if (partie && k > 0.5 && Math.abs(px - c.x) < 60 * c.s && py > c.tete - 90 * c.s && py < c.sol - 10) {
+          partie.score += 1;
+          scoreEl.textContent = String(partie.score);
+          p.el.classList.add('pris');
+          poissons = poissons.filter((x) => x !== p);
+          window.setTimeout(() => p.el.remove(), 400);
+          lien.chat?.fete();
+          continue;
+        }
         if (k >= 1 || !partie) {
           plouf(p.x0 + p.dx, p.y0);
           p.el.remove();
           poissons = poissons.filter((x) => x !== p);
           continue;
         }
-        const x = p.x0 + p.dx * k, y = p.y0 - 4 * p.h * k * (1 - k);
-        p.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${((k - 0.5) * 110 * Math.sign(p.dx || 1)).toFixed(1)}deg)`;
+        p.el.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) rotate(${((k - 0.5) * 110 * Math.sign(p.dx || 1)).toFixed(1)}deg)`;
       }
 
       // feuilles : elles prennent de la vitesse puis tombent régulièrement ; posées dans l'herbe, elles y restent 10 s
@@ -339,18 +345,18 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
   .jeu__boutons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
   .jeu__boutons [hidden] { display: none; }
 
-  /* Ce qui tombe et ce qui saute passe devant le panneau ; seuls les poissons se touchent */
+  /* Ce qui tombe et ce qui saute passe devant le panneau, sans jamais gêner les doigts */
   .jeu__ciel { position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
   .jeu__ciel :global(.jeu__feuille) { position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; will-change: transform; transition: opacity 0.35s, scale 0.35s; }
   .jeu__ciel :global(.attrapee) { opacity: 0; scale: 0.2; }
   .jeu__ciel :global(.coulee) { opacity: 0; transition-duration: 1s; }
   .jeu__ciel :global(.jeu__plouf) { position: absolute; left: -24px; top: -7px; width: 48px; height: 14px; border: 3px solid #fff; border-radius: 50%; animation: jeu-plouf 0.9s ease-out forwards; }
   .jeu__ciel :global(.jeu__trace) { position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50% 50% 45% 45%; background: rgba(43, 110, 58, 0.45); animation: jeu-trace 0.9s ease-out forwards; }
-  /* un poisson : grande zone à toucher (72 × 54), dessin de 60 × 36 */
-  .jeu__ciel :global(.poisson) { position: absolute; left: -36px; top: -27px; width: 72px; height: 54px; padding: 9px 6px; border: 0; background: none; cursor: pointer; pointer-events: auto; touch-action: none; -webkit-tap-highlight-color: transparent; will-change: transform; transition: opacity 0.3s, scale 0.3s; }
+  /* un poisson (60 × 36) */
+  .jeu__ciel :global(.poisson) { position: absolute; left: -30px; top: -18px; width: 60px; height: 36px; will-change: transform; transition: opacity 0.3s, scale 0.3s; }
   .jeu__ciel :global(.poisson svg) { display: block; width: 60px; height: 36px; }
   .jeu__ciel :global(.poisson--gauche svg) { transform: scaleX(-1); }
-  .jeu__ciel :global(.poisson.pris) { opacity: 0; scale: 1.5; pointer-events: none; }
+  .jeu__ciel :global(.poisson.pris) { opacity: 0; scale: 0.4; }
 
   /* L'herbe au bord de l'étang : la toucher appelle Tilleul (le doigt ne fait pas défiler la page ici) */
   .jeu__sol { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: clamp(96px, 12vw, 140px); cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; }
@@ -365,6 +371,6 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     .jeu__ordre { min-height: 72px; font-size: 1.25rem; }
     .jeu__ordre svg { width: 32px; height: 32px; }
     .jeu__ciel :global(.poisson) { scale: 1.35; }
-    .jeu__ciel :global(.poisson.pris) { scale: 1.9; }
+    .jeu__ciel :global(.poisson.pris) { scale: 0.5; }
   }
 </style>

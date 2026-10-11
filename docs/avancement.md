@@ -28,6 +28,8 @@ Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé
 
 ### Dernier choix de Claudiu (2026-10-11, nuit)
 
+**Mini-jeu « Tilleul pêcheur »** (2026-10-12, remplace « Attraper les poissons », choix de Claudiu parmi 4 idées) : des poissons sautent de l'étang ; on touche l'herbe pour envoyer Tilleul au trot là où ils retombent ; un poisson qui redescend sur lui est attrapé au vol (petit bond, deux cœurs). 30 s, un poisson toutes les 1,9 s puis 1,1 s, record `tilleul-record-peche`. À tester par Claudiu.
+
 Sur le site (accueil compris), Tilleul ne marche plus : il reste toujours dans son coin en bas à droite, même quand on défile (plus de rail au bord de l'étang sur l'accueil), et change seulement de pose de temps en temps (assis, toilette, couché, bâille, dort, s'étire, debout). Chaque caresse lui fait prendre une autre pose (assis, couché, s'étire, debout). **La toilette est supprimée partout** (pose, geste de la patte, petite langue, et plus jamais d'elle-même), à la demande de Claudiu. Page de jeu : la feuille a un contour vert foncé (comme celles de l'arbre), elle reste posée 10 s dans l'herbe (Tilleul peut encore l'attraper) puis s'efface, sans rond au sol. Il ne marche que sur la page de jeu, au bord de l'étang. Cela remplace la promenade continue et le demi-tour au bout de l'écran ci-dessous.
 
 ### Retours de Claudiu (2026-10-11, nuit) : appliqués, à juger par Claudiu (sans grands tests, à sa demande)
