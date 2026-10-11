@@ -97,6 +97,13 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     // La zone à toucher, la bulle et l'invitation suivent le chat (positions dans sa bande, écritures seulement)
     let zone = { l: 0, h: 0 }, queueBulle = -1;
     const px = (n: number) => `${Math.round(n * 10) / 10}px`;
+    // bulle et invitation : placées par « translate », que l'agrandissement d'apparition (scale) ne déplace pas
+    // (navigateurs anciens : left et top)
+    const individuel = CSS.supports('translate', '1px 1px');
+    const poser = (el: HTMLElement, x: number, y: number) => {
+      if (individuel) el.style.translate = `${px(x)} ${px(y)}`;
+      else { el.style.left = px(x); el.style.top = px(y); }
+    };
     const placer = () => {
       if (!repere) return;
       const { s, tete, boite, haut } = repere;
@@ -113,7 +120,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
         if (!t) return;
         const gauche = Math.min(Math.max(8, tete.x - t.l + 60), largeur - t.l - 8);
         const queue = Math.round(Math.min(Math.max(tete.x - gauche, 26), t.l - 40));
-        bulle.style.transform = `translate(${px(gauche)}, ${px(Math.max(8 - haut, tete.y - 68 * s - t.h))})`;
+        poser(bulle, gauche, Math.max(8 - haut, tete.y - 68 * s - t.h));
+        bulle.classList.add('place');
         if (queue !== queueBulle) {
           queueBulle = queue;
           bulle.style.setProperty('--queue', `${queue}px`);
@@ -122,7 +130,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       } else if (!racine.classList.contains('touche') && !racine.classList.contains('silence')) {
         const t = taille.get(invite);
         if (!t) return;
-        invite.style.transform = `translate(${px(Math.min(Math.max(4, tete.x - t.l / 2), largeur - t.l - 4))}, ${px(Math.max(4 - haut, tete.y - 62 * s - t.h))})`;
+        poser(invite, Math.min(Math.max(4, tete.x - t.l / 2), largeur - t.l - 4), Math.max(4 - haut, tete.y - 62 * s - t.h));
+        invite.classList.add('place');
       }
     };
 
@@ -139,7 +148,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
     new IntersectionObserver(([e]) => chat.veille(!e.isIntersecting)).observe(racine);
 
     // Il parle : la bulle s'écrit lettre après lettre, et sa bouche bouge tant que le texte s'écrit
-    const cacherBulle = () => { bulle.hidden = true; chat.retenu = false; };
+    const cacherBulle = () => { bulle.hidden = true; bulle.classList.remove('place'); chat.retenu = false; };
     const dire = (message: string, lecture = 6500, adieu = false) => {
       if (!message) return;
       if (!adieu && (muet || chat.dort)) return;
@@ -150,6 +159,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       vu.textContent = '';
       bulle.hidden = false;
       chat.retenu = true;
+      // la bulle est mesurée et posée au-dessus de sa tête avant d'apparaître (elle naît de sa pointe)
+      taille.set(bulle, { l: bulle.offsetWidth, h: bulle.offsetHeight });
       placer();
       bulle.classList.remove('pop');
       void bulle.offsetWidth;
@@ -217,10 +228,10 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       if (!bulle.hidden && !ecrit) minuteurBulle = window.setTimeout(cacherBulle, 3500);
     });
 
-    // Il ne parle qu'à la toute première visite, puis seulement quand on le touche
-    if (lireDurable('mascotte-accueil') !== '1') {
+    // Il salue à l'arrivée sur le site (une fois par visite), puis ne parle que quand on le touche
+    if (lire('mascotte-accueil') !== '1') {
       window.setTimeout(() => {
-        ecrireDurable('mascotte-accueil', '1');
+        ecrire('mascotte-accueil', '1');
         chat.salue();
         dire(accueil);
       }, 450);
@@ -265,7 +276,9 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__corps { position: absolute; left: 0; top: 0; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 40%; background: none; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
   .mascotte__corps:focus-visible { outline-offset: 2px; }
 
-  .mascotte__bulle { position: absolute; left: 0; top: 0; pointer-events: auto; width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 28px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: 85% 100%; }
+  .mascotte__bulle { position: absolute; left: 0; top: 0; pointer-events: auto; width: max-content; max-width: min(300px, calc(100vw - 32px)); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 22px 12px 20px 12px / 12px 20px 12px 22px; padding: 12px 44px 28px 16px; font-size: 1.02rem; line-height: 1.35; box-shadow: 0 5px 0 rgba(43, 110, 58, 0.15); transform-origin: var(--queue, 85%) 100%; }
+  /* tant qu'elles ne sont pas posées au-dessus du chat, la bulle et l'invitation restent invisibles */
+  .mascotte__bulle:not(.place), .mascotte__invite:not(.place) { visibility: hidden; }
   .mascotte__bulle[hidden] { display: none; }
   .mascotte__bulle::after { content: ''; position: absolute; left: calc(var(--queue, 60px) - 9px); bottom: -14px; width: 18px; height: 18px; background: #fff; border-right: var(--trait) solid var(--vert-fonce); border-bottom: var(--trait) solid var(--vert-fonce); transform: rotate(45deg) skew(8deg, 8deg); }
   .mascotte__bulle.pop { animation: mascotte-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1); }
@@ -274,7 +287,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__vu { position: absolute; inset: 0; }
   /* Chemin vers la page de jeu, dans la bulle : discret sur la page de jeu elle-même (inutile) */
   .mascotte__jouer { display: inline-block; margin-top: 10px; padding: 6px 14px; font-family: var(--titre); font-size: 1.05rem; line-height: 1.1; color: #fff; background: var(--orange-fonce); border-radius: 18px 10px 16px 10px / 10px 16px 10px 18px; text-decoration: none; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18); }
-  .mascotte__jouer:hover, .mascotte__jouer:focus-visible { background: var(--vert-fonce); }
+  .mascotte__jouer:hover { color: #fff; translate: 0 -1px; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18); }
   .mascotte.jeu .mascotte__jouer, .mascotte.silence .mascotte__jouer { display: none; }
   .mascotte__muet { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--vert-fonce); cursor: pointer; border-radius: 50%; }
   /* Pastille collée au bas de la bulle, du côté opposé à la queue (sinon elle cache la pointe) : trois Z dessinés qui montent, comme ceux du chat endormi */
@@ -292,7 +305,7 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__bulle:not([hidden]) ~ .mascotte__invite { display: none; }
 
   @keyframes mascotte-pop { from { scale: 0.6; rotate: -3deg; opacity: 0; } to { scale: 1; rotate: 0deg; opacity: 1; } }
-  @keyframes mascotte-invite { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+  @keyframes mascotte-invite { 0%, 100% { transform: none; } 50% { transform: translateY(-6px); } }
 
   @media (max-width: 700px) {
     .mascotte__bulle { font-size: 0.98rem; max-width: min(240px, calc(100vw - 20px)); }

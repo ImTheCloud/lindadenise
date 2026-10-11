@@ -13,6 +13,19 @@ Consigne complète : `docs/prive/prompt-tilleul.md`. Quatre phases, un commit `[
 
 Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé par le mode automatique** : la session a continué sans. Serveur de dev ouvert au Wi-Fi (configuration `site-wifi` de `.claude/launch.json`, `astro dev --host`) : http://192.168.129.13:4321/ et http://192.168.129.13:4321/jouer/ (pare-feu du Mac désactivé, réponse vérifiée depuis l'adresse Wi-Fi).
 
+### Retours de Claudiu (2026-10-11, soir) : appliqués
+
+- **Site principal** : Tilleul se promène sans cesse d'un bord à l'autre (toutes les pages, toute la largeur, aussi sur téléphone), avec son demi-tour à chaque bout. Il ne s'arrête que pour parler : il freine (sans revenir en arrière), regarde le visiteur, et repart dès que la bulle se ferme. Remplace la règle « discret » de la phase 4 (plus de « visiteur occupé », plus de marche réservée à l'étang, plus de poses rares) ; il s'efface toujours pendant la saisie d'un formulaire et quand le menu du téléphone est ouvert, et s'assoit toujours sur la barre de la page Toiles. Sur le site, il ne chasse plus les feuilles de l'accueil (elles restent un décor) ; la chasse, l'étang et la toilette restent pour la page de jeu.
+- **Salut** : il salue à chaque arrivée sur le site (une fois par visite, `sessionStorage`), plus seulement à la toute première visite.
+- **Bulle** : elle venait de la gauche : l'agrandissement d'apparition (`scale`) agrandissait aussi son déplacement (`transform`). Elle est maintenant placée par `translate` et naît de sa pointe, directement au-dessus de la tête (vérifié image par image) ; elle reste invisible tant qu'elle n'est pas posée (de même pour « Touchez-moi ! »).
+- **« Jouer avec moi »** : changeait de couleur au survol (le style global des liens mettait le texte en orange sur le fond orange). Le texte reste blanc, le bouton monte d'un pixel.
+- **Arbre** de la page de jeu redessiné (`Arbre.astro`) : couronne ronde et feuillue au contour unique, dessous plus sombre, bord du haut plus clair, 54 petites feuilles en cœur, fleurs de tilleul, feuilles qui pendent sous la couronne, branches, tronc qui se prolonge jusqu'à l'étang sans raccord visible. Sur téléphone on est sous la couronne (on en voit le bas), sur grand écran l'arbre entier est à gauche.
+- **Feuilles** : elles se détachent du bas du feuillage (elles grandissent en sortant) et tombent plus vite : mini-jeu 130 à 190 pixels par seconde (avant 95 à 135) ; « Une feuille » jusqu'à 10 % de l'écran par seconde (avant 6 %), un peu moins vite quand Tilleul doit traverser l'écran pour l'attraper (il trotte). Chasse : marge d'affût réduite (il bondit tout de suite si la feuille arrive près du sol).
+- **Boutons retirés** : « L'étang » et « Toilette » (et leurs textes FR / NL). « Attraper les feuilles » prend la place de deux boutons dans la grille.
+- **Dormir ne marchait pas** après « Se coucher » : il attendait la fin de la pose commandée (25 s). Il bâille maintenant tout de suite puis s'endort (zzz en 4 s).
+- Papillons un peu plus grands (× 1,35).
+- Vérifié : 13 tests sur 13 sur ordinateur et téléphone simulé (dont promenade sur l'accueil et sur `/dessins/` : 279 à 947 px en 15 s ; arrêt pendant qu'il parle : 0 px, puis 247 à 493 px ; salut à l'arrivée, bulle au-dessus de lui, silence à la page suivante ; dormir après se coucher), feuille lâchée attrapée 8 fois sur 8, 60 images/s et 0 mise en page forcée, Lighthouse mobile accueil 99 / 100 / 100 / 100, `/jouer/` 100 / 100 / 100 / 100, CLS 0. Références du dessin inchangées.
+
 ### Phase 1 : diagnostic (moteur d'avant la refonte)
 
 **Images de référence** (hors dépôt, dans le dossier de travail de la session) : 28 images rendues dans Chrome sans écran en temps virtuel (pas de 1/120 s, hasard fixé, clignements et coups d'œil coupés), moteur chargé tel quel : assis, debout, couché, dort, étire (2 instants), toilette (4 instants), bâille, cœurs (2 instants), tête vers la gauche / la droite / le haut, marche (4 instants du pas), demi-tour à 0 / 25 / 50 / 75 / 100 %, guette, bond (2 instants). Deux rendus successifs sont identiques au pixel près. **Seuil retenu** : un pixel est « visible » si un canal diffère de plus de 24 sur 255 ; une image est identique si elle a au plus 40 pixels visibles (sur 1600 × 560).
@@ -118,7 +131,7 @@ Ordinateur, toutes pages : 60 images/s, 95e centile 16,8 ms, aucune tâche longu
 
 ### À tester par Claudiu (téléphone, http://192.168.129.13:4321/ avec `npm run dev -- --host`, ou la configuration « site-wifi »)
 
-1. Accueil : défiler doucement puis vite ; Tilleul monte avec l'étang, sans à-coup ni retard.
+1. Accueil : Tilleul salue, puis se promène d'un bord à l'autre ; défiler : il monte avec l'étang, sans à-coup ni retard.
 2. Toucher Tilleul plusieurs fois (et glisser le doigt sur lui : la page doit défiler).
 3. `/jouer/` : toucher l'herbe à gauche puis à droite ; « Un papillon » ; « Une feuille ».
 4. `/jouer/` : une partie d'« Attraper les feuilles » (le record reste après rechargement).
@@ -134,7 +147,6 @@ Ordinateur, toutes pages : 60 images/s, 95e centile 16,8 ms, aucune tâche longu
 - Zone à toucher : un rectangle aux coins arrondis autour du corps et de la tête (pas la queue), d'au moins 44 px. Toucher juste à côté du chat, dans ce rectangle, compte comme une caresse.
 - Sur Safari avant la version 16 (sans `overflow: clip`), le chat de l'accueil reste au bord de l'étang au lieu de coller au bas de l'écran quand l'étang est plus bas que l'écran.
 - Pendant qu'on écrit dans un formulaire ou que le menu du téléphone est ouvert, Tilleul s'efface complètement (il revient ensuite).
-- Sur les autres pages, une pose dure 18 à 30 s (assis) au lieu de 6 à 10 s.
 - Sur la page de jeu, la bande d'herbe du bas ne fait pas défiler la page au doigt (elle sert à appeler Tilleul) ; la page tient dans un écran de téléphone courant.
 - Mesures faites dans Chrome sans écran : elles ne remplacent pas un essai sur un vrai téléphone (surtout iPhone, et un Android modeste).
 

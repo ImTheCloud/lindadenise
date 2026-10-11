@@ -1,52 +1,80 @@
 ---
-// Grand tilleul dessiné (page de jeu) : une couronne large d'où tombent les feuilles, et un tronc qui descend jusqu'au
-// bord de l'étang. Même manière que Tilleul : toutes les boules de la couronne sont tracées d'un seul trait épais,
-// puis remplies par-dessus (il ne reste que le tour de l'ensemble). Décor, ignoré par les lecteurs d'écran.
+// Grand tilleul dessiné (page de jeu) : couronne feuillue en trois tons (dessous sombre, reflets du haut), petites feuilles
+// en cœur, feuilles qui pendent sous la couronne et fleurs de tilleul ; branches et tronc qui descend jusqu'à l'étang.
+// Même manière que Tilleul : toutes les boules de la couronne sont tracées d'un seul trait épais, puis remplies par-dessus
+// (il ne reste que le tour de l'ensemble). Décor, ignoré par les lecteurs d'écran.
+// La couronne garde ses proportions ; le bas du tronc (arbre__tronc) s'allonge jusqu'à l'étang.
 import { FEUILLE, NERVURES } from './tilleul/formes';
 
-const boules = [
-  [70, 150, 72], [170, 108, 92], [290, 92, 100], [410, 118, 96], [520, 86, 104], [640, 112, 98], [760, 94, 100], [880, 126, 92], [960, 160, 64],
-  [120, 196, 66], [250, 184, 84], [380, 196, 80], [500, 184, 88], [620, 196, 82], [740, 184, 86], [860, 196, 70],
-];
-// reflets clairs en haut à gauche des grosses boules
-const reflets = boules.filter(([, , r]) => r > 85).map(([x, y, r]) => [x - r * 0.3, y - r * 0.34, r * 0.3]);
-// fleurs de tilleul : petits bouquets crème
-const fleurs = [[140, 120], [330, 70], [455, 150], [585, 64], [700, 150], [820, 92], [230, 200], [905, 170], [520, 214]];
-// feuilles au bord de la couronne : [x, y, angle, taille]
-const feuilles = [[18, 150, -70, 0.5], [92, 60, -40, 0.55], [300, 4, -10, 0.5], [530, -2, 12, 0.55], [770, 8, 30, 0.5], [975, 110, 70, 0.5], [60, 250, -140, 0.45], [430, 270, 170, 0.45], [800, 268, 150, 0.45]];
-const cercles = (r = 0) => boules.map(([x, y, rr]) => `M${x - rr - r},${y}a${rr + r},${rr + r} 0 1 0 ${2 * (rr + r)},0a${rr + r},${rr + r} 0 1 0 ${-2 * (rr + r)},0Z`).join('');
+// petit hasard reproductible : l'arbre est le même à chaque construction du site
+let graine = 11;
+const hasard = () => { graine = (graine * 16807) % 2147483647; return graine / 2147483647; };
+const rond = (n: number) => Math.round(n * 10) / 10;
+
+// couronne dans un cadre de 1000 × 760 ; le tronc sort du bas en x = 640
+const CX = 500, CY = 360, RX = 370, RY = 230;
+// boules du bord, plus petites et un peu remontées en bas (le dessous d'un tilleul est plus plat)
+const lobes = Array.from({ length: 26 }, (_, k) => {
+  const a = (k / 26) * Math.PI * 2, bas = Math.max(0, Math.sin(a));
+  return { x: rond(CX + RX * Math.cos(a)), y: rond(CY + RY * Math.sin(a) - 40 * bas), r: rond((104 + 24 * Math.sin(k * 2.3)) * (1 - 0.32 * bas)), a };
+});
+const boule = (x: number, y: number, r: number) => `M${rond(x - r)},${y}a${r},${r} 0 1 0 ${rond(2 * r)},0a${r},${r} 0 1 0 ${rond(-2 * r)},0Z`;
+const masse = (dx = 0, dy = 0) => lobes.map((l) => boule(l.x + dx, l.y + dy, l.r)).join('') + `M${CX - RX + dx},${CY + dy}a${RX},${RY + 20} 0 1 0 ${2 * RX},0a${RX},${RY + 20} 0 1 0 ${-2 * RX},0Z`;
+// reflet : une bande plus claire le long du bord du haut, faite des mêmes boules un peu rentrées (elles se fondent)
+const reflet = lobes.filter((l) => Math.sin(l.a) < -0.15 && Math.cos(l.a) < 0.75).map((l) => boule(rond(l.x + 0.16 * l.r), rond(l.y + 0.2 * l.r), rond(l.r * 0.8))).join('');
+// petites feuilles en cœur sur toute la couronne : claires en haut, sombres en bas
+const petites: { x: number; y: number; a: number; k: number; c: string }[] = [];
+while (petites.length < 54) {
+  const x = CX + (hasard() * 2 - 1) * RX * 0.92, y = CY + (hasard() * 2 - 1) * RY * 0.95;
+  if (((x - CX) / (RX * 0.92)) ** 2 + ((y - CY) / (RY * 0.95)) ** 2 > 1) continue;
+  const clair = y < CY - 20 ? hasard() < 0.85 : hasard() < 0.25;
+  petites.push({ x: rond(x), y: rond(y), a: Math.round(hasard() * 360), k: rond(0.2 + hasard() * 0.12), c: clair ? (hasard() < 0.5 ? '#6CBF6F' : '#58B05E') : hasard() < 0.5 ? '#2E7A3B' : '#357F40' });
+}
+// feuilles qui pendent sous la couronne (c'est de là que tombent celles du jeu)
+const pendues = lobes.filter((l) => Math.sin(l.a) > 0.3).map((l) => ({ x: rond(l.x + (hasard() - 0.5) * 30), y: rond(l.y + l.r * 0.82), a: Math.round(180 + (hasard() - 0.5) * 60) }));
+// fleurs de tilleul : une bractée pâle et quelques boutons crème
+const fleurs = [[300, 470], [420, 540], [560, 520], [690, 470], [790, 420], [210, 400], [470, 300], [640, 260], [350, 220]];
+// branches, sous le feuillage (on les voit entre les boules du bas)
+const branches = ['M640,760 C640,690 626,640 604,560', 'M632,650 C560,590 452,566 352,500', 'M648,630 C700,566 760,532 806,470', 'M612,590 C584,506 566,430 520,362', 'M598,600 C520,560 420,520 250,470'];
 ---
 <div class="arbre" aria-hidden="true">
-  <svg class="arbre__tronc" viewBox="0 0 60 300" preserveAspectRatio="none">
-    <path d="M16,0 C18,90 14,200 4,300 L58,300 C46,200 42,90 44,0 Z" fill="#9C5B2C" stroke="#6B3A17" stroke-width="5" vector-effect="non-scaling-stroke" />
-    <path d="M24,30 C26,90 22,150 20,220 M36,70 C38,130 36,190 40,270" fill="none" stroke="#6B3A17" stroke-width="3" stroke-linecap="round" opacity=".55" vector-effect="non-scaling-stroke" />
+  <svg class="arbre__tronc" viewBox="0 0 100 300" preserveAspectRatio="none">
+    <path d="M0,0 C2,120 -2,220 -16,300 L116,300 C102,220 98,120 100,0 Z" fill="#9C5B2C" />
+    <path d="M0,0 C2,120 -2,220 -16,300 M116,300 C102,220 98,120 100,0" fill="none" stroke="#6B3A17" stroke-width="5" vector-effect="non-scaling-stroke" />
+    <path d="M30,10 C32,90 26,170 22,280 M66,40 C70,130 66,210 74,290" fill="none" stroke="#6B3A17" stroke-width="3" stroke-linecap="round" opacity=".5" vector-effect="non-scaling-stroke" />
   </svg>
-  <svg class="arbre__couronne" viewBox="-20 -30 1040 320" data-couronne>
-    <path d="M470,300 C480,250 440,230 400,214 M500,300 C510,250 560,236 600,222" fill="none" stroke="#6B3A17" stroke-width="16" stroke-linecap="round" />
-    {feuilles.map(([x, y, a, k]) => (
-      <g transform={`translate(${x},${y}) rotate(${a}) scale(${k}) translate(-50,-50)`}>
-        <path d={FEUILLE} fill="#3E9A47" stroke="#2B6E3A" stroke-width="6" />
-        <path d={NERVURES} stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".5" />
-      </g>
-    ))}
-    <path d={cercles()} fill="#2B6E3A" stroke="#2B6E3A" stroke-width="12" stroke-linejoin="round" />
-    <path d={cercles()} fill="#3E9A47" />
-    <path d={reflets.map(([x, y, r]) => `M${x - r},${y}a${r},${r} 0 1 0 ${2 * r},0a${r},${r} 0 1 0 ${-2 * r},0Z`).join('')} fill="#4BA652" />
+  <svg class="arbre__couronne" viewBox="0 0 1000 760" data-couronne>
+    <g fill="none" stroke-linecap="round">
+      {branches.map((d, i) => <path d={d} stroke="#6B3A17" stroke-width={i === 0 ? 92 : 34 - i * 3} />)}
+      {branches.map((d, i) => <path d={d} stroke="#9C5B2C" stroke-width={i === 0 ? 82 : 26 - i * 3} />)}
+    </g>
+    <path d={masse() + masse(10, 30)} fill="#245E31" stroke="#245E31" stroke-width="14" stroke-linejoin="round" />
+    <path d={masse(10, 30)} fill="#2E7A3B" />
+    <path d={masse()} fill="#3E9A47" />
+    <path d={reflet} fill="#48A34F" />
+    {petites.map((p) => <path d={FEUILLE} fill={p.c} transform={`translate(${p.x},${p.y}) rotate(${p.a}) scale(${p.k}) translate(-50,-50)`} />)}
     {fleurs.map(([x, y]) => (
       <g transform={`translate(${x},${y})`}>
-        <circle cx="-7" cy="0" r="6" fill="#FFF1B8" /><circle cx="6" cy="-4" r="6" fill="#FFF1B8" /><circle cx="2" cy="8" r="6" fill="#FFF1B8" />
-        <circle cx="0" cy="1" r="3" fill="#E8B53C" />
+        <path d="M0,0 C10,8 14,30 6,44 C-2,30 -6,12 0,0 Z" fill="#E3EFA0" stroke="#9BB05A" stroke-width="2" />
+        <circle cx="-8" cy="6" r="7" fill="#FFF3C4" stroke="#E2C66B" stroke-width="1.5" /><circle cx="6" cy="10" r="7" fill="#FFF3C4" stroke="#E2C66B" stroke-width="1.5" /><circle cx="-2" cy="18" r="7" fill="#FFF3C4" stroke="#E2C66B" stroke-width="1.5" />
+        <circle cx="-8" cy="6" r="2.4" fill="#E8B53C" /><circle cx="6" cy="10" r="2.4" fill="#E8B53C" /><circle cx="-2" cy="18" r="2.4" fill="#E8B53C" />
+      </g>
+    ))}
+    {pendues.map((p) => (
+      <g transform={`translate(${p.x},${p.y}) rotate(${p.a}) scale(.44) translate(-50,-6)`}>
+        <path d={FEUILLE} fill="#3E9A47" stroke="#245E31" stroke-width="7" />
+        <path d={NERVURES} stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".55" />
       </g>
     ))}
   </svg>
 </div>
 <style>
-  /* Téléphone : la couronne couvre le haut de la scène, le tronc descend à droite. Grand écran : l'arbre est à gauche. */
-  .arbre { position: absolute; inset: 0; pointer-events: none; }
-  .arbre__couronne { position: absolute; top: -9vw; left: -4vw; width: 108vw; height: auto; }
-  .arbre__tronc { position: absolute; top: 20vw; right: 9vw; width: 13vw; height: calc(100% - 20vw - 30px); }
+  /* Téléphone : on est sous la couronne (seul son bas se voit en haut de la scène), le tronc descend à droite.
+     Grand écran : l'arbre entier, à gauche. Le tronc prolonge celui de la couronne (même largeur : 8,4 % de la couronne). */
+  .arbre { position: absolute; inset: 0; pointer-events: none; --l: 116vw; --g: -12vw; --h: -48vw; }
+  .arbre__couronne { position: absolute; left: var(--g); top: var(--h); width: var(--l); height: auto; }
+  .arbre__tronc { position: absolute; overflow: visible; left: calc(var(--g) + var(--l) * 0.598); width: calc(var(--l) * 0.084); top: calc(var(--h) + var(--l) * 0.76 - 1px); height: calc(100% - var(--h) - var(--l) * 0.76 - 40px); }
   @media (min-width: 900px) {
-    .arbre__couronne { left: -3vw; width: 60vw; top: -10px; }
-    .arbre__tronc { top: 11vw; right: auto; left: 22vw; width: 6vw; height: calc(100% - 11vw - 30px); }
+    .arbre { --l: 50vw; --g: 1vw; --h: 0vw; }
   }
 </style>

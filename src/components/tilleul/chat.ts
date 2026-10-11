@@ -446,8 +446,8 @@ ${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" 
 
 // Le décor de la page (étang, feuilles), tenu à jour par decor.ts : positions en pixels de l'écran, gardées en mémoire
 // (le chat ne lit jamais la mise en page lui-même)
-// une feuille (ou un papillon) : position à l'écran, vitesse de chute (pixels par seconde), opacité, et ce qui arrive quand il l'attrape
-export interface FeuilleDecor { el: object; x: number; y: number; vy?: number; op?: number; attraper?(): void }
+// une feuille (ou un papillon) : position à l'écran, vitesse de chute (pixels par seconde), et ce qui arrive quand il l'attrape
+export interface FeuilleDecor { el: object; x: number; y: number; vy?: number; attraper?(): void }
 export interface Decor {
   haut?(): number; // où est le haut de la bande du chat à l'écran (par défaut : collée au bas de l'écran)
   lotus(): V[];
@@ -465,11 +465,10 @@ export interface Options {
   toucher(): void; // le visiteur l'a touché
   suit(r: Reperes): void; // appelé à chaque image : où il est
 }
-export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'toilette' | 'chasse' | 'viens' | 'etang';
+export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'chasse' | 'viens';
 export interface Precision { x?: number; vite?: boolean; cible?: object } // « viens » : où aller (pixels de la bande), s'il trotte ; « chasse » : quelle feuille
 
 export const HAUT = 280; // hauteur de la bande où il vit
-const CALME = 2500; // ms sans geste du visiteur avant qu'il se promène
 const APPROCHE = 130; // distance (unités du dessin) à laquelle il se tapit d'une feuille
 const PORTEE = 125; // hauteur (en unités du dessin) à laquelle une feuille est à sa portée : il bondit quand elle y passe
 const PAS = 1 / 120; // pas de temps fixe du mouvement, en secondes
@@ -521,7 +520,7 @@ function squelette(p: Pose, w: number, phase: number, t: number) {
 export class Chat {
   // ce que la page peut régler
   parle = false; // sa bouche bouge pendant qu'il parle
-  retenu = false; // une bulle est ouverte : il ne part pas se promener de lui-même (hors page de jeu)
+  retenu = false; // il parle (bulle ouverte) : sur le site, il s'arrête et attend la fin de la bulle
   // réglés aussi par la vidéo (scripts/video/scene.html)
   x = 0;
   cibleX = 0;
@@ -560,7 +559,6 @@ export class Chat {
   private dernierDessin = 0;
   private raf = 0;
   private saut = false; // la prochaine image ne mélange pas deux pas (redimensionnement)
-  private geste = -Infinity; // dernier geste du visiteur (défilement, clavier, doigt)
   private allure = new Ressort(0, 60);
   private trot = new Ressort(0, 30);
   private r = Object.fromEntries(CLES.map((c) => [c, new Ressort(DEBOUT[c], RAIDEUR[c] ?? 32)])) as Record<Cle, Ressort>;
@@ -582,7 +580,7 @@ export class Chat {
   private sautV = 0;
   private coeurs: { dx: number; vie: number }[] = [];
   private pointeur: V | null = null;
-  private feuille: { el: object; x: number; y: number; op: number; attraper?(): void } | null = null; // vraie feuille du décor qu'il chasse
+  private feuille: { el: object; x: number; y: number; attraper?(): void } | null = null; // feuille ou papillon qu'il chasse
   private chasseT = 0;
   private lotus: V | null = null; // lotus qu'il regarde, assis au bord de l'étang
   private pupille = new Ressort(1, 60);
@@ -607,11 +605,10 @@ export class Chat {
     const suivre = (e: PointerEvent) => { this.pointeur = { x: e.clientX, y: e.clientY - this.haut }; };
     addEventListener('pointermove', suivre, { passive: true });
     addEventListener('pointerdown', suivre, { passive: true });
-    // défilement, clavier et doigt posé disent au chat que le visiteur est occupé
-    for (const nom of ['scroll', 'wheel', 'keydown', 'touchstart']) addEventListener(nom, () => { this.geste = performance.now(); }, { passive: true });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) this.lancer(); });
     if (o.dort) { this.etat = 'dort'; this.attente = 15; }
     else this.mettre('assis');
+    if (!o.libre && !o.dort) this.attente = Math.min(this.attente, 1.5); // sur le site, il part vite se promener
     this.poser(this.etat);
     this.stabiliser();
     this.lancer();
@@ -633,6 +630,7 @@ export class Chat {
     this.feuille = null;
     this.lotus = null;
     if (!this.dort) { this.mettre('couche'); this.attente = 1.4; }
+    else if (this.etat === 'couche') this.attente = Math.min(this.attente, 0.8); // déjà couché : il bâille tout de suite
     if (this.fige) { this.mettre('dort'); this.stabiliser(); }
   }
 
@@ -681,7 +679,6 @@ export class Chat {
   // Ce qu'il fait, pour la page de jeu (le bouton de l'action en cours est allumé), et ce qu'il chasse
   get action() {
     if (this.feuille || this.etat === 'guette' || this.etat === 'bond') return 'chasse';
-    if (this.lotus) return 'etang';
     return this.etat === 'baille' ? 'dort' : this.etat;
   }
 
@@ -690,7 +687,7 @@ export class Chat {
   }
 
   // Ordres du visiteur : ils passent avant le pilote automatique et avant la bulle ouverte. En plein bond, l'ordre attend
-  // l'atterrissage. Un ordre impossible (rien à chasser, pas d'étang) est dit par un petit miaou, la tête vers le visiteur.
+  // l'atterrissage. Un ordre impossible (rien à chasser) est dit par un petit miaou, la tête vers le visiteur.
   ordre(o: Ordre, q: Precision = {}) {
     if (this.etat === 'bond') { this.enAttente = [o, q]; return true; }
     const ok = this.executer(o, q);
@@ -708,7 +705,6 @@ export class Chat {
     if (o === 'marche') this.marcher();
     else if (o === 'viens') { this.cibleX = this.dansEcran(q.x ?? this.x); this.etat = 'marche'; }
     else if (o === 'chasse') ok = this.chasserUneFeuille(q.cible);
-    else if (o === 'etang') ok = this.allerAuLotus();
     else if (o === 'dort') this.dormir();
     else { this.mettre(o); this.attente = 25; }
     if (!ok) this.ordonne = this.vite = false;
@@ -740,7 +736,7 @@ export class Chat {
 
   private chasser(f: FeuilleDecor) {
     this.lotus = null;
-    this.feuille = { el: f.el, x: f.x, y: f.y - this.haut, op: 1, attraper: f.attraper };
+    this.feuille = { el: f.el, x: f.x, y: f.y - this.haut, attraper: f.attraper };
     this.chasseT = 0;
     const d = Math.sign(f.x - this.x) || 1;
     this.cibleX = this.dansEcran(f.x - d * APPROCHE * this.s);
@@ -788,33 +784,11 @@ export class Chat {
     this.attente = lerp(a, b, Math.random());
   }
 
-  private calme() {
-    return this.o.libre || performance.now() - this.geste > CALME;
-  }
-
-  // Hors de la page de jeu, il ne marche que sur l'herbe devant l'étang (accueil, étang visible en bas de l'écran) ; ailleurs il reste sur place
-  private promener() {
-    if (this.o.libre || this.o.decor.lotus().length) this.marcher();
-    else this.mettre('assis');
-  }
-
+  // Une promenade vers l'autre côté de l'écran (il fait demi-tour en marchant à chaque fois)
   private marcher() {
     this.lotus = null;
-    let x = this.x;
-    if (this.o.libre) {
-      // page de jeu : une vraie promenade, vers l'autre côté de l'écran
-      const bord = 70 * this.s + Math.random() * this.W * 0.12;
-      x = this.x < this.W / 2 ? this.W - bord : bord;
-    } else if (this.W < 700) {
-      // sur téléphone : de courtes promenades
-      const d = (Math.random() < 0.5 ? -1 : 1) * lerp(0.12, 0.3, Math.random()) * this.W;
-      x = this.dansEcran(this.x + d);
-      if (Math.abs(x - this.x) < 50 * this.s) x = this.dansEcran(this.x - d);
-    } else {
-      const marge = 100 * this.s;
-      for (let i = 0; i < 12 && Math.abs(x - this.x) < this.W * 0.25; i++) x = lerp(marge, this.W - marge, Math.random());
-    }
-    this.cibleX = this.dansEcran(x);
+    const bord = 70 * this.s + Math.random() * this.W * 0.12;
+    this.cibleX = this.dansEcran(this.x < this.W / 2 ? this.W - bord : bord);
     this.etat = 'marche';
   }
 
@@ -826,16 +800,14 @@ export class Chat {
   // Une feuille du décor (ou celle qu'on lui montre) est assez haute pour qu'il ait le temps de la guetter :
   // il va se placer et se tapir. Sur la page de jeu, il trotte vers une feuille lointaine.
   private chasserUneFeuille(cible?: object) {
-    if (!this.o.libre && !this.o.decor.lotus().length) return false;
     const portee = this.haut + this.sol - PORTEE * this.s;
     const loin = (l: FeuilleDecor) => Math.max(0, Math.abs(l.x - this.x) - APPROCHE * this.s);
     const vitesse = (l: FeuilleDecor) => (this.o.libre && loin(l) > 250 ? TROT.vmax : VMAX) * this.s;
     const f = this.o.decor.feuilles()
       .filter((l) => {
-        // elle doit être encore assez haute quand il sera en place : trajet, demi-tour et affût
-        // (les feuilles de l'accueil tombent de 5,5 % de l'écran par seconde)
-        const delai = loin(l) / vitesse(l) + 3;
-        return (!cible || l.el === cible) && (l.op ?? 1) > 0.5 && l.y > 0 && l.y + (l.vy ?? 0.055 * this.vh) * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
+        // elle doit être encore assez haute quand il sera en place : trajet, demi-tour et début d'affût
+        const delai = loin(l) / vitesse(l) + 2;
+        return (!cible || l.el === cible) && l.y > 0 && l.y + (l.vy ?? 0) * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
       })
       .sort((a, b) => b.y - a.y)[0];
     if (!f) return false;
@@ -856,32 +828,31 @@ export class Chat {
     return true;
   }
 
-  // Pilote automatique : une petite vie de chat. Quand le visiteur est occupé, il reste tranquille.
+  // Pilote automatique. Sur le site, il se promène d'un bord à l'autre de l'écran ; quand il parle, il s'arrête et attend.
+  // Sur la page de jeu, une petite vie de chat : poses, toilette, étang, feuilles et papillons.
   private suivant() {
     this.ordonne = this.vite = false;
     if (this.dodo) {
       this.mettre(this.etat === 'couche' ? 'baille' : this.etat === 'baille' || this.etat === 'dort' ? 'dort' : 'couche');
       return;
     }
-    if ((this.retenu && !this.o.libre) || !this.calme()) {
-      if (this.etat === 'dort') this.mettre('etire');
-      else if (this.etat !== 'couche') this.mettre('assis');
-      else this.mettre('baille');
+    if (!this.o.libre) {
+      if (this.etat === 'dort' || this.etat === 'couche' || this.etat === 'baille') this.mettre('etire');
+      else if (this.retenu) { this.mettre('debout'); this.attente = 0.4; }
+      else this.marcher();
       return;
     }
     const r = Math.random();
     const decor = () => (r < 0.5 ? this.chasserUneFeuille() || this.allerAuLotus() : this.allerAuLotus() || this.chasserUneFeuille());
     switch (this.etat) {
-      case 'debout': if (r < 0.3) this.mettre('assis'); else if (r < 0.4) this.mettre('couche'); else if (r < 0.6 && decor()) break; else this.promener(); break;
-      case 'assis': if (r < 0.3) this.promener(); else if (r < 0.5) this.mettre('toilette'); else if (r < 0.65) this.mettre('couche'); else if (!decor()) this.promener(); break;
+      case 'debout': if (r < 0.3) this.mettre('assis'); else if (r < 0.4) this.mettre('couche'); else if (r < 0.6 && decor()) break; else this.marcher(); break;
+      case 'assis': if (r < 0.3) this.marcher(); else if (r < 0.5) this.mettre('toilette'); else if (r < 0.65) this.mettre('couche'); else if (!decor()) this.marcher(); break;
       case 'toilette': this.mettre('assis'); break;
       case 'couche': if (r < 0.6) this.mettre('baille'); else this.mettre('debout'); break;
       case 'baille': this.mettre('dort'); break;
       case 'dort': this.mettre('etire'); break;
-      case 'etire': this.promener(); break;
+      case 'etire': this.marcher(); break;
     }
-    // loin de l'étang (autres pages, accueil défilé), il reste sur place et chaque pose dure trois fois plus longtemps
-    if (!this.o.libre && !this.o.decor.lotus().length && (this.etat === 'assis' || this.etat === 'couche' || this.etat === 'dort' || this.etat === 'debout')) this.attente *= 3;
   }
 
   // Arrivé là où il allait : il se tapit (feuille), s'assoit (lotus) ou reste debout ; après un ordre, il reste un moment
@@ -926,8 +897,9 @@ export class Chat {
 
     // déplacement : il freine pour s'arrêter pile ; pendant un demi-tour en marchant, sa vitesse suit son orientation
     if (this.etat === 'marche') {
-      // le visiteur défile ou tape : il s'arrête là où il est (une bulle ouverte le retient aussi), sauf s'il suit un ordre
-      if (!libre && (this.retenu || !this.calme()) && this.cibleX !== this.x) { this.feuille = null; this.lotus = null; this.cibleX = this.x; }
+      // il parle : il s'arrête là où il est (sauf s'il suit un ordre, ou sur la page de jeu)
+      // (en freinant normalement : le point d'arrêt est un peu devant lui, il ne revient pas en arrière)
+      if (!libre && this.retenu && this.cibleX !== this.x) { this.feuille = null; this.lotus = null; this.cibleX = this.x + (Math.sign(this.vx) * this.vx * this.vx * s) / (2 * accel); }
       const d = this.cibleX - this.x;
       if (Math.abs(d) > 4 && Math.sign(d) !== this.sens) this.sens = Math.sign(d);
       if (this.retour >= 0 && this.enArc) this.vx = this.vArc * Math.cos(this.phi);
@@ -972,10 +944,9 @@ export class Chat {
     const fe = this.feuille;
     if (fe) {
       const l = this.o.decor.feuilles().find((x) => x.el === fe.el);
-      if (l) { fe.x = l.x; fe.y = l.y - this.haut; fe.op = l.op ?? 1; }
-      else fe.op = 0;
+      if (l) { fe.x = l.x; fe.y = l.y - this.haut; }
       this.chasseT += dt;
-      if (this.etat !== 'bond' && (fe.op < 0.3 || fe.y > this.sol + 10 || this.chasseT > 30 || (!libre && (this.retenu || !this.calme())))) this.abandonner();
+      if (this.etat !== 'bond' && (!l || fe.y > this.sol + 10 || this.chasseT > 30 || (!libre && this.retenu))) this.abandonner();
     }
 
     // saut de joie
@@ -1063,6 +1034,7 @@ export class Chat {
     // regard : devant lui la plupart du temps ; de temps en temps (et quand on le caresse),
     // un coup d'œil vers le visiteur, ou vers le pointeur s'il y en a un
     this.prochainCoupDoeil -= dt;
+    if (this.retenu && !this.o.libre) this.coupDoeil = Math.max(this.coupDoeil, 0.2); // il regarde le visiteur pendant qu'il parle
     if (this.prochainCoupDoeil <= 0) { this.coupDoeil = 1.4 + Math.random() * 1.2; this.prochainCoupDoeil = this.coupDoeil + 5 + Math.random() * 7; }
     this.coupDoeil = Math.max(0, this.coupDoeil - dt);
     let tourCible = p.tour * cphi, rx = 0.5 * cap, ry = 0;
