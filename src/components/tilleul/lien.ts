@@ -5,6 +5,6 @@ import type { Chat, FeuilleDecor, Reperes } from './chat';
 export const lien: {
   chat?: Chat;
   reperes?: Reperes;
-  feuilles?: () => FeuilleDecor[]; // feuilles et papillons de la page de jeu, à l'écran
+  feuilles?: () => FeuilleDecor[]; // feuilles de la page de jeu, à l'écran
   curiosite?: () => { x: number; y: number } | null;
 } = {};

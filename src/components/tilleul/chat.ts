@@ -446,13 +446,13 @@ ${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" 
 
 // Le décor de la page (étang, feuilles), tenu à jour par decor.ts : positions en pixels de l'écran, gardées en mémoire
 // (le chat ne lit jamais la mise en page lui-même)
-// une feuille (ou un papillon) : position à l'écran, vitesse de chute (pixels par seconde), et ce qui arrive quand il l'attrape
+// une feuille : position à l'écran, vitesse de chute (pixels par seconde), et ce qui arrive quand il l'attrape
 export interface FeuilleDecor { el: object; x: number; y: number; vy?: number; attraper?(): void }
 export interface Decor {
   haut?(): number; // où est le haut de la bande du chat à l'écran (par défaut : collée au bas de l'écran)
   lotus(): V[];
   feuilles(): FeuilleDecor[];
-  curiosite?(): V | null; // ce qui attire son regard quand il ne fait rien (un papillon, une feuille qui tombe)
+  curiosite?(): V | null; // ce qui attire son regard quand il ne fait rien (un poisson qui saute, une feuille qui tombe)
 }
 
 // Repères donnés à la page à chaque image, dans la bande du chat : la boîte entoure le corps et la tête (zone à toucher)
@@ -466,7 +466,7 @@ export interface Options {
   suit(r: Reperes): void; // appelé à chaque image : où il est
 }
 export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'chasse' | 'viens';
-export interface Precision { x?: number; vite?: boolean; cible?: object } // « viens » : où aller (pixels de la bande), s'il trotte ; « chasse » : quelle feuille
+export interface Precision { x?: number; cible?: object } // « viens » : où aller (pixels de la bande) ; « chasse » : quelle feuille
 
 export const HAUT = 280; // hauteur de la bande où il vit
 const APPROCHE = 130; // distance (unités du dessin) à laquelle il se tapit d'une feuille
@@ -529,7 +529,8 @@ export class Chat {
   private fige: boolean;
   private dodo: boolean; // silence demandé : il dort tant qu'on ne le touche pas
   private ordonne = false; // il suit un ordre du visiteur : ni la bulle ni le visiteur occupé ne l'arrêtent
-  private vite = false; // il trotte (mini-jeu)
+  private vite = false; // il trotte (feuille lointaine)
+  private presse = 0; // temps restant pendant lequel il change de pose plus vivement (ordre du visiteur)
   private enAttente: [Ordre, Precision] | null = null; // ordre donné en plein bond, suivi à l'atterrissage
   private actif = true; // faux quand sa bande est hors de l'écran
   private calque: SVGGElement;
@@ -580,7 +581,7 @@ export class Chat {
   private sautV = 0;
   private coeurs: { dx: number; vie: number }[] = [];
   private pointeur: V | null = null;
-  private feuille: { el: object; x: number; y: number; attraper?(): void } | null = null; // feuille ou papillon qu'il chasse
+  private feuille: { el: object; x: number; y: number; attraper?(): void } | null = null; // feuille qu'il chasse
   private chasseT = 0;
   private lotus: V | null = null; // lotus qu'il regarde, assis au bord de l'étang
   private pupille = new Ressort(1, 60);
@@ -700,13 +701,13 @@ export class Chat {
     this.feuille = null;
     this.lotus = null;
     this.ordonne = true;
-    this.vite = !!q.vite;
+    this.vite = false;
     let ok = true;
     if (o === 'marche') this.marcher();
     else if (o === 'viens') { this.cibleX = this.dansEcran(q.x ?? this.x); this.etat = 'marche'; }
     else if (o === 'chasse') ok = this.chasserUneFeuille(q.cible);
-    else if (o === 'dort') this.dormir();
-    else { this.mettre(o); this.attente = 25; }
+    else if (o === 'dort') { this.dormir(); this.presse = 1.5; }
+    else { this.mettre(o); this.attente = 25; this.presse = 1.5; }
     if (!ok) this.ordonne = this.vite = false;
     if (this.fige) { if (o === 'dort') this.mettre('dort'); else if (this.etat === 'marche') this.mettre('assis'); this.stabiliser(); }
     return ok;
@@ -807,7 +808,8 @@ export class Chat {
       .filter((l) => {
         // elle doit être encore assez haute quand il sera en place : trajet, demi-tour et début d'affût
         const delai = loin(l) / vitesse(l) + 2;
-        return (!cible || l.el === cible) && l.y > 0 && l.y + (l.vy ?? 0) * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
+        // une feuille montrée par le visiteur : il y va toujours
+        return cible ? l.el === cible : l.y > 0 && l.y + (l.vy ?? 0) * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
       })
       .sort((a, b) => b.y - a.y)[0];
     if (!f) return false;
@@ -829,7 +831,7 @@ export class Chat {
   }
 
   // Pilote automatique. Sur le site, il se promène d'un bord à l'autre de l'écran ; quand il parle, il s'arrête et attend.
-  // Sur la page de jeu, une petite vie de chat : poses, toilette, étang, feuilles et papillons.
+  // Sur la page de jeu, une petite vie de chat : poses, toilette, étang, feuilles.
   private suivant() {
     this.ordonne = this.vite = false;
     if (this.dodo) {
@@ -838,7 +840,7 @@ export class Chat {
     }
     if (!this.o.libre) {
       if (this.etat === 'dort' || this.etat === 'couche' || this.etat === 'baille') this.mettre('etire');
-      else if (this.retenu) { this.mettre('debout'); this.attente = 0.4; }
+      else if (this.retenu) { if (this.etat !== 'assis') this.mettre('debout'); this.attente = 0.4; } // il reste assis s'il l'était
       else this.marcher();
       return;
     }
@@ -907,7 +909,9 @@ export class Chat {
         const tourne = this.retour >= 0 || cap !== this.sens;
         const voulu = tourne ? 0 : this.sens * Math.min(vmax, Math.sqrt(2 * accel * Math.max(0, Math.abs(d) / s - 1)));
         this.vx += clamp(voulu - this.vx, -accel * dt, accel * dt);
-        if (!tourne && Math.abs(d) < 3 && Math.abs(this.vx) < 6) this.arrivee();
+        // sur le site, au bout de l'écran, il repart aussitôt dans l'autre sens (demi-tour en marchant, sans s'arrêter)
+        if (!this.o.libre && !this.ordonne && !this.retenu && !this.feuille && Math.abs(d) < 24 * s) this.marcher();
+        else if (!tourne && Math.abs(d) < 3 && Math.abs(this.vx) < 6) this.arrivee();
       }
     } else {
       this.vx += clamp(-this.vx, -2 * ACCEL * dt, 2 * ACCEL * dt);
@@ -994,10 +998,13 @@ export class Chat {
       cible = { ...cible, cy: g.cy, incl: g.incl, ...(kLeve === 0 ? { avX: g.pied.x, avY: g.pied.y } : { av2X: g.pied.x, av2Y: g.pied.y }) };
     }
     const p = {} as Pose;
+    // après un ordre du visiteur, la pose change 1,8 fois plus vite (même mouvement, plus vif)
+    this.presse = Math.max(0, this.presse - dt);
+    const dp = this.presse > 0 ? dt * 1.8 : dt;
     for (const c of CLES) {
       const r = this.r[c];
       // l'angle de la queue prend le chemin le plus court (sinon elle balaie le dos en passant par l'avant)
-      p[c] = r.pas(c === 'qBase' ? r.x + ecart(cible[c] - r.x) : cible[c], dt);
+      p[c] = r.pas(c === 'qBase' ? r.x + ecart(cible[c] - r.x) : cible[c], dp);
     }
     const vit = this.retour >= 0 && this.enArc && this.etat === 'marche' ? this.vArc : Math.abs(this.vx);
     const w = this.allure.pas(clamp((vit / VMAX) * 1.4, 0, 1), dt);

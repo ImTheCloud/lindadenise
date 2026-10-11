@@ -1,6 +1,6 @@
 // Le décor où vit Tilleul, lu dans la page puis gardé en mémoire : rien n'est mesuré à chaque image.
 // Repères : [data-decor] (la scène : haut de l'accueil, page de jeu), .etang et ses .flotte (lotus, Etang.astro),
-// [data-tilleul-rail] (le bord de l'étang, où se pose la bande du chat). Les feuilles et les papillons qu'il peut chasser
+// [data-tilleul-rail] (le bord de l'étang, où se pose la bande du chat). Les feuilles qu'il peut chasser
 // sont donnés par la page de jeu (lien.ts). Les positions sont relevées au chargement, quand la taille change, et quand
 // le défilement s'arrête.
 import { HAUT, type Decor } from './chat';

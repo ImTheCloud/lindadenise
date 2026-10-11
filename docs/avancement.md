@@ -26,6 +26,14 @@ Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé
 - Papillons un peu plus grands (× 1,35).
 - Vérifié : 13 tests sur 13 sur ordinateur et téléphone simulé (dont promenade sur l'accueil et sur `/dessins/` : 279 à 947 px en 15 s ; arrêt pendant qu'il parle : 0 px, puis 247 à 493 px ; salut à l'arrivée, bulle au-dessus de lui, silence à la page suivante ; dormir après se coucher), feuille lâchée attrapée 8 fois sur 8, 60 images/s et 0 mise en page forcée, Lighthouse mobile accueil 99 / 100 / 100 / 100, `/jouer/` 100 / 100 / 100 / 100, CLS 0. Références du dessin inchangées.
 
+### Retours de Claudiu (2026-10-11, nuit) : appliqués, à juger par Claudiu (sans grands tests, à sa demande)
+
+- Accueil : il salue à chaque arrivée sur l'accueil, assis et immobile tant qu'il parle (autres pages : une fois par visite). Au bout de l'écran, il repart aussitôt dans l'autre sens (demi-tour en marchant, sans pause).
+- Page de jeu : « Se coucher » : le bouton s'allumait tout de suite (10 ms) mais le chat mettait près d'une seconde à descendre ; après un ordre, ses poses changent 1,8 fois plus vite pendant 1,5 s.
+- Feuille : elle se détache du feuillage, prend de la vitesse puis tombe régulièrement (plus de chute rapide puis lente) ; Tilleul va toujours la chercher (plus de refus « trop loin »).
+- Papillons retirés (bouton, passages, textes).
+- Nouveau mini-jeu **« Attraper les poissons »** (remplace « Attraper les feuilles ») : 30 s, des poissons orange sautent de l'étang en arc, on les touche avant qu'ils replongent (grande zone à toucher, 72 × 54 px), de plus en plus nombreux (un toutes les 1,05 s puis 0,55 s) et rapides ; Tilleul les suit des yeux et fait un petit bond à chaque prise ; record sur l'appareil (`tilleul-record-poissons`), fin calme avec « Rejouer » / « Revenir ». Au clavier, les poissons ne sont pas accessibles (jeu au doigt ou à la souris) : à valider.
+
 ### Phase 1 : diagnostic (moteur d'avant la refonte)
 
 **Images de référence** (hors dépôt, dans le dossier de travail de la session) : 28 images rendues dans Chrome sans écran en temps virtuel (pas de 1/120 s, hasard fixé, clignements et coups d'œil coupés), moteur chargé tel quel : assis, debout, couché, dort, étire (2 instants), toilette (4 instants), bâille, cœurs (2 instants), tête vers la gauche / la droite / le haut, marche (4 instants du pas), demi-tour à 0 / 25 / 50 / 75 / 100 %, guette, bond (2 instants). Deux rendus successifs sont identiques au pixel près. **Seuil retenu** : un pixel est « visible » si un canal diffère de plus de 24 sur 255 ; une image est identique si elle a au plus 40 pixels visibles (sur 1600 × 560).

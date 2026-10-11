@@ -228,8 +228,10 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       if (!bulle.hidden && !ecrit) minuteurBulle = window.setTimeout(cacherBulle, 3500);
     });
 
-    // Il salue à l'arrivée sur le site (une fois par visite), puis ne parle que quand on le touche
-    if (lire('mascotte-accueil') !== '1') {
+    // Il salue à l'arrivée sur le site et à chaque retour sur l'accueil (assis, sans bouger tant qu'il parle),
+    // puis ne parle que quand on le touche
+    const accueilPage = !!document.querySelector('[data-decor]:not([data-jeu])');
+    if (accueilPage || lire('mascotte-accueil') !== '1') {
       window.setTimeout(() => {
         ecrire('mascotte-accueil', '1');
         chat.salue();
