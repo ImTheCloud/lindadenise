@@ -34,7 +34,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
           <p class="jeu__intro">{j.intro}</p>
           <div class="jeu__ordres">
             {ordres.map((o) => (
-              <button class="jeu__ordre" type="button" data-ordre={o} data-bouge={bouge.has(o) ? '' : undefined} aria-pressed="false">
+              <button class="jeu__ordre" type="button" data-ordre={o} data-bouge={bouge.has(o) ? '' : undefined} aria-pressed={String(o === 'assis')}>
                 <svg viewBox="0 0 40 40" aria-hidden="true" set:html={icones[o]} />
                 <span>{j[o]}</span>
               </button>
@@ -250,7 +250,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     lien.curiosite = () => regard;
 
     // ---------- une image ----------
-    let avant = 0, actif = '';
+    let avant = 0, actif = 'assis'; // il arrive assis : le bouton est allumé dès l'affichage de la page
     const boucle = (t: number) => {
       const dt = avant ? Math.min(0.05, (t - avant) / 1000) : 0;
       avant = t;
