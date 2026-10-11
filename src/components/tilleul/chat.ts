@@ -676,7 +676,8 @@ export class Chat {
   // Ce qu'il fait, pour la page de jeu (le bouton de l'action en cours est allumé), et ce qu'il chasse
   get action() {
     if (this.feuille || this.etat === 'guette' || this.etat === 'bond') return 'chasse';
-    return this.etat === 'baille' ? 'dort' : this.etat;
+    // il va dormir (il se couche, bâille puis s'endort) : c'est déjà « dormir »
+    return this.dodo ? 'dort' : this.etat;
   }
 
   get cible() {
@@ -702,7 +703,7 @@ export class Chat {
     if (o === 'marche') this.marcher();
     else if (o === 'viens') { this.cibleX = this.dansEcran(q.x ?? this.x); this.etat = 'marche'; }
     else if (o === 'chasse') ok = this.chasserUneFeuille(q.cible);
-    else if (o === 'dort') { this.dormir(); this.presse = 1.5; }
+    else if (o === 'dort') { this.dormir(); this.presse = 1.5; if (this.etat === 'couche') this.attente = Math.min(this.attente, 0.6); }
     else { this.mettre(o); this.attente = 25; this.presse = 1.5; }
     if (!ok) this.ordonne = this.vite = false;
     if (this.fige) { if (o === 'dort') this.mettre('dort'); else if (this.etat === 'marche') this.mettre('assis'); this.stabiliser(); }
