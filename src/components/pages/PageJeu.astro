@@ -8,7 +8,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const j = t(lang).jeu;
 const chemins = { fr: chemin('jeu', 'fr'), nl: chemin('jeu', 'nl') };
-const ordres = ['marche', 'assis', 'couche', 'dort', 'etire', 'feuille'] as const;
+const ordres = ['assis', 'marche', 'couche', 'dort', 'etire', 'feuille'] as const; // assis en premier : c'est sa pose en arrivant (bouton déjà allumé)
 // ordres qui demandent du mouvement : cachés quand le visiteur a demandé moins d'animations
 const bouge = new Set(['marche', 'feuille']);
 // petites icônes dessinées (40 × 40), en couleur du texte
