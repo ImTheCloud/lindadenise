@@ -2,6 +2,51 @@
 
 Dernière mise à jour : 2026-10-11 (mission Toiles terminée, non publiée : voir la section « Mission Toiles » juste en dessous). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Mission Tilleul : fluidité, clics, marche et vraie page de jeu (2026-10-11, non publiée)
+
+Consigne complète : `docs/prive/prompt-tilleul.md`. Quatre phases, un commit `[skip ci]` à la fin de chacune.
+
+- **Phase 1 : faite** (diagnostic chiffré, images de référence, tests des bugs).
+- Phase 2 : à faire (moteur et clics, dessin inchangé).
+- Phase 3 : à faire (vraie page de jeu).
+- Phase 4 : à faire (accueil, reste du site, téléphone, documentation).
+
+Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé par le mode automatique** : la session a continué sans. Serveur de dev ouvert au Wi-Fi (configuration `site-wifi` de `.claude/launch.json`, `astro dev --host`) : http://192.168.129.13:4321/ et http://192.168.129.13:4321/jouer/ (pare-feu du Mac désactivé, réponse vérifiée depuis l'adresse Wi-Fi).
+
+### Phase 1 : diagnostic (moteur d'avant la refonte)
+
+**Images de référence** (hors dépôt, dans le dossier de travail de la session) : 28 images rendues dans Chrome sans écran en temps virtuel (pas de 1/120 s, hasard fixé, clignements et coups d'œil coupés), moteur chargé tel quel : assis, debout, couché, dort, étire (2 instants), toilette (4 instants), bâille, cœurs (2 instants), tête vers la gauche / la droite / le haut, marche (4 instants du pas), demi-tour à 0 / 25 / 50 / 75 / 100 %, guette, bond (2 instants). Deux rendus successifs sont identiques au pixel près. **Seuil retenu** : un pixel est « visible » si un canal diffère de plus de 24 sur 255 ; une image est identique si elle a au plus 40 pixels visibles (sur 1600 × 560).
+
+**Mesures** (version construite, Chrome sans écran ; ordinateur 1440 × 900 ; téléphone simulé 390 × 844, densité 3, processeur ralenti 4× ; ordre « marcher » toutes les 3 s ; visiteur déjà venu, sans bulle) :
+
+| Page | Appareil | Images/s | 95e centile | > 33 ms | Tâches longues | Script du chat par image (moy. / 95e) | Mises en page forcées par image |
+|---|---|---|---|---|---|---|---|
+| Accueil | ordinateur | 60 | 16,7 ms | 0 | 0 | 1,55 / 2,1 ms | 0,85 |
+| Accueil | téléphone | 58,6 | 16,7 ms | 1 | 0 | 4,2 / 5,3 ms | 1,7 |
+| Jouer | ordinateur | 60 | 16,8 ms | 0 | 0 | 1,35 / 1,9 ms | 0 |
+| Jouer | téléphone | 60 | 16,7 ms | 0 | 0 | 3,6 / 4,8 ms | 0,88 |
+
+Première visite (bulle de bienvenue ouverte) : script 2,4 ms (ordinateur) et 4,1 ms (téléphone), **1,9 mise en page forcée par image** à l'accueil. Par image, côté navigateur (téléphone simulé) : analyse du HTML du chat 0,7 à 0,8 ms, recalcul de style 0,7 à 1 ms, mise en page 0,3 ms, peinture 0,6 ms, préparation 0,4 ms. Chrome sans écran tient 60 images/s, mais il ne montre pas le coût du dessin sur la carte graphique d'un vrai téléphone, ni le ralentissement réel d'un petit processeur (le ralentissement 4× est imprécis sur des tâches aussi courtes) : sur un vrai téléphone, ces 7 à 8 ms par image deviennent 20 ms et plus, d'où les saccades.
+
+**Tests des bugs** (Chrome sans écran, temps réel) :
+
+| Test | Ordinateur | Téléphone |
+|---|---|---|
+| « Marcher » sur `/jouer/`, première visite (bulle de bienvenue ouverte) | **échec : 0 px** | **échec : 0 px** |
+| « Marcher » sur `/jouer/`, déjà venu | 515 px | **échec : 36 px** (promenades de 12 à 30 % de l'écran) |
+| Toucher le chat 5 fois | 5/5, 3 à 15 ms | 5/5, 42 ms |
+| « Lâcher une feuille » | **échec : jamais attrapée** (il a marché 1 062 px) | attrapée |
+| « Se coucher » | 300 ms | 374 ms |
+
+**Causes** (vérifiées dans le code et par les chiffres) :
+- Confirmé : `chat.ts` réécrit tout le dessin à chaque image (`innerHTML`) : analyse HTML, recalcul de style de centaines de nœuds neufs et déchets mémoire à chaque image.
+- Confirmé : lectures de mise en page dans la boucle, juste après des écritures : `Mascotte.astro` (`offsetWidth` / `offsetHeight` de la bulle et de l'invitation dans `placer()`), `decor.ts` (`getBoundingClientRect` de l'étang à chaque image, des lotus et des feuilles, `getComputedStyle` des feuilles) : 0,85 à 1,9 mise en page forcée par image.
+- Confirmé : une bulle ouverte (`retenu`) arrête toute marche, même un ordre donné par le bouton : la bienvenue de la première visite et chaque anecdote bloquent « Marcher ».
+- Confirmé : sur téléphone, « Marcher » ne fait qu'un petit pas (12 à 30 % de la largeur).
+- Confirmé : « Lâcher une feuille » ne vérifie pas que la chasse est possible ; sur grand écran, la feuille est trop loin ou déjà trop basse quand il arrive, et rien ne le dit.
+- Non reproduit dans Chrome : la caresse perdue (le moteur réagit au `pointerdown`, sur un nœud qui existe encore à cet instant). Risque réel sur Safari : le nœud touché est remplacé avant la fin du geste, et un `click` n'arrive jamais. La refonte le supprime de toute façon (zone de contact stable).
+- Pas de temps : `dt` plafonné à 1/30 s et redessin à 15 images/s endormi, sans à-coup mesuré ; le décalage de l'étang appliqué par `transform` à chaque image reste lié à une lecture de mise en page (voir plus haut).
+
 ## Mission Toiles (2026-10-11, non publiée)
 
 Consigne complète : `docs/prive/prompt-toiles.md`. Trois phases, un commit `[skip ci]` à la fin de chacune.
