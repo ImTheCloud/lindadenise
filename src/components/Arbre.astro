@@ -69,9 +69,9 @@ const branches = ['M640,760 C640,690 626,640 604,560', 'M632,650 C560,590 452,56
   </svg>
 </div>
 <style>
-  /* Téléphone : on est sous la couronne (seul son bas se voit en haut de la scène), le tronc descend à droite.
-     Grand écran : l'arbre entier, à gauche. Le tronc prolonge celui de la couronne (même largeur : 8,4 % de la couronne). */
-  .arbre { position: absolute; inset: 0; pointer-events: none; --l: 116vw; --g: -12vw; --h: -48vw; }
+  /* Téléphone : l'arbre entier, plus petit, posé à gauche au bord de l'étang, sous le panneau.
+     Grand écran : l'arbre entier, grand, à gauche. Le tronc prolonge celui de la couronne (même largeur : 8,4 % de la couronne). */
+  .arbre { position: absolute; inset: 0; pointer-events: none; --l: 64vw; --g: -2vw; --h: calc(100% - 64vw * 0.76 - 120px); }
   .arbre__couronne { position: absolute; left: var(--g); top: var(--h); width: var(--l); height: auto; }
   .arbre__tronc { position: absolute; overflow: visible; left: calc(var(--g) + var(--l) * 0.598); width: calc(var(--l) * 0.084); top: calc(var(--h) + var(--l) * 0.76 - 1px); height: calc(100% - var(--h) - var(--l) * 0.76 - 40px); }
   @media (min-width: 900px) {
