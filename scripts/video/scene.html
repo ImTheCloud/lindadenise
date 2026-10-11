@@ -287,7 +287,7 @@ function poussieres(parent, n) {
 // ---------- Tilleul (moteur du site, inchangé) ----------
 const porteChat = el('g', {});
 const scene = el('svg', { width: W, height: 280, overflow: 'visible' }, porteChat);
-const chat = new Tilleul.Chat(scene, { decor: { lotus: () => [], feuilles: () => [] }, libre: true, reduit: false, dort: false, toucher() {}, suit() {} });
+const chat = new Tilleul.Chat(scene, { decor: { lotus: () => [], feuilles: () => [] }, libre: true, reduit: false, dort: false, toucher() {}, taire() {}, suit() {} });
 scene.setAttribute('width', W); scene.setAttribute('height', 280);
 racine.removeChild(porteChat);
 let chatPret = false;

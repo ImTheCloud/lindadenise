@@ -438,6 +438,7 @@ export interface Options {
   reduit: boolean; // mouvement réduit : il reste assis, sans marcher
   dort: boolean; // il démarre endormi (silence demandé)
   toucher(): void; // le visiteur l'a touché
+  taire(): void; // un ordre arrive pendant qu'il parle : la bulle se ferme
   suit(r: Reperes): void; // appelé à chaque image : où il est
 }
 export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'chasse' | 'viens';
@@ -496,7 +497,7 @@ function squelette(p: Pose, w: number, phase: number, t: number) {
 export class Chat {
   // ce que la page peut régler
   parle = false; // sa bouche bouge pendant qu'il parle
-  retenu = false; // il parle (bulle ouverte) : sur le site, il garde sa pose jusqu'à la fin de la bulle
+  retenu = false; // il parle (bulle ouverte) : il ne marche pas, il reste assis ou garde sa pose jusqu'à la fin de la bulle
   // réglés aussi par la vidéo (scripts/video/scene.html)
   x = 0;
   cibleX = 0;
@@ -656,6 +657,7 @@ export class Chat {
   // Ordres du visiteur : ils passent avant le pilote automatique et avant la bulle ouverte. En plein bond, l'ordre attend
   // l'atterrissage. Un ordre impossible (rien à chasser) est dit par un petit miaou, la tête vers le visiteur.
   ordre(o: Ordre, q: Precision = {}) {
+    if (this.retenu) this.o.taire(); // soit il parle, soit il obéit
     if (this.etat === 'bond') { this.enAttente = [o, q]; return true; }
     const ok = this.executer(o, q);
     if (!ok && !this.fige) { this.miaou = 0.6; this.coupDoeil = 1.6; }
@@ -804,8 +806,8 @@ export class Chat {
       this.mettre(this.etat === 'couche' ? 'baille' : this.etat === 'baille' || this.etat === 'dort' ? 'dort' : 'couche');
       return;
     }
+    if (this.retenu) { this.attente = 0.4; return; } // il parle : il garde sa pose
     if (!this.o.libre) {
-      if (this.retenu) { this.attente = 0.4; return; }
       const r = Math.random();
       switch (this.etat) {
         case 'assis': this.mettre(r < 0.45 ? 'couche' : r < 0.75 ? 'etire' : 'debout'); break;
@@ -868,6 +870,8 @@ export class Chat {
     const k = this.trot.pas(this.vite ? 1 : 0, dt);
     const vmax = lerp(VMAX, TROT.vmax, k), accel = lerp(ACCEL, TROT.accel, k);
 
+    // il parle : il s'arrête et s'assoit (il repartira quand la bulle sera fermée)
+    if (this.retenu && this.etat === 'marche') { this.feuille = null; this.lotus = null; this.mettre('assis'); }
     // déplacement : il freine pour s'arrêter pile ; pendant un demi-tour en marchant, sa vitesse suit son orientation
     if (this.etat === 'marche') {
       const d = this.cibleX - this.x;

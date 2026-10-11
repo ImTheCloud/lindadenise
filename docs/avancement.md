@@ -28,6 +28,8 @@ Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé
 
 ### Dernier choix de Claudiu (2026-10-11, nuit)
 
+**Soit il parle, soit il marche** (2026-10-12) : partout, page de jeu comprise, dès qu'il parle il s'arrête et s'assoit, et ne repart qu'une fois la bulle fermée. Un ordre donné pendant qu'il parle ferme la bulle (option `taire` du moteur) et il obéit.
+
 **Anecdotes de Tilleul** (2026-10-12) : à chaque caresse, une petite histoire vraie sur Linda, ses dessins, les toiles et ce que propose le site (15 en FR et en NL, tirées des textes du site : doigt et smartphone depuis 2022, ancienne professeure de cuisine, nature et jardin, chats d'un ami québécois, Tiroux, « linde », zoom, 10 €, toiles uniques sur aluminium, Ostende, toile sur commande, réponse personnelle, quatre rubriques). Elles s'enchaînent d'une page à l'autre (`mascotte-rang` en sessionStorage), bulle lue 7 s. Bouton « Attraper une feuille » / « Een blaadje vangen ». À relire par Claudiu (surtout la phrase « elle mélange les couleurs comme les saveurs »).
 
 **Mini-jeu supprimé** (2026-10-12, à la demande de Claudiu) : plus de mini-jeu du tout sur la page de jeu (ni « Attraper les feuilles », ni « Attraper les poissons », ni « Tilleul pêcheur ») ; textes, record, poissons et fonctions du moteur qui ne servaient qu'au jeu retirés. La page garde les boutons Marcher, S'asseoir, Se coucher, Dormir, S'étirer, Une feuille, et l'herbe à toucher. Les sections plus bas qui parlent des mini-jeux sont de l'historique.
