@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["astro", "dev"],
       "port": 4321
+    },
+    {
+      "name": "site-wifi",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["astro", "dev", "--host"],
+      "port": 4321
     }
   ]
 }
