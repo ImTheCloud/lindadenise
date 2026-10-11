@@ -177,12 +177,12 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
 <style>
   /* La scène tient dans l'écran : l'arbre en haut (à gauche sur grand écran), le panneau, l'étang en bas où vit Tilleul */
   .jeu { position: relative; overflow: hidden; overflow: clip; min-height: calc(100svh - 68px); padding: 14px 0 clamp(158px, 22vw, 300px); background: linear-gradient(#fff 55%, #f6fbf6); }
-  .jeu__panneau { position: relative; z-index: 2; max-width: 560px; margin-inline: auto; padding: 12px 14px 12px; background: rgba(255, 255, 255, 0.94); border: var(--trait) solid var(--vert-pale); border-radius: var(--rayon); }
-  .jeu__titre { font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem); margin: 0; text-align: center; }
-  .jeu__intro { margin: 2px 0 10px; text-align: center; color: var(--encre-douce); font-size: 1.02rem; line-height: 1.3; }
-  .jeu__ordres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .jeu__ordre { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 60px; padding: 5px 4px; font-family: var(--titre); font-size: 1.15rem; line-height: 1.05; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(43, 110, 58, 0.3); cursor: pointer; transition: transform 0.15s, background 0.15s, color 0.15s; }
-  .jeu__ordre svg { width: 28px; height: 28px; flex: none; }
+  .jeu__panneau { position: relative; z-index: 2; max-width: 560px; margin-inline: auto; padding: 8px 10px 10px; background: rgba(255, 255, 255, 0.94); border: var(--trait) solid var(--vert-pale); border-radius: var(--rayon); }
+  .jeu__titre { font-size: clamp(1.6rem, 1.2rem + 2.2vw, 3rem); margin: 0; text-align: center; }
+  .jeu__intro { margin: 0 0 8px; text-align: center; color: var(--encre-douce); font-size: 1.02rem; line-height: 1.25; }
+  .jeu__ordres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .jeu__ordre { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: 5px 3px; font-family: var(--titre); font-size: 1.08rem; line-height: 1.02; text-align: center; overflow-wrap: anywhere; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(43, 110, 58, 0.3); cursor: pointer; transition: transform 0.15s, background 0.15s, color 0.15s; }
+  .jeu__ordre svg { width: 22px; height: 22px; flex: none; }
   .jeu__ordre:hover { color: var(--orange-fonce); border-color: var(--orange-fonce); }
   .jeu__ordre[hidden] { display: none; }
   .jeu__ordre:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(43, 110, 58, 0.3); }
@@ -200,10 +200,14 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
   .jeu__herbe { position: absolute; left: 0; bottom: 0; width: 100%; height: 22px; }
 
 
+  /* L'herbe de l'étang se prolonge dans le pied de page : pas de bande blanche, la vague du pied de page pousse dans l'herbe */
+  :global(footer.pied[data-mascotte]) { margin-top: 0; }
+  :global(footer.pied[data-mascotte] .pied__vague) { background: #3E9A47; }
+
   @media (min-width: 900px) {
     .jeu { padding-top: clamp(28px, 4vw, 56px); }
     .jeu__panneau { margin-right: 0; margin-left: auto; width: min(560px, 46vw); padding: 18px 22px 16px; }
-    .jeu__ordre { min-height: 72px; font-size: 1.25rem; }
-    .jeu__ordre svg { width: 32px; height: 32px; }
+    .jeu__ordre { min-height: 52px; font-size: 1.15rem; }
+    .jeu__ordre svg { width: 24px; height: 24px; }
       }
 </style>
