@@ -39,9 +39,8 @@ const branches = ['M640,760 C640,690 626,640 604,560', 'M632,650 C560,590 452,56
 ---
 <div class="arbre" aria-hidden="true">
   <svg class="arbre__tronc" viewBox="0 0 100 300" preserveAspectRatio="none">
-    <path d="M0,0 C2,120 -2,220 -16,300 L116,300 C102,220 98,120 100,0 Z" fill="#9C5B2C" />
-    <path d="M0,0 C2,120 -2,220 -16,300 M116,300 C102,220 98,120 100,0" fill="none" stroke="#6B3A17" stroke-width="5" vector-effect="non-scaling-stroke" />
-    <path d="M30,10 C32,90 26,170 22,280 M66,40 C70,130 66,210 74,290" fill="none" stroke="#6B3A17" stroke-width="3" stroke-linecap="round" opacity=".5" vector-effect="non-scaling-stroke" />
+    <path d="M0,-4 L0,300 L100,300 L100,-4 Z" fill="#9C5B2C" />
+    <path d="M0,-4 L0,300 M100,300 L100,-4" fill="none" stroke="#6B3A17" stroke-width="5" vector-effect="non-scaling-stroke" />
   </svg>
   <svg class="arbre__couronne" viewBox="0 0 1000 760" data-couronne>
     <g fill="none" stroke-linecap="round">
@@ -69,9 +68,9 @@ const branches = ['M640,760 C640,690 626,640 604,560', 'M632,650 C560,590 452,56
   </svg>
 </div>
 <style>
-  /* Téléphone : l'arbre entier, plus petit, posé à gauche au bord de l'étang, sous le panneau.
+  /* Téléphone : un grand arbre entier qui remplit l'espace entre le panneau et l'étang (il passe derrière le panneau).
      Grand écran : l'arbre entier, grand, à gauche. Le tronc prolonge celui de la couronne (même largeur : 8,4 % de la couronne). */
-  .arbre { position: absolute; inset: 0; pointer-events: none; --l: 64vw; --g: -2vw; --h: calc(100% - 64vw * 0.76 - 120px); }
+  .arbre { position: absolute; inset: 0; pointer-events: none; --l: 104vw; --g: -6vw; --h: calc(100% - 104vw * 0.76 - 104px); }
   .arbre__couronne { position: absolute; left: var(--g); top: var(--h); width: var(--l); height: auto; }
   .arbre__tronc { position: absolute; overflow: visible; left: calc(var(--g) + var(--l) * 0.598); width: calc(var(--l) * 0.084); top: calc(var(--h) + var(--l) * 0.76 - 1px); height: calc(100% - var(--h) - var(--l) * 0.76 - 40px); }
   @media (min-width: 900px) {
