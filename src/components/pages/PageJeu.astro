@@ -201,7 +201,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
 
 
   /* L'herbe de l'étang se prolonge dans le pied de page : pas de bande blanche, la vague du pied de page pousse dans l'herbe */
-  :global(footer.pied[data-mascotte]) { margin-top: 0; }
+  :global(footer.pied[data-mascotte]) { margin-top: -3px; position: relative; } /* chevauche de 3 px : aucun filet clair entre l'herbe et le pied de page */
   :global(footer.pied[data-mascotte] .pied__vague) { background: #3E9A47; }
 
   @media (min-width: 900px) {
