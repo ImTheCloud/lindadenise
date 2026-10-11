@@ -99,7 +99,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     };
 
     // Une feuille : elle se détache du feuillage, prend de la vitesse puis tombe régulièrement en se balançant ;
-    // Tilleul va la chercher (au trot si elle est loin) et bondit dessus. Posée dans l'herbe, elle y reste 10 s, puis s'efface.
+    // Tilleul va la chercher (au trot si elle est loin) et bondit dessus. Posée dans l'herbe, elle y reste 5 s, puis s'efface.
     interface Feuille { el: Element; x0: number; x: number; y: number; vy: number; ph: number; rot: number; posee: number }
     let feuilles: Feuille[] = [];
     const couleurs = ['#3E9A47', '#F28A1E', '#2B6E3A', '#FFB347'];
@@ -142,12 +142,12 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
       avant = t;
       const c = chat();
 
-      // feuilles : elles prennent de la vitesse puis tombent régulièrement ; posées dans l'herbe, elles y restent 10 s
+      // feuilles : elles prennent de la vitesse puis tombent régulièrement ; posées dans l'herbe, elles y restent 5 s
       const chute = 0.09 * innerHeight;
       for (const f of [...feuilles]) {
         if (f.posee >= 0) {
           f.posee += dt;
-          if (f.posee > 10) enlever(f, 'coulee');
+          if (f.posee > 5) enlever(f, 'coulee');
           continue;
         }
         f.ph += dt;

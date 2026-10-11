@@ -58,7 +58,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 
     let muet = lireDurable('mascotte-muet') === '1';
     let touche = lire('mascotte-touche') === '1';
-    let rang = 0;
+    // les anecdotes s'enchaînent d'une page à l'autre : une nouvelle à chaque caresse
+    let rang = Number(lire('mascotte-rang')) || 0;
     let minuteurBulle: number | undefined;
     let frappe: number | undefined;
     let ecrit = false;
@@ -199,7 +200,10 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       touche = true;
       ecrire('mascotte-touche', '1');
       racine.classList.add('touche');
-      window.setTimeout(() => dire(anecdotes[rang++ % anecdotes.length], 5000), 450);
+      const anecdote = anecdotes[rang % anecdotes.length];
+      rang += 1;
+      ecrire('mascotte-rang', String(rang));
+      window.setTimeout(() => dire(anecdote, 7000), 450);
     };
     // La zone à toucher ne change jamais d'élément : un appui bref (sans glisser) est une caresse ; le clavier passe par « click »
     let appui: { id: number; x: number; y: number } | null = null;
