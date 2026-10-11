@@ -120,8 +120,9 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
       haut = r.top + defile;
       largeur = r.width;
       hauteur = r.height;
-      // les feuilles se détachent du bas du feuillage
-      zone = { x0: Math.max(80, c.left + c.width * 0.2), x1: Math.min(largeur - 80, c.left + c.width * 0.8), y0: c.top - r.top + c.height * 0.6, y1: c.top - r.top + c.height * 0.76 };
+      // les feuilles se détachent de tout le feuillage (la partie visible de la couronne)
+      const y1 = c.top - r.top + c.height * 0.74;
+      zone = { x0: Math.max(40, c.left + c.width * 0.14), x1: Math.min(largeur - 40, c.left + c.width * 0.86), y0: Math.min(Math.max(12, c.top - r.top + c.height * 0.2), y1 - 20), y1 };
     };
     relever();
     new ResizeObserver(relever).observe(scene);
@@ -145,8 +146,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
       const el = modele('feuille').cloneNode(true) as Element;
       el.setAttribute('fill', couleurs[Math.floor(Math.random() * couleurs.length)]);
       ciel.append(el);
-      // elle tombe plutôt du côté de Tilleul
-      const x = Math.min(Math.max(chat().x + hasard(-0.15, 0.15) * largeur, zone.x0), zone.x1);
+      const x = hasard(zone.x0, zone.x1);
       const f: Feuille = { el, x0: x, x, y: hasard(zone.y0, zone.y1), vy: 0, ph: hasard(0, 6), rot: 0, posee: -1 };
       feuilles.push(f);
       return f;
