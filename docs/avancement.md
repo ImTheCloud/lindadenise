@@ -26,6 +26,10 @@ Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé
 - Papillons un peu plus grands (× 1,35).
 - Vérifié : 13 tests sur 13 sur ordinateur et téléphone simulé (dont promenade sur l'accueil et sur `/dessins/` : 279 à 947 px en 15 s ; arrêt pendant qu'il parle : 0 px, puis 247 à 493 px ; salut à l'arrivée, bulle au-dessus de lui, silence à la page suivante ; dormir après se coucher), feuille lâchée attrapée 8 fois sur 8, 60 images/s et 0 mise en page forcée, Lighthouse mobile accueil 99 / 100 / 100 / 100, `/jouer/` 100 / 100 / 100 / 100, CLS 0. Références du dessin inchangées.
 
+### Dernier choix de Claudiu (2026-10-11, nuit)
+
+Sur le site (accueil compris), Tilleul ne marche plus : il reste toujours dans son coin en bas à droite, même quand on défile (plus de rail au bord de l'étang sur l'accueil), et change seulement de pose de temps en temps (assis, toilette, couché, bâille, dort, s'étire, debout). Il ne marche que sur la page de jeu, au bord de l'étang. Cela remplace la promenade continue et le demi-tour au bout de l'écran ci-dessous.
+
 ### Retours de Claudiu (2026-10-11, nuit) : appliqués, à juger par Claudiu (sans grands tests, à sa demande)
 
 - Accueil : il salue à chaque arrivée sur l'accueil, assis et immobile tant qu'il parle (autres pages : une fois par visite). Au bout de l'écran, il repart aussitôt dans l'autre sens (demi-tour en marchant, sans pause).

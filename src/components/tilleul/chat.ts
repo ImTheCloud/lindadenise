@@ -520,7 +520,7 @@ function squelette(p: Pose, w: number, phase: number, t: number) {
 export class Chat {
   // ce que la page peut régler
   parle = false; // sa bouche bouge pendant qu'il parle
-  retenu = false; // il parle (bulle ouverte) : sur le site, il s'arrête et attend la fin de la bulle
+  retenu = false; // il parle (bulle ouverte) : sur le site, il garde sa pose jusqu'à la fin de la bulle
   // réglés aussi par la vidéo (scripts/video/scene.html)
   x = 0;
   cibleX = 0;
@@ -528,7 +528,7 @@ export class Chat {
   private auto: boolean;
   private fige: boolean;
   private dodo: boolean; // silence demandé : il dort tant qu'on ne le touche pas
-  private ordonne = false; // il suit un ordre du visiteur : ni la bulle ni le visiteur occupé ne l'arrêtent
+  private ordonne = false; // il suit un ordre du visiteur (page de jeu) : arrivé, il reste un moment avant de repartir
   private vite = false; // il trotte (feuille lointaine)
   private presse = 0; // temps restant pendant lequel il change de pose plus vivement (ordre du visiteur)
   private enAttente: [Ordre, Precision] | null = null; // ordre donné en plein bond, suivi à l'atterrissage
@@ -609,7 +609,6 @@ export class Chat {
     document.addEventListener('visibilitychange', () => { if (!document.hidden) this.lancer(); });
     if (o.dort) { this.etat = 'dort'; this.attente = 15; }
     else this.mettre('assis');
-    if (!o.libre && !o.dort) this.attente = Math.min(this.attente, 1.5); // sur le site, il part vite se promener
     this.poser(this.etat);
     this.stabiliser();
     this.lancer();
@@ -830,8 +829,8 @@ export class Chat {
     return true;
   }
 
-  // Pilote automatique. Sur le site, il se promène d'un bord à l'autre de l'écran ; quand il parle, il s'arrête et attend.
-  // Sur la page de jeu, une petite vie de chat : poses, toilette, étang, feuilles.
+  // Pilote automatique. Sur le site, il reste dans son coin et change de pose (jamais de marche) ; quand il parle, il garde
+  // sa pose. Sur la page de jeu, une petite vie de chat : promenades, poses, toilette, étang, feuilles.
   private suivant() {
     this.ordonne = this.vite = false;
     if (this.dodo) {
@@ -839,9 +838,16 @@ export class Chat {
       return;
     }
     if (!this.o.libre) {
-      if (this.etat === 'dort' || this.etat === 'couche' || this.etat === 'baille') this.mettre('etire');
-      else if (this.retenu) { if (this.etat !== 'assis') this.mettre('debout'); this.attente = 0.4; } // il reste assis s'il l'était
-      else this.marcher();
+      if (this.retenu) { this.attente = 0.4; return; }
+      const r = Math.random();
+      switch (this.etat) {
+        case 'assis': this.mettre(r < 0.35 ? 'toilette' : r < 0.6 ? 'couche' : r < 0.8 ? 'etire' : 'debout'); break;
+        case 'couche': this.mettre(r < 0.6 ? 'baille' : 'assis'); break;
+        case 'baille': this.mettre('dort'); break;
+        case 'dort': this.mettre('etire'); break;
+        case 'debout': this.mettre(r < 0.7 ? 'assis' : 'couche'); break;
+        default: this.mettre('assis');
+      }
       return;
     }
     const r = Math.random();
@@ -893,15 +899,11 @@ export class Chat {
     const s = this.s;
     this.t += dt;
     const cap = Math.cos(this.phi) >= 0 ? 1 : -1; // côté vers lequel le corps est tourné
-    const libre = this.o.libre || this.ordonne;
     const k = this.trot.pas(this.vite ? 1 : 0, dt);
     const vmax = lerp(VMAX, TROT.vmax, k), accel = lerp(ACCEL, TROT.accel, k);
 
     // déplacement : il freine pour s'arrêter pile ; pendant un demi-tour en marchant, sa vitesse suit son orientation
     if (this.etat === 'marche') {
-      // il parle : il s'arrête là où il est (sauf s'il suit un ordre, ou sur la page de jeu)
-      // (en freinant normalement : le point d'arrêt est un peu devant lui, il ne revient pas en arrière)
-      if (!libre && this.retenu && this.cibleX !== this.x) { this.feuille = null; this.lotus = null; this.cibleX = this.x + (Math.sign(this.vx) * this.vx * this.vx * s) / (2 * accel); }
       const d = this.cibleX - this.x;
       if (Math.abs(d) > 4 && Math.sign(d) !== this.sens) this.sens = Math.sign(d);
       if (this.retour >= 0 && this.enArc) this.vx = this.vArc * Math.cos(this.phi);
@@ -909,9 +911,7 @@ export class Chat {
         const tourne = this.retour >= 0 || cap !== this.sens;
         const voulu = tourne ? 0 : this.sens * Math.min(vmax, Math.sqrt(2 * accel * Math.max(0, Math.abs(d) / s - 1)));
         this.vx += clamp(voulu - this.vx, -accel * dt, accel * dt);
-        // sur le site, au bout de l'écran, il repart aussitôt dans l'autre sens (demi-tour en marchant, sans s'arrêter)
-        if (!this.o.libre && !this.ordonne && !this.retenu && !this.feuille && Math.abs(d) < 24 * s) this.marcher();
-        else if (!tourne && Math.abs(d) < 3 && Math.abs(this.vx) < 6) this.arrivee();
+        if (!tourne && Math.abs(d) < 3 && Math.abs(this.vx) < 6) this.arrivee();
       }
     } else {
       this.vx += clamp(-this.vx, -2 * ACCEL * dt, 2 * ACCEL * dt);
@@ -950,7 +950,7 @@ export class Chat {
       const l = this.o.decor.feuilles().find((x) => x.el === fe.el);
       if (l) { fe.x = l.x; fe.y = l.y - this.haut; }
       this.chasseT += dt;
-      if (this.etat !== 'bond' && (!l || fe.y > this.sol + 10 || this.chasseT > 30 || (!libre && this.retenu))) this.abandonner();
+      if (this.etat !== 'bond' && (!l || fe.y > this.sol + 10 || this.chasseT > 30)) this.abandonner();
     }
 
     // saut de joie

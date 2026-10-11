@@ -16,7 +16,7 @@ const collage = ['trois-tournesols', 'l-ile-de-brehat', 'time-et-rouroux-a-la-pl
 const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: 'arbres', fleurs: 'grand-bigard-tulipes', animaux: 'paon-indien' };
 ---
 <Base lang={lang} chemins={chemins}>
-  <section class="heros" data-decor>
+  <section class="heros" data-accueil>
     <Feuilles />
     <div class="contenu heros__grille">
       <div class="heros__texte">
@@ -37,7 +37,6 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
       </div>
     </div>
     <Etang />
-    <div data-tilleul-rail></div>
   </section>
 
   <section class="section">
@@ -111,7 +110,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
 </Base>
 
 <style>
-  .heros { position: relative; overflow: hidden; overflow: clip; display: flex; align-items: center; min-height: calc(100svh - 68px); padding-top: clamp(28px, 5vw, 64px); padding-bottom: clamp(190px, 26vw, 330px); background: linear-gradient(#fff 55%, #f6fbf6); }
+  .heros { position: relative; overflow: hidden; display: flex; align-items: center; min-height: calc(100svh - 68px); padding-top: clamp(28px, 5vw, 64px); padding-bottom: clamp(190px, 26vw, 330px); background: linear-gradient(#fff 55%, #f6fbf6); }
   .heros__grille { width: 100%; }
   .heros__grille { position: relative; z-index: 2; display: grid; gap: 28px; align-items: center; }
   .heros__texte h1 { font-size: clamp(3.8rem, 1.2rem + 9.5vw, 8.6rem); margin-bottom: 0.08em; line-height: 0.95; }
