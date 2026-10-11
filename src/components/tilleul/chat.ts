@@ -427,7 +427,7 @@ export interface Decor {
   haut?(): number; // où est le haut de la bande du chat à l'écran (par défaut : collée au bas de l'écran)
   lotus(): V[];
   feuilles(): FeuilleDecor[];
-  curiosite?(): V | null; // ce qui attire son regard quand il ne fait rien (un poisson qui saute, une feuille qui tombe)
+  curiosite?(): V | null; // ce qui attire son regard quand il ne fait rien (une feuille qui tombe)
 }
 
 // Repères donnés à la page à chaque image, dans la bande du chat : la boîte entoure le corps et la tête (zone à toucher)
@@ -441,7 +441,7 @@ export interface Options {
   suit(r: Reperes): void; // appelé à chaque image : où il est
 }
 export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'chasse' | 'viens';
-export interface Precision { x?: number; vite?: boolean; cible?: object } // « viens » : où aller (pixels de la bande), s'il trotte ; « chasse » : quelle feuille
+export interface Precision { x?: number; cible?: object } // « viens » : où aller (pixels de la bande) ; « chasse » : quelle feuille
 
 export const HAUT = 280; // hauteur de la bande où il vit
 const COIN = 175; // sa place dans le coin : distance au bord droit (unités du dessin), pour que pattes et queue restent à l'écran
@@ -642,20 +642,6 @@ export class Chat {
     this.sautV = 300;
   }
 
-  // Mini-jeu, feuille attrapée : un petit bond et deux cœurs
-  fete() {
-    if (this.fige) return;
-    this.joie = 1;
-    if (this.sautY === 0) this.sautV = 240;
-    for (let i = 0; i < 2; i++) this.coeurs.push({ dx: (Math.random() - 0.5) * 50, vie: 1 + i * 0.15 });
-  }
-
-  // Mini-jeu : le pilote automatique se tait, le chat ne bouge que quand le visiteur l'appelle
-  enPartie(oui: boolean) {
-    this.auto = !oui && !this.fige;
-    if (oui) { this.feuille = null; this.lotus = null; }
-  }
-
   // Ce qu'il fait, pour la page de jeu (le bouton de l'action en cours est allumé), et ce qu'il chasse
   get action() {
     if (this.feuille || this.etat === 'guette' || this.etat === 'bond') return 'chasse';
@@ -681,7 +667,7 @@ export class Chat {
     this.feuille = null;
     this.lotus = null;
     this.ordonne = true;
-    this.vite = !!q.vite;
+    this.vite = false;
     let ok = true;
     if (o === 'marche') this.marcher();
     else if (o === 'viens') { this.cibleX = this.dansEcran(q.x ?? this.x); this.etat = 'marche'; }
