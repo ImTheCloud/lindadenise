@@ -9,14 +9,14 @@ import { lien } from './lien';
 type Element2D = HTMLElement | SVGElement;
 interface Releve { el: Element2D; x: number; y: number; vx: number; vy: number; op: number; t: number }
 
-export function lireDecor(): Decor & { rail: HTMLElement | null } {
+export function lireDecor(): Decor & { rail: HTMLElement | null; leve: number } {
   const scene = document.querySelector<HTMLElement>('[data-decor]');
   const rail = scene?.querySelector<HTMLElement>('[data-tilleul-rail]') ?? null;
   const etangEl = scene?.querySelector<HTMLElement>('.etang') ?? null;
   const feuillesEl = scene?.getElementsByClassName('feuille');
   // sans « overflow: clip », la bande ne colle pas au bas de l'écran : elle reste au bord de l'étang
   const colle = CSS.supports('overflow', 'clip');
-  let defile = scrollY, vh = innerHeight;
+  let defile = scrollY, vh = innerHeight, arret: number | undefined;
   // positions dans le document
   let boite = { haut: 0, bas: 0 }, etang = { haut: 0, bas: 0 }, railBas = 0;
   let lotus: { x: number; y: number }[] = [];
@@ -41,7 +41,9 @@ export function lireDecor(): Decor & { rail: HTMLElement | null } {
   relever();
   if (scene) new ResizeObserver(relever).observe(scene);
   addEventListener('resize', relever);
-  addEventListener('scroll', () => { defile = scrollY; }, { passive: true });
+  // la position de la page est relue quand le défilement s'arrête (pendant qu'on défile, le chat reste tranquille) :
+  // jamais de lecture de mise en page pendant le défilement
+  addEventListener('scroll', () => { window.clearTimeout(arret); arret = window.setTimeout(() => { defile = scrollY; }, 120); }, { passive: true });
 
   // la scène couvre le milieu de l'écran : ses feuilles sont à regarder
   const auMilieu = () => boite.haut - defile < vh * 0.5 && boite.bas - defile > vh * 0.5;
@@ -54,8 +56,9 @@ export function lireDecor(): Decor & { rail: HTMLElement | null } {
 
   return {
     rail,
+    leve: 0, // la bande est montée de tant de pixels (posée sur une barre fixe, page Toiles)
     haut() {
-      if (!rail) return vh - HAUT;
+      if (!rail) return vh - HAUT - this.leve;
       const bas = railBas - defile;
       return (colle ? Math.min(vh, bas) : bas) - HAUT;
     },

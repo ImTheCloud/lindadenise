@@ -29,7 +29,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Une image de partage propre à la galerie et à l'À propos si utile
 
 ## Qualité technique
-- Lighthouse (mobile et ordinateur) sur l'accueil, la galerie, une fiche, le contact : on refait les mesures à la fin
+- Lighthouse (mobile et ordinateur) sur l'accueil, la galerie, une fiche, le contact, la page de jeu, les toiles : on refait les mesures à la fin (2026-10-11 : accueil 99, jeu et toiles 100 sur mobile, CLS 0)
 - Core Web Vitals (PageSpeed Insights) et WebPageTest sur connexion lente
 - Liens cassés (tout le site, FR et NL) et validité du HTML
 - En-têtes de sécurité (securityheaders.com) : à ajouter dans `netlify.toml` (Content-Security-Policy, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS)
@@ -43,7 +43,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 
 ## Appareils
 - iPhone (Safari) et Android (Chrome) réels, plus un grand écran d'ordinateur
-- Vérifier la mascotte, le formulaire et le menu sur téléphone
+- Vérifier la mascotte, le formulaire et le menu sur téléphone : Tilleul au bord de l'étang en défilant, toucher, page de jeu et mini-jeu, Tilleul qui s'efface dans un formulaire et sur la barre de la page Toiles ; un iPhone avec Safari plus ancien que la version 16 (Tilleul reste alors au bord de l'étang de l'accueil)
 
 ## Contenu et légal
 - Mentions légales complètes (adresse, numéro d'entreprise selon le statut de Linda), conditions d'utilisation et conditions de vente des toiles relues

@@ -124,7 +124,9 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     };
     relever();
     new ResizeObserver(relever).observe(scene);
-    addEventListener('scroll', () => { defile = scrollY; }, { passive: true });
+    // position de la page relue quand le défilement s'arrête (aucune lecture de mise en page pendant qu'on défile)
+    let arret: number | undefined;
+    addEventListener('scroll', () => { window.clearTimeout(arret); arret = window.setTimeout(() => { defile = scrollY; }, 120); }, { passive: true });
     const ecran = (y: number) => haut - defile + y; // de la scène à l'écran
     // où est le chat (repères de Mascotte.astro), dans la scène : tête, sol, échelle
     const chat = () => {
@@ -145,7 +147,8 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
       const el = modele('feuille').cloneNode(true) as Element;
       el.setAttribute('fill', couleurs[Math.floor(Math.random() * couleurs.length)]);
       ciel.append(el);
-      const x = hasard(zone.x0, zone.x1);
+      // hors mini-jeu, la feuille tombe plutôt du côté de Tilleul, pour qu'il ait le temps de la guetter
+      const x = partie ? hasard(zone.x0, zone.x1) : Math.min(Math.max(chat().x + hasard(-0.35, 0.35) * largeur, zone.x0), zone.x1);
       const f: Feuille = { el, x0: x, x, y: hasard(zone.y0, zone.y1), vy: vitesse, amp: hasard(18, 34), ph: hasard(0, 6), partie };
       feuilles.push(f);
       return f;

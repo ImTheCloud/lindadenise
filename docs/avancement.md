@@ -1,6 +1,6 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-11 (mission Toiles terminée, non publiée : voir la section « Mission Toiles » juste en dessous). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+Dernière mise à jour : 2026-10-11 (mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
 ## Mission Tilleul : fluidité, clics, marche et vraie page de jeu (2026-10-11, non publiée)
 
@@ -9,7 +9,7 @@ Consigne complète : `docs/prive/prompt-tilleul.md`. Quatre phases, un commit `[
 - **Phase 1 : faite** (diagnostic chiffré, images de référence, tests des bugs).
 - **Phase 2 : faite** (moteur et clics refaits, dessin inchangé).
 - **Phase 3 : faite** (vraie page de jeu : arbre, étang, feuilles, papillons, mini-jeu).
-- Phase 4 : à faire (accueil, reste du site, téléphone, documentation).
+- **Phase 4 : faite** (accueil, reste du site, téléphone, mouvement réduit, documentation).
 
 Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé par le mode automatique** : la session a continué sans. Serveur de dev ouvert au Wi-Fi (configuration `site-wifi` de `.claude/launch.json`, `astro dev --host`) : http://192.168.129.13:4321/ et http://192.168.129.13:4321/jouer/ (pare-feu du Mac désactivé, réponse vérifiée depuis l'adresse Wi-Fi).
 
@@ -87,6 +87,43 @@ Première visite (bulle ouverte) : 0 mise en page forcée (avant 1,9). Travail d
 
 **Vérifié** : 9 tests sur 9, ordinateur et téléphone simulé (marcher avec ou sans bulle, toucher le chat, une feuille attrapée, un papillon guetté puis bondi avec son bouton allumé, l'étang, toucher l'herbe : arrivé à 33 px de l'endroit, mini-jeu complet joué par un joueur automatique : 10 feuilles sur ordinateur, 7 sur téléphone, record enregistré, se coucher). Pendant le mini-jeu avec un papillon : 60 images/s sur ordinateur et téléphone simulé, 95e centile 16,8 ms, 0 tâche longue, 0 mise en page forcée, script de toutes les animations 0,7 à 0,9 ms en moyenne par appel. Mouvement réduit : 5 boutons, aucune animation, aucune erreur (FR et NL). **Lighthouse mobile** (version construite) : `/jouer/` et `/nl/spelen/` 99 / 100 / 100 / 100, CLS 0.
 
+### Phase 4 : accueil et reste du site
+
+- **Partout, discret** : quand l'étang n'est pas à l'écran (autres pages, accueil défilé), Tilleul reste sur place et chaque pose dure trois fois plus longtemps. Il ne se promène qu'à l'accueil (devant l'étang) et sur la page de jeu. Il ne parle qu'à la première visite puis quand on le touche ; « Laisser Tilleul dormir » inchangé.
+- **Il s'efface** (glisse sous le bord de l'écran, sans clic possible) pendant qu'on écrit dans un formulaire (sur téléphone, le clavier le poussait sur le champ) et quand le menu du téléphone est ouvert ; il revient ensuite.
+- **Page Toiles** : quand la barre de sélection est affichée sous lui (téléphone), il monte s'asseoir dessus ; le bouton « Demander ces toiles » reste entièrement libre (vérifié). Repère : `data-tilleul-appui` sur la barre. Les fenêtres plein écran (zoom d'un dessin, fiche d'une toile) passent au-dessus de lui.
+- **Accueil** : la bande colle à l'étang par le navigateur (voir phase 2) ; la position de la page n'est relue que quand le défilement s'arrête : **0 mise en page forcée pendant un défilement au doigt** (avant : 0,84 sur ordinateur, 1,66 sur téléphone simulé). Étang hors de l'écran : le chat ne travaille plus ; onglet caché : arrêt complet.
+- **Téléphone** : zone à toucher 80 × 112 px (au moins 44 px), le doigt fait défiler la page même posé sur le chat (sauf sur la bande d'herbe de la page de jeu) ; sur l'accueil il se pose sur le collage, sans couvrir les boutons (vérifié en 390 × 844 et 375 × 667).
+- **Mouvement réduit** : assis, une seule image, sans erreur, sur l'accueil, les dessins, les toiles, le contact, À propos, en FR et NL (vérifié).
+- Réglage de la chasse : il bondit sans finir son affût si la feuille arrive près du sol ; la feuille lâchée sur la page de jeu tombe plutôt de son côté (8 feuilles sur 8 attrapées en essai).
+
+**Lighthouse mobile final** (version construite, servie compressée comme chez Netlify) : accueil 99 / 100 / 100 / 100 (FR et NL), `/jouer/` et `/nl/spelen/` 100 / 100 / 100 / 100, `/toiles/` et `/nl/doeken/` 100 / 100 / 100 / 100 ; CLS 0 partout (avant la mission : 0,014 à 0,018).
+
+### Résumé : avant / après (Chrome sans écran, téléphone simulé 390 × 844, processeur ralenti 4×)
+
+| | Avant | Après |
+|---|---|---|
+| Script du chat par image, accueil | 4,2 ms (95e : 5,3) | 1,4 ms (95e : 2,2) |
+| Mises en page forcées par image (accueil, bulle ouverte) | 1,9 | 0 |
+| Mises en page forcées en défilant | 1,66 | 0 |
+| Analyse HTML par image | 0,73 ms | 0 |
+| Travail du navigateur par image (style, mise en page, peinture) | environ 3,4 ms | environ 1,2 ms |
+| Images de plus de 33 ms en défilant | 1 | 0 |
+| « Marcher » avec la bulle ouverte | 0 px | 236 à 520 px |
+| Feuille lâchée (ordinateur) | jamais attrapée | attrapée (8 sur 8) |
+
+Ordinateur, toutes pages : 60 images/s, 95e centile 16,8 ms, aucune tâche longue, script du chat 1,1 à 1,6 ms. Pendant le mini-jeu : 60 images/s, aucune tâche longue, aucune mise en page forcée.
+
+**Outils de mesure** (hors dépôt, dans le dossier de travail de la session, à refaire si besoin) : images de référence en temps virtuel et comparaison au pixel, mesures de fluidité par trace Chrome, tests des ordres et du mini-jeu par Chrome sans écran.
+
+### À tester par Claudiu (téléphone, http://192.168.129.13:4321/ avec `npm run dev -- --host`, ou la configuration « site-wifi »)
+
+1. Accueil : défiler doucement puis vite ; Tilleul monte avec l'étang, sans à-coup ni retard.
+2. Toucher Tilleul plusieurs fois (et glisser le doigt sur lui : la page doit défiler).
+3. `/jouer/` : toucher l'herbe à gauche puis à droite ; « Un papillon » ; « Une feuille ».
+4. `/jouer/` : une partie d'« Attraper les feuilles » (le record reste après rechargement).
+5. `/toiles/` : choisir deux toiles (Tilleul sur la barre) ; `/contact/` : écrire dans un champ (Tilleul s'efface).
+
 ### À valider (mission Tilleul)
 
 - Nom du mini-jeu : « Attraper les feuilles » (à l'infinitif comme les autres boutons, pour garder le vouvoiement), « Blaadjes vangen » en néerlandais. Bouton de retour : « Revenir » / « Terug ».
@@ -96,6 +133,10 @@ Première visite (bulle ouverte) : 0 mise en page forcée (avant 1,9). Travail d
 - **Plastron crème** : le code prévoyait une tache crème sur le poitrail, jamais affichée (erreur de mesure). Retirée pour garder le dessin validé. Si Claudiu la veut, c'est une ligne à remettre (ovale de 20 × 20 sous le cou) : à regarder ensemble avant.
 - Zone à toucher : un rectangle aux coins arrondis autour du corps et de la tête (pas la queue), d'au moins 44 px. Toucher juste à côté du chat, dans ce rectangle, compte comme une caresse.
 - Sur Safari avant la version 16 (sans `overflow: clip`), le chat de l'accueil reste au bord de l'étang au lieu de coller au bas de l'écran quand l'étang est plus bas que l'écran.
+- Pendant qu'on écrit dans un formulaire ou que le menu du téléphone est ouvert, Tilleul s'efface complètement (il revient ensuite).
+- Sur les autres pages, une pose dure 18 à 30 s (assis) au lieu de 6 à 10 s.
+- Sur la page de jeu, la bande d'herbe du bas ne fait pas défiler la page au doigt (elle sert à appeler Tilleul) ; la page tient dans un écran de téléphone courant.
+- Mesures faites dans Chrome sans écran : elles ne remplacent pas un essai sur un vrai téléphone (surtout iPhone, et un Android modeste).
 
 ## Mission Toiles (2026-10-11, non publiée)
 
@@ -234,9 +275,11 @@ Image d'aperçu de partage (WhatsApp, Facebook), Lighthouse et contrastes, test 
 
 ## Nouveau Tilleul animé (intégré au site le 2026-10-10, pas encore publié)
 
+> Moteur, toucher, ordres, décor et page de jeu ont été refaits le 2026-10-11 (section « Mission Tilleul » en haut de ce fichier). Ce qui suit reste vrai pour le dessin ; pour le fonctionnement, la mission Tilleul fait foi.
+
 Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui se déplace. La performance n'est plus une contrainte. Rive et Spine écartés (export payant, fichiers que Claude ne peut pas modifier). Choix : animation calculée en direct, SVG redessiné à chaque image. **Le site publié garde l'ancien Tilleul** jusqu'à la prochaine publication (sur demande de Claudiu seulement). La page d'essai, le banc d'essai et le dossier `essais/` sont supprimés.
 
-**Où est le code** : `src/components/tilleul/chat.ts` (le moteur), `src/components/tilleul/decor.ts` (lecture de l'étang et des feuilles de l'accueil), `src/components/Mascotte.astro` (bulle, silence, textes, invitation « Touchez-moi ! », bouton invisible pour le clavier). Textes dans `src/i18n` (FR et NL).
+**Où est le code** : `src/components/tilleul/chat.ts` (le moteur), `src/components/tilleul/decor.ts` (le décor gardé en mémoire), `src/components/tilleul/lien.ts` (ce que la page de jeu partage avec le chat), `src/components/Mascotte.astro` (bulle, silence, textes, invitation « Touchez-moi ! », bouton invisible pour le clavier). Textes dans `src/i18n` (FR et NL).
 
 **Ce qu'il fait** : il marche (pas réglés sur la distance, sans glisser), fait demi-tour en marchant en passant face au visiteur, s'assoit, se couche, dort (zzz), s'étire. Nouveau : **toilette** (assis, patte à la bouche, petite langue, puis patte sur l'oreille, 7 s), **bâillement** avant de dormir (bouche ouverte, yeux plissés, oreilles en arrière), **étang** (sur l'accueil, quand l'étang est au bas de l'écran il s'assoit devant un lotus et le regarde), **chasse aux vraies feuilles** de `Feuilles.astro` (il se tapit à 130 unités, pattes arrière immobiles, bondit quand la feuille passe à portée ; la feuille attrapée disparaît jusqu'à son prochain passage). Touché : saut, cœurs, yeux plissés, et il parle (anecdote). La tête suit le pointeur et cligne.
 
@@ -255,7 +298,7 @@ Souhait de Claudiu : un chat « ultra beau, stylé, qui fait des choses », qui 
 - Œil : seule la partie visible est peinte, sur un fond brun. L'iris remplit l'œil vu de biais, sans aucun filet blanc.
 - Queue : un segment posé au sol reste du côté où il s'est posé (jamais de basculement). Elle reste toujours derrière le corps.
 - Pattes : une patte reste du côté où elle est attachée ; celles du côté visible sont cachées progressivement par le corps (un masque par patte), pattes opaques, seul leur contour s'efface vers l'attache. Pendant la toilette, la patte levée (côté visible) est dessinée après la tête.
-- Les feuilles du décor sont animées en CSS : le chat lit leur position à l'écran (`getBoundingClientRect`) à chaque image pendant la chasse, et les masque après la prise.
+- Les feuilles de l'accueil sont animées en CSS : `decor.ts` relève leur position au plus toutes les 200 ms et prolonge leur chute entre deux relevés ; celles de la page de jeu sont déplacées par la page, qui les donne au chat (`lien.ts`).
 
 **Validé par Claudiu le 2026-10-10** : forme, demi-tour et pattes (avant et arrière). Retouches faites avant : oreilles, tête, queue, yeux (scintillement), contour, pattes arrière à l'affût.
 

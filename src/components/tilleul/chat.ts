@@ -880,6 +880,8 @@ export class Chat {
       case 'dort': this.mettre('etire'); break;
       case 'etire': this.promener(); break;
     }
+    // loin de l'étang (autres pages, accueil défilé), il reste sur place et chaque pose dure trois fois plus longtemps
+    if (!this.o.libre && !this.o.decor.lotus().length && (this.etat === 'assis' || this.etat === 'couche' || this.etat === 'dort' || this.etat === 'debout')) this.attente *= 3;
   }
 
   // Arrivé là où il allait : il se tapit (feuille), s'assoit (lotus) ou reste debout ; après un ordre, il reste un moment
@@ -944,7 +946,9 @@ export class Chat {
         if (!fe) this.mettre('debout');
         else {
           this.sens = Math.sign(fe.x - this.x) || this.sens;
-          if (this.attente <= 0 && fe.y >= this.sol - PORTEE * s && this.retour < 0 && cap === this.sens) this.bondir();
+          // il attend la fin de son affût, sauf si la feuille arrive près du sol : alors il bondit tout de suite
+          const basse = fe.y >= this.sol - 60 * s;
+          if ((this.attente <= 0 || basse) && fe.y >= this.sol - PORTEE * s && this.retour < 0 && cap === this.sens) this.bondir();
         }
       } else if (this.etat === 'bond') {
         this.bondT += dt;
