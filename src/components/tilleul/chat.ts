@@ -221,24 +221,12 @@ const GUETTE: Pose = { ...DEBOUT, hx: -32, hy: -44, sx: 30, sy: -34, arc: -4, cx
 const BOND: Pose = { ...DEBOUT, hx: -44, hy: -54, sx: 44, sy: -58, arc: 2, cx: 12, cy: -33, incl: 8, tour: 0.9, avX: 86, avY: -12, av2X: 92, av2Y: -12, arX: -80, arY: -14, ar2X: -74, qBase: 3.05, qCourbe: 0.03, qVague: 0.02 };
 const RAIDEUR: Partial<Record<Cle, number>> = { cx: 60, cy: 60, incl: 50, yeux: 140, qBase: 14, qCourbe: 14, avX: 80, av2X: 80, arX: 80, ar2X: 80, avY: 80, av2Y: 80, arY: 80 };
 
-// toilette : assis, tête baissée vers la patte ; bâillement : couché, tête levée
-const TOILETTE: Pose = { ...ASSIS, cy: -22, incl: 9 };
+// bâillement : couché, tête levée
 const BAILLE: Pose = { ...COUCHE, cx: 21, cy: -30, incl: -14 };
 
-type Etat = 'marche' | 'debout' | 'assis' | 'couche' | 'dort' | 'etire' | 'guette' | 'bond' | 'toilette' | 'baille';
-const POSES: Record<Etat, Pose> = { marche: DEBOUT, debout: DEBOUT, assis: ASSIS, couche: COUCHE, dort: DORT, etire: ETIRE, guette: GUETTE, bond: BOND, toilette: TOILETTE, baille: BAILLE };
-const DUREES: Record<Etat, [number, number]> = { marche: [0, 0], debout: [1, 2.5], assis: [6, 10], couche: [6, 9], dort: [12, 20], etire: [2.2, 2.2], guette: [1.4, 2.2], bond: [0, 0], toilette: [4.3, 4.3], baille: [2.6, 2.6] };
-
-// Toilette : la patte avant monte sous le menton, se fait lécher, puis redescend. Elle ne passe jamais devant le visage
-// (la tête est baissée en 24,-88 ; la bouche vers -72 ; le pied reste juste sous la langue).
-const T_BOUCHE = { x: 48, y: -56 };
-const T_REPOS = { x: 22, y: -7 };
-function toilette(tt: number) {
-  let pied = tt < 0.7 ? mix(T_REPOS, T_BOUCHE, lisse(tt / 0.7)) : tt < 3.4 ? T_BOUCHE : mix(T_BOUCHE, T_REPOS, lisse((tt - 3.4) / 0.9));
-  const leche = tt > 0.7 && tt < 3.4, lick = Math.sin(TAU * 2.2 * (tt - 0.7));
-  if (leche) pied = add(pied, { x: lick * 1.4, y: lick * 2.2 });
-  return { pied, langue: leche ? 0.5 + 0.5 * lick : 0 };
-}
+type Etat = 'marche' | 'debout' | 'assis' | 'couche' | 'dort' | 'etire' | 'guette' | 'bond' | 'baille';
+const POSES: Record<Etat, Pose> = { marche: DEBOUT, debout: DEBOUT, assis: ASSIS, couche: COUCHE, dort: DORT, etire: ETIRE, guette: GUETTE, bond: BOND, baille: BAILLE };
+const DUREES: Record<Etat, [number, number]> = { marche: [0, 0], debout: [1, 2.5], assis: [6, 10], couche: [6, 9], dort: [12, 20], etire: [2.2, 2.2], guette: [1.4, 2.2], bond: [0, 0], baille: [2.6, 2.6] };
 
 // Marche : le pas est réglé sur la distance parcourue, le pied au sol ne glisse jamais.
 // Le trot (mini-jeu) garde la même mécanique, avec une foulée et une cadence plus grandes : k va de 0 (pas) à 1 (trot).
@@ -268,7 +256,7 @@ const ARC = 0.9; // durée du demi-tour en marchant, en secondes
 const RX = 50, RY = 44, RZ = 42;
 const TETE = 0.82; // taille de la tête par rapport au corps
 
-interface Visage { tour: number; yeux: number; regard: V; pupille: number; joie: boolean; miaou: number; baille: number; langue: number; oreilles: [number, number] }
+interface Visage { tour: number; yeux: number; regard: V; pupille: number; joie: boolean; miaou: number; baille: number; oreilles: [number, number] }
 
 function tete(v: Visage) {
   const th = v.tour * 0.95, c = Math.cos(th), sn = Math.sin(th);
@@ -399,11 +387,6 @@ function tete(v: Visage) {
     s.push(h('ellipse', { cx: f(o.x), cy: f(o.y), rx: f(8 * cn * (0.7 + 0.3 * k)), ry: f(ry), fill: '#8A2E1B', stroke: '#6B2E12', 'stroke-width': 2.2 }));
     s.push(h('ellipse', { cx: f(o.x), cy: f(o.y + ry * 0.45), rx: f(5 * cn * k), ry: f(ry * 0.45), fill: '#FF8A80' }));
   } else s.push(null, null);
-  if (v.langue > 0.02) {
-    // petite langue qui sort pour lécher la patte
-    const o = rot({ x: 4, y: 19 + 2 * v.langue, z: RZ + 1.5 });
-    s.push(h('ellipse', { cx: f(o.x), cy: f(o.y), rx: f(3.4 * cn), ry: f(5 * v.langue), fill: '#FF8A80', stroke: '#C9524A', 'stroke-width': 1.4 }));
-  } else s.push(null);
   s.push(h('path', { d: `M${pt(m0)}L${pt(m1)}M${pt(mg)}Q${pt(cg)} ${pt(m1)}Q${pt(cd)} ${pt(md)}`, fill: 'none', stroke: '#6B2E12', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
 
   // moustaches, hors du contour
@@ -472,7 +455,7 @@ interface Cliche {
   x: number; leve: number; phi: number; proche: number; pietine: number; w: number; phase: number; t: number; trot: number;
   p: Pose; vPieds: number[]; q: number[];
   tour: number; regardX: number; regardY: number; oreilles: [number, number]; yeux: number; pupille: number;
-  joie: boolean; miaou: number; baille: number; langue: number; toilette: boolean; zzz: boolean;
+  joie: boolean; miaou: number; baille: number; zzz: boolean;
   coeurs: { dx: number; vie: number }[];
 }
 
@@ -491,7 +474,7 @@ function melanger(a: Cliche, b: Cliche, u: number): Cliche {
     vPieds: b.vPieds.map((v, i) => l(a.vPieds[i], v)), q: b.q.map((v, i) => ang(a.q[i], v)),
     tour: l(a.tour, b.tour), regardX: l(a.regardX, b.regardX), regardY: l(a.regardY, b.regardY),
     oreilles: [l(a.oreilles[0], b.oreilles[0]), l(a.oreilles[1], b.oreilles[1])], yeux: l(a.yeux, b.yeux), pupille: l(a.pupille, b.pupille),
-    miaou: l(a.miaou, b.miaou), baille: l(a.baille, b.baille), langue: l(a.langue, b.langue),
+    miaou: l(a.miaou, b.miaou), baille: l(a.baille, b.baille),
     coeurs: a.coeurs.length === b.coeurs.length ? b.coeurs.map((c, i) => ({ dx: c.dx, vie: l(a.coeurs[i].vie, c.vie) })) : b.coeurs,
   };
 }
@@ -647,7 +630,7 @@ export class Chat {
     this.faireDesCoeurs();
     // sur le site, chaque caresse lui fait prendre une autre pose (jamais la marche) ; sur la page de jeu, un saut de joie
     if (!this.o.libre) {
-      const suite: Etat[] = ['assis', 'toilette', 'couche', 'etire', 'debout'];
+      const suite: Etat[] = ['assis', 'couche', 'etire', 'debout'];
       this.mettre(suite[(suite.indexOf(this.etat) + 1) % suite.length]);
     } else if (this.sautY === 0) this.sautV = 300;
   }
@@ -828,7 +811,7 @@ export class Chat {
   }
 
   // Pilote automatique. Sur le site, il reste dans son coin et change de pose (jamais de marche) ; quand il parle, il garde
-  // sa pose. Sur la page de jeu, une petite vie de chat : promenades, poses, toilette, étang, feuilles.
+  // sa pose. Sur la page de jeu, une petite vie de chat : promenades, poses, étang, feuilles.
   private suivant() {
     this.ordonne = this.vite = false;
     if (this.dodo) {
@@ -839,7 +822,7 @@ export class Chat {
       if (this.retenu) { this.attente = 0.4; return; }
       const r = Math.random();
       switch (this.etat) {
-        case 'assis': this.mettre(r < 0.35 ? 'toilette' : r < 0.6 ? 'couche' : r < 0.8 ? 'etire' : 'debout'); break;
+        case 'assis': this.mettre(r < 0.45 ? 'couche' : r < 0.75 ? 'etire' : 'debout'); break;
         case 'couche': this.mettre(r < 0.6 ? 'baille' : 'assis'); break;
         case 'baille': this.mettre('dort'); break;
         case 'dort': this.mettre('etire'); break;
@@ -852,8 +835,7 @@ export class Chat {
     const decor = () => (r < 0.5 ? this.chasserUneFeuille() || this.allerAuLotus() : this.allerAuLotus() || this.chasserUneFeuille());
     switch (this.etat) {
       case 'debout': if (r < 0.3) this.mettre('assis'); else if (r < 0.4) this.mettre('couche'); else if (r < 0.6 && decor()) break; else this.marcher(); break;
-      case 'assis': if (r < 0.3) this.marcher(); else if (r < 0.5) this.mettre('toilette'); else if (r < 0.65) this.mettre('couche'); else if (!decor()) this.marcher(); break;
-      case 'toilette': this.mettre('assis'); break;
+      case 'assis': if (r < 0.3) this.marcher(); else if (r < 0.55) this.mettre('couche'); else if (!decor()) this.marcher(); break;
       case 'couche': if (r < 0.6) this.mettre('baille'); else this.mettre('debout'); break;
       case 'baille': this.mettre('dort'); break;
       case 'dort': this.mettre('etire'); break;
@@ -987,14 +969,7 @@ export class Chat {
     const proj = (q: V): V => ({ x: q.x * cphi, y: q.y });
 
     // pose : chaque réglage glisse vers celui de l'état voulu
-    let cible: Pose = POSES[this.etat];
-    const gesteToilette = this.etat === 'toilette' ? toilette(DUREES.toilette[0] - this.attente) : null;
-    // la patte avant du côté visible (la plus proche du visiteur) est celle qui monte
-    const kLeve = cphi >= 0 ? 0 : 1;
-    if (gesteToilette) {
-      const g = gesteToilette;
-      cible = { ...cible, ...(kLeve === 0 ? { avX: g.pied.x, avY: g.pied.y } : { av2X: g.pied.x, av2Y: g.pied.y }) };
-    }
+    const cible = POSES[this.etat];
     const p = {} as Pose;
     // après un ordre du visiteur, la pose change 1,8 fois plus vite (même mouvement, plus vif)
     this.presse = Math.max(0, this.presse - dt);
@@ -1087,8 +1062,8 @@ export class Chat {
       vPieds: [this.r.avX.v, this.r.av2X.v, this.r.arX.v, this.r.ar2X.v], q: [...this.qRendu],
       tour: this.tour.x, regardX: this.regardX.x, regardY: this.regardY.x, oreilles, yeux: clamp(p.yeux, 0, 1) * paupiere,
       pupille: this.pupille.pas(this.feuille && !this.dort ? 1.7 : 1, dt), joie: this.joie > 0 || baille > 0.2,
-      miaou: this.parle ? 0.05 + 0.2 * Math.abs(Math.sin(this.t * 9)) : this.miaou, baille, langue: gesteToilette?.langue ?? 0,
-      toilette: !!gesteToilette, zzz: this.etat === 'dort' && p.yeux < 0.05, coeurs: this.coeurs.map((c) => ({ ...c })),
+      miaou: this.parle ? 0.05 + 0.2 * Math.abs(Math.sin(this.t * 9)) : this.miaou, baille,
+      zzz: this.etat === 'dort' && p.yeux < 0.05, coeurs: this.coeurs.map((c) => ({ ...c })),
     };
   }
 
@@ -1225,12 +1200,10 @@ export class Chat {
       h('path', { transform: `translate(${pt(ombreTete)})`, d: polygone(couper(contourCorps, ovalePts(ombreTete, 36, 18)).map((q) => sub(q, ombreTete))), fill: 'url(#t-ombre)' }),
     ];
 
-    // à la toilette, la patte levée passe devant le visage : elle est dessinée après la tête.
     // Chaque patte garde son groupe d'une image à l'autre, même quand elle change de plan.
     const corpsTransform = `translate(${f(c.x)},${f(this.sol - leve)}) scale(${sv.toFixed(4)})`;
-    const levee = c.toilette ? devant.find((v) => v.k === (cphi >= 0 ? 0 : 1)) : undefined;
     const groupe = (v: (typeof vues)[number], masque: boolean) => h('g', masque ? { mask: `url(#t-m-cache-${v.k})` } : {}, v.dessin, `p${v.k}`);
-    const visage = tete({ tour: c.tour, yeux: c.yeux, regard: { x: c.regardX, y: c.regardY }, pupille: c.pupille, joie: c.joie, miaou: c.miaou, baille: c.baille, langue: c.langue, oreilles: c.oreilles });
+    const visage = tete({ tour: c.tour, yeux: c.yeux, regard: { x: c.regardX, y: c.regardY }, pupille: c.pupille, joie: c.joie, miaou: c.miaou, baille: c.baille, oreilles: c.oreilles });
 
     // zzz quand il dort, cœurs quand on le caresse
     const zzz: Enfant[] = [];
@@ -1249,9 +1222,8 @@ export class Chat {
 
     peindre(this.calque, [
       dOmbre,
-      h('g', { transform: corpsTransform }, [...derriere.map((v) => groupe(v, false)), h('g', {}, queue, 'queue'), h('g', {}, corps, 'corps'), ...devant.filter((v) => v !== levee).map((v) => groupe(v, true))]),
+      h('g', { transform: corpsTransform }, [...derriere.map((v) => groupe(v, false)), h('g', {}, queue, 'queue'), h('g', {}, corps, 'corps'), ...devant.map((v) => groupe(v, true))]),
       h('g', { transform: `translate(${pt(teteMonde)}) scale(${(sv * TETE).toFixed(4)}) rotate(${f(p.incl * cphi)})` }, [...silhouette(visage.formes, EP / TETE), ...visage.details, visage.moustaches]),
-      levee ? h('g', { transform: corpsTransform }, [groupe(levee, true)]) : null,
       h('g', {}, zzz),
       h('g', {}, coeurs),
     ]);
