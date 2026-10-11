@@ -446,11 +446,13 @@ ${[0, 1, 2, 3].map((k) => `<mask id="t-m-cache-${k}" maskUnits="userSpaceOnUse" 
 
 // Le décor de la page (étang, feuilles), tenu à jour par decor.ts : positions en pixels de l'écran, gardées en mémoire
 // (le chat ne lit jamais la mise en page lui-même)
-export interface FeuilleDecor { el: object; x: number; y: number; op?: number; attraper?(): void }
+// une feuille (ou un papillon) : position à l'écran, vitesse de chute (pixels par seconde), opacité, et ce qui arrive quand il l'attrape
+export interface FeuilleDecor { el: object; x: number; y: number; vy?: number; op?: number; attraper?(): void }
 export interface Decor {
   haut?(): number; // où est le haut de la bande du chat à l'écran (par défaut : collée au bas de l'écran)
   lotus(): V[];
   feuilles(): FeuilleDecor[];
+  curiosite?(): V | null; // ce qui attire son regard quand il ne fait rien (un papillon, une feuille qui tombe)
 }
 
 // Repères donnés à la page à chaque image, dans la bande du chat : la boîte entoure le corps et la tête (zone à toucher)
@@ -464,7 +466,7 @@ export interface Options {
   suit(r: Reperes): void; // appelé à chaque image : où il est
 }
 export type Ordre = 'marche' | 'assis' | 'couche' | 'dort' | 'etire' | 'toilette' | 'chasse' | 'viens' | 'etang';
-export interface Precision { x?: number; vite?: boolean } // « viens » : où aller (pixels de la bande), et s'il trotte
+export interface Precision { x?: number; vite?: boolean; cible?: object } // « viens » : où aller (pixels de la bande), s'il trotte ; « chasse » : quelle feuille
 
 export const HAUT = 280; // hauteur de la bande où il vit
 const CALME = 2500; // ms sans geste du visiteur avant qu'il se promène
@@ -662,6 +664,31 @@ export class Chat {
     this.sautV = 300;
   }
 
+  // Mini-jeu, feuille attrapée : un petit bond et deux cœurs
+  fete() {
+    if (this.fige) return;
+    this.joie = 1;
+    if (this.sautY === 0) this.sautV = 240;
+    for (let i = 0; i < 2; i++) this.coeurs.push({ dx: (Math.random() - 0.5) * 50, vie: 1 + i * 0.15 });
+  }
+
+  // Mini-jeu : le pilote automatique se tait, le chat ne bouge que quand le visiteur l'appelle
+  enPartie(oui: boolean) {
+    this.auto = !oui && !this.fige;
+    if (oui) { this.feuille = null; this.lotus = null; }
+  }
+
+  // Ce qu'il fait, pour la page de jeu (le bouton de l'action en cours est allumé), et ce qu'il chasse
+  get action() {
+    if (this.feuille || this.etat === 'guette' || this.etat === 'bond') return 'chasse';
+    if (this.lotus) return 'etang';
+    return this.etat === 'baille' ? 'dort' : this.etat;
+  }
+
+  get cible() {
+    return this.feuille?.el ?? null;
+  }
+
   // Ordres du visiteur : ils passent avant le pilote automatique et avant la bulle ouverte. En plein bond, l'ordre attend
   // l'atterrissage. Un ordre impossible (rien à chasser, pas d'étang) est dit par un petit miaou, la tête vers le visiteur.
   ordre(o: Ordre, q: Precision = {}) {
@@ -680,7 +707,7 @@ export class Chat {
     let ok = true;
     if (o === 'marche') this.marcher();
     else if (o === 'viens') { this.cibleX = this.dansEcran(q.x ?? this.x); this.etat = 'marche'; }
-    else if (o === 'chasse') ok = this.chasserUneFeuille();
+    else if (o === 'chasse') ok = this.chasserUneFeuille(q.cible);
     else if (o === 'etang') ok = this.allerAuLotus();
     else if (o === 'dort') this.dormir();
     else { this.mettre(o); this.attente = 25; }
@@ -796,19 +823,19 @@ export class Chat {
     return clamp(x, 70 * this.s, this.W - 70 * this.s);
   }
 
-  // Une feuille du décor est assez haute pour qu'il ait le temps de la guetter : il va se placer et se tapir.
-  // Sur la page de jeu, il trotte vers une feuille lointaine.
-  private chasserUneFeuille() {
+  // Une feuille du décor (ou celle qu'on lui montre) est assez haute pour qu'il ait le temps de la guetter :
+  // il va se placer et se tapir. Sur la page de jeu, il trotte vers une feuille lointaine.
+  private chasserUneFeuille(cible?: object) {
     if (!this.o.libre && !this.o.decor.lotus().length) return false;
     const portee = this.haut + this.sol - PORTEE * this.s;
-    const chute = 0.055 * this.vh; // vitesse de chute des feuilles, en pixels par seconde
     const loin = (l: FeuilleDecor) => Math.max(0, Math.abs(l.x - this.x) - APPROCHE * this.s);
     const vitesse = (l: FeuilleDecor) => (this.o.libre && loin(l) > 250 ? TROT.vmax : VMAX) * this.s;
     const f = this.o.decor.feuilles()
       .filter((l) => {
         // elle doit être encore assez haute quand il sera en place : trajet, demi-tour et affût
+        // (les feuilles de l'accueil tombent de 5,5 % de l'écran par seconde)
         const delai = loin(l) / vitesse(l) + 3;
-        return (l.op ?? 1) > 0.5 && l.y > 0 && l.y + chute * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
+        return (!cible || l.el === cible) && (l.op ?? 1) > 0.5 && l.y > 0 && l.y + (l.vy ?? 0.055 * this.vh) * delai < portee && l.x > 70 * this.s && l.x < this.W - 70 * this.s;
       })
       .sort((a, b) => b.y - a.y)[0];
     if (!f) return false;
@@ -1035,6 +1062,7 @@ export class Chat {
     if (this.prochainCoupDoeil <= 0) { this.coupDoeil = 1.4 + Math.random() * 1.2; this.prochainCoupDoeil = this.coupDoeil + 5 + Math.random() * 7; }
     this.coupDoeil = Math.max(0, this.coupDoeil - dt);
     let tourCible = p.tour * cphi, rx = 0.5 * cap, ry = 0;
+    const curieux = this.o.decor.curiosite?.();
     const regarder = (q: V) => {
       const dx = q.x - teteMonde.x, dy = q.y - teteMonde.y;
       tourCible = clamp(dx / 420, -0.8, 0.8);
@@ -1044,6 +1072,7 @@ export class Chat {
     if (this.retour >= 0) { const nouveau = this.phiA === 0 ? 1 : -1; tourCible = 0.85 * nouveau; rx = 0.7 * nouveau; }
     else if (this.feuille && !this.dort) regarder(this.feuille);
     else if (this.lotus && this.etat === 'assis') regarder(this.lotus);
+    else if (curieux && this.etat !== 'dort' && this.etat !== 'marche') regarder({ x: curieux.x, y: curieux.y - this.haut });
     else if (this.coupDoeil > 0 && this.etat !== 'dort' && this.etat !== 'marche') {
       if (this.pointeur) regarder(this.pointeur);
       else { tourCible = 0; rx = 0; }

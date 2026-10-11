@@ -27,8 +27,9 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
 </script>
 
 <script>
-  import { Chat, type Ordre, type Precision, type Reperes } from './tilleul/chat';
+  import { Chat, type Reperes } from './tilleul/chat';
   import { lireDecor } from './tilleul/decor';
+  import { lien } from './tilleul/lien';
 
   const racine = document.querySelector<HTMLElement>('.mascotte');
   if (racine) {
@@ -131,8 +132,9 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       reduit: moinsDeMouvement,
       dort: muet,
       toucher: () => toucher(),
-      suit: (r) => { repere = r; placer(); },
+      suit: (r) => { repere = lien.reperes = r; placer(); },
     });
+    lien.chat = chat;
     // Bande hors de l'écran (accueil défilé) : le chat ne travaille plus
     new IntersectionObserver(([e]) => chat.veille(!e.isIntersecting)).observe(racine);
 
@@ -198,12 +200,6 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       if (a && a.id === e.pointerId && Math.hypot(e.clientX - a.x, e.clientY - a.y) < 12) chat.caresse();
     });
     corps.addEventListener('click', (e) => { if (e.detail === 0) chat.caresse(); });
-    // La page de jeu donne ses ordres par cet événement : un nom d'ordre, ou { ordre, x, vite }
-    addEventListener('tilleul-ordre', (e) => {
-      const d = (e as CustomEvent<Ordre | (Precision & { ordre: Ordre })>).detail;
-      if (typeof d === 'string') chat.ordre(d);
-      else chat.ordre(d.ordre, d);
-    });
 
     fermer.addEventListener('click', taire);
 

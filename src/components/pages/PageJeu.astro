@@ -1,49 +1,407 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Etang from '../Etang.astro';
+import Arbre from '../Arbre.astro';
 import { t, chemin, type Lang } from '../../i18n';
+import { FEUILLE, NERVURES } from '../tilleul/formes';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const j = t(lang).jeu;
 const chemins = { fr: chemin('jeu', 'fr'), nl: chemin('jeu', 'nl') };
-const ordres = ['marche', 'assis', 'couche', 'dort', 'etire', 'toilette'] as const;
-const FEUILLE = 'M50,6 C64,28 88,40 83,64 C80,80 62,85 50,75 C38,85 20,80 17,64 C12,40 36,28 50,6 Z';
+const ordres = ['marche', 'assis', 'couche', 'dort', 'etire', 'toilette', 'feuille', 'papillon', 'etang'] as const;
+// ordres qui demandent du mouvement : cachés quand le visiteur a demandé moins d'animations
+const bouge = new Set(['marche', 'feuille', 'papillon', 'etang']);
+// petites icônes dessinées (40 × 40), en couleur du texte
+const icones: Record<(typeof ordres)[number], string> = {
+  marche: '<g fill="currentColor"><ellipse cx="12" cy="27" rx="5" ry="4"/><circle cx="7" cy="21" r="2"/><circle cx="11" cy="19" r="2"/><circle cx="15" cy="19" r="2"/><circle cx="18" cy="22" r="2"/><ellipse cx="27" cy="15" rx="5" ry="4"/><circle cx="22" cy="9" r="2"/><circle cx="26" cy="7" r="2"/><circle cx="30" cy="7" r="2"/><circle cx="33" cy="10" r="2"/></g>',
+  assis: '<path fill="currentColor" d="M13,35 C9,27 11,19 15,16 L14,7 L19,12 L23,12 L28,7 L27,16 C31,19 32,27 28,35 Z"/><path d="M28,34 C34,34 36,29 33,25" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
+  couche: '<path fill="currentColor" d="M8,32 C8,25 13,22 20,23 L29,23 L30,16 L34,20 L37,16 L37,25 C37,29 35,32 31,32 Z"/><path d="M9,31 C3,31 3,25 6,23" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
+  dort: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20h11l-11 13h11" stroke-width="3"/><path d="M19 10h9l-9 10h9" stroke-width="2.6"/><path d="M29 3h6l-6 7h6" stroke-width="2.2"/></g>',
+  etire: '<path d="M5,20 H35 M5,20 l7,-7 M5,20 l7,7 M35,20 l-7,-7 M35,20 l-7,7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  toilette: '<path fill="currentColor" d="M20,5 C26,14 31,20 31,26 a11,11 0 0 1 -22,0 C9,20 14,14 20,5 Z"/><path d="M15,26 a5,5 0 0 0 5,5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>',
+  feuille: `<g transform="translate(20,20) rotate(-20) scale(.36) translate(-50,-50)"><path fill="currentColor" d="${FEUILLE}"/><path d="${NERVURES}" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/></g>`,
+  papillon: '<g fill="currentColor"><path d="M20,19 C15,7 4,6 5,14 C6,21 14,22 20,20 Z"/><path d="M20,19 C25,7 36,6 35,14 C34,21 26,22 20,20 Z"/><path d="M20,21 C15,26 9,30 11,33 C14,35 18,28 20,21 Z"/><path d="M20,21 C25,26 31,30 29,33 C26,35 22,28 20,21 Z"/></g><path d="M20,12 V31 M20,13 L16,5 M20,13 L24,5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  etang: '<g fill="currentColor"><path d="M20,31 C14,25 14,16 20,9 C26,16 26,25 20,31 Z"/><path d="M19,31 C11,29 6,23 7,16 C13,18 17,24 19,31 Z"/><path d="M21,31 C29,29 34,23 33,16 C27,18 23,24 21,31 Z"/></g><path d="M5,35 H35" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
+};
+const textes = JSON.stringify({ refus: j.refus, fin0: j.fin0, fin1: j.fin1, finN: j.finN, meilleur: j.meilleur });
+// touffes d'herbe au bord de l'étang (là où on touche pour appeler Tilleul)
+const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) * 9; return `M${x},40 C${x + 2},26 ${x + 6},18 ${x + 3},6 M${x + 9},40 C${x + 10},30 ${x + 14},24 ${x + 18},16 M${x + 16},40 C${x + 17},32 ${x + 22},28 ${x + 27},26`; }).join(' ');
 ---
 <Base lang={lang} titre={j.titre} description={j.meta} chemins={chemins}>
-  <section class="section jeu" data-jeu data-decor>
-    <div class="contenu centre">
-      <h1>{j.titre}</h1>
-      <p class="chapeau">{j.intro}</p>
-      <div class="jeu__ordres">
-        {ordres.map((o) => <button class="bouton bouton--contour" type="button" data-ordre={o}>{j[o]}</button>)}
-        <button class="bouton" type="button" data-ordre="feuille">{j.feuille}</button>
+  <section class="jeu" data-jeu data-decor data-textes={textes}>
+    <Arbre />
+    <div class="contenu">
+      <div class="jeu__panneau">
+        <h1 class="jeu__titre">{j.titre}</h1>
+        <div class="jeu__libre">
+          <p class="jeu__intro">{j.intro}</p>
+          <div class="jeu__ordres">
+            {ordres.map((o) => (
+              <button class="jeu__ordre" type="button" data-ordre={o} data-bouge={bouge.has(o) ? '' : undefined} aria-pressed="false">
+                <svg viewBox="0 0 40 40" aria-hidden="true" set:html={icones[o]} />
+                <span>{j[o]}</span>
+              </button>
+            ))}
+          </div>
+          <button class="bouton jeu__lancer" type="button" data-bouge data-lancer>{j.jouer}</button>
+          <p class="jeu__reduit" hidden>{j.reduit}</p>
+        </div>
+        <div class="jeu__partie" hidden>
+          <p class="jeu__regle">{j.regle}</p>
+          <div class="jeu__compteurs">
+            <p class="jeu__compteur"><span class="jeu__nombre" data-score>0</span> <span>{j.score}</span></p>
+            <p class="jeu__compteur"><span class="jeu__nombre" data-temps>30</span> <span>{j.temps}</span></p>
+            <p class="jeu__compteur jeu__compteur--record"><span class="jeu__nombre" data-record>0</span> <span>{j.record}</span></p>
+          </div>
+          <p class="jeu__fin" data-fin hidden></p>
+          <div class="jeu__boutons">
+            <button class="bouton bouton--contour" type="button" data-arreter>{j.arreter}</button>
+            <button class="bouton" type="button" data-rejouer hidden>{j.rejouer}</button>
+            <button class="bouton bouton--contour" type="button" data-retour hidden>{j.retour}</button>
+          </div>
+        </div>
+        <p class="jeu__message" role="status" aria-live="polite"></p>
       </div>
     </div>
-    <div class="jeu__feuilles" aria-hidden="true" data-forme={FEUILLE}></div>
+    <Etang />
+    <div class="jeu__ciel" aria-hidden="true"></div>
+    <div class="jeu__sol" aria-hidden="true">
+      <svg class="jeu__herbe" viewBox="0 0 1440 40" preserveAspectRatio="none"><path d={herbe} fill="none" stroke="#2B6E3A" stroke-width="4" stroke-linecap="round" /></svg>
+    </div>
+    <div data-tilleul-rail></div>
+    <template data-modele="feuille">
+      <svg class="jeu__feuille" viewBox="0 0 100 100"><path d={FEUILLE} /><path d={NERVURES} stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".6" /></svg>
+    </template>
+    <template data-modele="papillon">
+      <div class="papillon">
+        <svg class="papillon__aile papillon__aile--g" viewBox="0 0 30 40"><path class="papillon__haut" d="M30,18 C22,2 6,0 3,8 C0,16 12,20 30,20 Z" /><path class="papillon__bas" d="M30,20 C18,22 8,30 12,36 C16,40 26,32 30,22 Z" /><circle cx="12" cy="10" r="3" fill="#FFF4E3" /></svg>
+        <svg class="papillon__aile papillon__aile--d" viewBox="0 0 30 40"><g transform="translate(30,0) scale(-1,1)"><path class="papillon__haut" d="M30,18 C22,2 6,0 3,8 C0,16 12,20 30,20 Z" /><path class="papillon__bas" d="M30,20 C18,22 8,30 12,36 C16,40 26,32 30,22 Z" /><circle cx="12" cy="10" r="3" fill="#FFF4E3" /></g></svg>
+        <svg class="papillon__corps" viewBox="0 0 10 34"><path d="M5,8 L1,0 M5,8 L9,0" fill="none" stroke="#5A2410" stroke-width="1.4" stroke-linecap="round" /><ellipse cx="5" cy="20" rx="2.6" ry="11" fill="#5A2410" /></svg>
+      </div>
+    </template>
   </section>
 </Base>
 <script>
-  // Une vraie feuille tombe du haut de l'écran ; Tilleul la chasse comme celles de l'accueil
-  const conteneur = document.querySelector<HTMLElement>('.jeu__feuilles')!;
-  const lacher = () => {
-    const x = 12 + Math.random() * 76;
-    conteneur.insertAdjacentHTML('beforeend', `<svg class="feuille" viewBox="0 0 100 100" style="left:${x}%"><path d="${conteneur.dataset.forme}" fill="#3E9A47"/><path d="M50,74 L50,26 M50,56 L36,42 M50,56 L64,42" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".6"/></svg>`);
-    const feuille = conteneur.lastElementChild as SVGElement;
-    feuille.addEventListener('animationend', () => feuille.remove());
-    window.setTimeout(() => dispatchEvent(new CustomEvent('tilleul-ordre', { detail: 'chasse' })), 150);
-  };
-  document.querySelectorAll<HTMLButtonElement>('[data-ordre]').forEach((b) =>
-    b.addEventListener('click', () => (b.dataset.ordre === 'feuille' ? lacher() : dispatchEvent(new CustomEvent('tilleul-ordre', { detail: b.dataset.ordre })))),
-  );
+  import { lien } from '../tilleul/lien';
+  import type { FeuilleDecor, Ordre } from '../tilleul/chat';
+
+  const scene = document.querySelector<HTMLElement>('.jeu');
+  if (scene) {
+    const textes = JSON.parse(scene.dataset.textes ?? '{}') as { refus: Record<string, string>; fin0: string; fin1: string; finN: string; meilleur: string };
+    const ciel = scene.querySelector<HTMLElement>('.jeu__ciel')!;
+    const sol = scene.querySelector<HTMLElement>('.jeu__sol')!;
+    const couronne = scene.querySelector<SVGSVGElement>('[data-couronne]')!;
+    const message = scene.querySelector<HTMLElement>('.jeu__message')!;
+    const libre = scene.querySelector<HTMLElement>('.jeu__libre')!;
+    const panneauPartie = scene.querySelector<HTMLElement>('.jeu__partie')!;
+    const champ = <T extends Element>(sel: string) => scene.querySelector<T>(sel)!;
+    const scoreEl = champ<HTMLElement>('[data-score]'), tempsEl = champ<HTMLElement>('[data-temps]'), recordEl = champ<HTMLElement>('[data-record]'), finEl = champ<HTMLElement>('[data-fin]');
+    const arreter = champ<HTMLButtonElement>('[data-arreter]'), rejouer = champ<HTMLButtonElement>('[data-rejouer]'), retour = champ<HTMLButtonElement>('[data-retour]');
+    const boutons = [...scene.querySelectorAll<HTMLButtonElement>('[data-ordre]')];
+    const modele = (nom: string) => scene.querySelector<HTMLTemplateElement>(`[data-modele="${nom}"]`)!.content.firstElementChild!;
+    const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lireRecord = () => { try { return Number(localStorage.getItem('tilleul-record')) || 0; } catch { return 0; } };
+    const ecrireRecord = (n: number) => { try { localStorage.setItem('tilleul-record', String(n)); } catch { /* sans stockage : record gardé le temps de la visite */ } };
+    let record = lireRecord();
+    const hasard = (a: number, b: number) => a + Math.random() * (b - a);
+
+    // Moins d'animations : le chat change de pose sans bouger, rien ne tombe ni ne vole
+    if (reduit) {
+      scene.querySelectorAll<HTMLElement>('[data-bouge]').forEach((b) => { b.hidden = true; });
+      champ<HTMLElement>('.jeu__reduit').hidden = false;
+    }
+
+    // Mesures de la scène, relevées quand sa taille change (positions dans la scène ; l'écran s'en déduit au défilement)
+    let haut = 0, defile = scrollY, largeur = 0, hauteur = 0, zone = { x0: 0, x1: 0, y0: 0, y1: 0 };
+    const relever = () => {
+      defile = scrollY;
+      const r = scene.getBoundingClientRect(), c = couronne.getBoundingClientRect();
+      haut = r.top + defile;
+      largeur = r.width;
+      hauteur = r.height;
+      // les feuilles et les papillons sortent du bas de la couronne
+      zone = { x0: Math.max(80, c.left + c.width * 0.08), x1: Math.min(largeur - 80, c.right - c.width * 0.08), y0: c.top - r.top + c.height * 0.5, y1: c.top - r.top + c.height * 0.8 };
+    };
+    relever();
+    new ResizeObserver(relever).observe(scene);
+    addEventListener('scroll', () => { defile = scrollY; }, { passive: true });
+    const ecran = (y: number) => haut - defile + y; // de la scène à l'écran
+    // où est le chat (repères de Mascotte.astro), dans la scène : tête, sol, échelle
+    const chat = () => {
+      const r = lien.reperes;
+      if (!r) return { x: largeur / 2, tete: hauteur - 110, sol: hauteur - 4, s: 0.72 };
+      const y0 = r.haut - ecran(0);
+      return { x: r.tete.x, tete: y0 + r.tete.y, sol: y0 + 276, s: r.s };
+    };
+
+    // Feuilles et papillons : des éléments posés une fois, déplacés par transform à chaque image
+    interface Feuille { el: Element; x0: number; x: number; y: number; vy: number; amp: number; ph: number; partie: boolean }
+    interface Papillon { el: HTMLElement; x: number; y: number; vx: number; vy: number; t: number; ph: number; cx: number; cy: number; joueur: boolean; fuit: boolean; vie: number }
+    let feuilles: Feuille[] = [];
+    let papillons: Papillon[] = [];
+    const couleurs = ['#3E9A47', '#F28A1E', '#2B6E3A', '#FFB347'];
+
+    const lacher = (partie: boolean, vitesse: number) => {
+      const el = modele('feuille').cloneNode(true) as Element;
+      el.setAttribute('fill', couleurs[Math.floor(Math.random() * couleurs.length)]);
+      ciel.append(el);
+      const x = hasard(zone.x0, zone.x1);
+      const f: Feuille = { el, x0: x, x, y: hasard(zone.y0, zone.y1), vy: vitesse, amp: hasard(18, 34), ph: hasard(0, 6), partie };
+      feuilles.push(f);
+      return f;
+    };
+    const finir = (f: Feuille, classe: string) => {
+      f.el.classList.add(classe);
+      feuilles = feuilles.filter((x) => x !== f);
+      window.setTimeout(() => f.el.remove(), 450);
+    };
+    // la feuille touche l'eau : un rond dans l'eau, elle disparaît
+    const plouf = (f: Feuille) => {
+      const p = document.createElement('div');
+      p.className = 'jeu__plouf';
+      p.style.transform = `translate(${f.x}px, ${f.y}px)`;
+      ciel.append(p);
+      p.addEventListener('animationend', () => p.remove());
+      finir(f, 'coulee');
+    };
+
+    const appeler = (joueur: boolean) => {
+      const el = modele('papillon').cloneNode(true) as HTMLElement;
+      if (Math.random() < 0.5) el.classList.add('papillon--clair');
+      ciel.append(el);
+      const x = hasard(zone.x0, zone.x1), y = hasard(zone.y0, zone.y1);
+      const p: Papillon = { el, x, y, vx: 0, vy: -20, t: 0, ph: hasard(0, 6), cx: x, cy: y - 40, joueur, fuit: false, vie: joueur ? 15 : hasard(16, 22) };
+      papillons.push(p);
+      return p;
+    };
+    // le chat bondit sur le papillon : il s'envole, jamais touché
+    const fuir = (p: Papillon) => { p.fuit = true; p.cx = p.x < largeur / 2 ? -80 : largeur + 80; p.cy = -120; };
+
+    // ce que le chat peut chasser, à l'écran : la feuille lâchée et le papillon appelé (pas ceux du mini-jeu)
+    lien.feuilles = (): FeuilleDecor[] => [
+      ...feuilles.filter((f) => !f.partie).map((f) => ({ el: f.el, x: f.x, y: ecran(f.y), vy: f.vy, attraper: () => finir(f, 'attrapee') })),
+      ...papillons.filter((p) => p.joueur && !p.fuit).map((p) => ({ el: p.el, x: p.x, y: ecran(p.y), vy: 0, attraper: () => fuir(p) })),
+    ];
+    // ce qu'il suit des yeux : la feuille la plus basse, sinon un papillon
+    let regard: { x: number; y: number } | null = null;
+    lien.curiosite = () => regard;
+
+    // Le message dit gentiment ce qui n'a pas marché ; il s'efface tout seul
+    let minuteurMessage: number | undefined;
+    const dire = (texte: string) => {
+      window.clearTimeout(minuteurMessage);
+      message.textContent = texte;
+      if (texte) minuteurMessage = window.setTimeout(() => { message.textContent = ''; }, 5000);
+    };
+
+    boutons.forEach((b) => b.addEventListener('click', () => {
+      const o = b.dataset.ordre!;
+      let ok: boolean | undefined;
+      if (o === 'feuille') ok = lien.chat?.ordre('chasse', { cible: lacher(false, 0.06 * innerHeight).el });
+      else if (o === 'papillon') ok = lien.chat?.ordre('chasse', { cible: appeler(true).el });
+      else ok = lien.chat?.ordre(o as Ordre);
+      dire(ok === false ? textes.refus[o] ?? '' : '');
+    }));
+
+    // Toucher l'herbe : Tilleul vient (au trot pendant le mini-jeu) ; une petite trace de patte montre l'endroit
+    sol.addEventListener('pointerdown', (e) => {
+      if (reduit || !lien.chat) return;
+      lien.chat.ordre('viens', { x: e.clientX, vite: !!partie });
+      const trace = document.createElement('div');
+      trace.className = 'jeu__trace';
+      trace.style.transform = `translate(${e.clientX}px, ${e.clientY - ecran(0)}px)`;
+      ciel.append(trace);
+      trace.addEventListener('animationend', () => trace.remove());
+    });
+
+    // ---------- mini-jeu : attraper les feuilles ----------
+    const DUREE = 30;
+    let partie: { t: number; score: number; prochaine: number; temps: number } | null = null;
+    const montrer = (enPartie: boolean) => {
+      libre.hidden = enPartie;
+      panneauPartie.hidden = !enPartie;
+    };
+    const commencer = () => {
+      dire('');
+      partie = { t: 0, score: 0, prochaine: 0.8, temps: DUREE };
+      scoreEl.textContent = '0';
+      tempsEl.textContent = String(DUREE);
+      recordEl.textContent = String(record);
+      finEl.hidden = true;
+      arreter.hidden = false;
+      rejouer.hidden = retour.hidden = true;
+      montrer(true);
+      feuilles.filter((f) => !f.partie).forEach((f) => finir(f, 'coulee'));
+      papillons.filter((p) => p.joueur).forEach(fuir);
+      lien.chat?.enPartie(true);
+      if (scene.getBoundingClientRect().top < 0) scrollTo({ top: 0 });
+      arreter.focus();
+    };
+    const terminer = (fini: boolean) => {
+      const p = partie;
+      partie = null;
+      lien.chat?.enPartie(false);
+      if (!p) return;
+      if (!fini) { montrer(false); return; }
+      const nouveau = p.score > record;
+      if (nouveau) { record = p.score; ecrireRecord(record); recordEl.textContent = String(record); }
+      finEl.textContent = (p.score === 0 ? textes.fin0 : p.score === 1 ? textes.fin1 : textes.finN.replace('{n}', String(p.score))) + (nouveau ? ` ${textes.meilleur}` : '');
+      finEl.hidden = false;
+      arreter.hidden = true;
+      rejouer.hidden = retour.hidden = false;
+      rejouer.focus();
+    };
+    champ<HTMLButtonElement>('[data-lancer]').addEventListener('click', commencer);
+    rejouer.addEventListener('click', commencer);
+    arreter.addEventListener('click', () => terminer(false));
+    retour.addEventListener('click', () => { montrer(false); champ<HTMLButtonElement>('[data-lancer]').focus(); });
+    // au clavier, pendant la partie : les flèches envoient Tilleul à gauche ou à droite
+    addEventListener('keydown', (e) => {
+      if (!partie || !lien.chat || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      lien.chat.ordre('viens', { x: chat().x + (e.key === 'ArrowLeft' ? -1 : 1) * largeur * 0.22, vite: true });
+    });
+
+    // ---------- une image ----------
+    let avant = 0, actif = '';
+    const boucle = (t: number) => {
+      const dt = avant ? Math.min(0.05, (t - avant) / 1000) : 0;
+      avant = t;
+      const c = chat();
+
+      if (partie) {
+        partie.t += dt;
+        // de plus en plus de feuilles, un peu plus rapides vers la fin
+        const u = Math.min(1, partie.t / DUREE);
+        if (partie.t >= partie.prochaine && partie.t < DUREE - 1.5) {
+          lacher(true, (95 + 40 * u) * Math.max(0.8, hauteur / 760));
+          partie.prochaine += 2.1 - 1.0 * u;
+        }
+        const reste = Math.max(0, Math.ceil(DUREE - partie.t));
+        if (reste !== partie.temps) { partie.temps = reste; tempsEl.textContent = String(reste); }
+        if (partie.t >= DUREE) terminer(true);
+      }
+
+      // feuilles : elles tombent en se balançant ; au mini-jeu, attrapées quand elles arrivent sur Tilleul
+      const eau = c.sol - 20;
+      for (const f of [...feuilles]) {
+        f.ph += dt;
+        f.y += f.vy * dt;
+        f.x = f.x0 + f.amp * Math.sin(f.ph * 1.3);
+        (f.el as SVGElement).style.transform = `translate(${f.x.toFixed(1)}px, ${f.y.toFixed(1)}px) rotate(${(28 * Math.sin(f.ph * 1.3 + 1)).toFixed(1)}deg)`;
+        if (f.partie && partie && Math.abs(f.x - c.x) < 50 * c.s && f.y > c.tete - 70 * c.s && f.y < c.sol - 8) {
+          finir(f, 'attrapee');
+          partie.score += 1;
+          scoreEl.textContent = String(partie.score);
+          lien.chat?.fete();
+        } else if (f.y >= eau) plouf(f);
+      }
+
+      // papillons : ils volettent vers un point qui change ; celui qu'on appelle descend jouer près de Tilleul
+      for (const p of [...papillons]) {
+        p.t += dt;
+        if (!p.fuit) {
+          if (p.t > p.vie) fuir(p);
+          else if (p.joueur && p.t > 2.6) {
+            // à portée du chat, devant lui : il peut bondir
+            p.cx = Math.min(Math.max(p.cx, 80), largeur - 80);
+            p.cy = c.sol - 100 * c.s + 14 * Math.sin(p.t * 1.7);
+          } else if (Math.abs(p.cx - p.x) + Math.abs(p.cy - p.y) < 30) {
+            p.cx = Math.min(Math.max(p.x + hasard(-160, 160), 60), largeur - 60);
+            p.cy = Math.min(Math.max(p.y + hasard(-70, 70), zone.y0 - 20), hauteur * 0.55);
+          }
+        }
+        const k = p.fuit ? 3.5 : 1.4;
+        p.vx += ((p.cx - p.x) * k - p.vx * 1.3) * dt;
+        p.vy += ((p.cy - p.y) * k - p.vy * 1.3) * dt;
+        p.x += p.vx * dt;
+        p.y += (p.vy + 40 * Math.sin(p.t * 9 + p.ph)) * dt;
+        p.el.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) rotate(${Math.max(-25, Math.min(25, p.vx * 0.2)).toFixed(1)}deg)`;
+        if (p.fuit && (p.y < -100 || p.x < -100 || p.x > largeur + 100)) {
+          p.el.remove();
+          papillons = papillons.filter((x) => x !== p);
+        }
+      }
+
+      // regard du chat : la feuille la plus basse, sinon le premier papillon
+      const basse = feuilles.reduce<Feuille | null>((m, f) => (!m || f.y > m.y ? f : m), null);
+      const vole = papillons.find((p) => !p.fuit);
+      regard = basse ? { x: basse.x, y: ecran(basse.y) } : vole ? { x: vole.x, y: ecran(vole.y) } : null;
+
+      // le bouton de ce que fait Tilleul est allumé
+      const a = lien.chat?.action ?? '';
+      const maintenant = a === 'chasse' ? (papillons.some((p) => p.el === lien.chat?.cible) ? 'papillon' : 'feuille') : a;
+      if (maintenant !== actif) {
+        actif = maintenant;
+        boutons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ordre === actif)));
+      }
+      requestAnimationFrame(boucle);
+    };
+    requestAnimationFrame(boucle);
+
+    // De temps en temps, un papillon passe tout seul près de l'arbre
+    if (!reduit) {
+      const passer = () => {
+        if (!partie && !papillons.some((p) => !p.joueur)) appeler(false);
+        window.setTimeout(passer, hasard(25000, 40000));
+      };
+      window.setTimeout(passer, 4000);
+    }
+  }
 </script>
 <style>
-  .jeu { min-height: 70svh; }
-  .jeu__ordres { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 24px; }
-  .jeu__feuilles { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
-  .jeu__feuilles :global(.feuille) { position: absolute; top: 0; width: 34px; height: 34px; animation: jeu-feuille 17s linear forwards; }
-  @keyframes jeu-feuille {
-    0% { transform: translate(0, 0) rotate(0deg); opacity: 0.9; }
-    50% { transform: translate(-45px, 47vh) rotate(180deg); }
-    92% { opacity: 0.9; }
-    100% { transform: translate(40px, 95vh) rotate(380deg); opacity: 0; }
+  /* La scène tient dans l'écran : l'arbre en haut (à gauche sur grand écran), le panneau, l'étang en bas où vit Tilleul */
+  .jeu { position: relative; overflow: hidden; overflow: clip; min-height: calc(100svh - 68px); padding: 22vw 0 clamp(158px, 22vw, 300px); background: linear-gradient(#fff 55%, #f6fbf6); }
+  .jeu__panneau { position: relative; z-index: 2; max-width: 560px; margin-inline: auto; padding: 12px 14px 10px; background: rgba(255, 255, 255, 0.94); border: var(--trait) solid var(--vert-pale); border-radius: var(--rayon); }
+  .jeu__titre { font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem); margin: 0; text-align: center; }
+  .jeu__intro { margin: 2px 0 10px; text-align: center; color: var(--encre-douce); font-size: 1.02rem; line-height: 1.3; }
+  .jeu__ordres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .jeu__ordre { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 60px; padding: 5px 4px; font-family: var(--titre); font-size: 1.15rem; line-height: 1.05; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(43, 110, 58, 0.3); cursor: pointer; transition: transform 0.15s, background 0.15s, color 0.15s; }
+  .jeu__ordre svg { width: 28px; height: 28px; flex: none; }
+  .jeu__ordre:hover { color: var(--orange-fonce); border-color: var(--orange-fonce); }
+  .jeu__ordre:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(43, 110, 58, 0.3); }
+  .jeu__ordre[aria-pressed='true'] { color: #fff; background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 4px 0 #173f20; }
+  .jeu__ordre[hidden], .jeu__lancer[hidden] { display: none; }
+  .jeu__lancer { display: flex; justify-content: center; width: 100%; margin-top: 12px; }
+  .jeu__reduit, .jeu__regle { margin: 6px 0; text-align: center; color: var(--encre-douce); line-height: 1.3; }
+  .jeu__message { min-height: 1.35em; margin: 8px 0 0; text-align: center; color: var(--orange-fonce); line-height: 1.3; }
+  .jeu__message:empty { display: none; }
+  .jeu__compteurs { display: flex; justify-content: center; gap: clamp(14px, 5vw, 36px); margin: 4px 0; }
+  .jeu__compteur { display: flex; flex-direction: column; align-items: center; margin: 0; font-family: var(--titre); font-size: 1.1rem; color: var(--encre-douce); line-height: 1; }
+  .jeu__nombre { font-size: clamp(2.8rem, 2rem + 4vw, 4rem); color: var(--vert-fonce); line-height: 1; }
+  .jeu__compteur--record .jeu__nombre { color: var(--orange-fonce); }
+  .jeu__fin { margin: 6px 0; text-align: center; font-size: 1.15rem; line-height: 1.35; }
+  .jeu__boutons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+  .jeu__boutons [hidden] { display: none; }
+
+  /* Ce qui tombe et ce qui vole passe devant le panneau, sans jamais gêner les boutons */
+  .jeu__ciel { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+  .jeu__ciel :global(.jeu__feuille) { position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; will-change: transform; transition: opacity 0.35s, scale 0.35s; }
+  .jeu__ciel :global(.attrapee) { opacity: 0; scale: 0.2; }
+  .jeu__ciel :global(.coulee) { opacity: 0; }
+  .jeu__ciel :global(.jeu__plouf) { position: absolute; left: -24px; top: -7px; width: 48px; height: 14px; border: 3px solid #fff; border-radius: 50%; animation: jeu-plouf 0.9s ease-out forwards; }
+  .jeu__ciel :global(.jeu__trace) { position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50% 50% 45% 45%; background: rgba(43, 110, 58, 0.45); animation: jeu-trace 0.9s ease-out forwards; }
+  .jeu__ciel :global(.papillon) { position: absolute; left: -30px; top: -20px; width: 60px; height: 40px; will-change: transform; --aile1: #F28A1E; --aile2: #FFB347; }
+  .jeu__ciel :global(.papillon--clair) { --aile1: #FFB347; --aile2: #F7D774; }
+  .jeu__ciel :global(.papillon__aile) { position: absolute; top: 0; width: 30px; height: 40px; overflow: visible; animation: jeu-battre 0.16s ease-in-out infinite alternate; }
+  .jeu__ciel :global(.papillon__aile--g) { left: 0; transform-origin: 100% 50%; }
+  .jeu__ciel :global(.papillon__aile--d) { left: 30px; transform-origin: 0 50%; }
+  .jeu__ciel :global(.papillon__haut) { fill: var(--aile1); stroke: #8B3E12; stroke-width: 1.6; }
+  .jeu__ciel :global(.papillon__bas) { fill: var(--aile2); stroke: #8B3E12; stroke-width: 1.6; }
+  .jeu__ciel :global(.papillon__corps) { position: absolute; left: 25px; top: 4px; width: 10px; height: 34px; }
+
+  /* L'herbe au bord de l'étang : la toucher appelle Tilleul (le doigt ne fait pas défiler la page ici) */
+  .jeu__sol { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: clamp(96px, 12vw, 140px); cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; }
+  .jeu__herbe { position: absolute; left: 0; bottom: 0; width: 100%; height: 22px; }
+
+  @keyframes jeu-plouf { from { scale: 0.3; opacity: 1; } to { scale: 1.7; opacity: 0; } }
+  @keyframes jeu-trace { from { scale: 0.6; opacity: 1; } to { scale: 1.3; opacity: 0; } }
+  @keyframes jeu-battre { from { scale: 1 1; } to { scale: 0.25 1; } }
+
+  @media (min-width: 900px) {
+    .jeu { padding-top: clamp(28px, 4vw, 56px); }
+    .jeu__panneau { margin-right: 0; margin-left: auto; width: min(560px, 46vw); padding: 18px 22px 16px; }
+    .jeu__ordre { min-height: 72px; font-size: 1.25rem; }
+    .jeu__ordre svg { width: 32px; height: 32px; }
   }
 </style>

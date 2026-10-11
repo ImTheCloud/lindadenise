@@ -1,0 +1,52 @@
+---
+// Grand tilleul dessiné (page de jeu) : une couronne large d'où tombent les feuilles, et un tronc qui descend jusqu'au
+// bord de l'étang. Même manière que Tilleul : toutes les boules de la couronne sont tracées d'un seul trait épais,
+// puis remplies par-dessus (il ne reste que le tour de l'ensemble). Décor, ignoré par les lecteurs d'écran.
+import { FEUILLE, NERVURES } from './tilleul/formes';
+
+const boules = [
+  [70, 150, 72], [170, 108, 92], [290, 92, 100], [410, 118, 96], [520, 86, 104], [640, 112, 98], [760, 94, 100], [880, 126, 92], [960, 160, 64],
+  [120, 196, 66], [250, 184, 84], [380, 196, 80], [500, 184, 88], [620, 196, 82], [740, 184, 86], [860, 196, 70],
+];
+// reflets clairs en haut à gauche des grosses boules
+const reflets = boules.filter(([, , r]) => r > 85).map(([x, y, r]) => [x - r * 0.3, y - r * 0.34, r * 0.3]);
+// fleurs de tilleul : petits bouquets crème
+const fleurs = [[140, 120], [330, 70], [455, 150], [585, 64], [700, 150], [820, 92], [230, 200], [905, 170], [520, 214]];
+// feuilles au bord de la couronne : [x, y, angle, taille]
+const feuilles = [[18, 150, -70, 0.5], [92, 60, -40, 0.55], [300, 4, -10, 0.5], [530, -2, 12, 0.55], [770, 8, 30, 0.5], [975, 110, 70, 0.5], [60, 250, -140, 0.45], [430, 270, 170, 0.45], [800, 268, 150, 0.45]];
+const cercles = (r = 0) => boules.map(([x, y, rr]) => `M${x - rr - r},${y}a${rr + r},${rr + r} 0 1 0 ${2 * (rr + r)},0a${rr + r},${rr + r} 0 1 0 ${-2 * (rr + r)},0Z`).join('');
+---
+<div class="arbre" aria-hidden="true">
+  <svg class="arbre__tronc" viewBox="0 0 60 300" preserveAspectRatio="none">
+    <path d="M16,0 C18,90 14,200 4,300 L58,300 C46,200 42,90 44,0 Z" fill="#9C5B2C" stroke="#6B3A17" stroke-width="5" vector-effect="non-scaling-stroke" />
+    <path d="M24,30 C26,90 22,150 20,220 M36,70 C38,130 36,190 40,270" fill="none" stroke="#6B3A17" stroke-width="3" stroke-linecap="round" opacity=".55" vector-effect="non-scaling-stroke" />
+  </svg>
+  <svg class="arbre__couronne" viewBox="-20 -30 1040 320" data-couronne>
+    <path d="M470,300 C480,250 440,230 400,214 M500,300 C510,250 560,236 600,222" fill="none" stroke="#6B3A17" stroke-width="16" stroke-linecap="round" />
+    {feuilles.map(([x, y, a, k]) => (
+      <g transform={`translate(${x},${y}) rotate(${a}) scale(${k}) translate(-50,-50)`}>
+        <path d={FEUILLE} fill="#3E9A47" stroke="#2B6E3A" stroke-width="6" />
+        <path d={NERVURES} stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".5" />
+      </g>
+    ))}
+    <path d={cercles()} fill="#2B6E3A" stroke="#2B6E3A" stroke-width="12" stroke-linejoin="round" />
+    <path d={cercles()} fill="#3E9A47" />
+    <path d={reflets.map(([x, y, r]) => `M${x - r},${y}a${r},${r} 0 1 0 ${2 * r},0a${r},${r} 0 1 0 ${-2 * r},0Z`).join('')} fill="#4BA652" />
+    {fleurs.map(([x, y]) => (
+      <g transform={`translate(${x},${y})`}>
+        <circle cx="-7" cy="0" r="6" fill="#FFF1B8" /><circle cx="6" cy="-4" r="6" fill="#FFF1B8" /><circle cx="2" cy="8" r="6" fill="#FFF1B8" />
+        <circle cx="0" cy="1" r="3" fill="#E8B53C" />
+      </g>
+    ))}
+  </svg>
+</div>
+<style>
+  /* Téléphone : la couronne couvre le haut de la scène, le tronc descend à droite. Grand écran : l'arbre est à gauche. */
+  .arbre { position: absolute; inset: 0; pointer-events: none; }
+  .arbre__couronne { position: absolute; top: -9vw; left: -4vw; width: 108vw; height: auto; }
+  .arbre__tronc { position: absolute; top: 20vw; right: 9vw; width: 13vw; height: calc(100% - 20vw - 30px); }
+  @media (min-width: 900px) {
+    .arbre__couronne { left: -3vw; width: 60vw; top: -10px; }
+    .arbre__tronc { top: 11vw; right: auto; left: 22vw; width: 6vw; height: calc(100% - 11vw - 30px); }
+  }
+</style>

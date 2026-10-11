@@ -4,6 +4,7 @@
 // Les positions sont relevées au chargement, quand la taille change et quand on défile ; celles des feuilles qui tombent,
 // au plus toutes les 200 ms (entre deux relevés, leur chute est prolongée).
 import { HAUT, type Decor, type FeuilleDecor } from './chat';
+import { lien } from './lien';
 
 type Element2D = HTMLElement | SVGElement;
 interface Releve { el: Element2D; x: number; y: number; vx: number; vy: number; op: number; t: number }
@@ -63,7 +64,9 @@ export function lireDecor(): Decor & { rail: HTMLElement | null } {
       if (!etangEl || etang.haut - defile > vh - 70 || etang.bas - defile < 100) return [];
       return lotus.map((l) => ({ x: l.x, y: l.y - defile }));
     },
+    // la page de jeu donne elle-même ses feuilles et ses papillons ; ailleurs, ce sont celles de Feuilles.astro
     feuilles() {
+      if (lien.feuilles) return lien.feuilles();
       if (!feuillesEl || !auMilieu()) return [];
       const maintenant = performance.now();
       if (maintenant - dernier > 200 || feuillesEl.length !== nombre) {
@@ -80,8 +83,9 @@ export function lireDecor(): Decor & { rail: HTMLElement | null } {
       }
       return releves.filter((r) => r.el.style.visibility !== 'hidden').map((r): FeuilleDecor => {
         const dt = (maintenant - r.t) / 1000;
-        return { el: r.el, x: r.x + r.vx * dt, y: r.y + r.vy * dt, op: r.op, attraper: () => cacher(r.el) };
+        return { el: r.el, x: r.x + r.vx * dt, y: r.y + r.vy * dt, vy: r.vy || undefined, op: r.op, attraper: () => cacher(r.el) };
       });
     },
+    curiosite: () => lien.curiosite?.() ?? null,
   };
 }

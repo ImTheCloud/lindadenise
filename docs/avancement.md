@@ -8,7 +8,7 @@ Consigne complète : `docs/prive/prompt-tilleul.md`. Quatre phases, un commit `[
 
 - **Phase 1 : faite** (diagnostic chiffré, images de référence, tests des bugs).
 - **Phase 2 : faite** (moteur et clics refaits, dessin inchangé).
-- Phase 3 : à faire (vraie page de jeu).
+- **Phase 3 : faite** (vraie page de jeu : arbre, étang, feuilles, papillons, mini-jeu).
 - Phase 4 : à faire (accueil, reste du site, téléphone, documentation).
 
 Démarrage : le Mac reste éveillé (accordé). **Remote Control a été refusé par le mode automatique** : la session a continué sans. Serveur de dev ouvert au Wi-Fi (configuration `site-wifi` de `.claude/launch.json`, `astro dev --host`) : http://192.168.129.13:4321/ et http://192.168.129.13:4321/jouer/ (pare-feu du Mac désactivé, réponse vérifiée depuis l'adresse Wi-Fi).
@@ -74,7 +74,24 @@ Première visite (bulle ouverte) : 0 mise en page forcée (avant 1,9). Travail d
 
 **Tests** : 10 sur 10. Ordinateur : « Marcher » bulle ouverte 523 px (avant 0), déjà venu 519 px, toucher 5/5 en 4 à 13 ms, feuille attrapée (avant jamais), se coucher 304 ms. Téléphone : 250 px (avant 0), 238 px (avant 36), toucher 5/5 en 41 à 44 ms, feuille attrapée, se coucher 411 ms.
 
+### Phase 3 : la vraie page de jeu (`/jouer/`, `/nl/spelen/`)
+
+**Comment elle est faite** (`src/components/pages/PageJeu.astro`, `src/components/Arbre.astro`) :
+- **Scène** d'un écran de haut : grand tilleul dessiné (`Arbre.astro` : couronne de boules au contour unique, reflets, fleurs crème, feuilles de tilleul au bord, tronc qui descend jusqu'à l'étang ; en haut sur téléphone, à gauche sur grand écran), panneau blanc au milieu, vrai étang (`Etang.astro`) en bas avec une bordure d'herbe dessinée. Tilleul vit au bord de l'étang comme à l'accueil (même rail, même décor `[data-decor]`).
+- **Boutons** (grille de 3, grands, icône dessinée + un ou deux mots) : Marcher, S'asseoir, Se coucher, Dormir, S'étirer, Toilette, Une feuille, Un papillon, L'étang, puis « Attraper les feuilles ». Le bouton de ce que fait Tilleul est allumé (`aria-pressed`, lu sur `chat.action`). Un ordre impossible est dit gentiment sous les boutons (« Cette feuille tombe trop loin pour Tilleul. »…), le message s'efface seul.
+- **Toucher l'herbe** (bande du bas, `.jeu__sol`) : Tilleul vient à cet endroit (ordre `viens`), une petite trace de patte montre l'endroit. Au clavier, pendant le mini-jeu : flèches gauche et droite.
+- **Feuilles et papillons** : éléments posés une fois et déplacés par `transform` (aucune lecture de mise en page), dans une couche qui passe devant le panneau sans gêner les doigts. « Une feuille » : une feuille sort de la couronne et tombe lentement ; Tilleul la guette (au trot si elle est loin) et bondit ; une feuille qui touche l'eau fait un rond dans l'eau. « Un papillon » : il sort de l'arbre, volette, puis descend jouer à portée de Tilleul, qui se tapit et bondit : le papillon s'envole aussitôt, jamais touché. Un papillon passe aussi tout seul de temps en temps (toutes les 25 à 40 s). Tilleul suit des yeux la feuille la plus basse, sinon un papillon.
+- **Partage** avec le chat : `src/components/tilleul/lien.ts` (le chat, ses repères, les feuilles et papillons que la page lui montre). L'ancien événement `tilleul-ordre` est supprimé. Forme de la feuille partagée : `src/components/tilleul/formes.ts` (aussi pour `Feuilles.astro`).
+- **Mini-jeu « Attraper les feuilles »** : 30 secondes ; des feuilles tombent de la couronne, de plus en plus souvent (une toutes les 2,1 s au début, 1,1 s à la fin) et un peu plus vite. Le visiteur touche l'herbe : Tilleul y trotte (pilote automatique coupé pendant la partie). Une feuille qui arrive sur Tilleul = 1 point (petit bond, deux cœurs) ; une feuille qui touche l'eau est perdue. Score, secondes et record en grand ; record gardé sur l'appareil (`localStorage`, clé `tilleul-record`, repli sans stockage : gardé le temps de la visite). Fin : « Bravo ! Tilleul a attrapé 7 feuilles. C'est votre meilleur score. », boutons « Rejouer » et « Revenir ». Aucun son.
+- **Mouvement réduit** (choix) : seuls les boutons de pose restent (s'asseoir, se coucher, dormir, s'étirer, toilette) ; Tilleul change de pose en une seule image ; ni feuille ni papillon ; le mini-jeu est remplacé par une phrase : « Les animations sont réduites sur cet appareil : Tilleul change de pose sans bouger. »
+
+**Vérifié** : 9 tests sur 9, ordinateur et téléphone simulé (marcher avec ou sans bulle, toucher le chat, une feuille attrapée, un papillon guetté puis bondi avec son bouton allumé, l'étang, toucher l'herbe : arrivé à 33 px de l'endroit, mini-jeu complet joué par un joueur automatique : 10 feuilles sur ordinateur, 7 sur téléphone, record enregistré, se coucher). Pendant le mini-jeu avec un papillon : 60 images/s sur ordinateur et téléphone simulé, 95e centile 16,8 ms, 0 tâche longue, 0 mise en page forcée, script de toutes les animations 0,7 à 0,9 ms en moyenne par appel. Mouvement réduit : 5 boutons, aucune animation, aucune erreur (FR et NL). **Lighthouse mobile** (version construite) : `/jouer/` et `/nl/spelen/` 99 / 100 / 100 / 100, CLS 0.
+
 ### À valider (mission Tilleul)
+
+- Nom du mini-jeu : « Attraper les feuilles » (à l'infinitif comme les autres boutons, pour garder le vouvoiement), « Blaadjes vangen » en néerlandais. Bouton de retour : « Revenir » / « Terug ».
+- Difficulté du mini-jeu (30 s, une feuille toutes les 2,1 s puis 1,1 s) : environ 7 à 10 feuilles attrapées par un joueur rapide. À ajuster après essai par Claudiu.
+- Le papillon qu'on appelle descend toujours jouer près de Tilleul (pour que le bond arrive) ; les papillons qui passent seuls restent en haut et ne sont pas chassés.
 
 - **Plastron crème** : le code prévoyait une tache crème sur le poitrail, jamais affichée (erreur de mesure). Retirée pour garder le dessin validé. Si Claudiu la veut, c'est une ligne à remettre (ovale de 20 × 20 sous le cou) : à regarder ensemble avant.
 - Zone à toucher : un rectangle aux coins arrondis autour du corps et de la tête (pas la queue), d'au moins 44 px. Toucher juste à côté du chat, dans ce rectangle, compte comme une caresse.
