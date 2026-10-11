@@ -447,7 +447,7 @@ export interface Precision { x?: number; cible?: object } // « viens » : où a
 export const HAUT = 280; // hauteur de la bande où il vit
 // sa place dans le coin : distance au bord droit (unités du dessin), pour que pattes et queue restent à l'écran ;
 // sur téléphone, plus près du bord (sinon il paraît au milieu)
-const COIN = 175, COIN_TELEPHONE = 100;
+const COIN = 130, COIN_TELEPHONE = 100;
 const APPROCHE = 130; // distance (unités du dessin) à laquelle il se tapit d'une feuille
 const PORTEE = 125; // hauteur (en unités du dessin) à laquelle une feuille est à sa portée : il bondit quand elle y passe
 const PAS = 1 / 120; // pas de temps fixe du mouvement, en secondes
