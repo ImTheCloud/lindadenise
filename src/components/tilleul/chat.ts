@@ -227,25 +227,17 @@ const BAILLE: Pose = { ...COUCHE, cx: 21, cy: -30, incl: -14 };
 
 type Etat = 'marche' | 'debout' | 'assis' | 'couche' | 'dort' | 'etire' | 'guette' | 'bond' | 'toilette' | 'baille';
 const POSES: Record<Etat, Pose> = { marche: DEBOUT, debout: DEBOUT, assis: ASSIS, couche: COUCHE, dort: DORT, etire: ETIRE, guette: GUETTE, bond: BOND, toilette: TOILETTE, baille: BAILLE };
-const DUREES: Record<Etat, [number, number]> = { marche: [0, 0], debout: [1, 2.5], assis: [6, 10], couche: [6, 9], dort: [12, 20], etire: [2.2, 2.2], guette: [1.4, 2.2], bond: [0, 0], toilette: [7.2, 7.2], baille: [2.6, 2.6] };
+const DUREES: Record<Etat, [number, number]> = { marche: [0, 0], debout: [1, 2.5], assis: [6, 10], couche: [6, 9], dort: [12, 20], etire: [2.2, 2.2], guette: [1.4, 2.2], bond: [0, 0], toilette: [4.3, 4.3], baille: [2.6, 2.6] };
 
-// Toilette : la patte avant monte à la bouche, se fait lécher, passe sur l'oreille, puis redescend.
-// Positions du pied dans le repère du corps (le chat assis a la tête en 24,-88 ; la tête se baisse pour l'oreille).
-const T_BOUCHE = { x: 46, y: -66 };
-const T_OREILLE = { x: 34, y: -100 };
+// Toilette : la patte avant monte sous le menton, se fait lécher, puis redescend. Elle ne passe jamais devant le visage
+// (la tête est baissée en 24,-88 ; la bouche vers -72 ; le pied reste juste sous la langue).
+const T_BOUCHE = { x: 48, y: -56 };
 const T_REPOS = { x: 22, y: -7 };
 function toilette(tt: number) {
-  let pied: V, bascule = 0; // bascule : 0 la patte est à la bouche, 1 elle est à l'oreille
-  if (tt < 0.7) pied = mix(T_REPOS, T_BOUCHE, lisse(tt / 0.7));
-  else if (tt < 3.4) pied = T_BOUCHE;
-  else if (tt < 4.3) { bascule = lisse((tt - 3.4) / 0.9); pied = mix(T_BOUCHE, T_OREILLE, bascule); }
-  else if (tt < 6.3) { bascule = 1; pied = T_OREILLE; }
-  else { bascule = 1 - lisse((tt - 6.3) / 0.9); pied = mix(T_REPOS, T_OREILLE, bascule); }
-  const leche = tt > 0.7 && tt < 3.4, essuie = tt > 4.3 && tt < 6.3;
-  const lick = Math.sin(TAU * 2.2 * (tt - 0.7)), frotte = Math.sin(TAU * 1.5 * (tt - 4.3));
+  let pied = tt < 0.7 ? mix(T_REPOS, T_BOUCHE, lisse(tt / 0.7)) : tt < 3.4 ? T_BOUCHE : mix(T_BOUCHE, T_REPOS, lisse((tt - 3.4) / 0.9));
+  const leche = tt > 0.7 && tt < 3.4, lick = Math.sin(TAU * 2.2 * (tt - 0.7));
   if (leche) pied = add(pied, { x: lick * 1.4, y: lick * 2.2 });
-  if (essuie) pied = add(pied, { x: frotte * 3, y: frotte * 5 });
-  return { pied, langue: leche ? 0.5 + 0.5 * lick : 0, cy: lerp(-22, -11, bascule), incl: lerp(9, 15, bascule) + (essuie ? frotte * 1.5 : 0), oreille: essuie ? 8 + 8 * frotte : 0 };
+  return { pied, langue: leche ? 0.5 + 0.5 * lick : 0 };
 }
 
 // Marche : le pas est réglé sur la distance parcourue, le pied au sol ne glisse jamais.
@@ -652,8 +644,12 @@ export class Chat {
     this.joie = 1.6;
     this.miaou = 0.5;
     this.coupDoeil = 2;
-    if (this.sautY === 0) this.sautV = 300;
     this.faireDesCoeurs();
+    // sur le site, chaque caresse lui fait prendre une autre pose (jamais la marche) ; sur la page de jeu, un saut de joie
+    if (!this.o.libre) {
+      const suite: Etat[] = ['assis', 'toilette', 'couche', 'etire', 'debout'];
+      this.mettre(suite[(suite.indexOf(this.etat) + 1) % suite.length]);
+    } else if (this.sautY === 0) this.sautV = 300;
   }
 
   // Petit saut de joie pour dire bonjour
@@ -996,7 +992,7 @@ export class Chat {
     const kLeve = cphi >= 0 ? 0 : 1;
     if (gesteToilette) {
       const g = gesteToilette;
-      cible = { ...cible, cy: g.cy, incl: g.incl, ...(kLeve === 0 ? { avX: g.pied.x, avY: g.pied.y } : { av2X: g.pied.x, av2Y: g.pied.y }) };
+      cible = { ...cible, ...(kLeve === 0 ? { avX: g.pied.x, avY: g.pied.y } : { av2X: g.pied.x, av2Y: g.pied.y }) };
     }
     const p = {} as Pose;
     // après un ordre du visiteur, la pose change 1,8 fois plus vite (même mouvement, plus vif)
@@ -1071,7 +1067,7 @@ export class Chat {
     this.oreille.pas(0, dt);
     // bâillement : bouche grande ouverte (qui s'ouvre puis se referme), yeux plissés, oreilles un peu en arrière
     const baille = this.etat === 'baille' ? Math.sin(Math.PI * clamp(1 - this.attente / DUREES.baille[0], 0, 1)) ** 0.7 : 0;
-    const repos = this.etat === 'dort' ? 12 : 8 * baille + (gesteToilette?.oreille ?? 0);
+    const repos = this.etat === 'dort' ? 12 : 8 * baille;
     const oreilles: [number, number] = [repos + this.oreille.x * (this.oreilleCote === 0 ? 1 : 0.25), repos + this.oreille.x * (this.oreilleCote === 1 ? 1 : 0.25)];
     this.prochainCligne -= dt;
     if (this.prochainCligne <= 0) { this.cligne = 0.16; this.prochainCligne = 2.5 + Math.random() * 4; }
