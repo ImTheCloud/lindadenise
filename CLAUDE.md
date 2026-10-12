@@ -9,7 +9,7 @@ Site de Linda Denise (retraitée belge, dessins numériques faits au doigt sur s
 ## Règles non négociables
 
 - **Le dépôt est public (choix assumé)** : ne pas le rendre privé. Jamais de clé API ni de dessin original en haute définition dans ce qui est versionné (ce serait un téléchargement gratuit). Les infos d'identité sont de toute façon affichées sur le site, dans les mentions légales.
-- **Sur le site, elle est « Linda Denise »** partout, sauf dans les mentions légales où figure son nom de famille.
+- **Sur le site, elle est « Linda Denise »** partout, sauf dans les mentions légales où figure son nom de famille. **Linda parle toujours à la première personne** (« je », « mon », « mes », « écrivez-moi ») dans les textes du site, jamais « elle » ni « Linda vous répond » ; exceptions : les pages légales (mentions légales, licence, conditions de vente, confidentialité), les noms et légendes d'auteur (« de Linda Denise ») et Tilleul, qui parle d'elle à la troisième personne (c'est le chat qui raconte). En NL : « ik » pour Linda, « je » pour le visiteur.
 - **Les originaux haute définition ne vont jamais dans git** (dossier source : `~/Desktop/DessinsLinda`). Seuls des aperçus filigranés basse définition sont publics.
 - **Ne jamais inventer d'information** sur Linda. Rien de provisoire visible sur le site.
 - **Pas de paiement en ligne** tant que son statut légal n'est pas confirmé : Linda se renseigne elle-même (voir `docs/prive/suivi-client.md`).

@@ -29,6 +29,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Page de jeu** : l'arbre est un peu plus petit et le panneau un peu moins large sur ordinateur, pour qu'ils ne se touchent plus (mesuré : 90 px d'écart à 1100 px, 48 px à 1440 px, 76 px à 950 px).
 
+- **Linda parle à la première personne (choix de Claudiu)** : tous les textes FR et NL hors pages légales sont passés en « je / mon / écrivez-moi » (accueil, galeries, fiches, panier, formulaire, merci, FAQ, pied de page, À propos déjà ainsi) ; ex. « Je vous l'envoie » (toiles), « Écrivez-moi », « Je suis Linda » à la place de « Rencontrez Linda ». Inchangés : les pages légales, les titres et textes alternatifs « de Linda Denise », et les anecdotes de Tilleul (3e personne). Règle ajoutée dans `CLAUDE.md`. À relire par Claudiu, surtout le NL.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
