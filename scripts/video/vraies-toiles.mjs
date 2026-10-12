@@ -3,13 +3,13 @@
 // fondus de 0,4 s. Le son d'origine (bruits de manipulation) est retiré et remplacé par une musique originale
 // (musique.py, style « reel » : guitare et piano, sans effets ; une mesure = 2,1 s = une toile). Trois passes : le montage, un léger débruitage
 // et une compression plus forte pour rester sous 10 Mo, puis la musique (l'image n'est pas recompressée).
-// Usage : node scripts/video/vraies-toiles.mjs [vidéo brute]   (par défaut la vidéo WhatsApp du 2026-10-10 dans ~/Downloads)
+// Usage : node scripts/video/vraies-toiles.mjs [vidéo brute]   (par défaut la vidéo WhatsApp du 2026-10-10 dans ~/Desktop/DessinsLinda/Videoss)
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-const SOURCE = process.argv[2] ?? path.join(os.homedir(), 'Downloads', 'WhatsApp Video 2026-10-10 at 12.30.18.mp4');
+const SOURCE = process.argv[2] ?? path.join(os.homedir(), 'Desktop', 'DessinsLinda', 'Videos', 'WhatsApp Video 2026-10-10 at 12.30.18.mp4');
 // début du passage de chaque toile, en secondes
 const DEBUTS = [
   [0, 'frangipanier'], [5.05, 'mauves'], [9.77, 'chat-au-repos'], [12.97, 'le-chemin-de-foret'], [20.55, 'vieux-cerisier'],

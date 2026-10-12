@@ -758,5 +758,33 @@
     },
     "largeur": 760,
     "hauteur": 1075
+  },
+  {
+    "id": "plante-pres-du-ruisseau",
+    "rubrique": "psaumes",
+    "titre": {
+      "fr": "Planté près du ruisseau",
+      "nl": "Geplant bij de beek"
+    },
+    "largeur": 760,
+    "hauteur": 1074,
+    "verset": {
+      "ref": "1,3",
+      "texte": "Il est comme un arbre planté près du ruisseau qui donne son fruit en sa saison."
+    }
+  },
+  {
+    "id": "les-arbres-crient-de-joie",
+    "rubrique": "psaumes",
+    "titre": {
+      "fr": "Les arbres crient de joie",
+      "nl": "De bomen juichen"
+    },
+    "largeur": 760,
+    "hauteur": 1074,
+    "verset": {
+      "ref": "96,12",
+      "texte": "Joie au ciel. Que tous les arbres des forêts crient de joie."
+    }
   }
 ]

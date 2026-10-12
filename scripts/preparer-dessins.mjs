@@ -10,7 +10,7 @@ const SOURCE = process.argv[2] ?? path.join(os.homedir(), 'Desktop', 'DessinsLin
 const SORTIE_IMG = path.resolve('public/dessins');
 const SORTIE_JSON = path.resolve('src/data/dessins.json');
 
-// rubrique : chats | fleurs | nature | animaux
+// rubrique : chats | fleurs | nature | animaux | psaumes (les psaumes : voir PSAUMES plus bas)
 const CATALOGUE = [
   // Chats
   ['chats', 'Avec Timé', 'Met Timé'],
@@ -138,6 +138,21 @@ for (const [rubrique, fr, nl] of CATALOGUE) {
   const grande = await apercu(source, 760, path.join(SORTIE_IMG, id), 76, 52);
   await apercu(source, 400, path.join(SORTIE_IMG, `${id}-vignette`), 66, 48);
   sortie.push({ id, rubrique, titre: { fr, nl }, largeur: grande.largeur, hauteur: grande.hauteur });
+}
+
+// Psaumes : le verset est écrit par Linda dans son dessin ; il est redonné en texte sous le dessin (fiche).
+// Fichiers dans le sous-dossier « Psaumes » de la source. Pas de verset en néerlandais : le texte reste en français.
+const PSAUMES = [
+  ['Psaume 1,3.jpeg', 'Planté près du ruisseau', 'Geplant bij de beek', { ref: '1,3', texte: 'Il est comme un arbre planté près du ruisseau qui donne son fruit en sa saison.' }],
+  ['Psaume 96,12.jpeg', 'Les arbres crient de joie', 'De bomen juichen', { ref: '96,12', texte: 'Joie au ciel. Que tous les arbres des forêts crient de joie.' }],
+];
+for (const [fichier, fr, nl, verset] of PSAUMES) {
+  const source = path.join(SOURCE, 'Psaumes', fichier);
+  if (!fs.existsSync(source)) { manquants.push(fr); continue; }
+  const id = slug(fr);
+  const grande = await apercu(source, 760, path.join(SORTIE_IMG, id), 76, 52);
+  await apercu(source, 400, path.join(SORTIE_IMG, `${id}-vignette`), 66, 48);
+  sortie.push({ id, rubrique: 'psaumes', titre: { fr, nl }, largeur: grande.largeur, hauteur: grande.hauteur, verset });
 }
 
 fs.writeFileSync(SORTIE_JSON, JSON.stringify(sortie, null, 2) + '\n');

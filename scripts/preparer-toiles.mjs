@@ -1,6 +1,6 @@
 // Prepare les photos des toiles : redresse la perspective, garde seulement la toile au ratio A3,
 // ecrit les images de public/toiles et le fichier src/data/toiles.json.
-// Usage : npm run toiles [dossier]   (par defaut ~/Downloads, photos « Titre.jpeg »)
+// Usage : npm run toiles [dossier]   (par defaut ~/Desktop/DessinsLinda/Toiles, photos « Titre.jpeg »)
 // Les photos d'origine ne sont jamais copiees dans le depot. Pas de filigrane : ce sont des photos
 // de toiles physiques, en definition limitee.
 // « vendue » se change a la main dans src/data/toiles.json : ce script garde la valeur existante.
@@ -9,7 +9,7 @@ import path from 'node:path';
 import os from 'node:os';
 import sharp from 'sharp';
 
-const SOURCE = process.argv[2] ?? path.join(os.homedir(), 'Downloads');
+const SOURCE = process.argv[2] ?? path.join(os.homedir(), 'Desktop', 'DessinsLinda', 'Toiles');
 const SORTIE_IMG = path.resolve('public/toiles');
 const SORTIE_JSON = path.resolve('src/data/toiles.json');
 

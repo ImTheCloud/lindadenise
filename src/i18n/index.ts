@@ -5,8 +5,8 @@ import toilesJson from '../data/toiles.json';
 import { calculLot } from '../data/vente';
 
 export type Lang = 'fr' | 'nl';
-export type Rubrique = 'chats' | 'nature' | 'fleurs' | 'animaux';
-export const RUBRIQUES: Rubrique[] = ['chats', 'nature', 'fleurs', 'animaux'];
+export type Rubrique = 'chats' | 'nature' | 'fleurs' | 'animaux' | 'psaumes';
+export const RUBRIQUES: Rubrique[] = ['chats', 'nature', 'fleurs', 'animaux', 'psaumes'];
 
 export interface Dessin {
   id: string;
@@ -14,6 +14,8 @@ export interface Dessin {
   titre: { fr: string; nl: string };
   largeur: number;
   hauteur: number;
+  /** psaumes : verset écrit par Linda dans le dessin, redonné ici en texte (référence « 1,3 » + texte) */
+  verset?: { ref: string; texte: string };
 }
 export const dessins = dessinsJson as Dessin[];
 
@@ -22,7 +24,6 @@ export interface Toile {
   id: string;
   titre: { fr: string; nl: string };
   description: { fr: string; nl: string };
-  dessin: string | null;
   vendue: boolean;
 }
 export const toiles = toilesJson as Toile[];

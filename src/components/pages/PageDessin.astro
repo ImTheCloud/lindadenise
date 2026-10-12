@@ -59,6 +59,14 @@ const jsonld = {
       </div>
     </div>
   </section>
+  {dessin.verset && (
+    <section class="section">
+      <figure class="contenu verset apparait">
+        <blockquote lang="fr">« {dessin.verset.texte} »</blockquote>
+        <figcaption>{d.dessins.versetTitre(dessin.verset.ref)}</figcaption>
+      </figure>
+    </section>
+  )}
   <section class="section section--vert" id="toile">
     <div class="contenu option-toile cadre">
       <div class="option-toile__image" aria-hidden="true">
@@ -121,6 +129,9 @@ const jsonld = {
   .option-toile__nom { font-family: var(--titre); font-size: 1.3rem; color: var(--orange-fonce); }
   .option-toile__note { margin: 16px 0 0; font-size: 0.95rem; color: var(--encre-douce); }
   .option-toile .bouton { margin-top: 4px; }
+  .verset { max-width: 640px; margin: 0 auto; text-align: center; }
+  .verset blockquote { margin: 0; font-family: var(--titre); font-size: clamp(1.5rem, 1.25rem + 1.2vw, 2.1rem); line-height: 1.3; color: var(--vert-fonce); }
+  .verset figcaption { margin-top: 10px; font-family: var(--titre); font-size: 1.3rem; color: var(--orange-titre); }
   .suite { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 28px; }
   .suite :global(.carte) { margin: 0; }
   /* Mobile : le dessin, son titre, son prix et le bouton tiennent dans un seul écran. */
