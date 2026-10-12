@@ -49,7 +49,7 @@ const TOILES = [
     'un chemin qui serpente entre les arbres', 'een pad dat tussen de bomen kronkelt'],
   ['Le tournesol', 'De zonnebloem', 0, [[39, 16], [1122, 16], [1150, 1587], [10, 1587]],
     'un grand tournesol jaune et ses feuilles vertes', 'een grote gele zonnebloem met groene bladeren'],
-  ['Mauves', 'Kaasjeskruid', 0, [[12, 10], [1111, 10], [1122, 1586], [12, 1559]],
+  ['Fleurs mauves', 'Paarse bloemen', 0, [[12, 10], [1111, 10], [1122, 1586], [12, 1559]],
     'des fleurs de mauve violettes parmi les feuilles', 'paarse bloemen van kaasjeskruid tussen de bladeren'],
   ['Montagne et tournesols', 'Berg en zonnebloemen', 0, [[42, 58], [1120, 52], [1118, 1561], [65, 1561]],
     'un champ de tournesols au pied d’une montagne enneigée', 'een veld zonnebloemen aan de voet van een besneeuwde berg'],

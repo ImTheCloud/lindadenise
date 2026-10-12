@@ -12,8 +12,6 @@ const d = t(lang);
 const titre = dessin.titre[lang];
 const chemins = { fr: cheminDessin(dessin.id, 'fr'), nl: cheminDessin(dessin.id, 'nl') };
 const i = dessins.findIndex((x) => x.id === dessin.id);
-const prec = dessins[(i - 1 + dessins.length) % dessins.length];
-const suiv = dessins[(i + 1) % dessins.length];
 // Dessins à voir aussi : ceux de la même rubrique qui suivent celui-ci (donc différents d'une fiche à l'autre), complétés par la suite du catalogue.
 const apres = [...dessins.slice(i + 1), ...dessins.slice(0, i)];
 const memeRubrique = [...apres.filter((x) => x.rubrique === dessin.rubrique), ...apres.filter((x) => x.rubrique !== dessin.rubrique)].slice(0, 4);
@@ -49,16 +47,6 @@ const jsonld = {
             <a href={chemin('panier', lang)}>{d.panier.voir}</a>
           </p>
           <p class="fiche__petit"><a href={chemin('licence', lang)}>{d.dessins.licence}</a> · <a href="#toile">{d.dessins.toileLien}</a></p>
-          <nav class="fiche__nav" aria-label="Navigation">
-            <a href={cheminDessin(prec.id, lang)} rel="prev">
-              <Apercu id={prec.id} alt="" largeur={prec.largeur} hauteur={prec.hauteur} />
-              <span>← {d.dessins.precedent}</span>
-            </a>
-            <a href={cheminDessin(suiv.id, lang)} rel="next">
-              <Apercu id={suiv.id} alt="" largeur={suiv.largeur} hauteur={suiv.hauteur} />
-              <span>{d.dessins.suivant} →</span>
-            </a>
-          </nav>
         </div>
       </div>
     </div>
@@ -125,10 +113,6 @@ const jsonld = {
   .fiche__petit { font-size: 0.98rem; }
   .fiche__panier { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
   .fiche__panier a { font-family: var(--titre); font-size: 1.2rem; }
-  .fiche__nav { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-top: 34px; padding-top: 18px; border-top: 3px dashed var(--vert-pale); font-family: var(--titre); font-size: 1.3rem; }
-  .fiche__nav a { display: grid; gap: 6px; text-decoration: none; justify-items: start; }
-  .fiche__nav a[rel='next'] { justify-items: end; text-align: right; }
-  .fiche__nav :global(img) { height: 84px; width: auto; border-radius: 8px 4px 8px 5px / 5px 8px 4px 8px; border: 2px solid var(--vert-fonce); }
   .option-toile { display: grid; grid-template-columns: 110px 1fr; gap: 20px; align-items: center; max-width: 760px; padding: 18px 20px; }
   .option-toile h2 { font-size: clamp(1.7rem, 1.4rem + 1.2vw, 2.3rem); margin-bottom: 0.2em; }
   .option-toile p { margin: 0 0 10px; }
@@ -157,8 +141,7 @@ const jsonld = {
     .fiche__prix { font-size: 2.2rem; margin: 0; }
     .fiche__panier a { display: none; } /* l'icône du panier est dans l'en-tête */
     .fiche__infos .bouton { padding: 10px 18px; font-size: 1.15rem; }
-    .fiche__nav { margin-top: 18px; }
-  }
+    }
   @media (min-width: 860px) {
     .option-toile { grid-template-columns: 170px 1fr; gap: 32px; padding: 24px 32px; }
     .fiche { grid-template-columns: 1.05fr 0.95fr; gap: 64px; }

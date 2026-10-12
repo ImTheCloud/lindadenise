@@ -79,6 +79,12 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Fiches et textes courts** : plus de rubrique (« · Chats ») dans le surtitre des fiches (déjà dite par la section) ; la phrase de livraison des fiches est celle des badges (« Livrée par bpost », « Reçu par e-mail ») ; filtres des galeries sur téléphone : grille de trois colonnes (deux lignes). Règles notées dans `CLAUDE.md` : textes courts, jamais de répétition d'une information déjà visible à côté.
 
+- **« Voir à l'échelle » deux fois plus grand** : le salon est recadré sur la toile, la règle de 50 cm et le canapé (échelle inchangée, donc toujours juste), et le bloc passe de 760 à 880 px : la toile apparaît environ 2 fois plus grande sur ordinateur, et presque 2 fois sur téléphone.
+
+- **Plus de « précédent / suivant »** sur les fiches d'un dessin et d'une toile (ordinateur et téléphone), à la demande de Claudiu ; textes supprimés des dictionnaires.
+
+- **Toile « Fleurs mauves »** (avant : « Mauves ; NL « Paarse bloemen » au lieu de « Kaasjeskruid ») : titre changé dans `scripts/preparer-toiles.mjs` et `toiles.json` ; l'identifiant reste `mauves` (adresse inchangée).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
