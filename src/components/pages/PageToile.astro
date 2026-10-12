@@ -20,7 +20,7 @@ const autres = [...toiles.slice(i + 1), ...toiles.slice(0, i)].slice(0, 4);
 const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
 const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
 ---
-<Base lang={lang} titre={titre} description={`${alt} · ${tt.prix(PRIX_TOILE)}`} chemins={chemins} image={`/toiles/${toile.id}-800.jpg`}>
+<Base lang={lang} monde="toiles" titre={titre} description={`${alt} · ${tt.prix(PRIX_TOILE)}`} chemins={chemins} image={`/toiles/${toile.id}-800.jpg`}>
   <section class="section section--fiche">
     <div class="contenu">
       <p><a href={chemin('toiles', lang)}>{tt.retour}</a></p>

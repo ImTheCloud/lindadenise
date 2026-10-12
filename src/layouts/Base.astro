@@ -18,21 +18,23 @@ interface Props {
   chemins: { fr: string; nl: string };
   image?: string;
   noindex?: boolean;
+  /** monde du site : les dessins (vert) ou les toiles (brun) */
+  monde?: 'dessins' | 'toiles';
 }
-const { lang, titre, description, chemins, image = '/images/partage.png', noindex = false } = Astro.props;
+const { lang, titre, description, chemins, image = '/images/partage.png', noindex = false, monde = 'dessins' } = Astro.props;
 const d = t(lang);
 const titrePage = titre ? `${titre} – Linda Denise` : d.meta.titre;
 const desc = description ?? d.meta.description;
 const canonique = SITE + chemins[lang];
 ---
 <!doctype html>
-<html lang={lang} class="sans-js">
+<html lang={lang} class="sans-js" data-monde={monde}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{titrePage}</title>
     <meta name="description" content={desc} />
-    <meta name="theme-color" content="#3e9a47" />
+    <meta name="theme-color" content={monde === 'toiles' ? '#5b3a29' : '#3e9a47'} />
     <link rel="preload" href={policeTitre} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={policeTexte} as="font" type="font/woff2" crossorigin />
     {noindex && <meta name="robots" content="noindex" />}
@@ -92,6 +94,7 @@ const canonique = SITE + chemins[lang];
       });
       window.addEventListener('panier-change', majPanier);
       majPanier();
+      document.documentElement.classList.add('panier-pret');
     </script>
     <style is:global>
       .evitement { position: absolute; left: -999px; top: 0; background: #fff; padding: 8px 14px; z-index: 100; }

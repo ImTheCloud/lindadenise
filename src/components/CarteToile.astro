@@ -22,6 +22,7 @@ const tailles = '(min-width: 1000px) 24vw, (min-width: 700px) 32vw, 46vw';
       {toile.vendue && <span class="carte__vendue">{tt.vendue}</span>}
     </span>
     <span class="carte__titre">{titre}</span>
+    <span class="carte__rubrique">{d.rubriques[toile.rubrique].court}</span>
     <span class="carte__prix">{toile.vendue ? tt.vendueTexte : tt.prix(PRIX_TOILE)}</span>
   </a>
   {!toile.vendue && (

@@ -21,6 +21,28 @@
   --max: 1180px;
   --gouttiere: clamp(16px, 4vw, 40px);
   --ombre: 0 6px 0 rgba(43, 110, 58, 0.12);
+
+  /* Les deux mondes du site : couleurs fixes, pour les repères qui doivent rester verts ou bruns partout */
+  --monde-dessins: #2b6e3a;
+  --monde-toiles: #5b3a29;
+  --fond: #fff;
+}
+
+/* Le monde des toiles reprend exactement les mêmes variables, en brun terre et crème : tout ce qui s'appuie sur elles change seul */
+[data-monde='toiles'] {
+  --vert: #8a5a3c;
+  --vert-fonce: #5b3a29;
+  --vert-creme: #f7efe4;
+  --vert-pale: #eadbc9;
+  --orange: #c9803f;
+  --orange-clair: #e0a463;
+  --orange-creme: #f6ebdc;
+  --orange-fonce: #a2561f;
+  --orange-titre: #b5652a;
+  --encre: #3a2a20;
+  --encre-douce: #6b5546;
+  --ombre: 0 6px 0 rgba(91, 58, 41, 0.14);
+  --fond: #fbf6ef;
 }
 
 *,
@@ -31,7 +53,7 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: var(--blanc);
+  background: var(--fond);
   color: var(--encre);
   font-family: var(--texte);
   font-size: clamp(1.06rem, 0.98rem + 0.3vw, 1.22rem);
@@ -93,26 +115,34 @@ p { margin: 0 0 1em; }
   .apparait { opacity: 1; transform: none; }
 }
 
-/* Cartes des dessins et des toiles (CarteDessin.astro, CarteToile.astro) */
-.carte { background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 10px 10px 10px; box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s; break-inside: avoid; margin-bottom: 22px; }
-.carte__lien { display: block; text-decoration: none; }
-.carte__lien img { width: 100%; height: auto; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; background: var(--vert-creme); }
-.carte__titre { display: block; font-family: var(--titre); font-size: 1.35rem; line-height: 1.15; color: var(--vert-fonce); padding: 10px 6px 8px; text-align: center; }
-.carte:hover, .carte:focus-within { transform: translateY(-6px) rotate(-1.4deg); box-shadow: 0 12px 0 rgba(43, 110, 58, 0.14); }
-.carte:hover .carte__titre { color: var(--orange-fonce); }
+/* Cartes des dessins et des toiles (CarteDessin.astro, CarteToile.astro) : grille de boutique, cadres dessinés à la main, couleurs du monde (html[data-monde]) */
+.carte { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s; }
 .carte[hidden] { display: none; }
-.carte__panier { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 7px 10px; font-family: var(--titre); font-size: 1.1rem; line-height: 1.1; cursor: pointer; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: background-color 0.15s, color 0.15s; }
+.carte:hover, .carte:focus-within { transform: translateY(-6px) rotate(-1.2deg); box-shadow: 0 12px 0 rgba(43, 110, 58, 0.14); }
+.carte__lien { display: block; text-decoration: none; }
+.carte__image { position: relative; display: block; aspect-ratio: 5 / 7; overflow: hidden; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; background: var(--vert-creme); }
+.carte__image picture { display: block; height: 100%; }
+.carte__image img { width: 100%; height: 100%; object-fit: cover; }
+/* Une toile : même carte, avec le bord d'aluminium */
+.carte--toile .carte__image { padding: 5px; border-radius: 4px; background: #e9ecee; box-shadow: inset 0 0 0 1px #c3c9cd; }
+.carte--toile .carte__image img { border-radius: 2px; box-shadow: 0 0 0 1px #9aa2a8; }
+.carte__etiquette { position: absolute; left: -6px; top: 10px; padding: 3px 12px 4px; font-family: var(--titre); font-size: 1.05rem; line-height: 1.1; color: #fff; background: var(--vert-fonce); border: 2px solid #fff; border-radius: 0 10px 10px 0; box-shadow: 0 2px 4px rgba(60, 40, 20, 0.3); }
+.carte--toile .carte__etiquette { left: 0; }
+.carte__vendue { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 62px; height: 62px; font-family: var(--titre); font-size: 1.05rem; color: #fff; background: var(--encre-douce); border: 3px solid #fff; border-radius: 50%; transform: rotate(-8deg); }
+.carte--vendue .carte__image img { filter: grayscale(0.9) opacity(0.7); }
+.carte__titre { display: block; padding: 10px 6px 0; font-family: var(--titre); font-size: 1.35rem; line-height: 1.15; text-align: center; color: var(--vert-fonce); }
+.carte__rubrique { display: block; padding: 2px 6px 0; font-size: 0.9rem; text-align: center; color: var(--encre-douce); }
+.carte__prix { display: block; padding: 2px 6px 10px; font-family: var(--titre); font-size: 1.25rem; text-align: center; color: var(--orange-fonce); }
+.carte:hover .carte__titre { color: var(--orange-fonce); }
+.carte__panier { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: auto; padding: 7px 10px; font-family: var(--titre); font-size: 1.1rem; line-height: 1.1; cursor: pointer; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); }
 .carte__panier:hover { background: var(--orange-creme); color: var(--orange-fonce); border-color: var(--orange-fonce); }
-.carte__panier[aria-pressed='true'] { background: var(--vert-fonce); color: #fff; }
+.carte__panier[aria-pressed='true'] { background: var(--vert-fonce); color: #fff; border-color: var(--vert-fonce); }
 @media (max-width: 619px) {
+  .carte { padding: 7px; }
+  .carte__titre { font-size: 1.15rem; }
   .carte__panier { font-size: 0.9rem; padding: 6px 4px; white-space: nowrap; }
   .carte__panier svg { display: none; }
 }
-/* Une toile : même carte que les dessins, avec le bord d'aluminium, une étiquette « Toile » et son prix */
-.carte__image { position: relative; display: block; }
-.carte--toile .carte__image img { border-radius: 3px; background: #dfe3e6; box-shadow: 0 0 0 1px #c3c9cd, 0 0 0 3px #eef1f3, 0 0 0 4px #9aa2a8, 0 8px 14px -6px rgba(60, 40, 20, 0.35); }
-.carte__etiquette { position: absolute; left: -6px; top: 10px; padding: 3px 12px 4px; font-family: var(--titre); font-size: 1.05rem; line-height: 1.1; color: #fff; background: var(--orange-fonce); border: 2px solid #fff; border-radius: 0 10px 10px 0; box-shadow: 0 2px 4px rgba(60, 40, 20, 0.3); }
-.carte--dessin .carte__etiquette { background: var(--vert-fonce); }
-.carte__vendue { position: absolute; right: -8px; bottom: -8px; display: grid; place-items: center; width: 62px; height: 62px; font-family: var(--titre); font-size: 1.05rem; color: #fff; background: var(--encre-douce); border: 3px solid #fff; border-radius: 50%; transform: rotate(-8deg); }
-.carte--vendue .carte__image img { filter: grayscale(0.9) opacity(0.7); }
-.carte__prix { display: block; margin-top: -4px; padding: 0 6px 8px; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--orange-fonce); }
+
+/* Un bouton du panier reste invisible jusqu'à ce que son état (dans le panier ou non) soit lu : plus de clignotement au chargement */
+html:not(.panier-pret) [data-panier] { visibility: hidden; }

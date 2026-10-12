@@ -2,6 +2,17 @@
 
 Dernière mise à jour : 2026-10-12 (retours vidéos et toiles : voir la première section ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Refonte façon boutique : accueil, Dessins, Toiles (2026-10-12, non publié)
+
+Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gardant l'univers dessiné**, un monde vert (dessins) et un monde brun (toiles), identiques et inversés.
+- **Deux mondes par variables CSS** : `html[data-monde='toiles']` (ou tout élément `[data-monde='toiles']`) redéfinit les variables vertes en brun terre / crème (`global.css`) ; `Base.astro` prend `monde="toiles"` (page Toiles et fiches de toiles). `--monde-dessins` / `--monde-toiles` restent fixes (points de couleur du menu).
+- **Galerie** (`Galerie.astro`) : plus de gros titre ni de sous-texte : petit titre « Dessins (78) » (le nombre suit le filtre), filtres collés sous l'en-tête (défilent de côté sur téléphone), grille 2 / 3 / 4 colonnes de cartes dessinées (image, titre, rubrique, prix, bouton panier). Filtre lu avant l'affichage (`#fleurs` n'affiche plus tout un instant), suit aussi `hashchange`.
+- **Bugs visuels corrigés** : bouton du panier invisible tant que son état n'est pas lu (`html:not(.panier-pret) [data-panier]`) : plus de passage du blanc au vert au chargement (vérifié : états vus = caché puis vert, jamais blanc visible) ; filtre d'adresse ; plus de bande vide dans le haut de la page Toiles.
+- **Bandeau vidéo** (`Bandeau.astro`) : le motion design démarre seul, **sans son**, en boucle, après le chargement de la page ; boutons Pause / Activer le son ; arrêt hors écran ; pas de lecture automatique avec « réduire les animations » ou « économiser les données » (affiche + bouton Lecture). Affiches refaites en 1600 px. Accueil : tout en haut ; page Toiles : en bandeau tout en haut, la vidéo des vraies toiles en bas (clic pour lancer, `Video.astro`).
+- **Accueil** : vidéo, étang et lotus, deux grandes portes dessinées (Dessins vert, Toiles brun), une rangée « à découvrir » par monde (4 cartes + les trois étapes), puis « Rencontrez Linda ». **Retirés** (récupérables dans git) : section des cinq univers, « un dessin, c'est un moment de calme », bloc « Ce que vous recevez », section « Aussi en grand format » ; leurs textes ont quitté `fr.ts` / `nl.ts`.
+- À valider par Claudiu : l'aspect sur téléphone, le brun, la vidéo d'accueil (elle parle des toiles), le poids de la vidéo qui démarre seule (7,7 Mo).
+- Pas encore fait : fiches détail (`PageDessin`, `PageToile`) seulement recolorées par le monde, pas refaites ; texte « Chaque toile est unique » de la vidéo coupé sur le bandeau de la page Toiles (cadrage 16:9 limité en hauteur).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

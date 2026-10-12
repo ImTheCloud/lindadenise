@@ -14,6 +14,7 @@ const p = d.panier;
       <span class="carte__etiquette">{d.dessins.etiquette}</span>
     </span>
     <span class="carte__titre">{titre}</span>
+    <span class="carte__rubrique">{d.rubriques[dessin.rubrique].court}</span>
     <span class="carte__prix">{d.dessins.prix}</span>
   </a>
   <button type="button" class="carte__panier" aria-pressed="false" aria-label={p.ajouterAria.replace('{t}', titre)} data-panier={`dessin:${dessin.id}`} data-titre={titre} data-ajouter={p.ajouter} data-dedans={p.dedans} data-aria-ajouter={p.ajouterAria} data-aria-dedans={p.dedansAria}>

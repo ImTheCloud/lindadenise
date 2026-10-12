@@ -10,7 +10,7 @@ const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
 const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, nombre: parRubrique(r).length })).filter((r) => r.nombre > 0);
 ---
 <Base lang={lang} titre={d.dessins.titre} description={d.dessins.metaDescription} chemins={chemins}>
-  <Galerie titre={d.dessins.titre} intro={d.dessins.intro} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={dessins.length}>
+  <Galerie titre={d.nav.dessins} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={dessins.length}>
     {dessins.map((x, i) => <CarteDessin dessin={x} lang={lang} priorite={i < 4} />)}
   </Galerie>
 </Base>
