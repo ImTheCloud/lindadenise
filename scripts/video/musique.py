@@ -1,6 +1,6 @@
 # Musiques originales des vidéos, composées et synthétisées ici (numpy seulement, aucune bibliothèque sous licence).
 #   motion : la vidéo « Les toiles » (motion design) : pop électro, 120 BPM, sol majeur (sol - ré - mi mineur - do).
-#            Une mesure = 2 s, une toile par mesure. Intro, couplet, refrain, pause pour Tilleul, montée, final.
+#            Une mesure = 2 s, une toile par mesure (44 s : 22 mesures). Intro, mur, toiles une par une, pause pour Tilleul, montée, final.
 #   reel   : la vidéo « Les vraies toiles » : pop acoustique chaloupée, 114,3 BPM (une mesure = 2,1 s = le rythme
 #            des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, piano électrique, sifflet.
 # Usage : python musique.py motion|reel duree_en_secondes sortie.wav
@@ -143,10 +143,10 @@ def motion():
 
     def section(b):
         if b < 2: return 'intro'
-        if b < 7: return 'A'
-        if b < 23: return 'B'
-        if b < 26: return 'pause'
-        if b == 26: return 'montee'
+        if b < nb - 14: return 'A'      # le mur et ses toiles qui défilent
+        if b < nb - 5: return 'B'       # les toiles une par une
+        if b < nb - 3: return 'pause'   # Tilleul
+        if b == nb - 3: return 'montee'
         if b < nb - 1: return 'final'
         return 'fin'
 
@@ -192,11 +192,11 @@ def motion():
             poser('batt', montee(BAR), t0, 0, 0.75)
             for i in range(8): poser('batt', caisse_claire(), t0 + i * B / 2, 0, 0.3 + 0.06 * i)
             for i in range(16): poser('batt', caisse_claire(), t0 + 2 * B + i * B / 8, 0, 0.45 + 0.04 * i)
-        if b == 1 or (s == 'A' and b == 6) or (s == 'B' and (b - 7) % 4 == 3):  # roulement de caisse claire avant un changement
+        if b == 1 or b == nb - 15 or (s == 'B' and (b - (nb - 14)) % 4 == 3):  # roulement de caisse claire avant un changement
             for i in range(8): poser('batt', caisse_claire(), t0 + 3 * B + i * B / 8, 0, 0.35 + 0.05 * i)
-        if b in (2, 7, 15, 23, 27):
+        if b in (2, nb - 14, nb - 5, nb - 2):
             poser('batt', cymbale(), t0, 0, 0.55)
-        if b in (2, 27, nb - 1): poser('batt', impact(), t0, 0, 0.9)
+        if b in (2, nb - 2, nb - 1): poser('batt', impact(), t0, 0, 0.9)
         if s == 'fin':
             kicks.append(t0); poser('batt', grosse_caisse(), t0, 0, 1.0)
             poser('harm', nappe([55, 59, 62, 67], duree - t0), t0, 0, 0.7)

@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Scène de la vidéo « Les toiles » (16:9, 60 s) : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
+<!-- Scène de la vidéo « Les toiles » (16:9, 44 s) : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -23,38 +23,32 @@ racine.setAttribute('width', W); racine.setAttribute('height', H); racine.setAtt
 
 const BLANC = '#fff', ORANGE = '#FFA52E', VERT_NUIT = '#1f5a2e';
 
-// Textes (à l'écran : seulement ce que le site dit déjà ; ni prix ni remise). Légendes : [début, fin, texte, mis en avant].
+// Textes (à l'écran : ni prix ni remise, rien sur Ostende). Légendes : [début, fin, texte, mis en avant].
 const T = {
   fr: {
     titre: 'Les toiles', sous: 'de Linda Denise', fin: 'Les toiles',
     legendes: [
-      [4.5, 5.5, 'Des dessins', false], [5.5, 7.0, 'faits au doigt', true],
+      [4.5, 5.5, 'Des dessins', false], [5.5, 7.0, 'faits à la main', true],
       [7.5, 8.5, 'imprimés', false], [8.5, 10.0, 'sur aluminium', true],
       [10.5, 11.5, 'Format A3', false], [11.5, 13.3, 'Chaque toile est unique', true],
-      [18.0, 19.5, 'Elles ont été imprimées', false], [19.5, 21.0, 'pour une exposition', false], [21.0, 23.5, 'à Ostende', true],
-      [26.0, 27.5, 'Le lieu a fermé', false], [27.5, 30.0, 'avant l’accrochage', true],
-      [47.0, 48.5, 'Elles cherchent', false], [48.5, 50.0, 'aujourd’hui', false], [50.0, 53.2, 'un nouveau mur', true],
     ],
   },
   nl: {
     titre: 'De doeken', sous: 'van Linda Denise', fin: 'De doeken',
     legendes: [
-      [4.5, 5.5, 'Tekeningen', false], [5.5, 7.0, 'met de vinger', true],
+      [4.5, 5.5, 'Tekeningen', false], [5.5, 7.0, 'met de hand gemaakt', true],
       [7.5, 8.5, 'gedrukt', false], [8.5, 10.0, 'op aluminium', true],
       [10.5, 11.5, 'A3-formaat', false], [11.5, 13.3, 'Elk doek is uniek', true],
-      [18.0, 19.5, 'Ze werden gedrukt', false], [19.5, 21.0, 'voor een tentoonstelling', false], [21.0, 23.5, 'in Oostende', true],
-      [26.0, 27.5, 'De plek sloot', false], [27.5, 30.0, 'nog voor ze opgehangen werden', true],
-      [47.0, 48.5, 'Vandaag zoeken ze', false], [48.5, 53.2, 'een nieuwe muur', true],
     ],
   },
 }[LANG];
 
-// Les 23 toiles (titres tirés du site) : 7 au mur de la galerie, 16 montrées une à une
+// Les 23 toiles (titres tirés du site) : 14 au mur de la galerie, 9 montrées une à une
 const donnees = (() => { const x = new XMLHttpRequest(); x.open('GET', `${REPO}/src/data/toiles.json`, false); x.send(); return JSON.parse(x.responseText); })();
 const titreToile = (id) => donnees.find((x) => x.id === id).titre[LANG].replace(/'/g, '’');
-const GALERIE = ['frangipanier', 'iris', 'le-tournesol', 'bouleaux-en-hiver', 'chat-a-l-ile-de-brehat', 'tournesols', 'sweet'];
-const UNE_A_UNE = ['mauves', 'bois-de-hal', 'chat-au-repos', 'jonquilles', 'vieux-cerisier', 'le-chemin-de-foret', 'time-gambade', 'fleurs-bleues',
-  'l-oiseau', 'montagne-et-tournesols', 'printemps', 'chats-camoufles', 'narcisses', 'sous-bois', 'time-s-amuse', 'la-cloture'];
+const GALERIE = ['frangipanier', 'iris', 'mauves', 'le-tournesol', 'bouleaux-en-hiver', 'chat-a-l-ile-de-brehat', 'tournesols', 'sweet', 'jonquilles',
+  'fleurs-bleues', 'le-chemin-de-foret', 'montagne-et-tournesols', 'sous-bois', 'time-s-amuse'];
+const UNE_A_UNE = ['bois-de-hal', 'chat-au-repos', 'vieux-cerisier', 'time-gambade', 'l-oiseau', 'printemps', 'chats-camoufles', 'narcisses', 'la-cloture'];
 
 // ---------- outils ----------
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -319,31 +313,31 @@ window.pret = (async () => {
   const introTitre = mots(intro, T.titre, W / 2, 600, 250, { remplir: [BLANC, ORANGE] });
   const introSous = mots(intro, T.sous, W / 2, 770, 120, { remplir: [BLANC, BLANC, ORANGE] });
 
-  // 4 – 14 : un long mur qu'on longe, sept toiles qui se peignent et se balancent
+  // 4 – 16 : un long mur qu'on longe, quatorze toiles qui se peignent et se balancent
   const galerie = el('g', {}, calques.scene);
   const camera = el('g', {}, galerie);
-  const ECART = 560, PAN = 380 + 6 * ECART - 1500; // la dernière toile s'arrête à x = 1500
+  const ECART = 450, PAN = 380 + (GALERIE.length - 1) * ECART - 1500; // la dernière toile s'arrête à x = 1500
   mur(camera, -200, -300, PAN + W + 400, H + 300);
-  const decalage = (t) => sinus(prog(t, 4.0, 12.6)) * PAN;
+  const decalage = (t) => sinus(prog(t, 4.0, 14.6)) * PAN;
   const accroches = GALERIE.map((nom, i) => {
     const x = 380 + i * ECART;
     // le pinceau commence quand la toile entre dans l'image, et finit toujours avant la fin du défilement
     let debut = 4.3 + i * 0.3;
-    while (debut < 11.4 && x - decalage(debut) - 200 > W - 40) debut += 0.05;
-    return { t: toile(camera, nom, 400), x, y: 120 + (i % 2 ? 34 : 0), pente: [-0.8, 0.6, -0.3, 0.9, -0.6, 0.4, -0.5][i], debut };
+    while (debut < 13.2 && x - decalage(debut) - 200 > W - 40) debut += 0.05;
+    return { t: toile(camera, nom, 380), x, y: 120 + (i % 2 ? 34 : 0), pente: [-0.8, 0.6, -0.3, 0.9, -0.6, 0.4, -0.5][i % 7], debut };
   });
-  console.log('galerie : fin de la peinture de la dernière toile à', (accroches[6].debut + 1.1).toFixed(2), 's (défilement fini à 12,6 s)');
-  const grain = poussieres(galerie, 26);
+  console.log('galerie : fin de la peinture de la dernière toile à', (accroches[accroches.length - 1].debut + 1.1).toFixed(2), 's (défilement fini à 14,6 s)');
+  const grain = poussieres(galerie, 30);
 
-  // 14 – 46 : les seize autres toiles, une par une (une toile par mesure de 2 s)
+  // 16 – 34 : les neuf autres toiles, une par une (une toile par mesure de 2 s)
   const gros = el('g', {}, calques.scene);
   mur(gros, 0, 0, W, H);
   const unes = UNE_A_UNE.map((nom, i) => {
-    const a = 14 + i * 2, gauche = i % 2 === 0;
+    const a = 16 + i * 2, gauche = i % 2 === 0;
     return { a, gauche, t: toile(gros, nom, 470), nom: titre(gros, titreToile(nom), gauche ? W * 0.71 : W * 0.29, 500, 132, 700) };
   });
 
-  // 46 – 54 : un nouveau mur ; Tilleul arrive et regarde la toile
+  // 34 – 40 : un nouveau mur ; Tilleul arrive et regarde la toile
   const nouveau = el('g', {}, calques.scene);
   el('rect', { width: W, height: H, fill: '#fff' }, nouveau);
   const tombe2 = feuilles(nouveau, 6, 3);
@@ -352,7 +346,7 @@ window.pret = (async () => {
   const bassin = etang(nouveau, 830);
   nouveau.appendChild(porteChat);
 
-  // 54 – 60 : fin
+  // 40 – 44 : fin
   const fin = el('g', {}, calques.scene);
   el('rect', { width: W, height: H, fill: '#fff' }, fin);
   const tombe4 = feuilles(fin, 9, 7);
@@ -373,17 +367,17 @@ window.pret = (async () => {
       introTitre.maj(prog(t, 0.8, 1.9)); introSous.maj(prog(t, 1.9, 3.0));
     }
     // galerie (fondu depuis le titre)
-    montrer(galerie, t >= 3.4 && t < 14.1);
-    if (t >= 3.4 && t < 14.1) {
+    montrer(galerie, t >= 3.4 && t < 15.9);
+    if (t >= 3.4 && t < 15.9) {
       galerie.setAttribute('opacity', ss(prog(t, 3.4, 4.2)).toFixed(3));
       camera.setAttribute('transform', `translate(${(-decalage(t)).toFixed(2)},0)`);
-      accroches.forEach((a) => a.t.maj({ x: a.x, y: a.y, p: io(prog(t, a.debut, a.debut + 1.1)), b: t - a.debut - 1.1, pente: a.pente, opacite: 1 - ss(prog(t, 13.0, 13.7)) }));
-      grain(t, 1 - ss(prog(t, 13.0, 13.7)));
+      accroches.forEach((a) => a.t.maj({ x: a.x, y: a.y, p: io(prog(t, a.debut, a.debut + 1.1)), b: t - a.debut - 1.1, pente: a.pente, opacite: 1 - ss(prog(t, 14.9, 15.6)) }));
+      grain(t, 1 - ss(prog(t, 14.9, 15.6)));
     }
-    // les seize toiles, une par une : fondu enchaîné d'une toile à l'autre, la toile est peinte avant de partir
-    montrer(gros, t >= 13.2 && t < 46.2);
-    if (t >= 13.2 && t < 46.2) {
-      gros.setAttribute('opacity', ss(prog(t, 13.2, 14.0)).toFixed(3));
+    // les neuf toiles, une par une : fondu enchaîné d'une toile à l'autre, la toile est peinte avant de partir
+    montrer(gros, t >= 15.0 && t < 34.2);
+    if (t >= 15.0 && t < 34.2) {
+      gros.setAttribute('opacity', ss(prog(t, 15.0, 15.8)).toFixed(3));
       unes.forEach((u, i) => {
         const visible = t >= u.a - 0.3 && t < u.a + 2.0;
         montrer(u.t.g, visible); montrer(u.nom.g, visible);
@@ -396,29 +390,29 @@ window.pret = (async () => {
       });
     }
     // nouveau mur
-    montrer(nouveau, t >= 45.4 && t < 54.2);
-    if (t >= 45.4 && t < 54.2) {
-      nouveau.setAttribute('opacity', ss(prog(t, 45.4, 46.2)).toFixed(3));
-      if (!chatPret) { chatEntre(1520, 1207); chatPret = true; }
-      if (t > 51.5 && chat.etat !== 'assis') chat.ordre('assis');
+    montrer(nouveau, t >= 33.4 && t < 40.2);
+    if (t >= 33.4 && t < 40.2) {
+      nouveau.setAttribute('opacity', ss(prog(t, 33.4, 34.2)).toFixed(3));
+      if (!chatPret) { chatEntre(1420, 1207); chatPret = true; }
+      if (t > 38.2 && chat.etat !== 'assis') chat.ordre('assis');
       regarde(970, 780);
       tombe2(t);
-      murDessine(io(prog(t, 45.6, 46.8)));
-      seule.maj({ x: W * 0.43, y: 150, p: io(prog(t, 46.2, 47.3)), b: t - 47.3, pente: -0.5 });
+      murDessine(io(prog(t, 33.6, 34.8)));
+      seule.maj({ x: W * 0.43, y: 150, p: io(prog(t, 34.2, 35.3)), b: t - 35.3, pente: -0.5 });
       bassin(t);
       porteChat.setAttribute('transform', `translate(-1190,${826 - 276 * 2.1}) scale(2.1)`);
     }
     // fin (puis fondu vers le blanc)
-    montrer(fin, t >= 53.4);
-    if (t >= 53.4) {
-      fin.setAttribute('opacity', (ss(prog(t, 53.4, 54.2)) * (1 - ss(prog(t, 59.2, 60)))).toFixed(3));
+    montrer(fin, t >= 39.4);
+    if (t >= 39.4) {
+      fin.setAttribute('opacity', (ss(prog(t, 39.4, 40.2)) * (1 - ss(prog(t, 43.2, 44)))).toFixed(3));
       tombe4(t); bassinFin(t);
-      lgFin.setAttribute('transform', `translate(${W / 2},${400}) scale(${outBack(prog(t, 54.4, 55.4)) * 1.1})`);
-      finNom.maj(prog(t, 55.0, 56.1)); finSous.maj(prog(t, 56.1, 57.0));
+      lgFin.setAttribute('transform', `translate(${W / 2},${400}) scale(${outBack(prog(t, 40.4, 41.4)) * 1.1})`);
+      finNom.maj(prog(t, 41.0, 42.1)); finSous.maj(prog(t, 42.1, 43.0));
     }
     legende(t);
   };
-  window.DUREE = 60;
+  window.DUREE = 44;
   window.image = (t) => { avancer(1000 / 30); rendre(t); };
 
   const hrefs = [...new Set([...racine.querySelectorAll('image')].map((i) => i.getAttribute('href')).filter((h) => h.startsWith('file:')))];

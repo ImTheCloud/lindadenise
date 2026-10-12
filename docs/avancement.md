@@ -5,7 +5,7 @@ Dernière mise à jour : 2026-10-12 (retours vidéos et toiles : voir la premiè
 ## Retours de Claudiu sur les toiles et les vidéos (2026-10-12, non publiés)
 
 Appliqués :
-- **Une seule vidéo motion design** : `toiles-{fr,nl}.mp4` (16:9, 60 s, 10 Mo), sur l'accueil (section « Aussi en grand format ») et sur la page Toiles. La version courte 9:16 est supprimée (fichiers, affiches, textes).
+- **Une seule vidéo motion design** : `toiles-{fr,nl}.mp4` (16:9, 44 s, 7,7 Mo), sur l'accueil (section « Aussi en grand format ») et sur la page Toiles. La version courte 9:16 est supprimée (fichiers, affiches, textes).
 - **Déroulé** : titre, puis le mur avec 7 toiles (comme l'ancien passage de 5 à 12 s ; la dernière toile finit de se peindre à 10,8 s, avant la fin du défilement : plus de toile coupée à 13 s), puis **les 16 autres toiles une par une** (une par mesure de 2 s, nom en gros à côté), Tilleul devant son nouveau mur, fin. Toutes les 23 toiles sont montrées.
 - **Gros textes** façon vidéos courtes (Lilita One, contour vert foncé, mots qui sautent un à un, mot clé en orange), quelques mots à la fois ; les phrases validées (Ostende, lieu fermé, nouveau mur) sont inchangées. Plus de bandeau de sous-titres.
 - **Fondus enchaînés** partout : plus de grand coup de pinceau vert plein écran ; le balancement des toiles ne bouge plus pendant la peinture (il faisait pivoter la toile de 15° avant l'arrivée).
@@ -13,7 +13,13 @@ Appliqués :
 - **Plus d'effet verre/reflet** : retiré des vidéos et de la page Toiles (reflet qui suit la souris et voile clair sur chaque toile). Le léger relief au survol reste.
 - **Musiques** (`scripts/video/musique.py`, par code, sans bibliothèque sous licence) : motion design = pop électro dynamique, 120 BPM, sol majeur, batterie, basse, arpèges, cloche, montée avant le final, pause calme pour Tilleul ; une toile par mesure. `vraies-toiles.mp4` = **autre musique** (pop acoustique chaloupée, 114,3 BPM, guitare, piano électrique, sifflet), mesure = 2,1 s = changement de toile ; l'image n'a pas été recompressée, le bouton « Couper le son » est ajouté. Sons normalisés à −16 LUFS. **Vérifiées par mesures et structure (volume par mesure, spectre), pas à l'oreille : à écouter par Claudiu.**
 - Interprétation à confirmer : « une musique différente aussi dans la vidéo des toiles » = la vidéo des vraies toiles, qui n'avait pas de son.
-- Refaire : `node scripts/video/rendu.mjs fr brut.mp4` (environ 18 min), `python3 scripts/video/musique.py motion 60 m.wav`, `python3 scripts/video/assembler.py brut.mp4 m.wav public/video/toiles-fr.mp4 24` (idem NL). Chrome trouvé automatiquement (variable `CHROME` sinon). Les affiches sont une image à 12,4 s réduite à 960 × 540.
+- Refaire : `node scripts/video/rendu.mjs fr brut.mp4` (environ 13 min), `python3 scripts/video/musique.py motion 44 m.wav`, `python3 scripts/video/assembler.py brut.mp4 m.wav public/video/toiles-fr.mp4 24` (idem NL). Chrome trouvé automatiquement (variable `CHROME` sinon). Les affiches sont une image à 12,4 s réduite à 960 × 540.
+
+### 2e retour sur la vidéo (2026-10-12) : appliqué
+- **Plus courte : 44 s** (7,7 Mo), au lieu de 60 s. Mur de **14 toiles** (dont les Mauves) qui défilent au début, puis seulement **9 toiles une par une**, Tilleul, fin.
+- **Plus rien sur Ostende** dans la vidéo (ni « lieu fermé » ni « nouveau mur »). Le site garde son texte d'histoire (page Toiles, anecdote de Tilleul) : à dire si Claudiu veut le retirer aussi.
+- **« À la main » au lieu de « au doigt »** : vidéo, accroches, méta, « Dessins faits à la main », cartes, pied de page, anecdote de Tilleul (FR et NL). Gardé : l'histoire de Linda (page À propos, accueil) qui raconte qu'elle dessine avec le doigt sur son smartphone, c'est sa façon réelle de faire ; à relire par Claudiu.
+- Musique recalée sur 44 s (22 mesures, une toile par mesure).
 
 ## Mission Tilleul : fluidité, clics, marche et vraie page de jeu (2026-10-11, non publiée)
 
