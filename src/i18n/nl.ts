@@ -80,7 +80,7 @@ export const nl: Dico = {
     meta: 'Tekeningen van Linda Denise, gedrukt op aluminium in A3-formaat. Unieke stukken, geleverd in België.',
     histoire: 'Mijn doeken werden gedrukt voor een tentoonstelling in Oostende. De plek sloot nog voor ze opgehangen werden. Vandaag zoeken ze een nieuwe muur.',
     etiquette: 'Doek',
-    phrase: 'Uniek stuk, door Linda verstuurd',
+    phrase: 'Uniek stuk, door Linda verstuurd met bpost',
     bonus: [`Gratis verzending vanaf ${ENVOI_OFFERT_DES} doeken`, `${TOILES_ACHETEES} doeken gekocht, de ${TOILES_ACHETEES + 1}e is gratis`],
     surtitre: 'Doek op aluminium',
     retour: '← Alle doeken',
