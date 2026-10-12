@@ -32,12 +32,21 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
         <p class="jeu__intro">{j.intro}</p>
         <div class="jeu__ordres">
           {ordres.map((o) => (
-            <button class="jeu__ordre" type="button" data-ordre={o} data-bouge={bouge.has(o) ? '' : undefined} aria-pressed={String(o === 'assis')}>
+            <button class="jeu__ordre" type="button" data-ordre={o} data-bouge={bouge.has(o) ? '' : undefined} aria-pressed="false">
               <svg viewBox="0 0 40 40" aria-hidden="true" set:html={icones[o]} />
               <span>{j[o]}</span>
             </button>
           ))}
         </div>
+        <!-- Allumé avant l'affichage : un chat mis en silence arrive endormi, sinon assis ; plus de bouton qui change de couleur à l'arrivée -->
+        <script is:inline>
+          (() => {
+            let muet = false;
+            try { muet = localStorage.getItem('mascotte-muet') === '1'; } catch (e) {}
+            const b = document.querySelector('.jeu__ordre[data-ordre="' + (muet ? 'dort' : 'assis') + '"]');
+            if (b) b.setAttribute('aria-pressed', 'true');
+          })();
+        </script>
         <p class="jeu__reduit" hidden>{j.reduit}</p>
       </div>
     </div>
@@ -136,7 +145,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
     lien.curiosite = () => regard;
 
     // ---------- une image ----------
-    let avant = 0, actif = 'assis'; // il arrive assis : le bouton est allumé dès l'affichage de la page
+    let avant = 0, actif = boutons.find((b) => b.getAttribute('aria-pressed') === 'true')?.dataset.ordre ?? 'assis'; // le bouton allumé à l'affichage fait foi
     const boucle = (t: number) => {
       const dt = avant ? Math.min(0.05, (t - avant) / 1000) : 0;
       avant = t;
@@ -181,7 +190,7 @@ const herbe = Array.from({ length: 24 }, (_, i) => { const x = i * 60 + (i % 3) 
   .jeu__titre { font-size: clamp(1.6rem, 1.2rem + 2.2vw, 3rem); margin: 0; text-align: center; }
   .jeu__intro { margin: 0 0 8px; text-align: center; color: var(--encre-douce); font-size: 1.02rem; line-height: 1.25; }
   .jeu__ordres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-  .jeu__ordre { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: 5px 3px; font-family: var(--titre); font-size: 1.08rem; line-height: 1.02; text-align: center; overflow-wrap: anywhere; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(43, 110, 58, 0.3); cursor: pointer; transition: transform 0.15s, background 0.15s, color 0.15s; }
+  .jeu__ordre { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: 5px 3px; font-family: var(--titre); font-size: 1.08rem; line-height: 1.02; text-align: center; overflow-wrap: anywhere; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(43, 110, 58, 0.3); cursor: pointer; transition: transform 0.15s; }
   .jeu__ordre svg { width: 22px; height: 22px; flex: none; }
   .jeu__ordre:hover { color: var(--orange-fonce); border-color: var(--orange-fonce); }
   .jeu__ordre[hidden] { display: none; }

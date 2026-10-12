@@ -67,6 +67,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Frais de livraison** : la ligne du panier et du formulaire s'appelle « Frais de livraison » (NL « Leveringskosten »), sans « (Belgique) » ; la fiche d'un dessin dit « + frais de livraison » pour la toile sur commande. La Belgique reste dite dans la phrase « livrées uniquement en Belgique » (FAQ, conditions, formulaire).
 
+- **Page de jeu, plus de bouton qui change de couleur à l'arrivée** : le HTML n'allume aucun bouton ; un petit script en ligne, avant l'affichage, allume « Dormir » si le visiteur a mis Tilleul en silence (`mascotte-muet`), sinon « S'asseoir » ; le script de la page repart de ce bouton ; plus de fondu de couleur sur ces boutons. Vérifié : état vu à chaque image = un seul bouton, dès la première (silence : Dormir ; sinon : S'asseoir). Règle générale : un état connu avant l'affichage ne doit jamais apparaître après (même cause que le bouton du panier).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
