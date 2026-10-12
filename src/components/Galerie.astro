@@ -1,4 +1,5 @@
 ---
+import IconeLivraison from './IconeLivraison.astro';
 // Galerie commune aux dessins et aux toiles, façon boutique : petit titre avec le nombre, filtres par rubrique collés sous l'en-tête, grille de cartes.
 interface Props {
   titre: string;
@@ -6,15 +7,24 @@ interface Props {
   groupe: string;
   rubriques: { code: string; nom: string; nombre: number }[];
   total: number;
+  /** un monde ou l'autre : l'onglet actif, l'icône et la phrase de livraison */
+  genre: 'dessin' | 'toile';
+  phrase: string;
+  onglets: { dessin: { href: string; nom: string }; toile: { href: string; nom: string } };
   bonus?: string;
 }
-const { titre, tous, groupe, rubriques, total, bonus } = Astro.props;
+const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } = Astro.props;
 ---
 <section class="boutique">
   <div class="contenu boutique__tete">
     <h1>{titre} <span class="boutique__nombre" data-total>({total})</span></h1>
+    <nav class="onglets" aria-label={`${onglets.dessin.nom} / ${onglets.toile.nom}`}>
+      <a class="onglet onglet--dessin" href={onglets.dessin.href} aria-current={genre === 'dessin' ? 'page' : undefined}>{onglets.dessin.nom}</a>
+      <a class="onglet onglet--toile" href={onglets.toile.href} aria-current={genre === 'toile' ? 'page' : undefined}>{onglets.toile.nom}</a>
+    </nav>
   </div>
-  <div class="contenu">
+  <div class="contenu boutique__notes">
+    <p class="phrase"><IconeLivraison genre={genre} />{phrase}</p>
     {bonus && (
       <p class="bonus">
         <svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="24" height="16" rx="2" /><path d="M16 12v16M3 12h26v-4H3zM16 8c-3 0-6-1-6-3s3-2 6 3c3-5 6-5 6-3s-3 3-6 3z" /></svg>
@@ -72,9 +82,21 @@ const { titre, tous, groupe, rubriques, total, bonus } = Astro.props;
 
 <style>
   .boutique { padding-bottom: clamp(32px, 6vw, 72px); }
-  .boutique__tete { padding-block: clamp(18px, 3vw, 32px) 8px; }
+  .boutique__tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding-block: clamp(18px, 3vw, 32px) 8px; }
   .boutique h1 { margin: 0; font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.4rem); }
-  .bonus { display: flex; align-items: center; gap: 8px; margin: -8px 0 16px; font-size: 0.98rem; font-weight: 600; color: var(--orange-fonce); }
+  /* Interrupteur Dessins / Toiles : l'onglet actif prend la couleur de son monde */
+  .onglets { display: inline-flex; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); overflow: hidden; background: #fff; }
+  .onglet { display: flex; align-items: center; gap: 8px; padding: 6px 16px; font-family: var(--titre); font-size: 1.25rem; line-height: 1.2; text-decoration: none; color: var(--encre); }
+  .onglet::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--monde-dessins); }
+  .onglet--toile::before { background: var(--monde-toiles); }
+  .onglet:hover { color: var(--encre); background: var(--vert-creme); }
+  .onglet[aria-current='page'] { color: #fff; background: var(--monde-dessins); }
+  .onglet--toile[aria-current='page'] { background: var(--monde-toiles); }
+  .onglet[aria-current='page']::before { background: #fff; }
+  .boutique__notes { display: grid; gap: 4px; margin-bottom: 14px; }
+  .phrase { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 600; color: var(--encre-douce); }
+  .phrase :global(svg) { flex: none; color: var(--accent); }
+  .bonus { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 0.98rem; font-weight: 600; color: var(--orange-fonce); }
   .bonus svg { flex: none; }
   .boutique__nombre { color: var(--orange-titre); }
   /* Filtres : une rangée collée sous l'en-tête, qui défile de côté sur téléphone */

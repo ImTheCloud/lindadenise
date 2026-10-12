@@ -6,11 +6,12 @@ import { t, chemin, dessins, parRubrique, RUBRIQUES, type Lang } from '../../i18
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
+const onglets = { dessin: { href: chemin('dessins', lang), nom: d.nav.dessins }, toile: { href: chemin('toiles', lang), nom: d.nav.toiles } };
 const chemins = { fr: chemin('dessins', 'fr'), nl: chemin('dessins', 'nl') };
 const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, nombre: parRubrique(r).length })).filter((r) => r.nombre > 0);
 ---
 <Base lang={lang} titre={d.dessins.titre} description={d.dessins.metaDescription} chemins={chemins}>
-  <Galerie titre={d.nav.dessins} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={dessins.length}>
+  <Galerie titre={d.nav.dessins} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={dessins.length} genre="dessin" phrase={d.dessins.phrase} onglets={onglets}>
     {dessins.map((x, i) => <CarteDessin dessin={x} lang={lang} priorite={i < 4} />)}
   </Galerie>
 

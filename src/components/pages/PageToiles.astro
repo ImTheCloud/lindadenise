@@ -8,12 +8,13 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
 const tt = d.toiles;
+const onglets = { dessin: { href: chemin('dessins', lang), nom: d.nav.dessins }, toile: { href: chemin('toiles', lang), nom: d.nav.toiles } };
 const chemins = { fr: chemin('toiles', 'fr'), nl: chemin('toiles', 'nl') };
 const contact = chemin('contact', lang);
 const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, nombre: toiles.filter((x) => x.rubrique === r).length })).filter((r) => r.nombre > 0);
 ---
 <Base lang={lang} monde="toiles" titre={tt.titre} description={tt.meta} chemins={chemins} image={`/toiles/${toiles[0].id}-800.jpg`}>
-  <Galerie titre={d.nav.toiles} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={toiles.length} bonus={tt.bonus}>
+  <Galerie titre={d.nav.toiles} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={toiles.length} genre="toile" phrase={tt.phrase} onglets={onglets} bonus={tt.bonus}>
     {toiles.map((x, i) => <CarteToile toile={x} lang={lang} priorite={i < 4} />)}
   </Galerie>
 

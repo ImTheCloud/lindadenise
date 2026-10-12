@@ -43,6 +43,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Toiles plus classiques (2026-10-12)** : le monde des toiles ne repose plus sur de l'orange partout : titres, bordures et textes en brun-gris foncé `#3a2f28`, bords de cartes doux (`--bord-carte`), l'orange `#d9700b` (variable `--accent`, ajoutée aussi au vert des dessins) réservé aux badges, boutons, filtre actif, langue active et prix. **Bande des trois blocs d'info retirée** des deux galeries (Claudiu n'aimait pas), ses textes supprimés ; reste la ligne discrète « Envoi offert dès 2 toiles · 5 toiles achetées, la 6e est offerte » sur la page Toiles. Bouton « Couper le son » de la vidéo des vraies toiles supprimé (commandes natives du lecteur). **À proposer à Claudiu** : une autre présentation pour « dessin = e-mail, toile = envoyée par Linda » (les badges des cartes et des portes sont gardés en attendant).
 
+- **Interrupteur Dessins / Toiles (choix de Claudiu)** : en haut de chaque galerie, à droite du titre, deux onglets (l'actif prend la couleur de son monde, point vert ou orange) et une seule phrase dessous : « Fichier numérique envoyé par e-mail » (dessins) / « Pièce unique envoyée par Linda » (toiles), avec icône ; la ligne cadeau reste sous la phrase sur la page Toiles. Phrases de livraison raccourcies : panier et formulaire « Vous les recevez par e-mail. » / « Linda vous les envoie. » (NL : « Je ontvangt ze per e-mail. » / « Linda stuurt ze naar je op. »). Badges des cartes et des portes inchangés.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
