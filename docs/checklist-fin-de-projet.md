@@ -87,3 +87,7 @@ Aucun paiement n'est proposé : pour une toile ou un dessin numérique, on conta
 
 ## Vidéo motion design : texte à ajouter à la fin du projet
 L'image et la musique sont validées. Ajouter seulement du texte aux moments où l'écran n'en a pas, avec les infos de Linda : épaisseur 3 mm, environ 500 g, finition mate, crochet compris, envoi par bpost en 1 à 2 semaines, 5 toiles achetées = la 6e offerte, toile sur commande à partir d'un dessin numérique en 1 à 3 semaines. Toujours **sans prix** ni histoire d'Ostende (règle déjà en place). Refaire avec `scripts/video/` (voir `docs/avancement.md`), FR et NL.
+
+## Formulaire et panier : à vérifier après le déploiement final
+- Netlify → Forms : le formulaire `contact` doit contenir les champs `commande`, `total`, `rue`, `code_postal`, `localite`, `pays`, `conditions`, `conditions_toile`, `message` (plus de champ `toiles`). Envoyer une vraie demande avec un panier mixte (dessins + toile) et vérifier l'e-mail reçu.
+- Tester le panier sur un vrai téléphone (cartes de la galerie, en-tête, page Panier).

@@ -58,6 +58,7 @@ const canonique = SITE + chemins[lang];
     <PiedDePage lang={lang} />
     <Mascotte lang={lang} />
     <script>
+      import { lire, basculer, nombre, type Genre } from '../components/panier';
       // Apparition douce des blocs au défilement
       const blocs = document.querySelectorAll('.apparait');
       if ('IntersectionObserver' in window) {
@@ -67,6 +68,30 @@ const canonique = SITE + chemins[lang];
         );
         blocs.forEach((b) => obs.observe(b));
       } else blocs.forEach((b) => b.classList.add('visible'));
+
+      // Panier : tout bouton [data-panier="genre:identifiant"] ajoute ou retire l'article ; le compteur de l'en-tête suit
+      const majPanier = () => {
+        const p = lire();
+        document.querySelectorAll<HTMLElement>('[data-panier]').forEach((b) => {
+          const [genre, id] = b.dataset.panier!.split(':') as [Genre, string];
+          const dedans = p[genre].includes(id);
+          b.setAttribute('aria-pressed', String(dedans));
+          const texte = b.querySelector('[data-panier-texte]') ?? b;
+          texte.textContent = (dedans ? b.dataset.dedans : b.dataset.ajouter) ?? '';
+          const titre = b.dataset.titre;
+          if (titre) b.setAttribute('aria-label', ((dedans ? b.dataset.ariaDedans : b.dataset.ariaAjouter) ?? '').replace('{t}', titre));
+        });
+        const n = nombre(p);
+        document.querySelectorAll<HTMLElement>('[data-panier-nombre]').forEach((c) => { c.textContent = String(n); c.hidden = n === 0; });
+      };
+      document.addEventListener('click', (e) => {
+        const b = (e.target as Element).closest<HTMLElement>('[data-panier]');
+        if (!b) return;
+        const [genre, id] = b.dataset.panier!.split(':') as [Genre, string];
+        basculer(genre, id);
+      });
+      window.addEventListener('panier-change', majPanier);
+      majPanier();
     </script>
     <style is:global>
       .evitement { position: absolute; left: -999px; top: 0; background: #fff; padding: 8px 14px; z-index: 100; }

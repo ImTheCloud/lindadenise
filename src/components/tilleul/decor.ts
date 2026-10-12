@@ -6,7 +6,7 @@
 import { HAUT, type Decor } from './chat';
 import { lien } from './lien';
 
-export function lireDecor(): Decor & { rail: HTMLElement | null; leve: number } {
+export function lireDecor(): Decor & { rail: HTMLElement | null } {
   const scene = document.querySelector<HTMLElement>('[data-decor]');
   const rail = scene?.querySelector<HTMLElement>('[data-tilleul-rail]') ?? null;
   const etangEl = scene?.querySelector<HTMLElement>('.etang') ?? null;
@@ -38,9 +38,8 @@ export function lireDecor(): Decor & { rail: HTMLElement | null; leve: number } 
 
   return {
     rail,
-    leve: 0, // la bande est montée de tant de pixels (posée sur une barre fixe, page Toiles)
     haut() {
-      if (!rail) return vh - HAUT - this.leve;
+      if (!rail) return vh - HAUT;
       const bas = railBas - defile;
       return (colle ? Math.min(vh, bas) : bas) - HAUT;
     },

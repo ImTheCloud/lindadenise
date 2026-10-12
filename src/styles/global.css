@@ -75,6 +75,7 @@ p { margin: 0 0 1em; }
 .bouton:active { transform: translateY(3px); box-shadow: 0 2px 0 #7a3a00; }
 .bouton--vert { background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 5px 0 #173f20; }
 .bouton--vert:hover { box-shadow: 0 7px 0 #173f20; }
+.bouton[aria-pressed='true'] { background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 5px 0 #173f20; }
 .bouton--contour { background: #fff; color: var(--vert-fonce); border-color: var(--vert-fonce); box-shadow: 0 5px 0 rgba(43, 110, 58, 0.35); }
 .bouton--contour:hover { color: var(--orange-fonce); border-color: var(--orange-fonce); }
 

@@ -1,0 +1,159 @@
+---
+import Base from '../../layouts/Base.astro';
+import { t, chemin, cheminDessin, cheminToile, dessins, toiles, type Lang } from '../../i18n';
+import { PRIX_DESSIN, PRIX_TOILE } from '../../data/vente';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const p = d.panier;
+const chemins = { fr: chemin('panier', 'fr'), nl: chemin('panier', 'nl') };
+// Tout ce que le script de la page affiche vient d'ici : les textes restent dans les dictionnaires.
+const donnees = {
+  dessins: Object.fromEntries(dessins.map((x) => [x.id, { titre: x.titre[lang], href: cheminDessin(x.id, lang), img: `/dessins/${x.id}-vignette.webp` }])),
+  toiles: Object.fromEntries(toiles.map((x) => [x.id, { titre: x.titre[lang], href: cheminToile(x.id, lang), img: `/toiles/${x.id}-400.webp`, vendue: x.vendue }])),
+  prix: { dessin: PRIX_DESSIN, toile: PRIX_TOILE },
+  textes: p,
+  contact: `${chemin('contact', lang)}?sujet=commande`,
+};
+---
+<Base lang={lang} titre={p.titre} description={p.meta} chemins={chemins} noindex>
+  <section class="section">
+    <div class="contenu panier" data-panier-page data-donnees={JSON.stringify(donnees)}>
+      <header class="centre">
+        <h1>{p.titre}</h1>
+        <p class="chapeau">{p.intro}</p>
+      </header>
+
+      <div class="panier__vide cadre centre" data-vide hidden>
+        <p>{p.vide}</p>
+        <p class="panier__liens">
+          <a class="bouton bouton--vert" href={chemin('dessins', lang)}>{p.videDessins}</a>
+          <a class="bouton bouton--contour" href={chemin('toiles', lang)}>{p.videToiles}</a>
+        </p>
+      </div>
+
+      <div class="panier__contenu" data-contenu hidden>
+        <ul class="panier__liste" data-liste></ul>
+        <div class="panier__recap cadre">
+          <dl data-lignes></dl>
+          <p class="panier__note">{p.note}</p>
+          <p class="panier__note" data-delai hidden>{p.delaiCommande}</p>
+          <p class="panier__actions">
+            <a class="bouton" data-demander href={`${chemin('contact', lang)}?sujet=commande`}>{p.demander}</a>
+            <button type="button" class="panier__vider" data-vider>{p.vider}</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+<script>
+  import { lire, garder, vider } from '../panier';
+  import { calculPanier } from '../../data/vente';
+  interface Donnees {
+    dessins: Record<string, { titre: string; href: string; img: string }>;
+    toiles: Record<string, { titre: string; href: string; img: string; vendue: boolean }>;
+    prix: { dessin: number; toile: number };
+    textes: {
+      genres: { dessin: string; toile: string; commande: string };
+      retirer: string;
+      lignes: { dessins: string; toiles: string; lotUne: string; lotPlusieurs: string; envoi: string; envoiOffert: string; total: string };
+    };
+  }
+  const racine = document.querySelector<HTMLElement>('[data-panier-page]');
+  if (racine) {
+    const d = JSON.parse(racine.dataset.donnees ?? '{}') as Donnees;
+    const el = <T extends Element>(s: string) => racine.querySelector<T>(s)!;
+    const vide = el<HTMLElement>('[data-vide]'), contenu = el<HTMLElement>('[data-contenu]'), liste = el<HTMLElement>('[data-liste]');
+    const lignes = el<HTMLElement>('[data-lignes]'), delai = el<HTMLElement>('[data-delai]');
+    const euros = (n: number) => `${n} €`;
+    const noeud = <K extends keyof HTMLElementTagNameMap>(nom: K, classe: string, texte = '') => {
+      const n = document.createElement(nom);
+      n.className = classe;
+      if (texte) n.textContent = texte;
+      return n;
+    };
+
+    function article(genre: 'dessin' | 'toile' | 'commande', id: string) {
+      const src = genre === 'toile' ? d.toiles[id] : d.dessins[id];
+      const li = noeud('li', `article article--${genre}`);
+      const img = noeud('img', 'article__img');
+      img.src = src.img; img.alt = ''; img.width = 90; img.loading = 'lazy';
+      const corps = noeud('div', 'article__corps');
+      const lien = noeud('a', 'article__titre', src.titre);
+      lien.href = src.href;
+      const prix = genre === 'dessin' ? d.prix.dessin : d.prix.toile;
+      corps.append(noeud('span', 'article__genre', d.textes.genres[genre]), lien, noeud('span', 'article__prix', euros(prix)));
+      const retirer = noeud('button', 'article__retirer', d.textes.retirer);
+      retirer.type = 'button';
+      retirer.dataset.panier = `${genre}:${id}`;
+      retirer.dataset.ajouter = d.textes.retirer;
+      retirer.dataset.dedans = d.textes.retirer;
+      li.append(img, corps, retirer);
+      return li;
+    }
+
+    function ligne(nom: string, valeur: string, fort = false) {
+      const ligneEl = noeud('div', fort ? 'ligne ligne--total' : 'ligne');
+      ligneEl.append(noeud('dt', '', nom), noeud('dd', '', valeur));
+      return ligneEl;
+    }
+
+    function rendre() {
+      // les articles qui n'existent plus (toile vendue depuis, dessin retiré) sortent du panier
+      const p = garder({
+        dessin: new Set(Object.keys(d.dessins)),
+        toile: new Set(Object.keys(d.toiles).filter((id) => !d.toiles[id].vendue)),
+        commande: new Set(Object.keys(d.dessins)),
+      });
+      const nombreToiles = p.toile.length + p.commande.length;
+      const total = p.dessin.length + nombreToiles;
+      vide.hidden = total > 0;
+      contenu.hidden = total === 0;
+      liste.replaceChildren(...p.dessin.map((id) => article('dessin', id)), ...p.toile.map((id) => article('toile', id)), ...p.commande.map((id) => article('commande', id)));
+      delai.hidden = p.commande.length === 0;
+      const c = calculPanier(p.dessin.length, nombreToiles);
+      const l = d.textes.lignes;
+      const rangs: HTMLElement[] = [];
+      if (p.dessin.length) rangs.push(ligne(l.dessins.replace('{n}', String(p.dessin.length)), euros(c.sousTotalDessins)));
+      if (nombreToiles) rangs.push(ligne(l.toiles.replace('{n}', String(nombreToiles)), euros(c.sousTotal)));
+      if (c.offertes) rangs.push(ligne((c.offertes > 1 ? l.lotPlusieurs : l.lotUne).replace('{n}', String(c.offertes)), `−${euros(c.offertes * d.prix.toile)}`));
+      if (nombreToiles) rangs.push(ligne(l.envoi, c.envoi ? euros(c.envoi) : l.envoiOffert));
+      rangs.push(ligne(l.total, euros(c.total), true));
+      lignes.replaceChildren(...rangs);
+    }
+
+    el('[data-vider]').addEventListener('click', vider);
+    window.addEventListener('panier-change', rendre);
+    rendre();
+  }
+</script>
+<style>
+  .panier { max-width: 820px; }
+  .panier__vide { margin-top: 30px; padding: 34px 20px; }
+  .panier__liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 18px 0 0; }
+  .panier__contenu { display: grid; gap: 26px; margin-top: 30px; }
+  .panier__liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .panier__liste :global(.article) { display: grid; grid-template-columns: 90px 1fr auto; gap: 16px; align-items: center; padding: 10px 14px 10px 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  .panier__liste :global(.article__img) { width: 90px; height: 90px; object-fit: cover; object-position: top; border-radius: 10px 5px 10px 6px / 6px 10px 5px 10px; background: var(--vert-creme); }
+  .panier__liste :global(.article__corps) { display: grid; gap: 2px; min-width: 0; }
+  .panier__liste :global(.article__genre) { font-size: 0.95rem; color: var(--encre-douce); }
+  .panier__liste :global(.article__titre) { font-family: var(--titre); font-size: 1.4rem; line-height: 1.15; color: var(--vert-fonce); text-decoration: none; }
+  .panier__liste :global(.article__titre:hover) { color: var(--orange-fonce); }
+  .panier__liste :global(.article__prix) { font-family: var(--titre); font-size: 1.3rem; color: var(--orange-fonce); }
+  .panier__liste :global(.article__retirer) { font: inherit; font-size: 1rem; padding: 8px 12px; cursor: pointer; color: var(--vert-fonce); background: #fff; border: 2px solid var(--vert-fonce); border-radius: var(--rayon-petit); }
+  .panier__liste :global(.article__retirer:hover) { border-color: var(--orange-fonce); color: var(--orange-fonce); }
+  .panier__recap { padding: clamp(18px, 4vw, 30px); }
+  .panier__recap dl { margin: 0 0 12px; display: grid; gap: 6px; }
+  .panier__recap :global(.ligne) { display: flex; justify-content: space-between; gap: 16px; }
+  .panier__recap :global(.ligne dt), .panier__recap :global(.ligne dd) { margin: 0; }
+  .panier__recap :global(.ligne--total) { margin-top: 6px; padding-top: 10px; border-top: 3px dashed var(--vert-pale); font-family: var(--titre); font-size: 1.7rem; color: var(--orange-fonce); }
+  .panier__note { margin: 0 0 8px; color: var(--encre-douce); font-size: 0.98rem; }
+  .panier__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin: 16px 0 0; }
+  .panier__vider { font: inherit; font-size: 1rem; padding: 6px 4px; cursor: pointer; color: var(--vert-fonce); background: none; border: 0; text-decoration: underline; }
+  @media (max-width: 519px) {
+    .panier__liste :global(.article) { grid-template-columns: 72px 1fr; }
+    .panier__liste :global(.article__img) { width: 72px; height: 72px; }
+    .panier__liste :global(.article__retirer) { grid-column: 1 / -1; justify-self: end; padding: 6px 12px; }
+  }
+</style>

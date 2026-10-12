@@ -17,7 +17,6 @@ const suiv = dessins[(i + 1) % dessins.length];
 const apres = [...dessins.slice(i + 1), ...dessins.slice(0, i)];
 const memeRubrique = [...apres.filter((x) => x.rubrique === dessin.rubrique), ...apres.filter((x) => x.rubrique !== dessin.rubrique)].slice(0, 4);
 const rub = d.rubriques[dessin.rubrique];
-const contactUrl = `${chemin('contact', lang)}?dessin=${dessin.id}`;
 const jsonld = {
   '@context': 'https://schema.org',
   '@type': 'VisualArtwork',
@@ -43,7 +42,10 @@ const jsonld = {
           <h1>{titre}</h1>
           <p class="fiche__prix">{d.dessins.prix}</p>
           <p>{d.dessins.prixTexte}</p>
-          <p><a class="bouton" href={contactUrl}>{d.dessins.cta}</a></p>
+          <p class="fiche__panier">
+            <button type="button" class="bouton" aria-pressed="false" data-panier={`dessin:${dessin.id}`} data-ajouter={d.panier.ajouter} data-dedans={d.panier.dedans}>{d.panier.ajouter}</button>
+            <a href={chemin('panier', lang)}>{d.panier.voir}</a>
+          </p>
           <p class="fiche__petit"><a href={chemin('licence', lang)}>{d.dessins.licence}</a> · <a href="#toile">{d.dessins.toileLien}</a></p>
           <nav class="fiche__nav" aria-label="Navigation">
             <a href={cheminDessin(prec.id, lang)} rel="prev">
@@ -78,7 +80,7 @@ const jsonld = {
         <p class="option-toile__nom">{d.dessins.toilePrix(PRIX_TOILE)}</p>
         <p>{d.dessins.toileDelai(DELAI_TOILE_SUR_COMMANDE[lang])}</p>
         <p>{d.dessins.toileLot}</p>
-        <a class="bouton bouton--vert" href={`${chemin('contact', lang)}?sujet=toile-commande&dessin=${dessin.id}`}>{d.dessins.toileDemander}</a>
+        <button type="button" class="bouton bouton--vert" aria-pressed="false" data-panier={`commande:${dessin.id}`} data-ajouter={d.panier.ajouterToile} data-dedans={d.panier.dedans}>{d.panier.ajouterToile}</button>
         <p class="option-toile__note">{d.dessins.toileNote}</p>
       </div>
     </div>
@@ -118,6 +120,8 @@ const jsonld = {
   .fiche__image :global(img) { width: auto; max-width: 100%; height: auto; max-height: calc(100svh - 150px); margin-inline: auto; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; }
   .fiche__prix { font-family: var(--titre); font-size: 2.6rem; color: var(--orange-fonce); margin: 0 0 4px; line-height: 1.1; }
   .fiche__petit { font-size: 0.98rem; }
+  .fiche__panier { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  .fiche__panier a { font-family: var(--titre); font-size: 1.2rem; }
   .fiche__nav { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-top: 34px; padding-top: 18px; border-top: 3px dashed var(--vert-pale); font-family: var(--titre); font-size: 1.3rem; }
   .fiche__nav a { display: grid; gap: 6px; text-decoration: none; justify-items: start; }
   .fiche__nav a[rel='next'] { justify-items: end; text-align: right; }
@@ -148,6 +152,7 @@ const jsonld = {
     .fiche__infos p { margin: 0 0 6px; }
     .fiche__infos .surtitre { margin: 0 0 0; }
     .fiche__prix { font-size: 2.2rem; margin: 0; }
+    .fiche__panier a { display: none; } /* l'icône du panier est dans l'en-tête */
     .fiche__infos .bouton { padding: 10px 18px; font-size: 1.15rem; }
     .fiche__nav { margin-top: 18px; }
   }

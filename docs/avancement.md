@@ -2,6 +2,17 @@
 
 Dernière mise à jour : 2026-10-12 (retours vidéos et toiles : voir la première section ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Panier (2026-10-12, non publié)
+
+Choix de Claudiu : un seul panier pour les dessins numériques et les toiles, deux catalogues qui restent distincts ; bouton sur la carte ET sur la fiche ; icône dans l'en-tête + page Panier ; lot 5+1 sur les toiles seulement ; panier gardé sur l'appareil. **Aucun paiement** : le panier prépare la demande envoyée à Linda.
+- **Articles** (`src/components/panier.ts`, localStorage `panier`) : `dessin` (10 €), `toile` (déjà imprimée, 200 €), `commande` (toile sur commande à partir d'un dessin numérique, 200 €, id du dessin). Les toiles (imprimées ou sur commande) comptent ensemble pour le lot (5 achetées, la 6e offerte) et l'envoi (12 €, offert dès 2) ; `calculPanier()` dans `src/data/vente.ts`.
+- **Boutons** : tout `[data-panier="genre:id"]` bascule l'article (script de `Base.astro`, aria-pressed, textes « Ajouter au panier » / « Dans le panier ✓ ») : cartes de la galerie (`CarteDessin.astro`, devenue un `article` avec lien + bouton), fiche d'un dessin (remplace « Demander ce dessin » ; « Ajouter cette toile au panier » pour la toile sur commande), fiche d'une toile. Icône panier avec compteur dans l'en-tête (`Entete.astro`).
+- **Page Panier** (`PagePanier.astro`, `/panier/`, `/nl/mandje/`, non indexée) : liste, retirer, récapitulatif (dessins, toiles, offre de lot, envoi, total), « Envoyer ma demande à Linda » vers le formulaire. Les articles qui n'existent plus (toile vendue) sortent seuls du panier.
+- **Formulaire** : trois demandes (question, commande = le panier, exposition). Une commande affiche le récapitulatif, calcule le total, demande l'adresse en Belgique seulement s'il y a une toile, la case des conditions d'utilisation s'il y a un dessin et celle des conditions de vente s'il y a une toile ; panier vide = envoi bloqué avec un message. Champs envoyés à Netlify : `commande` (une ligne par article), `total`, `rue`, `code_postal`, `localite`, `pays`, `conditions`, `conditions_toile`, `message` (`toiles` n'existe plus).
+- **Retirés** : barre de sélection de la page Toiles et le code qui y posait Tilleul (`data-tilleul-appui`, `--leve`), anciennes demandes « dessin », « toile », « toile sur commande ». Confidentialité : le panier reste dans le navigateur.
+- Vérifié (Chrome, ordinateur et téléphone simulé) : ajout depuis une carte, une fiche de dessin, la toile sur commande et une fiche de toile ; totaux (7 dessins + 2 toiles = 470 € ; retirer un article met à jour) ; formulaire (récapitulatif, message pré-écrit, adresse seulement avec une toile, panier vide bloqué). **Pas testé** : envoi réel du formulaire (Netlify), lot 5+1 à l'écran du panier avec 6 toiles, navigateurs sans stockage.
+- À valider par Claudiu : textes FR/NL du panier, bouton sur les cartes (mobile : « Ajouter au panier » sans icône).
+
 ## Rubrique Psaumes et rangement des fichiers (2026-10-12, non publiés)
 
 - **5e rubrique « Les psaumes »** (accueil « Cinq univers à explorer », filtre de la galerie, 78 dessins au total) avec les 2 dessins de Linda : **« Planté près du ruisseau »** (Ps 1,3) et **« Les arbres crient de joie »** (Ps 96,12), NL « Geplant bij de beek » et « De bomen juichen » (titres de Claude, à valider). Le dessin n'est **pas retouché** : le verset écrit par Linda reste dans l'image, et il est redonné en texte propre sous le dessin (fiche, section `.verset`, champ `verset` de `dessins.json`). Sur la page NL, le verset reste en français (`lang="fr"`) avec « Psalm 1,3 », il n'y a qu'une version du dessin. Texte de la rubrique : « Des versets des Psaumes, mis en dessin par Linda. » Les psaumes sont déclarés dans `PSAUMES` de `scripts/preparer-dessins.mjs` (fichiers `~/Desktop/DessinsLinda/Psaumes/`). Les originaux reçus sont en JPEG de 1080 px (WhatsApp) : à remplacer par les vrais fichiers de Linda avant la vente (phase 3).
@@ -344,6 +355,8 @@ Tout ce qui reste à faire à la fin est dans `docs/checklist-fin-de-projet.md` 
 - Décidé : pas de page Psaumes, pas de liens vers des réseaux.
 
 ## À la toute fin (ne pas oublier)
+
+**Accord avec Linda (heures et paiement)** : un accord à l'amiable a été rédigé le 2026-10-12 (13 h au 2026-10-12, dont 3 h déjà payées). À la fin du projet, **Claudiu revient vers Claude pour compter les heures totales** et refaire le tableau de l'accord avant d'aller voir Linda sur place. Rappeler à Claudiu de le faire.
 
 Image d'aperçu de partage (WhatsApp, Facebook), Lighthouse et contrastes, test sur vrais téléphones (petit Android, iPhone ancien, mouvement réduit), nettoyage du code inutilisé : voir `docs/checklist-fin-de-projet.md`.
 

@@ -1,28 +1,24 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { t, chemin, dessins, toiles, resumeLot, type Lang } from '../../i18n';
+import { t, chemin, dessins, toiles, type Lang } from '../../i18n';
+import { PRIX_DESSIN, PRIX_TOILE } from '../../data/vente';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
 const c = d.contact;
 const chemins = { fr: chemin('contact', 'fr'), nl: chemin('contact', 'nl') };
-const disponibles = toiles.filter((x) => !x.vendue);
 // Tout ce que le script du formulaire doit écrire vient d'ici, pour que les textes restent dans les dictionnaires.
 const donnees = {
-  dessins: Object.fromEntries(dessins.map((x) => [x.id, { dessin: c.prefill(x.titre[lang]), commande: c.prefillCommande(x.titre[lang]) }])),
-  toiles: Object.fromEntries(disponibles.map((x) => [x.id, c.citer(x.titre[lang])])),
-  totaux: Array.from({ length: disponibles.length + 1 }, (_, n) => {
-    const r = resumeLot(lang, n);
-    return `${d.toiles.prix(r.total)} (${r.nombre} · ${r.detail})`;
-  }),
-  modeles: { toile: c.prefillToiles(1, '{toiles}', '{total}'), toiles: c.prefillToiles(2, '{toiles}', '{total}'), exposition: c.prefillExposition },
-  erreurs: { aucuneToile: c.aucuneToile, horsBelgique: c.horsBelgique, codePostal: c.codePostalErreur },
+  dessins: Object.fromEntries(dessins.map((x) => [x.id, x.titre[lang]])),
+  toiles: Object.fromEntries(toiles.map((x) => [x.id, x.titre[lang]])),
+  prix: { dessin: PRIX_DESSIN, toile: PRIX_TOILE },
+  panier: d.panier,
+  modeles: { commande: c.prefillCommande, exposition: c.prefillExposition },
+  erreurs: { panierVide: `${c.panierVide} ${c.panierChoisir}`, horsBelgique: c.horsBelgique, codePostal: c.codePostalErreur },
 };
 const sujets = [
   ['question', c.sujets.question],
-  ['dessin', c.sujets.dessin],
-  ['toile', c.sujets.toile],
-  ['toile-commande', c.sujets.commande],
+  ['commande', c.sujets.commande],
   ['exposition', c.sujets.exposition],
 ] as const;
 ---
@@ -47,31 +43,20 @@ const sujets = [
           {sujets.map(([code, nom]) => <option value={nom} data-code={code}>{nom}</option>)}
         </select>
 
-        <div class="bloc" data-pour="dessin toile-commande" hidden>
-          <label for="dessin">{c.dessin}</label>
-          <select id="dessin" name="dessin" data-requis>
-            <option value="">{c.aucun}</option>
-            {dessins.map((x) => <option value={x.titre[lang]} data-id={x.id}>{x.titre[lang]}</option>)}
-          </select>
+        <div class="bloc panier-recap" data-pour="commande" hidden>
+          <p class="panier-recap__titre">{c.panierTitre}</p>
+          <ul class="panier-recap__liste" data-panier-liste></ul>
+          <p class="formulaire__note" data-panier-vide hidden>{c.panierVide} {c.panierChoisir}</p>
+          <p class="formulaire__note"><a href={chemin('panier', lang)}>{c.panierModifier}</a></p>
+          <div class="bloc total" data-panier-total>
+            <p><strong>{c.total}</strong> <span data-total></span></p>
+            <input type="hidden" name="total" />
+            <p class="formulaire__note">{c.totalNote}</p>
+          </div>
+          <input type="hidden" name="commande" />
         </div>
 
         <fieldset class="bloc" data-pour="toile" hidden>
-          <legend>{c.toilesChoix}</legend>
-          <p class="formulaire__note">{c.toilesAide}</p>
-          <div class="choix-toiles">
-            {disponibles.map((x) => <label class="choix"><input type="checkbox" value={x.id} data-toile />{x.titre[lang]}</label>)}
-          </div>
-          <input type="hidden" name="toiles" />
-        </fieldset>
-
-        <div class="bloc total" data-pour="toile toile-commande" hidden>
-          <p><strong>{c.total}</strong> <span data-total></span></p>
-          <input type="hidden" name="total" />
-          <p class="formulaire__note" data-pour="toile">{c.totalNote}</p>
-          <p class="formulaire__note" data-pour="toile-commande">{c.commandeNote}</p>
-        </div>
-
-        <fieldset class="bloc" data-pour="toile toile-commande" hidden>
           <legend>{c.adresseTitre}</legend>
           <label for="rue">{c.rue}</label>
           <input id="rue" name="rue" type="text" autocomplete="street-address" data-requis />
@@ -97,7 +82,7 @@ const sujets = [
           <input id="conditions" name="conditions" type="checkbox" value="oui" data-requis />
           <label for="conditions">{c.conditionsAvant}<a href={chemin('licence', lang)} target="_blank" rel="noopener">{c.conditionsLien}</a>{c.conditionsApres}</label>
         </p>
-        <p class="conditions" data-pour="toile toile-commande" hidden>
+        <p class="conditions" data-pour="toile" hidden>
           <input id="conditions-toile" name="conditions_toile" type="checkbox" value="oui" data-requis />
           <label for="conditions-toile">{c.conditionsToileAvant}<a href={chemin('conditionsToiles', lang)} target="_blank" rel="noopener">{c.conditionsToileLien}</a>{c.conditionsToileApres}</label>
         </p>
@@ -111,27 +96,30 @@ const sujets = [
   </section>
 </Base>
 <script>
+  import { lire } from '../panier';
+  import { calculPanier } from '../../data/vente';
   interface Donnees {
-    dessins: Record<string, { dessin: string; commande: string }>;
+    dessins: Record<string, string>;
     toiles: Record<string, string>;
-    totaux: string[];
-    modeles: { toile: string; toiles: string; exposition: string };
-    erreurs: { aucuneToile: string; horsBelgique: string; codePostal: string };
+    prix: { dessin: number; toile: number };
+    panier: {
+      lignes: { lotUne: string; lotPlusieurs: string; envoi: string; envoiOffert: string };
+      ligneDessin: string; ligneToile: string; ligneCommande: string;
+    };
+    modeles: { commande: string; exposition: string };
+    erreurs: { panierVide: string; horsBelgique: string; codePostal: string };
   }
   const form = document.querySelector<HTMLFormElement>('form.formulaire');
   if (form) {
     const donnees = JSON.parse(form.dataset.donnees ?? '{}') as Donnees;
     const champ = <T extends Element>(s: string) => form.querySelector<T>(s)!;
     const sujet = champ<HTMLSelectElement>('#sujet');
-    const dessin = champ<HTMLSelectElement>('#dessin');
     const message = champ<HTMLTextAreaElement>('#message');
     const pays = champ<HTMLSelectElement>('#pays');
     const codePostal = champ<HTMLInputElement>('#code-postal');
-    const casesToiles = [...form.querySelectorAll<HTMLInputElement>('[data-toile]')];
     const horsBelgique = champ<HTMLElement>('[data-hors-belgique]');
+    const liste = champ<HTMLElement>('[data-panier-liste]');
     const code = () => sujet.selectedOptions[0]?.dataset.code ?? 'question';
-    const idDessin = () => dessin.selectedOptions[0]?.dataset.id ?? '';
-    const choisies = () => casesToiles.filter((x) => x.checked).map((x) => x.value);
 
     // Le message est pré-écrit tant que le visiteur ne l'a pas modifié lui-même.
     let messageAuto = '';
@@ -140,40 +128,55 @@ const sujets = [
       messageAuto = texte;
     }
 
+    // Le panier du visiteur, en lignes de texte (articles qui existent encore seulement) et son total.
+    function panier() {
+      const p = lire();
+      const ligne = (modele: string, titre: string, prix: number) => modele.replace('{t}', titre).replace('{p}', String(prix));
+      const lignes = [
+        ...p.dessin.filter((id) => donnees.dessins[id]).map((id) => ligne(donnees.panier.ligneDessin, donnees.dessins[id], donnees.prix.dessin)),
+        ...p.toile.filter((id) => donnees.toiles[id]).map((id) => ligne(donnees.panier.ligneToile, donnees.toiles[id], donnees.prix.toile)),
+        ...p.commande.filter((id) => donnees.dessins[id]).map((id) => ligne(donnees.panier.ligneCommande, donnees.dessins[id], donnees.prix.toile)),
+      ];
+      const dessins = p.dessin.filter((id) => donnees.dessins[id]).length;
+      const nbToiles = p.toile.filter((id) => donnees.toiles[id]).length + p.commande.filter((id) => donnees.dessins[id]).length;
+      const k = calculPanier(dessins, nbToiles);
+      const l = donnees.panier.lignes;
+      const details = [k.offertes ? (k.offertes > 1 ? l.lotPlusieurs : l.lotUne).replace('{n}', String(k.offertes)) : '', nbToiles ? (k.envoi ? `${l.envoi} ${k.envoi} €` : l.envoiOffert) : ''].filter(Boolean);
+      return { lignes, dessins, toiles: nbToiles, total: lignes.length ? `${k.total} €${details.length ? ` (${details.join(' · ')})` : ''}` : '' };
+    }
+
     function majFormulaire() {
       const s = code();
-      form!.querySelectorAll<HTMLElement>('[data-pour]').forEach((b) => { b.hidden = !b.dataset.pour!.split(' ').includes(s); });
+      const p = panier();
+      // blocs : par demande, et pour une commande selon ce que contient le panier (adresse seulement s'il y a une toile)
+      const actifs = new Set([s]);
+      if (s === 'commande' && p.toiles) actifs.add('toile');
+      if (s === 'commande' && p.dessins) actifs.add('dessin');
+      form!.querySelectorAll<HTMLElement>('[data-pour]').forEach((b) => { b.hidden = !b.dataset.pour!.split(' ').some((x) => actifs.has(x)); });
       form!.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-requis]').forEach((x) => { x.required = !x.closest('[hidden]'); });
-      const ids = choisies();
-      const nombre = s === 'toile' ? ids.length : s === 'toile-commande' ? 1 : 0;
-      const total = nombre ? donnees.totaux[nombre] : '';
-      champ('[data-total]').textContent = total;
-      champ<HTMLInputElement>('input[name=total]').value = total;
-      const titres = s === 'toile' ? ids.map((id) => donnees.toiles[id]).join(', ') : '';
-      champ<HTMLInputElement>('input[name=toiles]').value = titres;
-      // Au moins une toile cochée, et livraison en Belgique seulement.
-      casesToiles[0]?.setCustomValidity(s === 'toile' && ids.length === 0 ? donnees.erreurs.aucuneToile : '');
-      const ailleurs = !!pays.selectedOptions[0]?.hasAttribute('data-autre') && (s === 'toile' || s === 'toile-commande');
+      liste.replaceChildren(...p.lignes.map((texte) => Object.assign(document.createElement('li'), { textContent: texte })));
+      champ<HTMLElement>('[data-panier-vide]').hidden = p.lignes.length > 0;
+      champ<HTMLElement>('[data-panier-total]').hidden = p.lignes.length === 0;
+      champ('[data-total]').textContent = p.total;
+      champ<HTMLInputElement>('input[name=total]').value = s === 'commande' ? p.total : '';
+      champ<HTMLInputElement>('input[name=commande]').value = s === 'commande' ? p.lignes.join('\n') : '';
+      // Une commande demande un panier non vide, et une livraison en Belgique seulement.
+      sujet.setCustomValidity(s === 'commande' && p.lignes.length === 0 ? donnees.erreurs.panierVide : '');
+      const ailleurs = !!pays.selectedOptions[0]?.hasAttribute('data-autre') && actifs.has('toile');
       pays.setCustomValidity(ailleurs ? donnees.erreurs.horsBelgique : '');
       horsBelgique.hidden = !ailleurs;
       let texte = '';
-      if (s === 'dessin' && idDessin()) texte = donnees.dessins[idDessin()].dessin;
-      if (s === 'toile-commande' && idDessin()) texte = donnees.dessins[idDessin()].commande;
-      if (s === 'toile' && ids.length) texte = donnees.modeles[ids.length > 1 ? 'toiles' : 'toile'].replace('{toiles}', titres).replace('{total}', total);
+      if (s === 'commande' && p.lignes.length) texte = donnees.modeles.commande.replace('{liste}', p.lignes.map((x) => `- ${x}`).join('\n')).replace('{total}', p.total);
       if (s === 'exposition') texte = donnees.modeles.exposition;
       preEcrire(texte);
     }
 
-    // Arrivée depuis un lien : ?dessin=…, ?sujet=toile-commande&dessin=…, ?toiles=a,b, ?sujet=exposition
-    const params = new URLSearchParams(location.search);
-    const voulu = params.get('sujet') ?? (params.get('toiles') ? 'toile' : params.get('dessin') ? 'dessin' : '');
+    // Arrivée depuis un lien : ?sujet=commande (le panier), ?sujet=exposition ; sinon, un panier rempli ouvre la commande
+    const voulu = new URLSearchParams(location.search).get('sujet') ?? (panier().lignes.length ? 'commande' : '');
     const option = [...sujet.options].find((o) => o.dataset.code === voulu);
     if (option) sujet.value = option.value;
-    const optionDessin = [...dessin.options].find((o) => o.dataset.id === params.get('dessin'));
-    if (optionDessin) dessin.value = optionDessin.value;
-    const demandees = (params.get('toiles') ?? '').split(',');
-    casesToiles.forEach((x) => { x.checked = demandees.includes(x.value); });
-    [sujet, dessin, pays, ...casesToiles].forEach((x) => x.addEventListener('change', majFormulaire));
+    [sujet, pays].forEach((x) => x.addEventListener('change', majFormulaire));
+    window.addEventListener('panier-change', majFormulaire);
     codePostal.addEventListener('input', () => codePostal.setCustomValidity(''));
     codePostal.addEventListener('invalid', () => codePostal.setCustomValidity(codePostal.validity.patternMismatch ? donnees.erreurs.codePostal : ''));
     majFormulaire();
@@ -211,11 +214,12 @@ const sujets = [
   .bloc { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
   .bloc[hidden], .formulaire [data-pour][hidden] { display: none; }
   .formulaire legend { padding: 0; }
-  .choix-toiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; }
-  .formulaire .choix { display: flex; gap: 10px; align-items: center; margin: 0; font-family: var(--texte); font-size: 1.05rem; color: var(--encre); cursor: pointer; }
-  .formulaire .choix input, .conditions input { appearance: none; -webkit-appearance: none; flex: none; width: 30px; height: 30px; margin: 2px 0 0; padding: 0; cursor: pointer; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 12px 6px 11px 7px / 7px 11px 6px 12px; transition: transform 0.15s, background-color 0.15s; display: grid; place-items: center; }
-  .formulaire .choix input:checked, .conditions input:checked { background: var(--vert-creme); }
-  .formulaire .choix input:checked::after, .conditions input:checked::after { content: ''; width: 18px; height: 11px; margin-top: -4px; border-left: 4.5px solid var(--orange-fonce); border-bottom: 4.5px solid var(--orange-fonce); border-radius: 2px 0 3px 2px; transform: rotate(-48deg); }
+  .conditions input { appearance: none; -webkit-appearance: none; flex: none; width: 30px; height: 30px; margin: 2px 0 0; padding: 0; cursor: pointer; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 12px 6px 11px 7px / 7px 11px 6px 12px; transition: transform 0.15s, background-color 0.15s; display: grid; place-items: center; }
+  .conditions input:checked { background: var(--vert-creme); }
+  .conditions input:checked::after { content: ''; width: 18px; height: 11px; margin-top: -4px; border-left: 4.5px solid var(--orange-fonce); border-bottom: 4.5px solid var(--orange-fonce); border-radius: 2px 0 3px 2px; transform: rotate(-48deg); }
+  .panier-recap { padding: 14px 16px; background: var(--vert-creme); border-radius: var(--rayon-petit); }
+  .panier-recap__titre { margin: 0; font-family: var(--titre); font-size: 1.3rem; color: var(--vert-fonce); }
+  .panier-recap__liste { margin: 0; padding-left: 20px; }
   .total { margin-top: 12px; padding: 12px 16px; background: var(--orange-creme); border-radius: var(--rayon-petit); }
   .total p { margin: 0; }
   .total strong { font-family: var(--titre); font-weight: 400; font-size: 1.3rem; color: var(--orange-fonce); }

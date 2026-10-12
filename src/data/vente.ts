@@ -1,5 +1,6 @@
 // Prix et conditions des toiles : à changer ici seulement (les textes FR et NL les reprennent).
 // Les vidéos ne montrent ni prix ni offre de lot.
+export const PRIX_DESSIN = 10; // dessin numérique (les textes des dictionnaires l'écrivent aussi : « 10 € »)
 export const PRIX_TOILE = 200;
 // Moyenne arrondie des tarifs d'un colis de 2 kg livré à domicile en Belgique (voir docs/avancement.md).
 export const FRAIS_ENVOI = 12;
@@ -15,4 +16,10 @@ export function calculLot(nombre: number) {
   const offertes = Math.floor(nombre / (TOILES_ACHETEES + 1));
   const envoi = nombre === 0 || nombre >= ENVOI_OFFERT_DES ? 0 : FRAIS_ENVOI;
   return { nombre, sousTotal, offertes, envoi, total: sousTotal - offertes * PRIX_TOILE + envoi };
+}
+
+// Un panier : dessins numériques + toiles (déjà imprimées ou sur commande, comptées ensemble pour le lot et l'envoi).
+export function calculPanier(dessins: number, toiles: number) {
+  const lot = calculLot(toiles);
+  return { ...lot, dessins, sousTotalDessins: dessins * PRIX_DESSIN, total: dessins * PRIX_DESSIN + lot.total };
 }

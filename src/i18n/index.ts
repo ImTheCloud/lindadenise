@@ -2,7 +2,6 @@ import { fr, type Dico } from './fr';
 import { nl } from './nl';
 import dessinsJson from '../data/dessins.json';
 import toilesJson from '../data/toiles.json';
-import { calculLot } from '../data/vente';
 
 export type Lang = 'fr' | 'nl';
 export type Rubrique = 'chats' | 'nature' | 'fleurs' | 'animaux' | 'psaumes';
@@ -37,6 +36,7 @@ const chemins = {
   toiles: { fr: '/toiles/', nl: '/nl/doeken/' },
   apropos: { fr: '/a-propos/', nl: '/nl/over-mij/' },
   contact: { fr: '/contact/', nl: '/nl/contact/' },
+  panier: { fr: '/panier/', nl: '/nl/mandje/' },
   jeu: { fr: '/jouer/', nl: '/nl/spelen/' },
   merci: { fr: '/merci/', nl: '/nl/bedankt/' },
   mentions: { fr: '/mentions-legales/', nl: '/nl/juridische-info/' },
@@ -49,13 +49,6 @@ export type Page = keyof typeof chemins;
 export const chemin = (page: Page, lang: Lang) => chemins[page][lang];
 export const cheminDessin = (id: string, lang: Lang) => `${chemins.dessins[lang]}${id}/`;
 export const cheminToile = (id: string, lang: Lang) => `${chemins.toiles[lang]}#${id}`;
-// Résumé d'un lot de toiles (nombre, toiles offertes, envoi, total), pour la page Toiles et le formulaire.
-export function resumeLot(lang: Lang, nombre: number) {
-  const s = t(lang).toiles.selection;
-  const k = calculLot(nombre);
-  const detail = [k.offertes ? s.offerte(k.offertes) : '', k.envoi ? s.envoi(k.envoi) : s.envoiOffert].filter(Boolean).join(' · ');
-  return { nombre: s.nombre(nombre), detail, total: k.total };
-}
 export const autreLangue = (lang: Lang): Lang => (lang === 'fr' ? 'nl' : 'fr');
 
 export const parRubrique = (r: Rubrique) => dessins.filter((d) => d.rubrique === r);
