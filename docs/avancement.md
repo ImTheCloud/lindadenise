@@ -25,6 +25,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Accueil, côté gauche enrichi (ordinateur)** : après le titre, la phrase d'accroche d'origine (clé `accueil.texte`, rétablie), les deux boutons ; les deux lignes avec icône (« Dessins · Reçu par e-mail », « Toiles · Envoyée par Linda ») sont **retirées** à la demande de Claudiu (la différence reste dite sur les cartes, les portes et la bande d'info des galeries).
 
+- **Un seul brun** : la couleur d'accent orange des textes (`--orange-titre`, mot « Denise », logo, nombre du titre) est maintenant le brun clair caramel `#b05200` déjà utilisé pour les toiles et les boutons ; l'orange vif ne reste qu'en décor (lotus, feuilles, Tilleul).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
