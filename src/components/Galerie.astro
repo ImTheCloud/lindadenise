@@ -106,11 +106,13 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .boutique__tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding-block: clamp(10px, 2vw, 18px) 4px; }
   .boutique h1 { margin: 0; font-size: clamp(2rem, 1.5rem + 2vw, 2.8rem); }
   /* Interrupteur Dessins / Toiles : l'onglet actif prend la couleur de son monde */
-  .onglets { display: inline-flex; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); overflow: hidden; background: #fff; }
+  .onglets { display: inline-flex; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); overflow: hidden; }
   .onglet { display: flex; align-items: center; gap: 8px; padding: 6px 16px; font-family: var(--titre); font-size: 1.25rem; line-height: 1.2; text-decoration: none; color: var(--encre); }
   .onglet::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--monde-dessins); }
   .onglet--toile::before { background: var(--monde-toiles); }
-  .onglet:hover { color: var(--encre); background: var(--vert-creme); }
+  .onglet--dessin { background: #e3f1e3; }
+  .onglet--toile { background: #ffe3bd; }
+  .onglet:hover { color: var(--encre); filter: brightness(0.96); }
   .onglet[aria-current='page'] { color: #fff; background: var(--monde-dessins); }
   .onglet--toile[aria-current='page'] { background: var(--monde-toiles); }
   .onglet[aria-current='page']::before { background: #fff; }
