@@ -12,7 +12,14 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
 ---
 <Base lang={lang} titre={d.dessins.titre} description={d.dessins.metaDescription} chemins={chemins}>
   <Galerie titre={d.nav.dessins} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={dessins.length} genre="dessin" phrase={d.dessins.phrase} onglets={onglets}>
-    {dessins.map((x, i) => <CarteDessin dessin={x} lang={lang} priorite={i < 4} />)}
+    {rubriques.map((r, k) => (
+      <section class="rubrique-bloc" data-bloc={r.code}>
+        <h2 class="rubrique-bloc__titre">{d.rubriques[r.code].nom} <span>({r.nombre})</span></h2>
+        <div class="grille">
+          {parRubrique(r.code).map((x, i) => <CarteDessin dessin={x} lang={lang} priorite={k === 0 && i < 4} />)}
+        </div>
+      </section>
+    ))}
   </Galerie>
 
 </Base>

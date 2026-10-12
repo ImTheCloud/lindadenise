@@ -15,7 +15,14 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
 ---
 <Base lang={lang} monde="toiles" titre={tt.titre} description={tt.meta} chemins={chemins} image={`/toiles/${toiles[0].id}-800.jpg`}>
   <Galerie titre={d.nav.toiles} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={toiles.length} genre="toile" phrase={tt.phrase} onglets={onglets} bonus={tt.bonus}>
-    {toiles.map((x, i) => <CarteToile toile={x} lang={lang} priorite={i < 4} />)}
+    {rubriques.map((r, k) => (
+      <section class="rubrique-bloc" data-bloc={r.code}>
+        <h2 class="rubrique-bloc__titre">{d.rubriques[r.code].nom} <span>({r.nombre})</span></h2>
+        <div class="grille">
+          {toiles.filter((x) => x.rubrique === r.code).map((x, i) => <CarteToile toile={x} lang={lang} priorite={k === 0 && i < 4} />)}
+        </div>
+      </section>
+    ))}
   </Galerie>
 
   <section class="section videos-bande">

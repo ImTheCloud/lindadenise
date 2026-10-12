@@ -46,16 +46,14 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
     </div>
   </div>
   <div class="contenu">
-    <div class="grille" id="mur">
-      <slot />
-    </div>
+    <slot />
   </div>
 </section>
 <!-- Lu et appliqué avant l'affichage de la suite de la page : un lien #rubrique n'affiche jamais toute la galerie un instant -->
 <script is:inline>
   (() => {
     const boutons = document.querySelectorAll('.filtre');
-    const cartes = document.querySelectorAll('#mur .carte');
+    const blocs = document.querySelectorAll('[data-bloc]');
     const nombre = document.querySelector("[data-total]");
     const appliquer = (f) => {
       let n = 0;
@@ -64,7 +62,7 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
         b.setAttribute('aria-pressed', String(actif));
         if (actif) n = b.dataset.nombre;
       });
-      cartes.forEach((c) => (c.hidden = f !== 'tous' && c.dataset.rubrique !== f));
+      blocs.forEach((c) => (c.hidden = f !== 'tous' && c.dataset.bloc !== f));
       if (nombre) nombre.textContent = '(' + n + ')';
     };
     boutons.forEach((b) =>
@@ -99,19 +97,16 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .boutique__notes { display: grid; gap: 4px; margin-bottom: 14px; }
   .phrase { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 600; color: var(--encre-douce); }
   .phrase :global(svg) { flex: none; color: var(--accent); }
-  .bonus { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 0; padding: 0; list-style: none; font-size: 0.98rem; font-weight: 600; color: var(--orange-fonce); }
+  .bonus { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 0; padding: 0; list-style: none; font-size: 1rem; font-weight: 600; color: var(--encre-douce); }
+  .bonus li :global(svg), .bonus li span { color: var(--accent); }
   .bonus li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .bonus svg { flex: none; }
   .boutique__nombre { color: var(--orange-titre); }
-  /* Filtres : une rangée collée sous l'en-tête, qui défile de côté sur téléphone */
+  /* Filtres : une rangée collée sous l'en-tête sur grand écran ; sur téléphone ils passent à la ligne, tous visibles */
   .boutique__barre { position: sticky; top: 68px; z-index: 20; padding-block: 10px; background: var(--fond); border-bottom: 2px dashed var(--vert-pale); }
-  .filtres { display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 8px; scrollbar-width: none; }
-  .filtres::-webkit-scrollbar { display: none; }
+  .filtres { display: flex; flex-wrap: wrap; gap: 8px 10px; padding: 4px 4px 8px; }
   .filtre { flex: none; font-family: var(--titre); font-size: 1.25rem; line-height: 1; padding: 0.5em 1em; cursor: pointer; background: #fff; color: var(--vert-fonce); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: transform 0.15s; }
   .filtre:hover { transform: rotate(-2deg) translateY(-2px); }
   .filtre[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; margin-top: clamp(20px, 3vw, 30px); }
-  @media (min-width: 700px) { .grille { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 22px; } }
-  @media (min-width: 1000px) { .grille { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  @media (max-width: 619px) { .filtre { font-size: 1.1rem; padding: 0.45em 0.85em; } }
+  @media (max-width: 699px) { .boutique__barre { position: static; } .filtre { font-size: 1.1rem; padding: 0.45em 0.85em; } }
 </style>

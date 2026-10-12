@@ -47,6 +47,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **En-tête et pied de page** : toujours aux couleurs par défaut (vert et orange du logo), même sur la page Toiles. **Offre** : deux lignes courtes qui ne se coupent plus (« Envoi offert dès 2 toiles », « 5 toiles achetées, la 6e est offerte »).
 
+- **Galeries par rubriques** : avec « Tous », les dessins (et les toiles) sont rangés par sections — titre de la rubrique avec son nombre, puis ses cartes (chats, nature, fleurs, animaux, psaumes) ; un filtre ne garde que sa section ; styles dans `global.css` (`.rubrique-bloc`, `.grille`). **Filtres sur téléphone** : ils passent à la ligne (tous visibles, Psaumes compris) et ne sont plus collés en haut ; collés seulement dès 700 px.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

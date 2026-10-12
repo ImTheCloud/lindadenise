@@ -151,3 +151,14 @@ p { margin: 0 0 1em; }
 
 /* Un bouton du panier reste invisible jusqu'à ce que son état (dans le panier ou non) soit lu : plus de clignotement au chargement */
 html:not(.panier-pret) [data-panier] { visibility: hidden; }
+
+/* Galerie : un bloc par rubrique (titre, puis cartes en grille), le filtre n'en laisse qu'un */
+.rubrique-bloc { margin-top: clamp(24px, 4vw, 44px); }
+.rubrique-bloc[hidden] { display: none; }
+.rubrique-bloc__titre { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; font-size: clamp(1.8rem, 1.4rem + 1.6vw, 2.5rem); }
+.rubrique-bloc__titre::after { content: ''; flex: 1; align-self: center; border-top: 2px dashed var(--vert-pale); }
+.rubrique-bloc__titre span { order: 1; font-size: 0.6em; color: var(--encre-douce); }
+.rubrique-bloc__titre::after { order: 2; }
+.grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+@media (min-width: 700px) { .grille { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 22px; } }
+@media (min-width: 1000px) { .grille { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
