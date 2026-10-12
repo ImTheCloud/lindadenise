@@ -1,0 +1,188 @@
+---
+import Base from '../../layouts/Base.astro';
+import CarteToile from '../CarteToile.astro';
+import Etapes from '../Etapes.astro';
+import { t, chemin, cheminToile, toiles, type Toile, type Lang } from '../../i18n';
+import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES } from '../../data/vente';
+interface Props { lang: Lang; toile: Toile }
+const { lang, toile } = Astro.props;
+const d = t(lang);
+const tt = d.toiles;
+const titre = toile.titre[lang];
+const alt = tt.altDe(titre, toile.description[lang]);
+const chemins = { fr: cheminToile(toile.id, 'fr'), nl: cheminToile(toile.id, 'nl') };
+const i = toiles.findIndex((x) => x.id === toile.id);
+const prec = toiles[(i - 1 + toiles.length) % toiles.length];
+const suiv = toiles[(i + 1) % toiles.length];
+// Toiles à voir aussi : celles qui suivent celle-ci (différentes d'une fiche à l'autre).
+const autres = [...toiles.slice(i + 1), ...toiles.slice(0, i)].slice(0, 4);
+// Salon dessiné, en centimètres : la toile A3 (29,7 x 42) au-dessus d'un canapé.
+const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
+const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
+---
+<Base lang={lang} titre={titre} description={`${alt} · ${tt.prix(PRIX_TOILE)}`} chemins={chemins} image={`/toiles/${toile.id}-800.jpg`}>
+  <section class="section section--fiche">
+    <div class="contenu">
+      <p><a href={chemin('toiles', lang)}>{tt.retour}</a></p>
+      <div class="fiche">
+        <div class="fiche__image cadre">
+          <button type="button" class="fiche__zoom" data-zoom aria-label={tt.agrandir}>
+            <picture>
+              <source type="image/avif" srcset={[400, 800, 1000].map((l) => `/toiles/${toile.id}-${l}.avif ${l}w`).join(', ')} sizes="(min-width: 860px) 45vw, 92vw" />
+              <source type="image/webp" srcset={[400, 800, 1000].map((l) => `/toiles/${toile.id}-${l}.webp ${l}w`).join(', ')} sizes="(min-width: 860px) 45vw, 92vw" />
+              <img src={`/toiles/${toile.id}-800.jpg`} width="400" height="566" alt={alt} decoding="async" fetchpriority="high" />
+            </picture>
+          </button>
+        </div>
+        <div class="fiche__infos">
+          <p class="surtitre">{tt.surtitre}</p>
+          <h1>{titre}</h1>
+          <p class="fiche__prix">{toile.vendue ? tt.vendue : tt.prix(PRIX_TOILE)}</p>
+          <p>{toile.vendue ? tt.vendueTexte : tt.caracteristiques}</p>
+          {toile.vendue ? <p class="fiche__vendue">{tt.vendueTexte}</p> : (
+            <p class="fiche__panier">
+              <button type="button" class="bouton" aria-pressed="false" data-panier={`toile:${toile.id}`} data-ajouter={d.panier.ajouter} data-dedans={d.panier.dedans}>{d.panier.ajouter}</button>
+              <a href={chemin('panier', lang)}>{d.panier.voir}</a>
+            </p>
+          )}
+          <p class="fiche__petit"><a href={chemin('conditionsToiles', lang)}>{tt.conditions}</a> · <a href="#echelle">{tt.echelle}</a></p>
+          <nav class="fiche__nav" aria-label="Navigation">
+            <a href={cheminToile(prec.id, lang)} rel="prev">
+              <img src={vignette(prec)} width="60" height="84" alt="" loading="lazy" />
+              <span>← {tt.precedent}</span>
+            </a>
+            <a href={cheminToile(suiv.id, lang)} rel="next">
+              <img src={vignette(suiv)} width="60" height="84" alt="" loading="lazy" />
+              <span>{tt.suivant} →</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section section--vert" id="echelle">
+    <div class="contenu salon-bloc">
+      <h2>{tt.echelle}</h2>
+    <figure class="salon">
+      <svg viewBox="0 0 320 200" role="img" aria-labelledby="salon-legende">
+        <defs>
+          <linearGradient id="salon-mur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf7ef" /><stop offset="1" stop-color="#efe7d8" /></linearGradient>
+          <filter id="salon-ombre" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.4" flood-color="#3a2a18" flood-opacity="0.35" /></filter>
+        </defs>
+        <rect width="320" height="177" fill="url(#salon-mur)" />
+        <ellipse cx="160" cy="20" rx="70" ry="48" fill="#fffaf0" opacity="0.8" />
+        <rect y="177" width="320" height="8" fill="#fdfcf9" stroke="#d9cfbf" stroke-width="0.6" />
+        <rect y="185" width="320" height="15" fill="#e6cba0" />
+        <path d="M0 191 H320 M0 196 H320" stroke="#d4b685" stroke-width="0.5" />
+        <g stroke="#2b6e3a" stroke-width="1" stroke-linejoin="round">
+          <path d="M70 104 q0 -5 5 -5 h170 q5 0 5 5 v34 h-180 z" fill="#8cc49a" />
+          <rect x="80" y="104" width="76" height="33" rx="7" fill="#fff4e3" />
+          <rect x="164" y="104" width="76" height="33" rx="7" fill="#fff4e3" />
+          <rect x="62" y="134" width="196" height="22" rx="5" fill="#7bb989" />
+          <rect x="56" y="118" width="18" height="52" rx="7" fill="#6aac79" />
+          <rect x="246" y="118" width="18" height="52" rx="7" fill="#6aac79" />
+          <rect x="62" y="156" width="196" height="14" fill="#5d9e6c" />
+          <path d="M70 170 l2 15 h4 l1 -15 M244 170 l2 15 h4 l1 -15" fill="#9a6b3d" />
+          <path d="M200 112 q14 -6 24 4 q-2 14 -16 18 q-12 -6 -8 -22 z" fill="#f28a1e" />
+        </g>
+        <g stroke="#2b6e3a" stroke-width="0.9" stroke-linejoin="round">
+          <path d="M272 150 h26 l-3 35 h-20 z" fill="#c56b2c" />
+          <path d="M285 150 q-20 -30 -10 -58 q10 20 10 58 M285 150 q4 -40 18 -52 q2 28 -18 52 M285 150 q-22 -12 -28 -34 q20 4 28 34 M285 150 q16 -10 26 -26 q2 18 -26 26" fill="#3e9a47" />
+        </g>
+        <g>
+          <rect x="22" y="135" width="7" height="50" rx="1" fill="#f6d77c" stroke="#9a7a2a" stroke-width="0.6" />
+          <path d="M22 145 h3 M22 155 h3 M22 165 h3 M22 175 h3 M22 140 h1.6 M22 150 h1.6 M22 160 h1.6 M22 170 h1.6 M22 180 h1.6" stroke="#6b5212" stroke-width="0.5" />
+          <text x="33" y="162" class="salon__texte">50 cm</text>
+        </g>
+        <circle cx={TOILE.x + TOILE.l / 2} cy={TOILE.y + 3} r="0.7" fill="#888" />
+        <g filter="url(#salon-ombre)">
+          <image href={`/toiles/${toile.id}-400.webp`} x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} preserveAspectRatio="xMidYMid slice" />
+          <rect x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} fill="none" stroke="#a9b0b5" stroke-width="0.5" />
+        </g>
+        <g class="salon__cote" stroke="#b05200" stroke-width="0.5" fill="none">
+          <path d={`M${TOILE.x} ${TOILE.y - 5} h${TOILE.l} M${TOILE.x} ${TOILE.y - 7} v4 M${TOILE.x + TOILE.l} ${TOILE.y - 7} v4`} />
+          <path d={`M${TOILE.x + TOILE.l + 5} ${TOILE.y} v${TOILE.h} M${TOILE.x + TOILE.l + 3} ${TOILE.y} h4 M${TOILE.x + TOILE.l + 3} ${TOILE.y + TOILE.h} h4`} />
+        </g>
+        <text x={TOILE.x + TOILE.l / 2} y={TOILE.y - 7.5} text-anchor="middle" class="salon__texte salon__texte--cote">29,7 cm</text>
+        <text x={TOILE.x + TOILE.l + 8} y={TOILE.y + TOILE.h / 2 + 2} class="salon__texte salon__texte--cote">42 cm</text>
+      </svg>
+      <figcaption id="salon-legende">{tt.echelleLegende}</figcaption>
+    </figure>
+    </div>
+  </section>
+  <section class="section section--orange">
+    <div class="contenu"><Etapes titre={tt.commanderTitre} etapes={tt.etapes} /></div>
+  </section>
+  <section class="section">
+    <div class="contenu">
+      <h2 class="centre">{tt.autres}</h2>
+      <div class="suite">
+        {autres.map((x) => <CarteToile toile={x} lang={lang} />)}
+      </div>
+    </div>
+  </section>
+  <dialog class="zoom" id="zoom" aria-label={titre}>
+    <button type="button" class="zoom__fermer" data-fermer aria-label={tt.fermer}>×</button>
+    <img src={`/toiles/${toile.id}-1000.webp`} alt={alt} width="1000" height="1414" />
+  </dialog>
+</Base>
+
+<script>
+  const zoom = document.querySelector<HTMLDialogElement>('#zoom');
+  document.querySelector('[data-zoom]')?.addEventListener('click', () => zoom?.showModal());
+  zoom?.addEventListener('click', () => zoom.close());
+</script>
+
+<style>
+  .fiche__zoom { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .zoom { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100svh; width: 100%; height: 100%; overflow: hidden; }
+  .zoom::backdrop { background: rgba(20, 30, 22, 0.88); }
+  .zoom[open] { display: grid; place-items: center; cursor: zoom-out; }
+  .zoom img { width: auto; height: auto; max-width: 96vw; max-height: 94svh; border-radius: 10px; background: #fff; }
+  .zoom__fermer { position: absolute; top: 12px; right: 14px; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #fff; color: var(--vert-fonce); font-size: 2rem; line-height: 1; cursor: pointer; }
+  .fiche { display: grid; gap: 18px; align-items: start; }
+  .fiche__image { padding: 12px; max-width: 560px; margin-inline: auto; }
+  .fiche__image :global(img) { width: auto; max-width: 100%; height: auto; max-height: calc(100svh - 150px); margin-inline: auto; border-radius: 3px; box-shadow: 0 0 0 1px #c3c9cd, 0 0 0 3px #eef1f3, 0 0 0 4px #9aa2a8, 0 8px 14px -6px rgba(60, 40, 20, 0.35); }
+  .fiche__prix { font-family: var(--titre); font-size: 2.6rem; color: var(--orange-fonce); margin: 0 0 4px; line-height: 1.1; }
+  .fiche__petit { font-size: 0.98rem; }
+  .fiche__panier { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  .fiche__panier a { font-family: var(--titre); font-size: 1.2rem; }
+  .fiche__nav { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-top: 34px; padding-top: 18px; border-top: 3px dashed var(--vert-pale); font-family: var(--titre); font-size: 1.3rem; }
+  .fiche__nav a { display: grid; gap: 6px; text-decoration: none; justify-items: start; }
+  .fiche__nav a[rel='next'] { justify-items: end; text-align: right; }
+  .fiche__nav :global(img) { height: 84px; width: auto; border-radius: 8px 4px 8px 5px / 5px 8px 4px 8px; border: 2px solid var(--vert-fonce); }
+  .suite { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 28px; }
+  .suite :global(.carte) { margin: 0; }
+  /* Mobile : le dessin, son titre, son prix et le bouton tiennent dans un seul écran. */
+  @media (max-width: 859px) {
+    .section--fiche { padding-top: 14px; }
+    .section--fiche > .contenu > p { margin: 0 0 8px; }
+    .fiche__image { padding: 8px; }
+    .fiche__image :global(img) { max-height: max(240px, calc(100svh - 300px)); }
+    .fiche__infos { display: grid; grid-template-columns: auto auto 1fr; align-items: center; column-gap: 16px; }
+    .fiche__infos > :nth-child(1), .fiche__infos > :nth-child(2), .fiche__infos > :nth-child(4), .fiche__infos > :nth-child(6), .fiche__infos > :nth-child(7) { grid-column: 1 / -1; }
+    .fiche__infos > :nth-child(3) { grid-column: 2; grid-row: 3; }
+    .fiche__infos > :nth-child(5) { grid-column: 1; grid-row: 3; }
+    .fiche__infos h1 { font-size: 1.9rem; margin: 0 0 4px; }
+    .fiche__infos p { margin: 0 0 6px; }
+    .fiche__infos .surtitre { margin: 0 0 0; }
+    .fiche__prix { font-size: 2.2rem; margin: 0; }
+    .fiche__panier a { display: none; } /* l'icône du panier est dans l'en-tête */
+    .fiche__infos .bouton { padding: 10px 18px; font-size: 1.15rem; }
+    .fiche__nav { margin-top: 18px; }
+  }
+  @media (min-width: 860px) {
+      .fiche { grid-template-columns: 1.05fr 0.95fr; gap: 64px; }
+    .fiche__image { position: sticky; top: 92px; margin: 0; }
+    .suite { grid-template-columns: repeat(4, 1fr); }
+  }
+  .fiche__vendue { font-family: var(--titre); font-size: 1.5rem; color: var(--orange-fonce); }
+  .fiche__envoi { font-size: 1rem; }
+  .salon-bloc { max-width: 760px; margin-inline: auto; }
+  .salon-bloc h2 { margin-top: 0; text-align: center; }
+  .salon { margin: 0; background: #fff; border-radius: var(--rayon); overflow: hidden; }
+  .salon svg { display: block; width: 100%; height: auto; }
+  .salon figcaption { padding: 8px 14px 12px; font-size: 0.95rem; color: var(--encre-douce); text-align: center; }
+  .salon__texte { font-family: var(--titre); font-size: 6px; fill: #6b5212; }
+  .salon__texte--cote { font-size: 5px; fill: var(--orange-fonce); }
+</style>

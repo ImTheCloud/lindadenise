@@ -92,3 +92,26 @@ p { margin: 0 0 1em; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .apparait { opacity: 1; transform: none; }
 }
+
+/* Cartes des dessins et des toiles (CarteDessin.astro, CarteToile.astro) */
+.carte { background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 10px 10px 10px; box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s; break-inside: avoid; margin-bottom: 22px; }
+.carte__lien { display: block; text-decoration: none; }
+.carte__lien img { width: 100%; height: auto; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; background: var(--vert-creme); }
+.carte__titre { display: block; font-family: var(--titre); font-size: 1.35rem; line-height: 1.15; color: var(--vert-fonce); padding: 10px 6px 8px; text-align: center; }
+.carte:hover, .carte:focus-within { transform: translateY(-6px) rotate(-1.4deg); box-shadow: 0 12px 0 rgba(43, 110, 58, 0.14); }
+.carte:hover .carte__titre { color: var(--orange-fonce); }
+.carte[hidden] { display: none; }
+.carte__panier { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 7px 10px; font-family: var(--titre); font-size: 1.1rem; line-height: 1.1; cursor: pointer; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: background-color 0.15s, color 0.15s; }
+.carte__panier:hover { background: var(--orange-creme); color: var(--orange-fonce); border-color: var(--orange-fonce); }
+.carte__panier[aria-pressed='true'] { background: var(--vert-fonce); color: #fff; }
+@media (max-width: 619px) {
+  .carte__panier { font-size: 0.9rem; padding: 6px 4px; white-space: nowrap; }
+  .carte__panier svg { display: none; }
+}
+/* Une toile : même carte que les dessins, avec le bord d'aluminium, une étiquette « Toile » et son prix */
+.carte__image { position: relative; display: block; }
+.carte--toile .carte__image img { border-radius: 3px; background: #dfe3e6; box-shadow: 0 0 0 1px #c3c9cd, 0 0 0 3px #eef1f3, 0 0 0 4px #9aa2a8, 0 8px 14px -6px rgba(60, 40, 20, 0.35); }
+.carte__etiquette { position: absolute; left: -6px; top: 10px; padding: 3px 12px 4px; font-family: var(--titre); font-size: 1.05rem; line-height: 1.1; color: #fff; background: var(--orange-fonce); border: 2px solid #fff; border-radius: 0 10px 10px 0; box-shadow: 0 2px 4px rgba(60, 40, 20, 0.3); }
+.carte__vendue { position: absolute; right: -8px; bottom: -8px; display: grid; place-items: center; width: 62px; height: 62px; font-family: var(--titre); font-size: 1.05rem; color: #fff; background: var(--encre-douce); border: 3px solid #fff; border-radius: 50%; transform: rotate(-8deg); }
+.carte--vendue .carte__image img { filter: grayscale(0.9) opacity(0.7); }
+.carte__prix { display: block; margin-top: -4px; padding: 0 6px 8px; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--orange-fonce); }

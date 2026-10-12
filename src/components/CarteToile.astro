@@ -1,0 +1,33 @@
+---
+import { cheminToile, t, type Toile, type Lang } from '../i18n';
+import { PRIX_TOILE } from '../data/vente';
+interface Props { toile: Toile; lang: Lang; priorite?: boolean }
+const { toile, lang, priorite = false } = Astro.props;
+const titre = toile.titre[lang];
+const d = t(lang);
+const tt = d.toiles;
+const p = d.panier;
+const sources = (format: string) => [400, 800].map((l) => `/toiles/${toile.id}-${l}.${format} ${l}w`).join(', ');
+const tailles = '(min-width: 1000px) 24vw, (min-width: 700px) 32vw, 46vw';
+---
+<article class:list={['carte', 'carte--toile', toile.vendue && 'carte--vendue']}>
+  <a class="carte__lien" href={cheminToile(toile.id, lang)}>
+    <span class="carte__image">
+      <picture>
+        <source type="image/avif" srcset={sources('avif')} sizes={tailles} />
+        <source type="image/webp" srcset={sources('webp')} sizes={tailles} />
+        <img src={`/toiles/${toile.id}-800.jpg`} width="400" height="566" alt={tt.altDe(titre, toile.description[lang])} loading={priorite ? 'eager' : 'lazy'} decoding="async" />
+      </picture>
+      <span class="carte__etiquette">{tt.etiquette}</span>
+      {toile.vendue && <span class="carte__vendue">{tt.vendue}</span>}
+    </span>
+    <span class="carte__titre">{titre}</span>
+    <span class="carte__prix">{toile.vendue ? tt.vendueTexte : tt.prix(PRIX_TOILE)}</span>
+  </a>
+  {!toile.vendue && (
+    <button type="button" class="carte__panier" aria-pressed="false" aria-label={p.ajouterAria.replace('{t}', titre)} data-panier={`toile:${toile.id}`} data-titre={titre} data-ajouter={p.ajouter} data-dedans={p.dedans} data-aria-ajouter={p.ajouterAria} data-aria-dedans={p.dedansAria}>
+      <svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><path d="M3 7h4l3.2 13.5h13.6L27 11H8.6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /><circle cx="12" cy="25.5" r="2.5" fill="currentColor" /><circle cx="22" cy="25.5" r="2.5" fill="currentColor" /></svg>
+      <span data-panier-texte>{p.ajouter}</span>
+    </button>
+  )}
+</article>

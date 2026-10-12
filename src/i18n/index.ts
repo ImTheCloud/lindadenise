@@ -48,7 +48,7 @@ export type Page = keyof typeof chemins;
 
 export const chemin = (page: Page, lang: Lang) => chemins[page][lang];
 export const cheminDessin = (id: string, lang: Lang) => `${chemins.dessins[lang]}${id}/`;
-export const cheminToile = (id: string, lang: Lang) => `${chemins.toiles[lang]}#${id}`;
+export const cheminToile = (id: string, lang: Lang) => `${chemins.toiles[lang]}${id}/`;
 export const autreLangue = (lang: Lang): Lang => (lang === 'fr' ? 'nl' : 'fr');
 
 export const parRubrique = (r: Rubrique) => dessins.filter((d) => d.rubrique === r);

@@ -2,6 +2,14 @@
 
 Dernière mise à jour : 2026-10-12 (retours vidéos et toiles : voir la première section ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
+
+Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
+- **Galerie `/toiles/`** (`PageToiles.astro`) : même mise en page que la galerie des dessins (titre, texte, cartes en colonnes, mêmes cartes blanches au contour vert avec bouton « Ajouter au panier »). Ce qui dit « toile » : étiquette orange « Toile » sur l'image, bord d'aluminium (liseré gris clair, pas de verre ni de reflet), prix « 200 € » sous le titre, rond « Vendue » et photo grisée pour une toile vendue. Sous la galerie : vidéos, qualités et prix, étapes, « Un mur pour mes toiles » (inchangés).
+- **Une page par toile** (`PageToile.astro`, `/toiles/<id>/`, `/nl/doeken/<id>/`) : même fiche qu'un dessin (image avec zoom, surtitre « Toile sur aluminium », titre, prix, caractéristiques, bouton panier, précédent / suivant avec miniature), puis « Voir à l'échelle » (le salon dessiné, maintenant une section de la page), étapes, « D'autres toiles à découvrir ». Remplace le mur de galerie et la fenêtre de fiche (retirés : mur, clou, plinthe, accrochage penché, relief à la souris, fenêtre, glisser du doigt).
+- Cartes : le style est dans `global.css` ; `CarteDessin.astro` et `CarteToile.astro` ne contiennent que la structure. `cheminToile()` renvoie `/toiles/<id>/` (plus de `#id`).
+- À valider par Claudiu : l'apparence (étiquette, bord d'aluminium) sur ordinateur et téléphone.
+
 ## Panier (2026-10-12, non publié)
 
 Choix de Claudiu : un seul panier pour les dessins numériques et les toiles, deux catalogues qui restent distincts ; bouton sur la carte ET sur la fiche ; icône dans l'en-tête + page Panier ; lot 5+1 sur les toiles seulement ; panier gardé sur l'appareil. **Aucun paiement** : le panier prépare la demande envoyée à Linda.

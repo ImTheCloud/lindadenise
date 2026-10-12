@@ -1,0 +1,9 @@
+---
+import PageToile from '../../components/pages/PageToile.astro';
+import { toiles } from '../../i18n';
+export function getStaticPaths() {
+  return toiles.map((toile) => ({ params: { id: toile.id }, props: { toile } }));
+}
+const { toile } = Astro.props;
+---
+<PageToile lang="fr" toile={toile} />
