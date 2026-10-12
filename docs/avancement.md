@@ -51,6 +51,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Offre 5 + 1 aussi sur les dessins (choix de Claudiu)** : 5 dessins numériques achetés, le 6e offert, calculée séparément de celle des toiles (`DESSINS_ACHETES`, `calculPanier` renvoie `dessinsOfferts`) ; ligne d'offre dans le bloc des dessins du panier et dans le total du formulaire ; ligne cadeau sous la phrase de la page Dessins ; FAQ et conditions de vente des toiles mises à jour. **« Envoi offert » devient « Livraison gratuite »** (page Toiles, panier, formulaire, FAQ, conditions ; NL « levering »). **Page Toiles : « Voir à l'échelle »** (composant `Salon.astro`, aussi sur les fiches) avec le salon dessiné où toutes les toiles non vendues défilent une à une sur le mur (2,6 s chacune, fondu en CSS, une seule toile fixe en mouvement réduit).
 
+- **Galeries** : trait en pointillé après chaque titre de rubrique (sauf le premier bloc visible, pour ne pas doubler celui de la barre des filtres) ; sur la page Toiles, ordre des trois lignes : phrase de livraison, « 5 toiles achetées, la 6e est offerte » (icône cadeau), puis « Livraison gratuite dès 2 toiles » (✓).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

@@ -157,6 +157,9 @@ html:not(.panier-pret) [data-panier] { visibility: hidden; }
 .rubrique-bloc[hidden] { display: none; }
 .rubrique-bloc__titre { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; font-size: clamp(1.8rem, 1.4rem + 1.6vw, 2.5rem); }
 .rubrique-bloc__titre span { font-size: 0.6em; color: var(--encre-douce); }
+.rubrique-bloc__titre::after { content: ''; order: 2; flex: 1; align-self: center; border-top: 2px dashed var(--vert-pale); }
+/* le premier bloc visible n'a pas de trait : celui de la barre des filtres est juste au-dessus */
+.rubrique-bloc:first-of-type .rubrique-bloc__titre::after, .rubrique-bloc--premier .rubrique-bloc__titre::after { display: none; }
 .grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
 @media (min-width: 700px) { .grille { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 22px; } }
 @media (min-width: 1000px) { .grille { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
