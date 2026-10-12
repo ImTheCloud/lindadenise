@@ -51,7 +51,8 @@ const sujets = [
           <div class="bloc total" data-panier-total>
             <p><strong>{c.total}</strong> <span data-total></span></p>
             <input type="hidden" name="total" />
-            <p class="formulaire__note">{c.totalNote}</p>
+            <p class="formulaire__note" data-pour="sans-toile" hidden>{c.totalNote}</p>
+            <p class="formulaire__note" data-pour="toile" hidden>{c.totalNoteToile}</p>
           </div>
           <p class="formulaire__note" data-pour="dessin" hidden>{d.panier.livraisonDessin}</p>
           <p class="formulaire__note" data-pour="toile" hidden>{d.panier.livraisonToile}</p>
@@ -153,6 +154,7 @@ const sujets = [
       // blocs : par demande, et pour une commande selon ce que contient le panier (adresse seulement s'il y a une toile)
       const actifs = new Set([s]);
       if (s === 'commande' && p.toiles) actifs.add('toile');
+      if (s === 'commande' && !p.toiles) actifs.add('sans-toile');
       if (s === 'commande' && p.dessins) actifs.add('dessin');
       form!.querySelectorAll<HTMLElement>('[data-pour]').forEach((b) => { b.hidden = !b.dataset.pour!.split(' ').some((x) => actifs.has(x)); });
       form!.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-requis]').forEach((x) => { x.required = !x.closest('[hidden]'); });

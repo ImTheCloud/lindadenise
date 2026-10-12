@@ -92,9 +92,9 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
 </script>
 
 <style>
-  .boutique { padding-bottom: clamp(32px, 6vw, 72px); }
-  .boutique__tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding-block: clamp(18px, 3vw, 32px) 8px; }
-  .boutique h1 { margin: 0; font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.4rem); }
+  .boutique { padding-bottom: clamp(20px, 3vw, 40px); }
+  .boutique__tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding-block: clamp(10px, 2vw, 18px) 4px; }
+  .boutique h1 { margin: 0; font-size: clamp(2rem, 1.5rem + 2vw, 2.8rem); }
   /* Interrupteur Dessins / Toiles : l'onglet actif prend la couleur de son monde */
   .onglets { display: inline-flex; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); overflow: hidden; background: #fff; }
   .onglet { display: flex; align-items: center; gap: 8px; padding: 6px 16px; font-family: var(--titre); font-size: 1.25rem; line-height: 1.2; text-decoration: none; color: var(--encre); }
@@ -104,7 +104,7 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .onglet[aria-current='page'] { color: #fff; background: var(--monde-dessins); }
   .onglet--toile[aria-current='page'] { background: var(--monde-toiles); }
   .onglet[aria-current='page']::before { background: #fff; }
-  .boutique__notes { display: grid; gap: 4px; margin-bottom: 14px; }
+  .boutique__notes { display: grid; gap: 2px; margin-bottom: 8px; }
   .phrase { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 600; color: var(--encre-douce); }
   .phrase :global(svg) { flex: none; color: var(--accent); }
   .bonus { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: 1rem; font-weight: 600; color: var(--encre-douce); }
@@ -113,7 +113,7 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .bonus svg { flex: none; }
   .boutique__nombre { color: var(--orange-titre); }
   /* Filtres : une rangée collée sous l'en-tête sur grand écran ; sur téléphone ils passent à la ligne, tous visibles */
-  .boutique__barre { position: sticky; top: 68px; z-index: 20; padding-block: 10px; background: var(--fond); border-bottom: 2px dashed var(--vert-pale); }
+  .boutique__barre { position: sticky; top: 68px; z-index: 20; padding-block: 6px; background: var(--fond); border-bottom: 2px dashed var(--vert-pale); }
   .filtres { display: flex; flex-wrap: wrap; gap: 8px 10px; padding: 4px 4px 8px; }
   .filtre { flex: none; font-family: var(--titre); font-size: 1.25rem; line-height: 1; padding: 0.5em 1em; cursor: pointer; background: #fff; color: var(--vert-fonce); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: transform 0.15s; }
   .filtre:hover { transform: rotate(-2deg) translateY(-2px); }

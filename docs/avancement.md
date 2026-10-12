@@ -55,6 +55,10 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Panier, un gros bloc par monde** : l'en-tête (icône, titre, phrase) et les articles sont regroupés dans un seul cadre dessiné, de la couleur du monde (vert pour les dessins, orange pour les toiles) ; les articles y sont de simples lignes séparées par un pointillé, sans cadre chacun.
 
+- **Cohérence des textes selon le panier (relecture demandée par Claudiu)** : la note de paiement du panier et du formulaire ne parle de « livraison » que si le panier contient une toile (dessins seuls : « …le montant et le mode de paiement ») ; les fiches d'un dessin et d'une toile ont leur phrase de livraison avec icône (« Fichier numérique envoyé par e-mail » / « Pièce unique envoyée par Linda avec bpost ») ; « Le dessin vous est envoyé par e-mail » dans les étapes ; questions de la FAQ sans « vous/jullie » ambigu ; « livraison » partout au lieu d'« envoi » côté toiles. Règle : un texte propre aux dessins ne parle jamais d'envoi, de livraison ni de bpost ; un texte propre aux toiles ne parle jamais de fichier ni d'e-mail pour la remise.
+
+- **Gros check de compacité (demande de Claudiu)** : marges des sections réduites partout (`.section` 28 à 56 px au lieu de 48 à 96), cartes plus serrées (titre, prix, ligne de livraison, bouton), grilles plus resserrées, titres de rubrique et de page plus petits, FAQ plus compacte, accueil (hero, portes avec vitrine plus basse, rangées, étapes, « Je suis Linda ») resserré. **Panier** : un seul grand cadre qui regroupe les deux blocs (dessins, toiles) puis le récapitulatif et le total ; articles sur une ligne (vignette 56 px, titre, prix), « Retirer » devenu une petite croix ronde, libellé du genre masqué sauf « Toile sur commande », sous-totaux sur une ligne avec un point vert ou orange, total en pointillé. À vérifier par Claudiu sur un vrai téléphone.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

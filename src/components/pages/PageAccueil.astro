@@ -128,7 +128,7 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
 
 <style>
   /* Premier écran : titre, vidéo et trois dessins, avec l'étang tout en bas ; les deux portes viennent ensuite */
-  .heros { position: relative; overflow: hidden; display: flex; align-items: center; min-height: calc(100svh - 68px); padding-top: clamp(24px, 4vw, 56px); padding-bottom: clamp(150px, 22vw, 290px); background: linear-gradient(#fff 55%, #f6fbf6); }
+  .heros { position: relative; overflow: hidden; display: flex; align-items: center; min-height: calc(100svh - 68px); padding-top: clamp(16px, 3vw, 40px); padding-bottom: clamp(130px, 18vw, 240px); background: linear-gradient(#fff 55%, #f6fbf6); }
   .heros__grille { position: relative; z-index: 1; width: 100%; display: grid; gap: 28px; align-items: center; }
   .heros__texte h1 { font-size: clamp(3.4rem, 1.4rem + 7vw, 7rem); margin-bottom: 0.1em; line-height: 0.95; }
   .heros__texte-court { margin: 0 0 4px; max-width: 34ch; font-size: clamp(1.05rem, 1rem + 0.3vw, 1.3rem); }
@@ -145,12 +145,12 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   }
 
   /* Deux grands blocs dessinés : vert pour les dessins, brun pour les toiles */
-  .portes { position: relative; overflow: hidden; padding-block: clamp(24px, 4vw, 48px) clamp(40px, 6vw, 72px); background: var(--fond); }
+  .portes { position: relative; overflow: hidden; padding-block: clamp(16px, 3vw, 32px) clamp(24px, 4vw, 44px); background: var(--fond); }
   .portes__grille { position: relative; z-index: 1; display: grid; gap: clamp(18px, 3vw, 32px); }
   .porte { --p: var(--monde-dessins); --p-pale: #e3f1e3; position: relative; display: grid; grid-template-rows: auto 1fr; overflow: hidden; color: #fff; text-decoration: none; background: var(--p); border: var(--trait) solid var(--p); border-radius: var(--rayon); box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1); }
   .porte--toiles { --p: var(--monde-toiles); --p-pale: #ffe0b8; }
   .porte:hover { color: #fff; transform: translateY(-6px) rotate(-0.6deg); }
-  .porte__vitrine { position: relative; overflow: hidden; height: clamp(230px, 34vw, 320px); background: var(--p-pale); }
+  .porte__vitrine { position: relative; overflow: hidden; height: clamp(170px, 24vw, 230px); background: var(--p-pale); }
   .porte__image { position: absolute; bottom: -10%; width: 30%; max-width: 220px; aspect-ratio: 5 / 7; overflow: hidden; padding: 5px; background: #fff; border: 3px solid var(--p); border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; box-shadow: 0 10px 0 rgba(0, 0, 0, 0.12); transition: transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1); }
   .porte__image :global(img) { width: 100%; height: 100%; object-fit: cover; border-radius: 8px 4px 8px 5px; }
   .porte--toiles .porte__image { background: #e9ecee; border-radius: 4px; }
@@ -161,29 +161,29 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   .porte:hover .porte__image--1 { transform: rotate(-9deg) translateY(-3%); }
   .porte:hover .porte__image--2 { transform: translateY(-12%) rotate(-1deg); }
   .porte:hover .porte__image--3 { transform: rotate(9deg) translateY(-3%); }
-  .porte__texte { position: relative; display: grid; gap: 8px; align-content: start; justify-items: start; padding: clamp(20px, 3vw, 36px); }
+  .porte__texte { position: relative; display: grid; gap: 8px; align-content: start; justify-items: start; padding: clamp(14px, 2vw, 24px); }
   .porte__nombre { font-family: var(--titre); font-size: 1.3rem; }
-  .porte__nom { font-family: var(--titre); font-size: clamp(3.2rem, 1.6rem + 5vw, 5.6rem); line-height: 0.95; }
+  .porte__nom { font-family: var(--titre); font-size: clamp(2.6rem, 1.4rem + 3.6vw, 4.2rem); line-height: 0.95; }
   .porte__phrase { max-width: 34ch; font-size: 1.1rem; line-height: 1.45; }
   .porte__livraison { display: inline-flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 600; }
   .porte__cta { display: inline-flex; align-items: center; min-height: 48px; margin-top: 6px; padding: 0 1.3em; font-family: var(--titre); font-size: 1.35rem; color: var(--p); background: #fff; border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
 
   /* Une rangée par monde : mêmes éléments, mêmes places */
   .rangee { background: var(--fond); }
-  .rangee__tete { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: clamp(18px, 3vw, 30px); }
+  .rangee__tete { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: clamp(10px, 2vw, 18px); }
   .rangee__tete h2 { font-size: clamp(2rem, 1.5rem + 2vw, 3rem); margin: 0; }
   .rangee__lien { flex: none; font-family: var(--titre); font-size: 1.35rem; color: var(--vert-fonce); text-underline-offset: 5px; }
-  .grille-accueil { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
-  .rangee__etapes { margin-top: clamp(40px, 6vw, 72px); padding-top: clamp(28px, 4vw, 44px); border-top: 2px dashed var(--vert-pale); }
-  .rangee--toiles { padding-top: clamp(48px, 8vw, 96px); }
+  .grille-accueil { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+  .rangee__etapes { margin-top: clamp(20px, 3vw, 36px); padding-top: clamp(16px, 2.5vw, 26px); border-top: 2px dashed var(--vert-pale); }
+  .rangee--toiles { padding-top: clamp(28px, 4.5vw, 56px); }
 
-  .apropos { display: grid; gap: 36px; align-items: center; }
+  .apropos { display: grid; gap: 20px; align-items: center; }
   .apropos__photo { width: min(78%, 360px); margin-inline: auto; background: var(--vert-pale); padding: 10px; border: var(--trait) solid var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; box-shadow: var(--ombre); transform: rotate(-3deg); }
   .apropos__photo img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }
 
-  @media (min-width: 700px) { .grille-accueil { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 22px; } }
+  @media (min-width: 700px) { .grille-accueil { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 18px; } }
   @media (min-width: 900px) {
     .portes__grille { grid-template-columns: 1fr 1fr; }
   }
-  @media (min-width: 960px) { .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 64px; } }
+  @media (min-width: 960px) { .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 40px; } }
 </style>

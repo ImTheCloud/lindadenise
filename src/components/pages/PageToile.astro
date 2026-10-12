@@ -2,9 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import CarteToile from '../CarteToile.astro';
 import Etapes from '../Etapes.astro';
+import IconeLivraison from '../IconeLivraison.astro';
 import Salon from '../Salon.astro';
 import { t, chemin, cheminToile, toiles, type Toile, type Lang } from '../../i18n';
-import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES } from '../../data/vente';
+import { PRIX_TOILE } from '../../data/vente';
 interface Props { lang: Lang; toile: Toile }
 const { lang, toile } = Astro.props;
 const d = t(lang);
@@ -38,6 +39,7 @@ const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
           <h1>{titre}</h1>
           <p class="fiche__prix">{toile.vendue ? tt.vendue : tt.prix(PRIX_TOILE)}</p>
           <p>{toile.vendue ? tt.vendueTexte : tt.caracteristiques}</p>
+          {!toile.vendue && <p class="fiche__livraison"><IconeLivraison genre="toile" />{tt.phrase}</p>}
           {toile.vendue ? <p class="fiche__vendue">{tt.vendueTexte}</p> : (
             <p class="fiche__panier">
               <button type="button" class="bouton" aria-pressed="false" data-panier={`toile:${toile.id}`} data-ajouter={d.panier.ajouter} data-dedans={d.panier.dedans}>{d.panier.ajouter}</button>
@@ -132,7 +134,7 @@ const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
     .suite { grid-template-columns: repeat(4, 1fr); }
   }
   .fiche__vendue { font-family: var(--titre); font-size: 1.5rem; color: var(--orange-fonce); }
-  .fiche__envoi { font-size: 1rem; }
+  .fiche__livraison { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--encre-douce); }
   .salon-bloc { max-width: 760px; margin-inline: auto; }
   .salon-bloc h2 { margin-top: 0; text-align: center; }
 </style>
