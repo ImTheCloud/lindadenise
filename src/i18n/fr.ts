@@ -189,7 +189,7 @@ export const fr = {
     livraisonToile: 'Linda vous les envoie.',
     note: 'Pas de paiement sur le site : Linda vous confirme le montant et le mode de paiement.',
     noteToile: 'Pas de paiement sur le site : Linda vous confirme le montant, le mode de paiement et la livraison.',
-    demander: 'Envoyer ma demande à Linda',
+    demander: 'Envoyer ma demande',
     vider: 'Vider le panier',
     ligneDessin: 'Dessin numérique : « {t} » ({p} €)',
     ligneToile: 'Toile : « {t} » ({p} €)',

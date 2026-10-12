@@ -61,6 +61,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Galeries sur téléphone** : titre et interrupteur Dessins / Toiles toujours sur une ligne (interrupteur à droite) ; les filtres de rubrique deviennent une liste déroulante pleine largeur (une ligne, tous les choix avec leur nombre, synchronisée avec le titre et l'adresse `#rubrique`) ; les pastilles restent dès 700 px.
 
+- **Pas de mot seul sur une ligne (consigne de Claudiu, notée dans `CLAUDE.md`)** : bouton du panier « Envoyer ma demande » (sans « à Linda »), ligne de livraison des cartes sur une ligne, `text-wrap: balance` sur titres, étiquettes, boutons et questions de la FAQ, `pretty` sur les paragraphes, questions de la FAQ un peu plus petites sur téléphone. Contrôle automatique à 360 et 390 px sur accueil, galeries, fiches, panier, contact, FAQ, À propos.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

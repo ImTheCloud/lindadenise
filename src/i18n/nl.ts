@@ -190,7 +190,7 @@ export const nl: Dico = {
     livraisonToile: 'Linda stuurt ze naar je op.',
     note: 'Geen betaling op de site: Linda bevestigt het bedrag en de manier van betalen.',
     noteToile: 'Geen betaling op de site: Linda bevestigt het bedrag, de manier van betalen en de levering.',
-    demander: 'Mijn aanvraag naar Linda sturen',
+    demander: 'Mijn aanvraag versturen',
     vider: 'Mandje leegmaken',
     ligneDessin: 'Digitale tekening: “{t}” ({p} €)',
     ligneToile: 'Doek: “{t}” ({p} €)',

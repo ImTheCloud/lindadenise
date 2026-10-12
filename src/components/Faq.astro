@@ -26,6 +26,7 @@ const Titre = `h${titreNiveau}` as 'h1' | 'h2';
   .faq__item summary::-webkit-details-marker { display: none; }
   .faq__item summary::after { content: '+'; flex: none; display: grid; place-items: center; width: 30px; height: 30px; font-size: 1.5rem; line-height: 1; color: #fff; background: var(--vert-fonce); border-radius: 50%; }
   .faq__item[open] summary::after { content: '–'; }
+  @media (max-width: 519px) { .faq__item summary { font-size: 1.1rem; padding: 6px 12px; } }
   .faq__item summary:hover { color: var(--orange-fonce); }
   .faq__item p { margin: 0; padding: 0 16px 12px; color: var(--encre-douce); }
 </style>
