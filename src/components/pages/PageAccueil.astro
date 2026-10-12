@@ -126,7 +126,9 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .collage__img:hover { transform: scale(1.06) rotate(0deg); z-index: 5; animation-play-state: paused; }
   @keyframes collage-flotte { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
 
-  .rubriques { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 26px; margin-top: 34px; }
+  /* cinq cartes : trois par rangée sur tablette (la dernière rangée est centrée), les cinq sur une ligne sur grand écran */
+  .rubriques { display: flex; flex-wrap: wrap; justify-content: center; gap: 26px; margin-top: 34px; }
+  .rubrique { flex: 0 1 calc(33.333% - 18px); }
   .rubrique { display: flex; flex-direction: column; text-decoration: none; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 12px 12px 18px; box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1); text-align: center; }
   .rubrique:nth-child(odd) { transform: rotate(-1deg); } .rubrique:nth-child(even) { transform: rotate(1deg); }
   .rubrique:hover { transform: translateY(-8px) rotate(0deg); }
@@ -156,7 +158,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .apropos__photo img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }
 
   @media (max-width: 619px) {
-    .rubriques { grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
+    .rubriques { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
     .rubrique { position: relative; justify-content: center; min-height: 152px; padding: 12px 14px 12px 154px; text-align: left; }
     .rubrique :global(img) { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 130px; height: 130px; margin: 0; }
     .rubrique__nom { font-size: 1.6rem; }
@@ -164,7 +166,8 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     .rubrique__nombre { margin-top: 2px; font-size: 1.05rem; }
   }
   @media (min-width: 960px) {
-    .rubriques { grid-template-columns: repeat(4, 1fr); gap: 28px; }
+    .rubriques { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+    .rubrique { padding-inline: 10px; }
     .rubrique__nom { font-size: 2.1rem; }
     .rubrique__texte { font-size: 1.08rem; }
   }
