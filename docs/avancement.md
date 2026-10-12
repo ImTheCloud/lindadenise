@@ -17,7 +17,7 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Page Toiles (dernier état)** : plus de grande vidéo en tête ; elle commence par la galerie (titre, filtres, cartes), comme les Dessins. Les deux vidéos (motion design et vraies toiles filmées) sont dans la section « Les toiles en vidéo » juste sous la galerie, côte à côte, lancées au clic (`Video.astro`). `Bandeau.astro` ne sert plus que sur l'accueil.
 
-- **Cartes** : le titre occupe toujours deux lignes de haut (centré, retours à la ligne équilibrés) : prix et boutons restent alignés d'une carte à l'autre. Accueil : vidéo un peu plus grande (colonnes 0.9 / 1.1), titre sur une ligne.
+- **Cartes** : le titre est centré, retours à la ligne équilibrés ; plus de hauteur réservée (peu d'espace entre le texte et le bouton), les boutons restent alignés en bas d'une rangée. Accueil : vidéo un peu plus grande (colonnes 0.9 / 1.1), titre sur une ligne.
 
 - **Retours de Claudiu (suite)** : cartes sans la ligne de rubrique, titre et prix plus grands, badge « Dessin » / « Toile » collé à la bordure gauche de la carte ; accueil sur ordinateur : conteneur de 1300 px, vidéo plus grande ; sur téléphone, les deux boutons côte à côte sous le titre ; les portes ont l'image en haut et le texte (dont « 78 dessins ») sur fond uni dessous, donc lisible sur téléphone.
 
