@@ -73,7 +73,7 @@ const donnees = {
     textes: {
       genres: { dessin: string; toile: string; commande: string };
       retirer: string;
-      lignes: { dessins: string; toiles: string; lotUne: string; lotPlusieurs: string; envoi: string; envoiOffert: string; total: string };
+      lignes: { dessins: string; toiles: string; lotUne: string; lotPlusieurs: string; lotDessinUn: string; lotDessinsPlusieurs: string; envoi: string; envoiOffert: string; total: string };
     };
   }
   const racine = document.querySelector<HTMLElement>('[data-panier-page]');
@@ -142,7 +142,11 @@ const donnees = {
         return g;
       };
       const blocs: HTMLElement[] = [];
-      if (p.dessin.length) blocs.push(groupe('dessins', [ligne(l.dessins.replace('{n}', String(p.dessin.length)), euros(c.sousTotalDessins))]));
+      if (p.dessin.length) {
+        const rangs = [ligne(l.dessins.replace('{n}', String(p.dessin.length)), euros(c.sousTotalDessins))];
+        if (c.dessinsOfferts) rangs.push(ligne((c.dessinsOfferts > 1 ? l.lotDessinsPlusieurs : l.lotDessinUn).replace('{n}', String(c.dessinsOfferts)), `−${euros(c.dessinsOfferts * d.prix.dessin)}`));
+        blocs.push(groupe('dessins', rangs));
+      }
       if (nombreToiles) {
         const rangs = [ligne(l.toiles.replace('{n}', String(nombreToiles)), euros(c.sousTotal))];
         if (c.offertes) rangs.push(ligne((c.offertes > 1 ? l.lotPlusieurs : l.lotUne).replace('{n}', String(c.offertes)), `−${euros(c.offertes * d.prix.toile)}`));

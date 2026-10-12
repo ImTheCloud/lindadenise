@@ -1,6 +1,7 @@
-import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, TOILES_ACHETEES, DELAI_ENVOI, DELAI_TOILE_SUR_COMMANDE } from '../data/vente';
+import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, TOILES_ACHETEES, DESSINS_ACHETES, DELAI_ENVOI, DELAI_TOILE_SUR_COMMANDE } from '../data/vente';
 
 const lot = `${TOILES_ACHETEES} toiles achetées, la ${TOILES_ACHETEES + 1}e est offerte`;
+const lotDessins = `${DESSINS_ACHETES} dessins achetés, le ${DESSINS_ACHETES + 1}e est offert`;
 
 export const fr = {
   langue: 'fr',
@@ -50,6 +51,7 @@ export const fr = {
     prix: '10 €',
     etiquette: 'Dessin',
     phrase: 'Fichier numérique envoyé par e-mail',
+    bonus: [lotDessins],
     surtitre: 'Dessin numérique',
     prixTexte: 'Vous recevez le fichier numérique, sans filigrane.',
     etapesTitre: 'Comment recevoir un dessin ?',
@@ -69,7 +71,7 @@ export const fr = {
     toileLien: 'Aussi en toile',
     toileTitre: 'Ce dessin en toile',
     toileCommande: 'Linda peut faire imprimer ce dessin sur aluminium, au format A3 (29,7 × 42 cm) : le même format que ses toiles.',
-    toilePrix: (p: number) => `${p} € + frais d’envoi (Belgique)`,
+    toilePrix: (p: number) => `${p} € + frais de livraison (Belgique)`,
     toileDelai: (delai: string) => `Délai : ${delai}.`,
     toileLot: `Même offre de lot que les toiles : ${lot}.`,
     toileNote: 'Le fichier numérique s’imprime sur papier, pour votre usage privé. Une toile ne se fait que par Linda.',
@@ -80,7 +82,7 @@ export const fr = {
     histoire: 'Mes toiles ont été imprimées en vue d’une exposition à Ostende. Le lieu a fermé avant l’accrochage. Elles cherchent aujourd’hui un nouveau mur.',
     etiquette: 'Toile',
     phrase: 'Pièce unique envoyée par Linda avec bpost',
-    bonus: [`Envoi offert dès ${ENVOI_OFFERT_DES} toiles`, `${TOILES_ACHETEES} toiles achetées, la ${TOILES_ACHETEES + 1}e est offerte`],
+    bonus: [`Livraison gratuite dès ${ENVOI_OFFERT_DES} toiles`, `${TOILES_ACHETEES} toiles achetées, la ${TOILES_ACHETEES + 1}e est offerte`],
     surtitre: 'Toile sur aluminium',
     retour: '← Toutes les toiles',
     agrandir: 'Agrandir la toile',
@@ -178,7 +180,7 @@ export const fr = {
     ajouterAria: 'Ajouter « {t} » au panier',
     dedansAria: 'Retirer « {t} » du panier',
     voir: 'Voir mon panier',
-    lignes: { dessins: 'Dessins numériques ({n})', toiles: 'Toiles ({n})', lotUne: 'Offre de lot : 1 toile offerte', lotPlusieurs: 'Offre de lot : {n} toiles offertes', envoi: 'Envoi (Belgique)', envoiOffert: 'Envoi offert', total: 'Total' },
+    lignes: { dessins: 'Dessins numériques ({n})', toiles: 'Toiles ({n})', lotUne: 'Offre de lot : 1 toile offerte', lotPlusieurs: 'Offre de lot : {n} toiles offertes', lotDessinUn: 'Offre de lot : 1 dessin offert', lotDessinsPlusieurs: 'Offre de lot : {n} dessins offerts', envoi: 'Livraison (Belgique)', envoiOffert: 'Livraison gratuite', total: 'Total' },
     delaiCommande: `Toile sur commande : délai d’${DELAI_TOILE_SUR_COMMANDE.fr}.`,
     titreDessins: 'Dessins numériques',
     titreToiles: 'Toiles',
@@ -267,7 +269,7 @@ export const fr = {
     meta: 'Comment se passe l’achat d’une toile de Linda Denise : prix, commande, envoi en Belgique.',
     blocs: [
       { titre: 'Les toiles', texte: ['Une toile est un dessin de Linda Denise imprimé sur aluminium, au format A3 (29,7 × 42 cm).', 'Chaque toile déjà imprimée est une pièce unique. Une toile sur commande est imprimée à votre demande.'] },
-      { titre: 'Prix', texte: [`${PRIX_TOILE} € la toile, plus ${FRAIS_ENVOI} € de frais d’envoi. L’envoi est offert dès ${ENVOI_OFFERT_DES} toiles.`, `Offre de lot, sur les toiles seulement : ${lot}.`] },
+      { titre: 'Prix', texte: [`${PRIX_TOILE} € la toile, plus ${FRAIS_ENVOI} € de frais de livraison. La livraison est gratuite dès ${ENVOI_OFFERT_DES} toiles.`, `Offre de lot : ${lot}.`] },
       { titre: 'Commande et paiement', texte: ['Il n’y a pas de paiement sur le site. Vous envoyez votre demande par le formulaire ; Linda vous répond avec le montant total, le mode de paiement et l’envoi.'] },
       { titre: 'Envoi', texte: ['Livraison uniquement en Belgique.', `Linda emballe la toile elle-même, avec soin, et l’expédie avec bpost, en ${DELAI_ENVOI.fr}. Vous recevez les détails de l’envoi par e-mail.`] },
       { titre: 'Droit d’auteur', texte: ['Acheter une toile ne donne pas le droit de reproduire le dessin : le droit d’auteur reste à Linda Denise.'] },
@@ -302,9 +304,9 @@ export const fr = {
       { q: 'Le fichier d’un dessin a-t-il un filigrane ?', r: 'Non. Les aperçus du site portent un filigrane, le fichier que vous recevez n’en a pas.' },
       { q: 'Que puis-je faire du fichier d’un dessin ?', r: 'L’imprimer sur papier pour votre usage privé, et encadrer cette impression. L’impression sur toile, aluminium ou autre support rigide, et la revente sont interdites.' },
       { q: 'De quoi est faite une toile ?', r: 'Le dessin de Linda est imprimé sur aluminium, au format A3 (29,7 × 42 cm), 3 mm d’épaisseur, environ 500 g, finition mate. Un crochet d’accroche est intégré. Chaque toile est une pièce unique.' },
-      { q: 'Comment une toile est-elle envoyée, et à quel prix ?', r: `Linda l’emballe elle-même et vous l’envoie avec bpost, en ${DELAI_ENVOI.fr}. Les frais d’envoi sont de ${FRAIS_ENVOI} €, offerts dès ${ENVOI_OFFERT_DES} toiles.` },
+      { q: 'Comment une toile est-elle livrée, et à quel prix ?', r: `Linda l’emballe elle-même et vous l’envoie avec bpost, en ${DELAI_ENVOI.fr}. Les frais de livraison sont de ${FRAIS_ENVOI} €, gratuits dès ${ENVOI_OFFERT_DES} toiles.` },
       { q: 'Livrez-vous hors de Belgique ?', r: 'Non, les toiles sont livrées uniquement en Belgique.' },
-      { q: 'Y a-t-il une offre pour plusieurs toiles ?', r: `Oui : ${lot}.` },
+      { q: 'Y a-t-il une offre pour plusieurs articles ?', r: `Oui, pour les dessins comme pour les toiles : ${lotDessins}, ${lot}. Les deux offres sont calculées séparément.` },
       { q: 'Puis-je avoir un dessin numérique en toile ?', r: `Oui : c’est une toile sur commande, au même prix qu’une toile (${PRIX_TOILE} €). Délai : ${DELAI_TOILE_SUR_COMMANDE.fr}. Seule Linda fait les toiles : le fichier numérique ne s’imprime pas sur toile.` },
       { q: 'Comment contacter Linda ?', r: 'Par le formulaire de contact : elle vous répond personnellement.' },
     ],

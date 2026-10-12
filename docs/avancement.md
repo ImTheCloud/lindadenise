@@ -49,6 +49,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Galeries par rubriques** : avec « Tous », les dessins (et les toiles) sont rangés par sections — titre de la rubrique avec son nombre, puis ses cartes (chats, nature, fleurs, animaux, psaumes) ; un filtre ne garde que sa section ; styles dans `global.css` (`.rubrique-bloc`, `.grille`). **Filtres sur téléphone** : ils passent à la ligne (tous visibles, Psaumes compris) et ne sont plus collés en haut ; collés seulement dès 700 px.
 
+- **Offre 5 + 1 aussi sur les dessins (choix de Claudiu)** : 5 dessins numériques achetés, le 6e offert, calculée séparément de celle des toiles (`DESSINS_ACHETES`, `calculPanier` renvoie `dessinsOfferts`) ; ligne d'offre dans le bloc des dessins du panier et dans le total du formulaire ; ligne cadeau sous la phrase de la page Dessins ; FAQ et conditions de vente des toiles mises à jour. **« Envoi offert » devient « Livraison gratuite »** (page Toiles, panier, formulaire, FAQ, conditions ; NL « levering »). **Page Toiles : « Voir à l'échelle »** (composant `Salon.astro`, aussi sur les fiches) avec le salon dessiné où toutes les toiles non vendues défilent une à une sur le mur (2,6 s chacune, fondu en CSS, une seule toile fixe en mouvement réduit).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

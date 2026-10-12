@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import CarteToile from '../CarteToile.astro';
 import Etapes from '../Etapes.astro';
+import Salon from '../Salon.astro';
 import { t, chemin, cheminToile, toiles, type Toile, type Lang } from '../../i18n';
 import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES } from '../../data/vente';
 interface Props { lang: Lang; toile: Toile }
@@ -16,8 +17,6 @@ const prec = toiles[(i - 1 + toiles.length) % toiles.length];
 const suiv = toiles[(i + 1) % toiles.length];
 // Toiles à voir aussi : celles qui suivent celle-ci (différentes d'une fiche à l'autre).
 const autres = [...toiles.slice(i + 1), ...toiles.slice(0, i)].slice(0, 4);
-// Salon dessiné, en centimètres : la toile A3 (29,7 x 42) au-dessus d'un canapé.
-const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
 const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
 ---
 <Base lang={lang} monde="toiles" titre={titre} description={`${alt} · ${tt.prix(PRIX_TOILE)}`} chemins={chemins} image={`/toiles/${toile.id}-800.jpg`}>
@@ -63,51 +62,7 @@ const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
   <section class="section section--vert" id="echelle">
     <div class="contenu salon-bloc">
       <h2>{tt.echelle}</h2>
-    <figure class="salon">
-      <svg viewBox="0 0 320 200" role="img" aria-labelledby="salon-legende">
-        <defs>
-          <linearGradient id="salon-mur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf7ef" /><stop offset="1" stop-color="#efe7d8" /></linearGradient>
-          <filter id="salon-ombre" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.4" flood-color="#3a2a18" flood-opacity="0.35" /></filter>
-        </defs>
-        <rect width="320" height="177" fill="url(#salon-mur)" />
-        <ellipse cx="160" cy="20" rx="70" ry="48" fill="#fffaf0" opacity="0.8" />
-        <rect y="177" width="320" height="8" fill="#fdfcf9" stroke="#d9cfbf" stroke-width="0.6" />
-        <rect y="185" width="320" height="15" fill="#e6cba0" />
-        <path d="M0 191 H320 M0 196 H320" stroke="#d4b685" stroke-width="0.5" />
-        <g stroke="#2b6e3a" stroke-width="1" stroke-linejoin="round">
-          <path d="M70 104 q0 -5 5 -5 h170 q5 0 5 5 v34 h-180 z" fill="#8cc49a" />
-          <rect x="80" y="104" width="76" height="33" rx="7" fill="#fff4e3" />
-          <rect x="164" y="104" width="76" height="33" rx="7" fill="#fff4e3" />
-          <rect x="62" y="134" width="196" height="22" rx="5" fill="#7bb989" />
-          <rect x="56" y="118" width="18" height="52" rx="7" fill="#6aac79" />
-          <rect x="246" y="118" width="18" height="52" rx="7" fill="#6aac79" />
-          <rect x="62" y="156" width="196" height="14" fill="#5d9e6c" />
-          <path d="M70 170 l2 15 h4 l1 -15 M244 170 l2 15 h4 l1 -15" fill="#9a6b3d" />
-          <path d="M200 112 q14 -6 24 4 q-2 14 -16 18 q-12 -6 -8 -22 z" fill="#f28a1e" />
-        </g>
-        <g stroke="#2b6e3a" stroke-width="0.9" stroke-linejoin="round">
-          <path d="M272 150 h26 l-3 35 h-20 z" fill="#c56b2c" />
-          <path d="M285 150 q-20 -30 -10 -58 q10 20 10 58 M285 150 q4 -40 18 -52 q2 28 -18 52 M285 150 q-22 -12 -28 -34 q20 4 28 34 M285 150 q16 -10 26 -26 q2 18 -26 26" fill="#3e9a47" />
-        </g>
-        <g>
-          <rect x="22" y="135" width="7" height="50" rx="1" fill="#f6d77c" stroke="#9a7a2a" stroke-width="0.6" />
-          <path d="M22 145 h3 M22 155 h3 M22 165 h3 M22 175 h3 M22 140 h1.6 M22 150 h1.6 M22 160 h1.6 M22 170 h1.6 M22 180 h1.6" stroke="#6b5212" stroke-width="0.5" />
-          <text x="33" y="162" class="salon__texte">50 cm</text>
-        </g>
-        <circle cx={TOILE.x + TOILE.l / 2} cy={TOILE.y + 3} r="0.7" fill="#888" />
-        <g filter="url(#salon-ombre)">
-          <image href={`/toiles/${toile.id}-400.webp`} x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} preserveAspectRatio="xMidYMid slice" />
-          <rect x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} fill="none" stroke="#a9b0b5" stroke-width="0.5" />
-        </g>
-        <g class="salon__cote" stroke="#d9700b" stroke-width="0.5" fill="none">
-          <path d={`M${TOILE.x} ${TOILE.y - 5} h${TOILE.l} M${TOILE.x} ${TOILE.y - 7} v4 M${TOILE.x + TOILE.l} ${TOILE.y - 7} v4`} />
-          <path d={`M${TOILE.x + TOILE.l + 5} ${TOILE.y} v${TOILE.h} M${TOILE.x + TOILE.l + 3} ${TOILE.y} h4 M${TOILE.x + TOILE.l + 3} ${TOILE.y + TOILE.h} h4`} />
-        </g>
-        <text x={TOILE.x + TOILE.l / 2} y={TOILE.y - 7.5} text-anchor="middle" class="salon__texte salon__texte--cote">29,7 cm</text>
-        <text x={TOILE.x + TOILE.l + 8} y={TOILE.y + TOILE.h / 2 + 2} class="salon__texte salon__texte--cote">42 cm</text>
-      </svg>
-      <figcaption id="salon-legende">{tt.echelleLegende}</figcaption>
-    </figure>
+    <Salon lang={lang} ids={[toile.id]} />
     </div>
   </section>
   <section class="section section--orange">
@@ -180,9 +135,4 @@ const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
   .fiche__envoi { font-size: 1rem; }
   .salon-bloc { max-width: 760px; margin-inline: auto; }
   .salon-bloc h2 { margin-top: 0; text-align: center; }
-  .salon { margin: 0; background: #fff; border-radius: var(--rayon); overflow: hidden; }
-  .salon svg { display: block; width: 100%; height: auto; }
-  .salon figcaption { padding: 8px 14px 12px; font-size: 0.95rem; color: var(--encre-douce); text-align: center; }
-  .salon__texte { font-family: var(--titre); font-size: 6px; fill: #6b5212; }
-  .salon__texte--cote { font-size: 5px; fill: var(--orange-fonce); }
 </style>

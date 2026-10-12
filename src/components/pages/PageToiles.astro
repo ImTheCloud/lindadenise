@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Galerie from '../Galerie.astro';
 import CarteToile from '../CarteToile.astro';
 import Video from '../Video.astro';
+import Salon from '../Salon.astro';
 import { t, chemin, toiles, RUBRIQUES, type Lang } from '../../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -24,6 +25,13 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
       </section>
     ))}
   </Galerie>
+
+  <section class="section">
+    <div class="contenu salon-bloc">
+      <h2 class="apparait">{tt.echelle}</h2>
+      <div class="apparait"><Salon lang={lang} ids={toiles.filter((x) => !x.vendue).map((x) => x.id)} /></div>
+    </div>
+  </section>
 
   <section class="section videos-bande">
     <div class="contenu">
@@ -48,6 +56,8 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
 </Base>
 
 <style>
+  .salon-bloc { max-width: 760px; margin-inline: auto; }
+  .salon-bloc h2 { margin-top: 0; text-align: center; }
   .videos-bande { background: var(--vert-creme); text-align: center; }
   .videos-bande h2 { margin: 0 0 24px; }
   .vraies { width: min(100%, 300px); margin: 0 auto; padding: 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }

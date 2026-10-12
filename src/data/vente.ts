@@ -5,8 +5,9 @@ export const PRIX_TOILE = 200;
 // Moyenne arrondie des tarifs d'un colis de 2 kg livré à domicile en Belgique (voir docs/avancement.md).
 export const FRAIS_ENVOI = 12;
 export const ENVOI_OFFERT_DES = 2;
-// Offre de lot, sur les toiles seulement (pas sur les dessins numériques) : 5 achetées, la 6e offerte.
+// Offre de lot : 5 achetées, la 6e offerte, calculée séparément pour les dessins numériques et pour les toiles.
 export const TOILES_ACHETEES = 5;
+export const DESSINS_ACHETES = 5;
 // Délais donnés par Linda : envoi par bpost d'une toile déjà imprimée, création et envoi d'une toile sur commande.
 export const DELAI_ENVOI = { fr: '1 à 2 semaines', nl: '1 tot 2 weken' };
 export const DELAI_TOILE_SUR_COMMANDE = { fr: 'environ 1 à 3 semaines, création et envoi compris', nl: 'ongeveer 1 tot 3 weken, aanmaak en verzending inbegrepen' };
@@ -18,8 +19,10 @@ export function calculLot(nombre: number) {
   return { nombre, sousTotal, offertes, envoi, total: sousTotal - offertes * PRIX_TOILE + envoi };
 }
 
-// Un panier : dessins numériques + toiles (déjà imprimées ou sur commande, comptées ensemble pour le lot et l'envoi).
+// Un panier : dessins numériques + toiles (déjà imprimées ou sur commande, comptées ensemble pour le lot et la livraison).
 export function calculPanier(dessins: number, toiles: number) {
   const lot = calculLot(toiles);
-  return { ...lot, dessins, sousTotalDessins: dessins * PRIX_DESSIN, total: dessins * PRIX_DESSIN + lot.total };
+  const dessinsOfferts = Math.floor(dessins / (DESSINS_ACHETES + 1));
+  const sousTotalDessins = dessins * PRIX_DESSIN;
+  return { ...lot, dessins, dessinsOfferts, sousTotalDessins, total: sousTotalDessins - dessinsOfferts * PRIX_DESSIN + lot.total };
 }
