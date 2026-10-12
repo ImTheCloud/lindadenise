@@ -1,11 +1,12 @@
 ---
 // Questions fréquentes : une question par ligne, la réponse s'ouvre au toucher (aucun script).
-interface Props { titre: string; questions: { q: string; r: string }[] }
-const { titre, questions } = Astro.props;
+interface Props { titre: string; questions: { q: string; r: string }[]; titreNiveau?: 1 | 2 }
+const { titre, questions, titreNiveau = 2 } = Astro.props;
+const Titre = `h${titreNiveau}` as 'h1' | 'h2';
 ---
 <section class="section faq">
   <div class="contenu faq__corps">
-    <h2 class="centre">{titre}</h2>
+    <Titre class="centre">{titre}</Titre>
     <div class="faq__liste">
       {questions.map((x) => (
         <details class="faq__item">
@@ -18,7 +19,7 @@ const { titre, questions } = Astro.props;
 </section>
 <style>
   .faq__corps { max-width: 820px; }
-  .faq h2 { margin-bottom: 24px; }
+  .faq :global(h1), .faq :global(h2) { margin-bottom: 24px; }
   .faq__liste { display: grid; gap: 12px; }
   .faq__item { background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: var(--ombre); }
   .faq__item summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 10px 18px; font-family: var(--titre); font-size: 1.35rem; line-height: 1.2; color: var(--vert-fonce); cursor: pointer; list-style: none; }

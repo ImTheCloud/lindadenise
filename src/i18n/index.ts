@@ -37,6 +37,7 @@ const chemins = {
   toiles: { fr: '/toiles/', nl: '/nl/doeken/' },
   apropos: { fr: '/a-propos/', nl: '/nl/over-mij/' },
   contact: { fr: '/contact/', nl: '/nl/contact/' },
+  faq: { fr: '/faq/', nl: '/nl/faq/' },
   panier: { fr: '/panier/', nl: '/nl/mandje/' },
   jeu: { fr: '/jouer/', nl: '/nl/spelen/' },
   merci: { fr: '/merci/', nl: '/nl/bedankt/' },

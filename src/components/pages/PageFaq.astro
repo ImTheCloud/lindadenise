@@ -1,0 +1,12 @@
+---
+import Base from '../../layouts/Base.astro';
+import Faq from '../Faq.astro';
+import { t, chemin, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const chemins = { fr: chemin('faq', 'fr'), nl: chemin('faq', 'nl') };
+---
+<Base lang={lang} titre={d.faq.titre} description={d.faq.meta} chemins={chemins}>
+  <Faq titre={d.faq.titre} questions={d.faq.questions} titreNiveau={1} />
+</Base>

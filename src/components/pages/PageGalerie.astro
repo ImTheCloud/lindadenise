@@ -2,7 +2,6 @@
 import Base from '../../layouts/Base.astro';
 import Galerie from '../Galerie.astro';
 import CarteDessin from '../CarteDessin.astro';
-import Faq from '../Faq.astro';
 import { t, chemin, dessins, parRubrique, RUBRIQUES, type Lang } from '../../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -15,5 +14,4 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
     {dessins.map((x, i) => <CarteDessin dessin={x} lang={lang} priorite={i < 4} />)}
   </Galerie>
 
-  <Faq titre={d.faq.titre} questions={d.faq.dessins} />
 </Base>

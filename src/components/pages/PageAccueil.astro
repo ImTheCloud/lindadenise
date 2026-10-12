@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Bandeau from '../Bandeau.astro';
 import CarteDessin from '../CarteDessin.astro';
 import CarteToile from '../CarteToile.astro';
+import Faq from '../Faq.astro';
 import Etapes from '../Etapes.astro';
 import Apercu from '../Apercu.astro';
 import IconeLivraison from '../IconeLivraison.astro';
@@ -107,6 +108,8 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
       <div class="rangee__etapes"><Etapes titre={tt.commanderTitre} etapes={tt.etapes} /></div>
     </div>
   </section>
+
+  <Faq titre={d.faq.titre} questions={d.faq.questions} />
 
   <section class="section">
     <div class="contenu apropos">
