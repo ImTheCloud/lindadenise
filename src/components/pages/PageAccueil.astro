@@ -34,10 +34,6 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
           <a class="bouton bouton--vert" href={chemin('dessins', lang)}>{a.portes.dessinsCta}</a>
           <a class="bouton bouton--brun" href={chemin('toiles', lang)}>{a.portes.toilesCta}</a>
         </div>
-        <ul class="heros__points">
-          <li><IconeLivraison genre="dessin" /><span><strong>{d.nav.dessins}</strong> · {d.livraison.dessin}</span></li>
-          <li><IconeLivraison genre="toile" /><span><strong>{d.nav.toiles}</strong> · {d.livraison.toile}</span></li>
-        </ul>
       </div>
       <div class="heros__video">
         <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} />
@@ -136,12 +132,6 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   .heros__grille { position: relative; z-index: 1; width: 100%; display: grid; gap: 28px; align-items: center; }
   .heros__texte h1 { font-size: clamp(3.4rem, 1.4rem + 7vw, 7rem); margin-bottom: 0.1em; line-height: 0.95; }
   .heros__texte-court { margin: 0 0 4px; max-width: 34ch; font-size: clamp(1.05rem, 1rem + 0.3vw, 1.3rem); }
-  .heros__points { display: grid; gap: 8px; margin: 26px 0 0; padding: 0; list-style: none; }
-  @media (max-width: 699px) { .heros__points { display: none; } }
-  .heros__points li { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; color: var(--encre-douce); }
-  .heros__points li :global(svg) { flex: none; color: var(--vert-fonce); }
-  .heros__points li:nth-child(2) :global(svg) { color: var(--monde-toiles); }
-  .heros__points strong { font-weight: 400; font-family: var(--titre); font-size: 1.25rem; color: var(--encre); }
   .heros__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; max-width: 420px; }
   .heros__actions :global(.bouton) { justify-content: center; padding: 0.65em 0.6em; font-size: 1.15rem; }
   .bouton--brun { background: var(--monde-toiles); border-color: #7a3a00; box-shadow: 0 5px 0 #6b3200; }
