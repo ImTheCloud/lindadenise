@@ -119,6 +119,8 @@ export const fr = {
     expoTexte: 'Je cherche d’autres occasions de montrer mes toiles : une exposition, un dépôt dans une galerie, un café, un lieu d’accueil ou un commerce.',
     expoTexte2: 'Vous avez un mur qui les attend ? Écrivez-moi.',
     expoCta: 'Proposer un lieu',
+    videoTitre: 'Les toiles en vidéo',
+    videoFilm: 'Les toiles en musique',
     videoFilmAlt: 'film d’une minute : les toiles accrochées sur un mur dessiné, Tilleul, avec gros textes à l’écran et musique entraînante, sans voix',
     videoVraies: 'Les vraies toiles, filmées une à une',
     videoVraiesAlt: 'vidéo de 49 secondes, avec de la musique : les 23 toiles posées dans une maison, filmées une à une',

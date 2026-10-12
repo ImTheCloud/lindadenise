@@ -23,7 +23,7 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
 <Base lang={lang} chemins={chemins}>
   <section class="heros" data-accueil>
     <Feuilles />
-    <div class="heros__grille">
+    <div class="contenu heros__grille">
       <div class="heros__texte">
         <p class="surtitre">{a.surtitre}</p>
         <h1><span class="mot-vert">Linda</span> <span class="mot-orange">Denise</span></h1>
@@ -33,7 +33,7 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
         </div>
       </div>
       <div class="heros__video">
-        <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} cadre />
+        <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} />
       </div>
     </div>
     <Etang />
@@ -122,14 +122,14 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
 <style>
   /* Premier écran : titre, vidéo et trois dessins, avec l'étang tout en bas ; les deux portes viennent ensuite */
   .heros { position: relative; overflow: hidden; display: flex; align-items: center; min-height: calc(100svh - 68px); padding-top: clamp(24px, 4vw, 56px); padding-bottom: clamp(150px, 22vw, 290px); background: linear-gradient(#fff 55%, #f6fbf6); }
-  .heros__grille { position: relative; z-index: 1; width: 100%; max-width: 1720px; margin-inline: auto; padding-inline: var(--gouttiere); display: grid; gap: 28px; align-items: center; }
+  .heros__grille { position: relative; z-index: 1; width: 100%; display: grid; gap: 28px; align-items: center; }
   .heros__texte h1 { font-size: clamp(3.4rem, 1.4rem + 7vw, 7rem); margin-bottom: 0.1em; line-height: 0.95; }
   .heros__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
   .bouton--brun { background: var(--monde-toiles); border-color: #7a3a00; box-shadow: 0 5px 0 #6b3200; }
   .bouton--brun:hover { box-shadow: 0 7px 0 #6b3200; }
   /* Grand écran : titre à gauche, grande vidéo à droite : toute la largeur sert */
   @media (min-width: 1100px) {
-    .heros__grille { grid-template-columns: minmax(280px, 0.8fr) minmax(0, 2fr); gap: clamp(24px, 3vw, 56px); }
+    .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: clamp(24px, 3vw, 56px); }
     .heros__texte h1 { font-size: clamp(3.4rem, 0.8rem + 5.2vw, 7rem); }
   }
 

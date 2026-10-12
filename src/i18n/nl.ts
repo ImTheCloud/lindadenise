@@ -120,6 +120,8 @@ export const nl: Dico = {
     expoTexte: 'Ik zoek nog andere gelegenheden om mijn doeken te tonen: een tentoonstelling, een plek in een galerie, een café, een ontmoetingsplaats of een winkel.',
     expoTexte2: 'Heb je een muur die op ze wacht? Schrijf me.',
     expoCta: 'Een plek voorstellen',
+    videoTitre: 'De doeken in beeld',
+    videoFilm: 'De doeken op muziek',
     videoFilmAlt: 'film van een minuut: de doeken aan een getekende muur, Tilleul, met grote tekst in beeld en vrolijke muziek, zonder stem',
     videoVraies: 'De echte doeken, één voor één gefilmd',
     videoVraiesAlt: 'video van 49 seconden, met muziek: de 23 doeken in een huis, één voor één gefilmd',

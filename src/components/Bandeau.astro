@@ -6,12 +6,11 @@ interface Props {
   lang: Lang;
   nom: string; // /video/{nom}.mp4 et son affiche /video/{nom}.avif / .webp
   description: string;
-  cadre?: boolean; // vignette dans un cadre dessiné (accueil), au lieu d'un bandeau pleine largeur
 }
-const { lang, nom, description, cadre = false } = Astro.props;
+const { lang, nom, description } = Astro.props;
 const v = t(lang).video;
 ---
-<div class:list={['bandeau', cadre && 'bandeau--cadre']} data-bandeau={`/video/${nom}.mp4`}>
+<div class="bandeau" data-bandeau={`/video/${nom}.mp4`}>
   <picture>
     <source type="image/avif" srcset={`/video/${nom}.avif`} />
     <img class="bandeau__affiche" src={`/video/${nom}.webp`} width="1920" height="1080" alt="" fetchpriority="high" decoding="async" />
@@ -38,8 +37,7 @@ const v = t(lang).video;
   });
 </script>
 <style>
-  .bandeau { position: relative; isolation: isolate; overflow: hidden; width: 100%; aspect-ratio: 16 / 9; max-height: 62svh; background: #1d130d; color: #fff; }
-  .bandeau--cadre { max-height: none; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  .bandeau { position: relative; isolation: isolate; overflow: hidden; width: 100%; aspect-ratio: 16 / 9; background: #1d130d; color: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
   .bandeau__affiche, .bandeau :global(.bandeau__video), .bandeau__lancer { position: absolute; inset: 0; width: 100%; height: 100%; }
   .bandeau__affiche, .bandeau :global(.bandeau__video) { object-fit: cover; }
   .bandeau :global(.bandeau__video) { background: #000; }
