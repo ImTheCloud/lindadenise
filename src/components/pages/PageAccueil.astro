@@ -125,15 +125,15 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   .heros__grille { position: relative; z-index: 1; display: grid; gap: 28px; align-items: center; }
   .heros__texte h1 { font-size: clamp(3.6rem, 1.4rem + 8vw, 7.2rem); margin-bottom: 0.1em; line-height: 0.95; }
   .heros__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
-  .bouton--brun { background: var(--monde-toiles); border-color: #34200f; box-shadow: 0 5px 0 #34200f; }
-  .bouton--brun:hover { box-shadow: 0 7px 0 #34200f; }
+  .bouton--brun { background: var(--monde-toiles); border-color: #7a3a00; box-shadow: 0 5px 0 #6b3200; }
+  .bouton--brun:hover { box-shadow: 0 7px 0 #6b3200; }
   @media (min-width: 960px) { .heros__grille { grid-template-columns: 0.8fr 1.2fr; gap: 48px; } }
   .riviere { position: relative; height: clamp(130px, 18vw, 230px); margin-top: -1px; background: var(--fond); overflow: hidden; }
   /* Deux grands blocs dessinés : vert pour les dessins, brun pour les toiles */
   .portes { position: relative; overflow: hidden; padding-block: clamp(24px, 4vw, 48px) clamp(40px, 6vw, 72px); background: var(--fond); }
   .portes__grille { position: relative; z-index: 1; display: grid; gap: clamp(18px, 3vw, 32px); }
   .porte { --p: var(--monde-dessins); --p-pale: #e3f1e3; position: relative; display: grid; align-content: end; gap: 18px; min-height: 480px; padding: clamp(20px, 3vw, 40px); overflow: hidden; color: #fff; text-decoration: none; background: var(--p); border: var(--trait) solid var(--p); border-radius: var(--rayon); box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1); }
-  .porte--toiles { --p: var(--monde-toiles); --p-pale: #eadbc9; }
+  .porte--toiles { --p: var(--monde-toiles); --p-pale: #f6dfc0; }
   .porte:hover { color: #fff; transform: translateY(-6px) rotate(-0.6deg); }
   .porte__vitrine { position: absolute; inset: 0 0 auto 0; height: 54%; background: var(--p-pale); }
   .porte__image { position: absolute; bottom: 6%; width: 30%; max-width: 220px; aspect-ratio: 5 / 7; overflow: hidden; padding: 5px; background: #fff; border: 3px solid var(--p); border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; box-shadow: 0 10px 0 rgba(0, 0, 0, 0.12); transition: transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1); }

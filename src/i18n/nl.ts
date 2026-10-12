@@ -301,7 +301,7 @@ export const nl: Dico = {
       { titre: 'Je rechten', texte: ['Je kunt op elk moment inzage, correctie of verwijdering van je gegevens vragen via teugelslinda@yahoo.fr.'] },
     ],
   },
-  video: { lancer: 'Video afspelen', couper: 'Geluid uit', remettre: 'Geluid aan', pause: 'Pauzeren', lecture: 'Afspelen', activer: 'Geluid aanzetten' },
+  video: { lancer: 'Video afspelen', couper: 'Geluid uit', remettre: 'Geluid aan', pause: 'Pauzeren', lecture: 'Afspelen', agrandir: 'Volledig scherm' },
   mascotte: {
     nom: 'Tilleul',
     parler: 'Tilleul, de kat van Linda, aaien',

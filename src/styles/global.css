@@ -24,25 +24,25 @@
 
   /* Les deux mondes du site : couleurs fixes, pour les repères qui doivent rester verts ou bruns partout */
   --monde-dessins: #2b6e3a;
-  --monde-toiles: #5b3a29;
+  --monde-toiles: #b05200;
   --fond: #fff;
 }
 
 /* Le monde des toiles reprend exactement les mêmes variables, en brun terre et crème : tout ce qui s'appuie sur elles change seul */
 [data-monde='toiles'] {
-  --vert: #8a5a3c;
-  --vert-fonce: #5b3a29;
-  --vert-creme: #f7efe4;
-  --vert-pale: #eadbc9;
+  --vert: #c9741a;
+  --vert-fonce: #b05200;
+  --vert-creme: #fff4e3;
+  --vert-pale: #f6dfc0;
   --orange: #c9803f;
   --orange-clair: #e0a463;
-  --orange-creme: #f6ebdc;
-  --orange-fonce: #a2561f;
-  --orange-titre: #b5652a;
+  --orange-creme: #fff4e3;
+  --orange-fonce: #7a3a00;
+  --orange-titre: #7a3a00;
   --encre: #3a2a20;
   --encre-douce: #6b5546;
-  --ombre: 0 6px 0 rgba(91, 58, 41, 0.14);
-  --fond: #fbf6ef;
+  --ombre: 0 6px 0 rgba(176, 82, 0, 0.18);
+  --fond: #fffaf2;
 }
 
 *,

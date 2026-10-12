@@ -1,7 +1,6 @@
 ---
-// Bandeau vidéo en tête de page : l'affiche s'affiche d'abord, puis la vidéo démarre seule, sans son, en boucle.
-// Le visiteur peut la mettre en pause et activer le son. Pas de lecture automatique si « réduire les animations »
-// ou « économiser les données » est demandé : il reste l'affiche et un bouton Lecture.
+// Vidéo en tête de page : une affiche avec un bouton Lecture. Au clic, la vidéo démarre avec le son ; on peut la mettre en pause,
+// couper le son ou la passer en plein écran. Rien ne se charge ni ne démarre avant le clic.
 import { t, type Lang } from '../i18n';
 interface Props {
   lang: Lang;
@@ -12,90 +11,68 @@ interface Props {
 const { lang, nom, description, cadre = false } = Astro.props;
 const v = t(lang).video;
 ---
-<div class:list={['bandeau', cadre && 'bandeau--cadre']} data-bandeau={`/video/${nom}.mp4`} data-pause={v.pause} data-lecture={v.lecture} data-activer={v.activer} data-couper={v.couper}>
+<div class:list={['bandeau', cadre && 'bandeau--cadre']} data-bandeau={`/video/${nom}.mp4`} data-pause={v.pause} data-lecture={v.lecture} data-couper={v.couper} data-remettre={v.remettre}>
   <picture>
     <source type="image/avif" srcset={`/video/${nom}.avif`} />
     <img class="bandeau__affiche" src={`/video/${nom}.webp`} width="1920" height="1080" alt="" fetchpriority="high" decoding="async" />
   </picture>
-  <div class="bandeau__voile" aria-hidden="true"></div>
-  <div class="bandeau__contenu"><slot /></div>
-  <div class="bandeau__outils">
-    <button type="button" class="bandeau__bouton" data-bandeau-lecture aria-label={v.pause}>{v.pause}</button>
-    <button type="button" class="bandeau__bouton" data-bandeau-son aria-pressed="false">{v.activer}</button>
+  <button type="button" class="bandeau__lancer" aria-label={`${v.lancer} : ${description}`}>
+    <span class="bandeau__icone" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M14 9 L32 20 L14 31 Z" fill="currentColor" /></svg></span>
+  </button>
+  <div class="bandeau__outils" hidden>
+    <button type="button" class="bandeau__bouton" data-lecture-bouton>{v.pause}</button>
+    <button type="button" class="bandeau__bouton" data-son-bouton>{v.couper}</button>
+    <button type="button" class="bandeau__bouton" data-grand-bouton>{v.agrandir}</button>
   </div>
-  <p class="sr-only">{description}</p>
 </div>
 <script>
   document.querySelectorAll<HTMLElement>('[data-bandeau]').forEach((boite) => {
-    const lecture = boite.querySelector<HTMLButtonElement>('[data-bandeau-lecture]')!;
-    const son = boite.querySelector<HTMLButtonElement>('[data-bandeau-son]')!;
-    const calme = matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
-    let video: HTMLVideoElement | null = null;
-    let voulue = !calme; // lecture voulue par le visiteur (ou par défaut)
-    const majLecture = () => {
-      const enCours = video ? !video.paused : voulue;
-      const texte = (enCours ? boite.dataset.pause : boite.dataset.lecture) ?? '';
-      lecture.textContent = texte;
-      lecture.setAttribute('aria-label', texte);
-    };
-    const majSon = () => {
-      const coupe = !video || video.muted;
-      son.textContent = (coupe ? boite.dataset.activer : boite.dataset.couper) ?? '';
-      son.setAttribute('aria-pressed', String(!coupe));
-    };
-    const creer = () => {
-      if (video) return video;
-      video = document.createElement('video');
+    const lancer = boite.querySelector<HTMLButtonElement>('.bandeau__lancer')!;
+    const outils = boite.querySelector<HTMLElement>('.bandeau__outils')!;
+    const lecture = boite.querySelector<HTMLButtonElement>('[data-lecture-bouton]')!;
+    const son = boite.querySelector<HTMLButtonElement>('[data-son-bouton]')!;
+    const grand = boite.querySelector<HTMLButtonElement>('[data-grand-bouton]')!;
+    lancer.addEventListener('click', () => {
+      const video = document.createElement('video');
       video.className = 'bandeau__video';
       video.src = boite.dataset.bandeau!;
-      video.muted = true;
       video.loop = true;
       video.playsInline = true;
       video.preload = 'auto';
-      video.setAttribute('aria-hidden', 'true');
-      video.tabIndex = -1;
-      video.addEventListener('playing', () => boite.classList.add('en-lecture'));
+      video.setAttribute('aria-label', lancer.getAttribute('aria-label') ?? '');
+      const majLecture = () => { lecture.textContent = (video.paused ? boite.dataset.lecture : boite.dataset.pause) ?? ''; };
+      const majSon = () => { son.textContent = (video.muted ? boite.dataset.remettre : boite.dataset.couper) ?? ''; };
       video.addEventListener('play', majLecture);
       video.addEventListener('pause', majLecture);
       video.addEventListener('volumechange', majSon);
-      boite.querySelector('picture')!.after(video);
-      return video;
-    };
-    lecture.addEventListener('click', () => {
-      const v = creer();
-      voulue = v.paused;
-      if (voulue) void v.play().catch(() => {}); else v.pause();
+      lecture.addEventListener('click', () => { if (video.paused) void video.play().catch(() => {}); else video.pause(); });
+      son.addEventListener('click', () => { video.muted = !video.muted; });
+      grand.addEventListener('click', () => {
+        const v = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+        if (document.fullscreenElement) void document.exitFullscreen();
+        else if (v.requestFullscreen) void v.requestFullscreen().catch(() => {});
+        else v.webkitEnterFullscreen?.(); // iPhone
+      });
+      lancer.replaceWith(video);
+      outils.hidden = false;
+      void video.play().catch(() => { /* le visiteur peut relancer avec le bouton Lecture */ });
+      lecture.focus();
+      majLecture();
+      majSon();
     });
-    son.addEventListener('click', () => {
-      const v = creer();
-      v.muted = !v.muted;
-      if (!v.muted && v.paused) { voulue = true; void v.play().catch(() => {}); }
-    });
-    // La vidéo ne se charge qu'après l'affichage de la page, pour ne pas ralentir l'affiche
-    const demarrer = () => { if (voulue) void creer().play().catch(() => {}); };
-    if (document.readyState === 'complete') demarrer(); else window.addEventListener('load', demarrer, { once: true });
-    // Hors de l'écran, la vidéo s'arrête (économie de batterie) et repart au retour si le visiteur l'avait laissée tourner
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver((entrees) => {
-        if (!video) return;
-        if (entrees[0].isIntersecting) { if (voulue && video.paused) void video.play().catch(() => {}); } else video.pause();
-      }).observe(boite);
-    }
-    majLecture();
-    majSon();
   });
 </script>
 <style>
   .bandeau { position: relative; isolation: isolate; overflow: hidden; width: 100%; aspect-ratio: 16 / 9; max-height: 62svh; background: #1d130d; color: #fff; }
   .bandeau--cadre { max-height: none; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
-  .bandeau--cadre .bandeau__outils { inset: 10px 10px auto auto; }
-  .bandeau--cadre .bandeau__bouton { min-height: 38px; padding: 0 12px; font-size: 1rem; }
-  .bandeau__affiche, .bandeau :global(.bandeau__video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .bandeau :global(.bandeau__video) { opacity: 0; transition: opacity 0.6s; }
-  .bandeau.en-lecture :global(.bandeau__video) { opacity: 1; }
-  .bandeau__voile { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20, 12, 8, 0.7), rgba(20, 12, 8, 0) 55%); }
-  .bandeau__contenu { position: absolute; inset: auto 0 clamp(24px, 5vw, 56px) 0; }
-  .bandeau__outils { position: absolute; right: var(--gouttiere); top: 16px; display: flex; gap: 8px; }
-  .bandeau__bouton { min-height: 44px; padding: 0 18px; font-family: var(--titre); font-size: 1.15rem; color: #fff; cursor: pointer; background: rgba(20, 12, 8, 0.55); border: var(--trait) solid rgba(255, 255, 255, 0.85); border-radius: var(--rayon-petit); backdrop-filter: blur(6px); }
-  .bandeau__bouton:hover { background: rgba(20, 12, 8, 0.8); }
+  .bandeau__affiche, .bandeau :global(.bandeau__video), .bandeau__lancer { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .bandeau__affiche, .bandeau :global(.bandeau__video) { object-fit: cover; }
+  .bandeau :global(.bandeau__video) { background: #000; }
+  .bandeau__lancer { padding: 0; border: 0; background: none; cursor: pointer; }
+  .bandeau__icone { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center; width: 84px; height: 84px; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+  .bandeau__lancer:hover .bandeau__icone, .bandeau__lancer:focus-visible .bandeau__icone { transform: scale(1.08) rotate(-4deg); }
+  .bandeau__outils { position: absolute; inset: auto 10px 10px 10px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+  .bandeau__outils[hidden] { display: none; }
+  .bandeau__bouton { min-height: 40px; padding: 0 14px; font-family: var(--titre); font-size: 1.05rem; color: #fff; cursor: pointer; background: rgba(20, 12, 8, 0.6); border: var(--trait) solid rgba(255, 255, 255, 0.85); border-radius: var(--rayon-petit); backdrop-filter: blur(6px); }
+  .bandeau__bouton:hover { background: rgba(20, 12, 8, 0.85); }
 </style>

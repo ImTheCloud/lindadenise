@@ -300,7 +300,7 @@ export const fr = {
       { titre: 'Vos droits', texte: ['Vous pouvez demander à tout moment l’accès, la correction ou la suppression de vos données en écrivant à teugelslinda@yahoo.fr.'] },
     ],
   },
-  video: { lancer: 'Lancer la vidéo', couper: 'Couper le son', remettre: 'Remettre le son', pause: 'Mettre en pause', lecture: 'Lecture', activer: 'Activer le son' },
+  video: { lancer: 'Lancer la vidéo', couper: 'Couper le son', remettre: 'Remettre le son', pause: 'Mettre en pause', lecture: 'Lecture', agrandir: 'Plein écran' },
   mascotte: {
     nom: 'Tilleul',
     parler: 'Caresser Tilleul, le chat de Linda',
