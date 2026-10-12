@@ -62,6 +62,8 @@ export const fr = {
     retour: '← Tous les dessins',
     rubrique: 'Rubrique',
     prix: '10 €',
+    etiquette: 'Dessin',
+    surtitre: 'Dessin numérique',
     prixTexte: 'Vous recevez le fichier numérique, sans filigrane.',
     etapesTitre: 'Comment recevoir un dessin ?',
     etapes: [
@@ -88,7 +90,6 @@ export const fr = {
   toiles: {
     titre: 'Les toiles',
     meta: 'Des dessins de Linda Denise imprimés sur aluminium, au format A3. Des pièces uniques, livrées en Belgique.',
-    intro: (n: number) => `${n} dessins de Linda, imprimés sur aluminium au format A3. Chaque toile est une pièce unique.`,
     histoire: 'Ces toiles ont été imprimées en vue d’une exposition à Ostende. Le lieu a fermé avant l’accrochage. Elles cherchent aujourd’hui un nouveau mur.',
     murAide: 'Touchez ou cliquez sur une toile pour l’ouvrir.',
     etiquette: 'Toile',

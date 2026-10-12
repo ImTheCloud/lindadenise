@@ -35,7 +35,7 @@ const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
           </button>
         </div>
         <div class="fiche__infos">
-          <p class="surtitre">{tt.surtitre}</p>
+          <p class="surtitre">{tt.surtitre} · <a href={`${chemin('toiles', lang)}#${toile.rubrique}`}>{d.rubriques[toile.rubrique].court}</a></p>
           <h1>{titre}</h1>
           <p class="fiche__prix">{toile.vendue ? tt.vendue : tt.prix(PRIX_TOILE)}</p>
           <p>{toile.vendue ? tt.vendueTexte : tt.caracteristiques}</p>

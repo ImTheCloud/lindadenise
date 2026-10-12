@@ -21,6 +21,7 @@ export const dessins = dessinsJson as Dessin[];
 // Toiles imprimées sur aluminium (A3), préparées par scripts/preparer-toiles.mjs ; « vendue » se change à la main.
 export interface Toile {
   id: string;
+  rubrique: Rubrique;
   titre: { fr: string; nl: string };
   description: { fr: string; nl: string };
   vendue: boolean;

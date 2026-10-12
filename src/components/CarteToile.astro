@@ -10,7 +10,7 @@ const p = d.panier;
 const sources = (format: string) => [400, 800].map((l) => `/toiles/${toile.id}-${l}.${format} ${l}w`).join(', ');
 const tailles = '(min-width: 1000px) 24vw, (min-width: 700px) 32vw, 46vw';
 ---
-<article class:list={['carte', 'carte--toile', toile.vendue && 'carte--vendue']}>
+<article class:list={['carte', 'carte--toile', toile.vendue && 'carte--vendue']} data-rubrique={toile.rubrique}>
   <a class="carte__lien" href={cheminToile(toile.id, lang)}>
     <span class="carte__image">
       <picture>

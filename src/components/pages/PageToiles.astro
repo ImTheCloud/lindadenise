@@ -1,9 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Galerie from '../Galerie.astro';
 import CarteToile from '../CarteToile.astro';
 import Etapes from '../Etapes.astro';
 import Video from '../Video.astro';
-import { t, chemin, toiles, type Lang } from '../../i18n';
+import { t, chemin, toiles, RUBRIQUES, type Lang } from '../../i18n';
 import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, TOILES_ACHETEES, calculLot } from '../../data/vente';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -11,20 +12,12 @@ const d = t(lang);
 const tt = d.toiles;
 const chemins = { fr: chemin('toiles', 'fr'), nl: chemin('toiles', 'nl') };
 const contact = chemin('contact', lang);
+const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, nombre: toiles.filter((x) => x.rubrique === r).length })).filter((r) => r.nombre > 0);
 ---
 <Base lang={lang} titre={tt.titre} description={tt.meta} chemins={chemins} image={`/toiles/${toiles[0].id}-800.jpg`}>
-  <section class="section galerie">
-    <div class="contenu">
-      <header class="centre">
-        <h1>{tt.titre}</h1>
-        <p class="chapeau">{tt.intro(toiles.length)}</p>
-        <p class="aide">{tt.murAide}</p>
-      </header>
-      <div class="mur" id="mur">
-        {toiles.map((x, i) => <CarteToile toile={x} lang={lang} priorite={i < 4} />)}
-      </div>
-    </div>
-  </section>
+  <Galerie titre={tt.titre} intro={tt.murAide} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={toiles.length}>
+    {toiles.map((x, i) => <CarteToile toile={x} lang={lang} priorite={i < 4} />)}
+  </Galerie>
 
   <section class="section videos-bande">
     <div class="contenu">
@@ -80,12 +73,6 @@ const contact = chemin('contact', lang);
 </Base>
 
 <style>
-  .galerie h1 { margin-bottom: 0.2em; }
-  .aide { margin: 0; color: var(--encre-douce); }
-  .mur { column-count: 2; column-gap: 22px; margin-top: 30px; }
-  @media (min-width: 700px) { .mur { column-count: 3; } }
-  @media (min-width: 1000px) { .mur { column-count: 4; } }
-  @media (max-width: 619px) { .galerie { padding-top: 24px; } .galerie h1 { font-size: 2.3rem; } .mur { margin-top: 18px; } }
   .infos { display: grid; gap: 28px; }
   .info { padding: 8px 24px 18px; }
   .info h2 { margin-top: 0.5em; }

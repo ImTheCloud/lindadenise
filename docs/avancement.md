@@ -10,6 +10,13 @@ Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et coule
 - Cartes : le style est dans `global.css` ; `CarteDessin.astro` et `CarteToile.astro` ne contiennent que la structure. `cheminToile()` renvoie `/toiles/<id>/` (plus de `#id`).
 - À valider par Claudiu : l'apparence (étiquette, bord d'aluminium) sur ordinateur et téléphone.
 
+## Dessins et toiles cohérents (2026-10-12, non publié)
+
+- **Même galerie** : `Galerie.astro` (titre, texte, filtres par rubrique avec leur nombre, cartes) sert aux dessins (`PageGalerie.astro`) et aux toiles (`PageToiles.astro`). Les toiles ont maintenant les mêmes rubriques que les dessins (champ `rubrique` de `toiles.json`, table `RUBRIQUES` de `scripts/preparer-toiles.mjs` : chats 6, nature 7, fleurs 9, animaux 1 ; seules les rubriques non vides sont proposées, pas de Psaumes pour les toiles).
+- **Mêmes cartes** : badge (« Dessin » en vert, « Toile » en orange), titre, prix (10 € / 200 €), bouton panier ; seul le bord d'aluminium distingue l'image d'une toile. Le badge et le prix sont aussi sur les cartes des dessins.
+- **Mêmes fiches** : surtitre « Dessin numérique · Fleurs » / « Toile sur aluminium · Fleurs » (la rubrique renvoie à la galerie filtrée). La phrase de présentation des toiles n'est plus sous le titre (le texte du titre est le même que pour les dessins) : elle reste dans les blocs plus bas.
+- À valider par Claudiu : le classement des 23 toiles par rubrique (ex. « Montagne et tournesols » et « Jonquilles » classées en fleurs, « La clôture » et « Printemps » en nature).
+
 ## Panier (2026-10-12, non publié)
 
 Choix de Claudiu : un seul panier pour les dessins numériques et les toiles, deux catalogues qui restent distincts ; bouton sur la carte ET sur la fiche ; icône dans l'en-tête + page Panier ; lot 5+1 sur les toiles seulement ; panier gardé sur l'appareil. **Aucun paiement** : le panier prépare la demande envoyée à Linda.

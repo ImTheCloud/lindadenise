@@ -112,6 +112,7 @@ p { margin: 0 0 1em; }
 .carte__image { position: relative; display: block; }
 .carte--toile .carte__image img { border-radius: 3px; background: #dfe3e6; box-shadow: 0 0 0 1px #c3c9cd, 0 0 0 3px #eef1f3, 0 0 0 4px #9aa2a8, 0 8px 14px -6px rgba(60, 40, 20, 0.35); }
 .carte__etiquette { position: absolute; left: -6px; top: 10px; padding: 3px 12px 4px; font-family: var(--titre); font-size: 1.05rem; line-height: 1.1; color: #fff; background: var(--orange-fonce); border: 2px solid #fff; border-radius: 0 10px 10px 0; box-shadow: 0 2px 4px rgba(60, 40, 20, 0.3); }
+.carte--dessin .carte__etiquette { background: var(--vert-fonce); }
 .carte__vendue { position: absolute; right: -8px; bottom: -8px; display: grid; place-items: center; width: 62px; height: 62px; font-family: var(--titre); font-size: 1.05rem; color: #fff; background: var(--encre-douce); border: 3px solid #fff; border-radius: 50%; transform: rotate(-8deg); }
 .carte--vendue .carte__image img { filter: grayscale(0.9) opacity(0.7); }
 .carte__prix { display: block; margin-top: -4px; padding: 0 6px 8px; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--orange-fonce); }

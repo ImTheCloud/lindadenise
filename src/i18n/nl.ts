@@ -63,6 +63,8 @@ export const nl: Dico = {
     retour: '← Alle tekeningen',
     rubrique: 'Rubriek',
     prix: '10 €',
+    etiquette: 'Tekening',
+    surtitre: 'Digitale tekening',
     prixTexte: 'Je ontvangt het digitale bestand, zonder watermerk.',
     etapesTitre: 'Hoe ontvang je een tekening?',
     etapes: [
@@ -89,7 +91,6 @@ export const nl: Dico = {
   toiles: {
     titre: 'De doeken',
     meta: 'Tekeningen van Linda Denise, gedrukt op aluminium in A3-formaat. Unieke stukken, geleverd in België.',
-    intro: (n: number) => `${n} tekeningen van Linda, gedrukt op aluminium in A3-formaat. Elk doek is een uniek stuk.`,
     histoire: 'Deze doeken werden gedrukt voor een tentoonstelling in Oostende. De plek sloot nog voor ze opgehangen werden. Vandaag zoeken ze een nieuwe muur.',
     murAide: 'Tik of klik op een doek om het te openen.',
     etiquette: 'Doek',

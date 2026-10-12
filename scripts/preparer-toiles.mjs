@@ -136,6 +136,15 @@ fs.mkdirSync(SORTIE_IMG, { recursive: true });
 const anciennes = fs.existsSync(SORTIE_JSON) ? JSON.parse(fs.readFileSync(SORTIE_JSON, 'utf8')) : [];
 const vendue = (id) => anciennes.find((t) => t.id === id)?.vendue ?? false;
 
+// Rubrique de chaque toile (mêmes rubriques que les dessins : le tournesol, le champ de tournesols et les fleurs sont des « fleurs »)
+const RUBRIQUES = {
+  chats: ['chat-au-repos', 'chat-a-l-ile-de-brehat', 'chats-camoufles', 'sweet', 'time-gambade', 'time-s-amuse'],
+  fleurs: ['fleurs-bleues', 'frangipanier', 'iris', 'jonquilles', 'le-tournesol', 'mauves', 'montagne-et-tournesols', 'narcisses', 'tournesols'],
+  animaux: ['l-oiseau'],
+  nature: ['bois-de-hal', 'bouleaux-en-hiver', 'la-cloture', 'le-chemin-de-foret', 'printemps', 'sous-bois', 'vieux-cerisier'],
+};
+const rubrique = (id) => Object.keys(RUBRIQUES).find((r) => RUBRIQUES[r].includes(id));
+
 const sortie = [];
 for (const [fichier, nl, rotation, coins, descFr, descNl] of TOILES) {
   const source = path.join(SOURCE, `${fichier}.jpeg`);
@@ -149,7 +158,7 @@ for (const [fichier, nl, rotation, coins, descFr, descNl] of TOILES) {
     await taille.clone().webp({ quality: 80 }).toFile(`${base}.webp`);
     if (largeur === 800) await taille.clone().jpeg({ quality: 82, mozjpeg: true }).toFile(`${base}.jpg`);
   }
-  sortie.push({ id, titre: { fr: majuscule(fichier), nl }, description: { fr: descFr, nl: descNl }, vendue: vendue(id) });
+  sortie.push({ id, rubrique: rubrique(id), titre: { fr: majuscule(fichier), nl }, description: { fr: descFr, nl: descNl }, vendue: vendue(id) });
 }
 
 fs.writeFileSync(SORTIE_JSON, JSON.stringify(sortie, null, 2) + '\n');

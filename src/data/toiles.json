@@ -1,6 +1,7 @@
 [
   {
     "id": "bois-de-hal",
+    "rubrique": "nature",
     "titre": {
       "fr": "Bois de Hal",
       "nl": "Hallerbos"
@@ -13,6 +14,7 @@
   },
   {
     "id": "bouleaux-en-hiver",
+    "rubrique": "nature",
     "titre": {
       "fr": "Bouleaux en hiver",
       "nl": "Berken in de winter"
@@ -25,6 +27,7 @@
   },
   {
     "id": "chat-au-repos",
+    "rubrique": "chats",
     "titre": {
       "fr": "Chat au repos",
       "nl": "Rustende kat"
@@ -37,6 +40,7 @@
   },
   {
     "id": "chat-a-l-ile-de-brehat",
+    "rubrique": "chats",
     "titre": {
       "fr": "Chat à l'île de Bréhat",
       "nl": "Kat op het eiland Bréhat"
@@ -49,6 +53,7 @@
   },
   {
     "id": "chats-camoufles",
+    "rubrique": "chats",
     "titre": {
       "fr": "Chats camouflés",
       "nl": "Verstopte katten"
@@ -61,6 +66,7 @@
   },
   {
     "id": "fleurs-bleues",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Fleurs bleues",
       "nl": "Blauwe bloemen"
@@ -73,6 +79,7 @@
   },
   {
     "id": "frangipanier",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Frangipanier",
       "nl": "Frangipani"
@@ -85,6 +92,7 @@
   },
   {
     "id": "iris",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Iris",
       "nl": "Iris"
@@ -97,6 +105,7 @@
   },
   {
     "id": "jonquilles",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Jonquilles",
       "nl": "Paasbloemen"
@@ -109,6 +118,7 @@
   },
   {
     "id": "l-oiseau",
+    "rubrique": "animaux",
     "titre": {
       "fr": "L'oiseau",
       "nl": "De vogel"
@@ -121,6 +131,7 @@
   },
   {
     "id": "la-cloture",
+    "rubrique": "nature",
     "titre": {
       "fr": "La clôture",
       "nl": "Het hek"
@@ -133,6 +144,7 @@
   },
   {
     "id": "le-chemin-de-foret",
+    "rubrique": "nature",
     "titre": {
       "fr": "Le chemin de forêt",
       "nl": "Het bospad"
@@ -145,6 +157,7 @@
   },
   {
     "id": "le-tournesol",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Le tournesol",
       "nl": "De zonnebloem"
@@ -157,6 +170,7 @@
   },
   {
     "id": "mauves",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Mauves",
       "nl": "Kaasjeskruid"
@@ -169,6 +183,7 @@
   },
   {
     "id": "montagne-et-tournesols",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Montagne et tournesols",
       "nl": "Berg en zonnebloemen"
@@ -181,6 +196,7 @@
   },
   {
     "id": "printemps",
+    "rubrique": "nature",
     "titre": {
       "fr": "Printemps",
       "nl": "Lente"
@@ -193,6 +209,7 @@
   },
   {
     "id": "sous-bois",
+    "rubrique": "nature",
     "titre": {
       "fr": "Sous bois",
       "nl": "Onder de bomen"
@@ -205,6 +222,7 @@
   },
   {
     "id": "sweet",
+    "rubrique": "chats",
     "titre": {
       "fr": "Sweet",
       "nl": "Sweet"
@@ -217,6 +235,7 @@
   },
   {
     "id": "time-gambade",
+    "rubrique": "chats",
     "titre": {
       "fr": "Timé gambade",
       "nl": "Timé huppelt"
@@ -229,6 +248,7 @@
   },
   {
     "id": "time-s-amuse",
+    "rubrique": "chats",
     "titre": {
       "fr": "Timé s'amuse",
       "nl": "Timé speelt"
@@ -241,6 +261,7 @@
   },
   {
     "id": "tournesols",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Tournesols",
       "nl": "Zonnebloemen"
@@ -253,6 +274,7 @@
   },
   {
     "id": "vieux-cerisier",
+    "rubrique": "nature",
     "titre": {
       "fr": "Vieux cerisier",
       "nl": "Oude kersenboom"
@@ -265,6 +287,7 @@
   },
   {
     "id": "narcisses",
+    "rubrique": "fleurs",
     "titre": {
       "fr": "Narcisses",
       "nl": "Narcissen"
