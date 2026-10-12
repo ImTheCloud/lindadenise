@@ -21,11 +21,22 @@ const vitrineToiles = toiles.slice(0, 3);
 const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/${id}-${l}.${format} ${l}w`).join(', ');
 ---
 <Base lang={lang} chemins={chemins}>
-  <div data-accueil>
-    <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} haut>
-      <h1 class="sr-only">Linda Denise – {a.surtitre}</h1>
-    </Bandeau>
-  </div>
+  <section class="heros" data-accueil>
+    <Feuilles />
+    <div class="contenu heros__grille">
+      <div class="heros__texte">
+        <p class="surtitre">{a.surtitre}</p>
+        <h1><span class="mot-vert">Linda</span> <span class="mot-orange">Denise</span></h1>
+        <div class="heros__actions">
+          <a class="bouton bouton--vert" href={chemin('dessins', lang)}>{a.portes.dessinsCta}</a>
+          <a class="bouton bouton--brun" href={chemin('toiles', lang)}>{a.portes.toilesCta}</a>
+        </div>
+      </div>
+      <div class="heros__video">
+        <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} cadre />
+      </div>
+    </div>
+  </section>
 
   <div class="riviere" aria-hidden="true"><Etang /></div>
 
@@ -110,6 +121,13 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
 </Base>
 
 <style>
+  .heros { position: relative; overflow: hidden; padding-block: clamp(28px, 5vw, 64px) clamp(20px, 3vw, 36px); background: linear-gradient(#fff 55%, #f6fbf6); }
+  .heros__grille { position: relative; z-index: 1; display: grid; gap: 28px; align-items: center; }
+  .heros__texte h1 { font-size: clamp(3.6rem, 1.4rem + 8vw, 7.2rem); margin-bottom: 0.1em; line-height: 0.95; }
+  .heros__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
+  .bouton--brun { background: var(--monde-toiles); border-color: #34200f; box-shadow: 0 5px 0 #34200f; }
+  .bouton--brun:hover { box-shadow: 0 7px 0 #34200f; }
+  @media (min-width: 960px) { .heros__grille { grid-template-columns: 0.8fr 1.2fr; gap: 48px; } }
   .riviere { position: relative; height: clamp(130px, 18vw, 230px); margin-top: -1px; background: var(--fond); overflow: hidden; }
   /* Deux grands blocs dessinés : vert pour les dessins, brun pour les toiles */
   .portes { position: relative; overflow: hidden; padding-block: clamp(24px, 4vw, 48px) clamp(40px, 6vw, 72px); background: var(--fond); }
