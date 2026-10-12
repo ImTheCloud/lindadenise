@@ -48,11 +48,11 @@ export type Page = keyof typeof chemins;
 export const chemin = (page: Page, lang: Lang) => chemins[page][lang];
 export const cheminDessin = (id: string, lang: Lang) => `${chemins.dessins[lang]}${id}/`;
 export const cheminToile = (id: string, lang: Lang) => `${chemins.toiles[lang]}#${id}`;
-// Résumé d'un lot de toiles (nombre, remise, envoi, total), pour la page Toiles et le formulaire.
+// Résumé d'un lot de toiles (nombre, toiles offertes, envoi, total), pour la page Toiles et le formulaire.
 export function resumeLot(lang: Lang, nombre: number) {
   const s = t(lang).toiles.selection;
   const k = calculLot(nombre);
-  const detail = [k.pourcent ? s.remise(k.pourcent) : '', k.envoi ? s.envoi(k.envoi) : s.envoiOffert].filter(Boolean).join(' · ');
+  const detail = [k.offertes ? s.offerte(k.offertes) : '', k.envoi ? s.envoi(k.envoi) : s.envoiOffert].filter(Boolean).join(' · ');
   return { nombre: s.nombre(nombre), detail, total: k.total };
 }
 export const autreLangue = (lang: Lang): Lang => (lang === 'fr' ? 'nl' : 'fr');

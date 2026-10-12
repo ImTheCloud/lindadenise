@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import CarteDessin from '../CarteDessin.astro';
 import Apercu from '../Apercu.astro';
 import Etapes from '../Etapes.astro';
-import { t, chemin, cheminDessin, cheminToile, dessins, toiles, type Dessin, type Lang } from '../../i18n';
+import { t, chemin, cheminDessin, dessins, type Dessin, type Lang } from '../../i18n';
 import { PRIX_TOILE, DELAI_TOILE_SUR_COMMANDE } from '../../data/vente';
 interface Props { lang: Lang; dessin: Dessin }
 const { lang, dessin } = Astro.props;
@@ -18,8 +18,6 @@ const apres = [...dessins.slice(i + 1), ...dessins.slice(0, i)];
 const memeRubrique = [...apres.filter((x) => x.rubrique === dessin.rubrique), ...apres.filter((x) => x.rubrique !== dessin.rubrique)].slice(0, 4);
 const rub = d.rubriques[dessin.rubrique];
 const contactUrl = `${chemin('contact', lang)}?dessin=${dessin.id}`;
-// Toile déjà imprimée de ce dessin, encore disponible.
-const toile = toiles.find((x) => x.dessin === dessin.id && !x.vendue);
 const jsonld = {
   '@context': 'https://schema.org',
   '@type': 'VisualArtwork',
@@ -63,35 +61,16 @@ const jsonld = {
   </section>
   <section class="section section--vert" id="toile">
     <div class="contenu option-toile cadre">
-      {toile ? (
-        <a class="option-toile__image" href={cheminToile(toile.id, lang)} tabindex="-1" aria-hidden="true">
-          <picture>
-            <source type="image/avif" srcset={`/toiles/${toile.id}-400.avif`} />
-            <img src={`/toiles/${toile.id}-400.webp`} width="400" height="566" alt="" loading="lazy" decoding="async" />
-          </picture>
-        </a>
-      ) : (
-        <div class="option-toile__image" aria-hidden="true">
-          <Apercu id={dessin.id} alt="" largeur={dessin.largeur} hauteur={dessin.hauteur} />
-        </div>
-      )}
+      <div class="option-toile__image" aria-hidden="true">
+        <Apercu id={dessin.id} alt="" largeur={dessin.largeur} hauteur={dessin.hauteur} />
+      </div>
       <div>
         <h2>{d.dessins.toileTitre}</h2>
-        {toile ? (
-          <>
-            <p class="option-toile__nom">{d.dessins.toileNom(toile.titre[lang])}</p>
-            <p>{d.dessins.toileDeja(PRIX_TOILE)}</p>
-            <a class="bouton bouton--vert" href={cheminToile(toile.id, lang)}>{d.dessins.toileVoir}</a>
-          </>
-        ) : (
-          <>
-            <p>{d.dessins.toileCommande}</p>
-            <p class="option-toile__nom">{d.dessins.toilePrix(PRIX_TOILE)}</p>
-            <p>{d.dessins.toileDelai(DELAI_TOILE_SUR_COMMANDE[lang])}</p>
-            <p>{d.dessins.toileLot}</p>
-            <a class="bouton bouton--vert" href={`${chemin('contact', lang)}?sujet=toile-commande&dessin=${dessin.id}`}>{d.dessins.toileDemander}</a>
-          </>
-        )}
+        <p>{d.dessins.toileCommande}</p>
+        <p class="option-toile__nom">{d.dessins.toilePrix(PRIX_TOILE)}</p>
+        <p>{d.dessins.toileDelai(DELAI_TOILE_SUR_COMMANDE[lang])}</p>
+        <p>{d.dessins.toileLot}</p>
+        <a class="bouton bouton--vert" href={`${chemin('contact', lang)}?sujet=toile-commande&dessin=${dessin.id}`}>{d.dessins.toileDemander}</a>
         <p class="option-toile__note">{d.dessins.toileNote}</p>
       </div>
     </div>

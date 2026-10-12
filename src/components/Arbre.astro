@@ -35,13 +35,9 @@ const pendues = lobes.filter((l) => Math.sin(l.a) > 0.3).map((l) => ({ x: rond(l
 // fleurs de tilleul : une bractée pâle et quelques boutons crème
 const fleurs = [[300, 470], [420, 540], [560, 520], [690, 470], [790, 420], [210, 400], [470, 300], [640, 260], [350, 220]];
 // branches, sous le feuillage (on les voit entre les boules du bas)
-const branches = ['M640,760 C640,690 626,640 604,560', 'M632,650 C560,590 452,566 352,500', 'M648,630 C700,566 760,532 806,470', 'M612,590 C584,506 566,430 520,362', 'M598,600 C520,560 420,520 250,470'];
+const branches = ['M640,760 L640,712 C640,672 628,632 604,560', 'M632,650 C560,590 452,566 352,500', 'M648,630 C700,566 760,532 806,470', 'M612,590 C584,506 566,430 520,362', 'M598,600 C520,560 420,520 250,470'];
 ---
 <div class="arbre" aria-hidden="true">
-  <svg class="arbre__tronc" viewBox="0 0 100 300" preserveAspectRatio="none">
-    <path d="M0,-4 L0,300 L100,300 L100,-4 Z" fill="#9C5B2C" />
-    <path d="M0,-4 L0,300 M100,300 L100,-4" fill="none" stroke="#6B3A17" stroke-width="2.5" vector-effect="non-scaling-stroke" />
-  </svg>
   <svg class="arbre__couronne" viewBox="0 0 1000 760" data-couronne>
     <g fill="none" stroke-linecap="round">
       {branches.map((d, i) => <path d={d} stroke="#6B3A17" stroke-width={i === 0 ? 92 : 34 - i * 3} />)}
@@ -66,13 +62,18 @@ const branches = ['M640,760 C640,690 626,640 604,560', 'M632,650 C560,590 452,56
       </g>
     ))}
   </svg>
+  {/* le tronc du bas recouvre le pied de celui de la couronne : même couleur, même bord, aucun raccord visible */}
+  <svg class="arbre__tronc" viewBox="0 0 92 300" preserveAspectRatio="none">
+    <rect x="0" y="-4" width="92" height="304" fill="#6B3A17" />
+    <rect x="5" y="-4" width="82" height="304" fill="#9C5B2C" />
+  </svg>
 </div>
 <style>
   /* Téléphone : un grand arbre entier qui remplit l'espace entre le panneau et l'étang (il passe derrière le panneau).
-     Grand écran : l'arbre entier, grand, à gauche. Le tronc prolonge celui de la couronne (même largeur : 8,4 % de la couronne). */
+     Grand écran : l'arbre entier, grand, à gauche. Le tronc prolonge celui de la couronne (même largeur et même bord : 9,2 % de la couronne). */
   .arbre { position: absolute; inset: 0; pointer-events: none; --l: 92vw; --g: 4vw; --h: calc(100% - 92vw * 0.76 - 104px); }
   .arbre__couronne { position: absolute; left: var(--g); top: var(--h); width: var(--l); height: auto; }
-  .arbre__tronc { position: absolute; overflow: visible; left: calc(var(--g) + var(--l) * 0.598); width: calc(var(--l) * 0.084); top: calc(var(--h) + var(--l) * 0.76 - 1px); height: calc(100% - var(--h) - var(--l) * 0.76 - 40px); }
+  .arbre__tronc { position: absolute; overflow: visible; left: calc(var(--g) + var(--l) * 0.594); width: calc(var(--l) * 0.092); top: calc(var(--h) + var(--l) * 0.73); height: calc(100% - var(--h) - var(--l) * 0.73 - 40px); }
   @media (min-width: 900px) {
     .arbre { --l: 50vw; --g: 1vw; --h: 0vw; }
   }

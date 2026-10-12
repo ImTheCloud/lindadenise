@@ -2,6 +2,19 @@
 
 Dernière mise à jour : 2026-10-12 (retours vidéos et toiles : voir la première section ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Infos de Linda et corrections (2026-10-12, non publiées)
+
+Validés par Claudiu : musiques, frais d'envoi 12 €, titres NL, anecdotes de Tilleul.
+
+Appliqué :
+- **Tronc de l'arbre** (page de jeu) : le pied du tronc de la couronne avait un bord plus épais et décalé par rapport au tronc du bas (raccord visible, aussi sur téléphone). Le tronc du bas a maintenant la même largeur et le même bord que celui de la couronne et le recouvre depuis un endroit où il est droit (`Arbre.astro`) ; vérifié en le grossissant 6 fois.
+- **Toiles et dessins numériques séparés** : ce ne sont pas les mêmes dessins. Plus aucun lien entre eux : champ `dessin` retiré de `toiles.json` et du script, lien « Aussi en dessin numérique » retiré des fiches de toiles, « Déjà imprimée en toile » retiré des fiches de dessins. Reste seulement la **toile sur commande** à partir d'un dessin numérique (même prix, 1 à 3 semaines environ, création et envoi compris).
+- **Offre de lot** : plus de pourcentages, **5 toiles achetées, la 6e offerte** (6 toiles = 1 000 €). Envoi offert dès 2 toiles conservé (à confirmer).
+- **Toile** : 3 mm d'épaisseur, environ 500 g, finition mate (page Toiles, fiche, caractéristiques).
+- **Envoi** : bpost, 1 à 2 semaines (`DELAI_ENVOI`).
+- **Retours** : toile retournable, frais de livraison du retour à la charge de l'acheteur ; dessins numériques ni repris ni remboursés (page Conditions de vente des toiles).
+- **Expositions et dépôts** : à voir avec la galerie qui contactera Linda (rien d'écrit sur le site).
+
 ## Retours de Claudiu sur les toiles et les vidéos (2026-10-12, non publiés)
 
 Appliqués :

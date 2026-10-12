@@ -1,7 +1,7 @@
 import type { Dico } from './fr';
-import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, REMISES } from '../data/vente';
+import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, TOILES_ACHETEES, DELAI_ENVOI } from '../data/vente';
 
-const kortingen = [...REMISES].sort((a, b) => a.des - b.des).map((r) => `−${r.pourcent} % vanaf ${r.des} doeken`).join(', ');
+const lot = `${TOILES_ACHETEES} doeken gekocht, het ${TOILES_ACHETEES + 1}e is gratis`;
 
 export const nl: Dico = {
   langue: 'nl',
@@ -78,13 +78,10 @@ export const nl: Dico = {
     altDe: (t: string) => `Tekening “${t}” van Linda Denise`,
     toileLien: 'Ook als doek',
     toileTitre: 'Deze tekening als doek',
-    toileNom: (t: string) => `Het doek “${t}”`,
-    toileDeja: (p: number) => `Al gedrukt als doek: meteen beschikbaar, ${p} € + verzending.`,
-    toileVoir: 'Bekijk het doek',
     toileCommande: 'Linda kan deze tekening laten drukken op aluminium, in A3-formaat (29,7 × 42 cm): hetzelfde formaat als haar doeken.',
     toilePrix: (p: number) => `${p} € + verzendkosten (België)`,
-    toileDelai: (delai: string) => `Langere levertijd, het doek moet nog gedrukt worden: ${delai || 'Linda laat de termijn weten op aanvraag'}.`,
-    toileLot: `Dezelfde lotkorting als voor de doeken: ${kortingen}.`,
+    toileDelai: (delai: string) => `Termijn: ${delai}.`,
+    toileLot: `Hetzelfde lotaanbod als voor de doeken: ${lot}.`,
     toileDemander: 'Ik wil deze tekening als doek',
     toileNote: 'Het digitale bestand druk je op papier af, voor privégebruik. Een doek maakt alleen Linda.',
   },
@@ -98,18 +95,17 @@ export const nl: Dico = {
     vendue: 'Verkocht',
     vendueTexte: 'Dit doek is verkocht.',
     conditions: 'Verkoopvoorwaarden van de doeken',
-    caracteristiques: 'Druk op aluminium, A3, 29,7 × 42 cm, uniek stuk, ingebouwde ophanghaak',
+    caracteristiques: 'Druk op aluminium, A3, 29,7 × 42 cm, 3 mm dik, 500 g, matte afwerking, uniek stuk, ingebouwde ophanghaak',
     prix: (p: number) => `${p} €`,
     envoi: (e: number) => `+ ${e} € verzendkosten (België)`,
     envoiOffert: (n: number) => `Gratis verzending vanaf ${n} doeken.`,
-    remise: (n: number, p: number) => `−${p} % vanaf ${n} doeken`,
+    lot: lot[0].toUpperCase() + lot.slice(1),
     exemple: (n: number, total: number) => `${n} doeken = ${total} €`,
     ajouter: 'Toevoegen aan mijn selectie',
     demander: 'Dit doek aanvragen',
     echelle: 'Bekijk op schaal',
     echelleRetour: 'Terug naar het doek',
     echelleLegende: 'Het doek (29,7 × 42 cm) boven een zetel, naast een meetlat van 50 cm.',
-    dessinLie: (t: string) => `Ook als digitale tekening, 10 €: “${t}”`,
     precedent: 'Vorig doek',
     suivant: 'Volgend doek',
     fermer: 'Sluiten',
@@ -117,7 +113,7 @@ export const nl: Dico = {
     selection: {
       titre: 'Mijn selectie',
       nombre: (n: number) => (n > 1 ? `${n} doeken` : '1 doek'),
-      remise: (p: number) => `korting −${p} %`,
+      offerte: (n: number) => (n > 1 ? `${n} doeken gratis` : '1 doek gratis'),
       envoi: (e: number) => `verzending ${e} €`,
       envoiOffert: 'gratis verzending',
       total: (t: number) => `Totaal ${t} €`,
@@ -127,6 +123,7 @@ export const nl: Dico = {
     qualiteTitre: 'Het doek',
     qualite: [
       'De tekening is gedrukt op aluminium, in A3-formaat: 29,7 × 42 cm.',
+      'Dikte van 3 mm, gewicht van ongeveer 500 g, matte afwerking.',
       'Er zit een ophanghaak in het doek ingebouwd.',
       'Elk doek is een uniek stuk.',
       'Linda verpakt het zelf, met zorg.',
@@ -136,9 +133,9 @@ export const nl: Dico = {
     lotTitre: 'Meerdere doeken?',
     commanderTitre: 'Hoe bestel je?',
     etapes: [
-      { titre: 'Kies', texte: 'Eén doek of meer: de korting wordt meteen berekend.' },
+      { titre: 'Kies', texte: 'Eén doek of meer: het lotaanbod wordt meteen berekend.' },
       { titre: 'Schrijf aan Linda', texte: 'Het formulier neemt je keuze over. Linda antwoordt met het totaalbedrag, de manier van betalen en de verzending.' },
-      { titre: 'Ontvang je doek', texte: 'Linda verstuurt het met de vervoerder van haar keuze. Je ontvangt de details van de zending per e-mail.' },
+      { titre: 'Ontvang je doek', texte: `Linda verstuurt het met bpost, binnen ${DELAI_ENVOI.nl}. Je ontvangt de details van de zending per e-mail.` },
     ],
     livraison: 'Levering alleen in België.',
     paiement: 'Geen betaling op de site: je schrijft, Linda antwoordt.',
@@ -181,7 +178,7 @@ export const nl: Dico = {
     aucuneToile: 'Kies minstens één doek.',
     total: 'Berekend totaal:',
     totalNote: 'Geen betaling op de site: Linda bevestigt het bedrag, de manier van betalen en de verzending.',
-    commandeNote: 'Meerdere tekeningen als doek? Vermeld ze in je bericht: de lotkorting geldt ook dan.',
+    commandeNote: 'Meerdere tekeningen als doek? Vermeld ze in je bericht: het lotaanbod geldt ook dan.',
     adresseTitre: 'Leveringsadres (alleen in België)',
     rue: 'Straat en huisnummer',
     codePostal: 'Postcode',
@@ -286,10 +283,10 @@ export const nl: Dico = {
     meta: 'Hoe de aankoop van een doek van Linda Denise verloopt: prijs, bestelling, verzending in België.',
     blocs: [
       { titre: 'De doeken', texte: ['Een doek is een tekening van Linda Denise, gedrukt op aluminium in A3-formaat (29,7 × 42 cm).', 'Elk doek dat al gedrukt is, is een uniek stuk. Een doek op bestelling wordt op jouw vraag gedrukt.'] },
-      { titre: 'Prijs', texte: [`${PRIX_TOILE} € per doek, plus ${FRAIS_ENVOI} € verzendkosten. De verzending is gratis vanaf ${ENVOI_OFFERT_DES} doeken.`, `Lotkorting, alleen op de doeken: ${kortingen}.`] },
+      { titre: 'Prijs', texte: [`${PRIX_TOILE} € per doek, plus ${FRAIS_ENVOI} € verzendkosten. De verzending is gratis vanaf ${ENVOI_OFFERT_DES} doeken.`, `Lotaanbod, alleen op de doeken: ${lot}.`] },
       { titre: 'Bestelling en betaling', texte: ['Er is geen betaling op de site. Je stuurt je aanvraag via het formulier; Linda antwoordt met het totaalbedrag, de manier van betalen en de verzending.'] },
-      { titre: 'Verzending', texte: ['Levering alleen in België.', 'Linda verpakt het doek zelf, met zorg, en verstuurt het met de vervoerder van haar keuze. Je ontvangt de details van de zending per e-mail.'] },
-      { titre: 'Retour', texte: ['De voorwaarden voor een retour worden meegedeeld vóór elke betaling.'] },
+      { titre: 'Verzending', texte: ['Levering alleen in België.', `Linda verpakt het doek zelf, met zorg, en verstuurt het met bpost, binnen ${DELAI_ENVOI.nl}. Je ontvangt de details van de zending per e-mail.`] },
+      { titre: 'Retour', texte: ['Je kunt een doek terugsturen: de verzendkosten van het retour zijn voor jouw rekening.', 'Digitale tekeningen van 10 € worden niet teruggenomen of terugbetaald.'] },
       { titre: 'Auteursrecht', texte: ['Wie een doek koopt, krijgt niet het recht om de tekening te reproduceren: het auteursrecht blijft bij Linda Denise.'] },
     ],
   },

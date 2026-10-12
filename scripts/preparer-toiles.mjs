@@ -18,56 +18,56 @@ const LARGEUR = 1000;
 const HAUTEUR = Math.round((LARGEUR * 420) / 297);
 const TAILLES = [400, 800, 1000];
 
-// [fichier = titre FR, titre NL, dessin du site (id) ou null, rotation, coins de la toile dans la photo
+// [fichier = titre FR, titre NL, rotation, coins de la toile dans la photo
 //  (haut-gauche, haut-droite, bas-droite, bas-gauche), description FR, description NL]
 // Coins : detectes une fois par ordinateur (OpenCV) puis verifies et corriges a l'oeil.
 // Rotation : trois toiles ont ete photographiees couchees (-90 = quart de tour a gauche).
 const TOILES = [
-  ['Bois de Hal', 'Hallerbos', 'jacinthe-sauvage-dans-le-bois', -90, [[10, 92], [1544, 58], [1542, 1168], [10, 1150]],
+  ['Bois de Hal', 'Hallerbos', -90, [[10, 92], [1544, 58], [1542, 1168], [10, 1150]],
     'des troncs d’arbres au-dessus d’un tapis de jacinthes bleues', 'boomstammen boven een tapijt van blauwe hyacinten'],
-  ['Bouleaux en hiver', 'Berken in de winter', 'bouleaux-en-hiver', 0, [[85, 20], [1117, 26], [1126, 1502], [57, 1512]],
+  ['Bouleaux en hiver', 'Berken in de winter', 0, [[85, 20], [1117, 26], [1126, 1502], [57, 1512]],
     'des bouleaux blancs et noirs dans la neige, sous un ciel bleu', 'zwart-witte berken in de sneeuw, onder een blauwe lucht'],
-  ['Chat au repos', 'Rustende kat', null, 0, [[41, 12], [1139, 12], [1141, 1586], [34, 1558]],
+  ['Chat au repos', 'Rustende kat', 0, [[41, 12], [1139, 12], [1141, 1586], [34, 1558]],
     'un chat gris allongé près d’un arbre vert et d’un mur rose', 'een grijze kat die ligt bij een groene boom en een roze muur'],
-  ["Chat à l'île de Bréhat", 'Kat op het eiland Bréhat', 'chats-en-bretagne', 90, [[10, 47], [1589, 63], [1589, 1184], [10, 1159]],
+  ["Chat à l'île de Bréhat", 'Kat op het eiland Bréhat', 90, [[10, 47], [1589, 63], [1589, 1184], [10, 1159]],
     'la mer et ses bateaux, des maisons et un chat dans la verdure', 'de zee met bootjes, huizen en een kat in het groen'],
-  ['Chats camouflés', 'Verstopte katten', 'reve-de-chats-quebecois-en-hiver', 0, [[67, 9], [1111, 9], [1131, 1534], [23, 1528]],
+  ['Chats camouflés', 'Verstopte katten', 0, [[67, 9], [1111, 9], [1131, 1534], [23, 1528]],
     'trois chats dessinés au trait, cachés dans l’herbe sous un arbre', 'drie getekende katten, verstopt in het gras onder een boom'],
-  ['Fleurs bleues', 'Blauwe bloemen', null, -90, [[37, 59], [1589, 80], [1589, 1175], [17, 1174]],
+  ['Fleurs bleues', 'Blauwe bloemen', -90, [[37, 59], [1589, 80], [1589, 1175], [17, 1174]],
     'de grandes fleurs bleues sur un fond clair', 'grote blauwe bloemen op een lichte achtergrond'],
-  ['Frangipanier', 'Frangipani', 'frangipanier', 0, [[109, 10], [1189, 11], [1170, 1586], [62, 1528]],
+  ['Frangipanier', 'Frangipani', 0, [[109, 10], [1189, 11], [1170, 1586], [62, 1528]],
     'un frangipanier en fleurs blanches et jaunes sous un ciel bleu', 'een frangipani met witte en gele bloemen onder een blauwe lucht'],
-  ['Iris', 'Iris', 'iris-bleus', 0, [[77, 10], [1187, 10], [1176, 1589], [53, 1589]],
+  ['Iris', 'Iris', 0, [[77, 10], [1187, 10], [1176, 1589], [53, 1589]],
     'des iris bleu foncé au milieu de longues feuilles vertes', 'donkerblauwe irissen tussen lange groene bladeren'],
-  ['Jonquilles', 'Paasbloemen', null, 0, [[49, 11], [1155, 11], [1168, 1564], [60, 1587]],
+  ['Jonquilles', 'Paasbloemen', 0, [[49, 11], [1155, 11], [1168, 1564], [60, 1587]],
     'des jonquilles jaunes au pied de grands arbres', 'gele paasbloemen aan de voet van hoge bomen'],
-  ["L'oiseau", 'De vogel', null, 0, [[72, 14], [1157, 15], [1164, 1582], [50, 1554]],
+  ["L'oiseau", 'De vogel', 0, [[72, 14], [1157, 15], [1164, 1582], [50, 1554]],
     'un oiseau posé sur une branche, entouré de feuillage vert', 'een vogel op een tak, omringd door groen blad'],
-  ['La clôture', 'Het hek', null, 0, [[69, 23], [1138, 52], [1141, 1570], [44, 1570]],
+  ['La clôture', 'Het hek', 0, [[69, 23], [1138, 52], [1141, 1570], [44, 1570]],
     'un arbre derrière une clôture en bois, dans un jardin', 'een boom achter een houten hek, in een tuin'],
-  ['Le chemin de forêt', 'Het bospad', null, 0, [[33, 73], [1082, 65], [1121, 1577], [36, 1577]],
+  ['Le chemin de forêt', 'Het bospad', 0, [[33, 73], [1082, 65], [1121, 1577], [36, 1577]],
     'un chemin qui serpente entre les arbres', 'een pad dat tussen de bomen kronkelt'],
-  ['Le tournesol', 'De zonnebloem', 'tournesol', 0, [[39, 16], [1122, 16], [1150, 1587], [10, 1587]],
+  ['Le tournesol', 'De zonnebloem', 0, [[39, 16], [1122, 16], [1150, 1587], [10, 1587]],
     'un grand tournesol jaune et ses feuilles vertes', 'een grote gele zonnebloem met groene bladeren'],
-  ['Mauves', 'Kaasjeskruid', null, 0, [[12, 10], [1111, 10], [1122, 1586], [12, 1559]],
+  ['Mauves', 'Kaasjeskruid', 0, [[12, 10], [1111, 10], [1122, 1586], [12, 1559]],
     'des fleurs de mauve violettes parmi les feuilles', 'paarse bloemen van kaasjeskruid tussen de bladeren'],
-  ['Montagne et tournesols', 'Berg en zonnebloemen', null, 0, [[42, 58], [1120, 52], [1118, 1561], [65, 1561]],
+  ['Montagne et tournesols', 'Berg en zonnebloemen', 0, [[42, 58], [1120, 52], [1118, 1561], [65, 1561]],
     'un champ de tournesols au pied d’une montagne enneigée', 'een veld zonnebloemen aan de voet van een besneeuwde berg'],
-  ['Printemps', 'Lente', null, 0, [[58, 35], [1148, 10], [1184, 1589], [62, 1589]],
+  ['Printemps', 'Lente', 0, [[58, 35], [1148, 10], [1184, 1589], [62, 1589]],
     'des arbres aux couleurs tendres du printemps', 'bomen in de zachte kleuren van de lente'],
-  ['Sous bois', 'Onder de bomen', null, 0, [[67, 14], [1156, 15], [1145, 1583], [31, 1560]],
+  ['Sous bois', 'Onder de bomen', 0, [[67, 14], [1156, 15], [1145, 1583], [31, 1560]],
     'un sous-bois aux couleurs d’automne', 'een bos in herfstkleuren'],
-  ['Sweet', 'Sweet', 'coucou', 0, [[34, 17], [1129, 17], [1160, 1584], [38, 1584]],
+  ['Sweet', 'Sweet', 0, [[34, 17], [1129, 17], [1160, 1584], [38, 1584]],
     'un chat gris qui regarde par-dessus une nappe fleurie', 'een grijze kat die over een tafelkleed met bloemen kijkt'],
-  ['Timé gambade', 'Timé huppelt', null, 0, [[20, 19], [1072, 19], [1106, 1531], [20, 1531]],
+  ['Timé gambade', 'Timé huppelt', 0, [[20, 19], [1072, 19], [1106, 1531], [20, 1531]],
     'un chat blanc qui gambade entre les arbres', 'een witte kat die tussen de bomen huppelt'],
-  ["Timé s'amuse", 'Timé speelt', null, 0, [[76, 22], [1154, 21], [1189, 1552], [83, 1579]],
+  ["Timé s'amuse", 'Timé speelt', 0, [[76, 22], [1154, 21], [1189, 1552], [83, 1579]],
     'un petit chat blanc qui joue sous de grands arbres', 'een kleine witte kat die speelt onder hoge bomen'],
-  ['Tournesols', 'Zonnebloemen', 'prelude-a-amsterdam', 0, [[62, 78], [1130, 72], [1136, 1589], [63, 1589]],
+  ['Tournesols', 'Zonnebloemen', 0, [[62, 78], [1130, 72], [1136, 1589], [63, 1589]],
     'des tournesols sous un soleil jaune et un ciel bleu', 'zonnebloemen onder een gele zon en een blauwe lucht'],
-  ['Vieux cerisier', 'Oude kersenboom', 'arbre-a-saint-brieuc', 0, [[67, 10], [1181, 10], [1181, 1589], [60, 1589]],
+  ['Vieux cerisier', 'Oude kersenboom', 0, [[67, 10], [1181, 10], [1181, 1589], [60, 1589]],
     'un vieux cerisier au tronc tordu dans l’herbe haute', 'een oude kersenboom met een kromme stam in het hoge gras'],
-  ['narcisses', 'Narcissen', 'joie-de-paques', 0, [[113, 129], [1054, 118], [1071, 1476], [103, 1473]],
+  ['narcisses', 'Narcissen', 0, [[113, 129], [1054, 118], [1071, 1476], [103, 1473]],
     'des narcisses jaunes autour d’une branche', 'gele narcissen rond een tak'],
 ];
 
@@ -137,7 +137,7 @@ const anciennes = fs.existsSync(SORTIE_JSON) ? JSON.parse(fs.readFileSync(SORTIE
 const vendue = (id) => anciennes.find((t) => t.id === id)?.vendue ?? false;
 
 const sortie = [];
-for (const [fichier, nl, dessin, rotation, coins, descFr, descNl] of TOILES) {
+for (const [fichier, nl, rotation, coins, descFr, descNl] of TOILES) {
   const source = path.join(SOURCE, `${fichier}.jpeg`);
   if (!fs.existsSync(source)) { console.log('Introuvable :', source); continue; }
   const id = slug(fichier);
@@ -149,7 +149,7 @@ for (const [fichier, nl, dessin, rotation, coins, descFr, descNl] of TOILES) {
     await taille.clone().webp({ quality: 80 }).toFile(`${base}.webp`);
     if (largeur === 800) await taille.clone().jpeg({ quality: 82, mozjpeg: true }).toFile(`${base}.jpg`);
   }
-  sortie.push({ id, titre: { fr: majuscule(fichier), nl }, description: { fr: descFr, nl: descNl }, dessin, vendue: vendue(id) });
+  sortie.push({ id, titre: { fr: majuscule(fichier), nl }, description: { fr: descFr, nl: descNl }, vendue: vendue(id) });
 }
 
 fs.writeFileSync(SORTIE_JSON, JSON.stringify(sortie, null, 2) + '\n');

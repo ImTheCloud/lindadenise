@@ -2,24 +2,21 @@
 import Base from '../../layouts/Base.astro';
 import Etapes from '../Etapes.astro';
 import Video from '../Video.astro';
-import { t, chemin, cheminDessin, dessins, toiles, resumeLot, type Lang } from '../../i18n';
-import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, REMISES, calculLot } from '../../data/vente';
+import { t, chemin, toiles, resumeLot, type Lang } from '../../i18n';
+import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, TOILES_ACHETEES, calculLot } from '../../data/vente';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
 const tt = d.toiles;
 const chemins = { fr: chemin('toiles', 'fr'), nl: chemin('toiles', 'nl') };
 const contact = chemin('contact', lang);
-const remises = [...REMISES].sort((a, b) => a.des - b.des);
 const disponibles = toiles.filter((x) => !x.vendue).length;
 const liste = toiles.map((x) => {
-  const dessin = x.dessin ? dessins.find((y) => y.id === x.dessin) : undefined;
   return {
     id: x.id,
     titre: x.titre[lang],
     alt: tt.altDe(x.titre[lang], x.description[lang]),
     vendue: x.vendue,
-    dessin: dessin ? { href: cheminDessin(dessin.id, lang), texte: tt.dessinLie(dessin.titre[lang]) } : null,
   };
 });
 // Résumé de la sélection pour chaque nombre de toiles, calculé ici pour que les textes restent dans les dictionnaires.
@@ -93,7 +90,7 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
         <p>{tt.envoi(FRAIS_ENVOI)}</p>
         <h3>{tt.lotTitre}</h3>
         <ul class="coches">
-          {remises.map((r) => <li>{tt.remise(r.des, r.pourcent)} : {tt.exemple(r.des, calculLot(r.des).total)}</li>)}
+          <li>{tt.lot} : {tt.exemple(TOILES_ACHETEES + 1, calculLot(TOILES_ACHETEES + 1).total)}</li>
           <li>{tt.envoiOffert(ENVOI_OFFERT_DES)}</li>
         </ul>
         <p class="info__note">{tt.livraison} {tt.paiement}</p>
@@ -192,14 +189,13 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
           <p><a class="bouton" data-demander href={contact}>{tt.demander}</a></p>
         </div>
         <p><button type="button" class="bouton bouton--contour" data-echelle aria-pressed="false" data-texte={tt.echelle} data-retour={tt.echelleRetour}>{tt.echelle}</button></p>
-        <p class="fiche__dessin" data-dessin hidden><a href=""></a></p>
       </div>
     </div>
   </dialog>
 </Base>
 
 <script>
-  interface ToileVue { id: string; titre: string; alt: string; vendue: boolean; dessin: { href: string; texte: string } | null }
+  interface ToileVue { id: string; titre: string; alt: string; vendue: boolean }
   interface Resume { nombre: string; detail: string; total: string }
   const mur = document.querySelector<HTMLElement>('[data-mur]');
   const fiche = document.querySelector<HTMLDialogElement>('#fiche');
@@ -255,13 +251,6 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
       el<HTMLElement>(fiche!, '[data-vendue]').hidden = !x.vendue;
       el<HTMLElement>(fiche!, '[data-dispo]').hidden = x.vendue;
       el<HTMLAnchorElement>(fiche!, '[data-demander]').href = contact + x.id;
-      const dessin = el<HTMLElement>(fiche!, '[data-dessin]');
-      dessin.hidden = !x.dessin;
-      if (x.dessin) {
-        const a = el<HTMLAnchorElement>(dessin, 'a');
-        a.href = x.dessin.href;
-        a.textContent = x.dessin.texte;
-      }
       ajout.checked = selection.includes(x.id);
       vueEchelle(false);
       if (!fiche!.open) fiche!.showModal();
@@ -412,7 +401,6 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
   .fiche__vendue { font-family: var(--titre); font-size: 1.5rem; color: var(--orange-fonce); }
   .fiche__prix { font-family: var(--titre); font-size: 2.4rem; line-height: 1.1; color: var(--orange-fonce); }
   .fiche__envoi { font-size: 1rem; }
-  .fiche__dessin a { font-weight: 600; }
   .case { display: flex; gap: 12px; align-items: center; }
   .case input { appearance: none; -webkit-appearance: none; flex: none; width: 30px; height: 30px; margin: 0; cursor: pointer; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: 12px 6px 11px 7px / 7px 11px 6px 12px; display: grid; place-items: center; }
   .case input:checked { background: var(--vert-creme); }
