@@ -63,6 +63,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Pas de mot seul sur une ligne (consigne de Claudiu, notée dans `CLAUDE.md`)** : bouton du panier « Envoyer ma demande » (sans « à Linda »), ligne de livraison des cartes sur une ligne, `text-wrap: balance` sur titres, étiquettes, boutons et questions de la FAQ, `pretty` sur les paragraphes, questions de la FAQ un peu plus petites sur téléphone. Contrôle automatique à 360 et 390 px sur accueil, galeries, fiches, panier, contact, FAQ, À propos.
 
+- **Livraison, plus d'« envoi »** : pour les toiles, tous les textes FR et NL parlent de livraison (« Livrée par Linda », « Linda vous les livre », « Pièce unique livrée par Linda avec bpost », étapes, FAQ, conditions de vente, confidentialité) ; dessins : « livré par e-mail » dans les phrases, « reçu par e-mail » sur les badges. « Envoyer » reste seulement pour le formulaire. Panier : titre du bloc « Dessins » (plus « numériques », pour que la phrase de livraison tienne sur une ligne), sous-total « Dessins (n) ». Règle ajoutée dans `CLAUDE.md`.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
