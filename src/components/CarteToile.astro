@@ -1,4 +1,5 @@
 ---
+import IconeLivraison from './IconeLivraison.astro';
 import { cheminToile, t, type Toile, type Lang } from '../i18n';
 import { PRIX_TOILE } from '../data/vente';
 interface Props { toile: Toile; lang: Lang; priorite?: boolean }
@@ -23,6 +24,7 @@ const tailles = '(min-width: 1000px) 24vw, (min-width: 700px) 32vw, 46vw';
     </span>
     <span class="carte__titre">{titre}</span>
     <span class="carte__prix">{toile.vendue ? tt.vendueTexte : tt.prix(PRIX_TOILE)}</span>
+    {!toile.vendue && <span class="carte__livraison"><IconeLivraison genre="toile" taille={16} />{d.livraison.toile}</span>}
   </a>
   {!toile.vendue && (
     <button type="button" class="carte__panier" aria-pressed="false" aria-label={p.ajouterAria.replace('{t}', titre)} data-panier={`toile:${toile.id}`} data-titre={titre} data-ajouter={p.ajouter} data-dedans={p.dedans} data-aria-ajouter={p.ajouterAria} data-aria-dedans={p.dedansAria}>

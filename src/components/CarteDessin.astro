@@ -1,4 +1,5 @@
 ---
+import IconeLivraison from './IconeLivraison.astro';
 import Apercu from './Apercu.astro';
 import { cheminDessin, t, type Dessin, type Lang } from '../i18n';
 interface Props { dessin: Dessin; lang: Lang; priorite?: boolean }
@@ -15,6 +16,7 @@ const p = d.panier;
     </span>
     <span class="carte__titre">{titre}</span>
     <span class="carte__prix">{d.dessins.prix}</span>
+    <span class="carte__livraison"><IconeLivraison genre="dessin" taille={16} />{d.livraison.dessin}</span>
   </a>
   <button type="button" class="carte__panier" aria-pressed="false" aria-label={p.ajouterAria.replace('{t}', titre)} data-panier={`dessin:${dessin.id}`} data-titre={titre} data-ajouter={p.ajouter} data-dedans={p.dedans} data-aria-ajouter={p.ajouterAria} data-aria-dedans={p.dedansAria}>
     <svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><path d="M3 7h4l3.2 13.5h13.6L27 11H8.6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /><circle cx="12" cy="25.5" r="2.5" fill="currentColor" /><circle cx="22" cy="25.5" r="2.5" fill="currentColor" /></svg>

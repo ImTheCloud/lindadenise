@@ -53,6 +53,8 @@ const sujets = [
             <input type="hidden" name="total" />
             <p class="formulaire__note">{c.totalNote}</p>
           </div>
+          <p class="formulaire__note" data-pour="dessin" hidden>{d.panier.livraisonDessin}</p>
+          <p class="formulaire__note" data-pour="toile" hidden>{d.panier.livraisonToile}</p>
           <input type="hidden" name="commande" />
         </div>
 

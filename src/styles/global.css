@@ -131,6 +131,7 @@ p { margin: 0 0 1em; }
 .carte--vendue .carte__image img { filter: grayscale(0.9) opacity(0.7); }
 .carte__titre { display: flex; align-items: center; justify-content: center; padding: 8px 6px 0; font-family: var(--titre); font-size: 1.6rem; line-height: 1.15; text-align: center; text-wrap: balance; color: var(--vert-fonce); }
 .carte__prix { display: block; padding: 2px 6px 8px; font-family: var(--titre); font-size: 1.55rem; text-align: center; color: var(--orange-fonce); }
+.carte__livraison { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 6px 10px; font-size: 0.95rem; color: var(--encre-douce); }
 .carte:hover .carte__titre { color: var(--orange-fonce); }
 .carte__panier { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: auto; padding: 7px 10px; font-family: var(--titre); font-size: 1.1rem; line-height: 1.1; cursor: pointer; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); }
 .carte__panier:hover { background: var(--orange-creme); color: var(--orange-fonce); border-color: var(--orange-fonce); }

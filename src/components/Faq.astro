@@ -1,0 +1,30 @@
+---
+// Questions fréquentes : une question par ligne, la réponse s'ouvre au toucher (aucun script).
+interface Props { titre: string; questions: { q: string; r: string }[] }
+const { titre, questions } = Astro.props;
+---
+<section class="section faq">
+  <div class="contenu faq__corps">
+    <h2 class="centre">{titre}</h2>
+    <div class="faq__liste">
+      {questions.map((x) => (
+        <details class="faq__item">
+          <summary>{x.q}</summary>
+          <p>{x.r}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+<style>
+  .faq__corps { max-width: 820px; }
+  .faq h2 { margin-bottom: 24px; }
+  .faq__liste { display: grid; gap: 12px; }
+  .faq__item { background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: var(--ombre); }
+  .faq__item summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 10px 18px; font-family: var(--titre); font-size: 1.35rem; line-height: 1.2; color: var(--vert-fonce); cursor: pointer; list-style: none; }
+  .faq__item summary::-webkit-details-marker { display: none; }
+  .faq__item summary::after { content: '+'; flex: none; display: grid; place-items: center; width: 30px; height: 30px; font-size: 1.5rem; line-height: 1; color: #fff; background: var(--vert-fonce); border-radius: 50%; }
+  .faq__item[open] summary::after { content: '–'; }
+  .faq__item summary:hover { color: var(--orange-fonce); }
+  .faq__item p { margin: 0; padding: 0 18px 16px; color: var(--encre-douce); }
+</style>

@@ -2,10 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import Galerie from '../Galerie.astro';
 import CarteToile from '../CarteToile.astro';
-import Etapes from '../Etapes.astro';
+import Faq from '../Faq.astro';
 import Video from '../Video.astro';
 import { t, chemin, toiles, RUBRIQUES, type Lang } from '../../i18n';
-import { PRIX_TOILE, FRAIS_ENVOI, ENVOI_OFFERT_DES, TOILES_ACHETEES, calculLot } from '../../data/vente';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
@@ -15,50 +14,20 @@ const contact = chemin('contact', lang);
 const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, nombre: toiles.filter((x) => x.rubrique === r).length })).filter((r) => r.nombre > 0);
 ---
 <Base lang={lang} monde="toiles" titre={tt.titre} description={tt.meta} chemins={chemins} image={`/toiles/${toiles[0].id}-800.jpg`}>
-  <Galerie titre={d.nav.toiles} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={toiles.length}>
+  <Galerie titre={d.nav.toiles} tous={d.dessins.tous} groupe={d.dessins.rubrique} rubriques={rubriques} total={toiles.length} genre="toile" info={tt.info}>
     {toiles.map((x, i) => <CarteToile toile={x} lang={lang} priorite={i < 4} />)}
   </Galerie>
 
   <section class="section videos-bande">
     <div class="contenu">
-      <h2 class="centre apparait">{tt.videoTitre}</h2>
-      <div class="videos">
-        <figure class="videos__film apparait">
-          <Video lang={lang} nom={`toiles-${lang}`} largeur={1920} hauteur={1080} description={tt.videoFilmAlt} son />
-          <figcaption>{tt.videoFilm}</figcaption>
-        </figure>
-        <figure class="videos__vraies apparait">
-          <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} son />
-          <figcaption>{tt.videoVraies}</figcaption>
-        </figure>
-      </div>
+      <h2 class="centre apparait">{tt.videoVraies}</h2>
+      <figure class="vraies apparait">
+        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} son />
+      </figure>
     </div>
   </section>
 
-  <section class="section">
-    <div class="contenu infos">
-      <article class="info cadre apparait">
-        <h2>{tt.qualiteTitre}</h2>
-        <ul class="coches">{tt.qualite.map((q) => <li>{q}</li>)}</ul>
-      </article>
-      <article class="info info--prix cadre apparait">
-        <h2>{tt.prixTitre}</h2>
-        <p class="info__montant">{tt.prix(PRIX_TOILE)}</p>
-        <p>{tt.envoi(FRAIS_ENVOI)}</p>
-        <h3>{tt.lotTitre}</h3>
-        <ul class="coches">
-          <li>{tt.lot} : {tt.exemple(TOILES_ACHETEES + 1, calculLot(TOILES_ACHETEES + 1).total)}</li>
-          <li>{tt.envoiOffert(ENVOI_OFFERT_DES)}</li>
-        </ul>
-        <p class="info__note">{tt.livraison} {tt.paiement}</p>
-        <p class="info__note"><a href={chemin('conditionsToiles', lang)}>{tt.conditions}</a></p>
-      </article>
-    </div>
-  </section>
-
-  <section class="section section--orange">
-    <div class="contenu etapes-toiles apparait"><Etapes titre={tt.commanderTitre} etapes={tt.etapes} /></div>
-  </section>
+  <Faq titre={d.faq.titre} questions={d.faq.toiles} />
 
   <section class="section">
     <div class="contenu expo apparait">
@@ -73,33 +42,10 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
 </Base>
 
 <style>
-  .infos { display: grid; gap: 28px; }
-  .info { padding: 8px 24px 18px; }
-  .info h2 { margin-top: 0.5em; }
-  .info h3 { font-size: 1.4rem; margin-top: 1em; }
-  .info--prix { border-color: var(--orange-fonce); }
-  .info__montant { font-family: var(--titre); font-size: 2.6rem; line-height: 1.1; color: var(--orange-fonce); margin: 0; }
-  .info__note { margin: 0; color: var(--encre-douce); }
-  .coches { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
-  .coches li { position: relative; padding-left: 28px; line-height: 1.4; }
-  .coches li::before { content: '✓'; position: absolute; left: 0; color: var(--orange-fonce); font-weight: 700; }
-  .etapes-toiles { max-width: 980px; }
-  /* Deux films à la même hauteur (--h) : le film large et celui des vraies toiles, en portrait, côte à côte. */
-  .videos-bande { background: var(--vert-creme); }
+  .videos-bande { background: var(--vert-creme); text-align: center; }
   .videos-bande h2 { margin: 0 0 24px; }
-  .videos { --h: 400px; display: grid; justify-content: center; justify-items: center; gap: 28px 32px; }
-  .videos figure { box-sizing: border-box; width: 100%; margin: 0; padding: 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
-  .videos__vraies { max-width: 300px; }
-  .videos figcaption { width: 0; min-width: 100%; padding: 8px 4px 0; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--vert-fonce); }
+  .vraies { width: min(100%, 300px); margin: 0 auto; padding: 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
   .expo { max-width: 760px; text-align: center; }
   .expo .chapeau { margin-inline: auto; }
   .expo__signature { font-family: var(--titre); font-size: 1.8rem; color: var(--orange-titre); margin: -6px 0 18px; }
-  @media (min-width: 900px) {
-    .infos { grid-template-columns: 1fr 1fr; }
-    .videos { grid-template-columns: max-content max-content; align-items: start; }
-    .videos__film :global(.video) { width: calc(var(--h) * 16 / 9); }
-    .videos figure { width: fit-content; }
-    .videos__vraies { max-width: none; }
-    .videos__vraies :global(.video) { width: calc(var(--h) * 478 / 850); }
-  }
 </style>

@@ -38,6 +38,8 @@ const donnees = {
           <dl data-lignes></dl>
           <p class="panier__note">{p.note}</p>
           <p class="panier__note" data-delai hidden>{p.delaiCommande}</p>
+          <p class="panier__note" data-livraison-dessin hidden>{p.livraisonDessin}</p>
+          <p class="panier__note" data-livraison-toile hidden>{p.livraisonToile}</p>
           <p class="panier__actions">
             <a class="bouton" data-demander href={`${chemin('contact', lang)}?sujet=commande`}>{p.demander}</a>
             <button type="button" class="panier__vider" data-vider>{p.vider}</button>
@@ -66,6 +68,7 @@ const donnees = {
     const el = <T extends Element>(s: string) => racine.querySelector<T>(s)!;
     const vide = el<HTMLElement>('[data-vide]'), contenu = el<HTMLElement>('[data-contenu]'), liste = el<HTMLElement>('[data-liste]');
     const lignes = el<HTMLElement>('[data-lignes]'), delai = el<HTMLElement>('[data-delai]');
+    const livraisonDessin = el<HTMLElement>('[data-livraison-dessin]'), livraisonToile = el<HTMLElement>('[data-livraison-toile]');
     const euros = (n: number) => `${n} €`;
     const noeud = <K extends keyof HTMLElementTagNameMap>(nom: K, classe: string, texte = '') => {
       const n = document.createElement(nom);
@@ -112,6 +115,8 @@ const donnees = {
       contenu.hidden = total === 0;
       liste.replaceChildren(...p.dessin.map((id) => article('dessin', id)), ...p.toile.map((id) => article('toile', id)), ...p.commande.map((id) => article('commande', id)));
       delai.hidden = p.commande.length === 0;
+      livraisonDessin.hidden = p.dessin.length === 0;
+      livraisonToile.hidden = nombreToiles === 0;
       const c = calculPanier(p.dessin.length, nombreToiles);
       const l = d.textes.lignes;
       const rangs: HTMLElement[] = [];

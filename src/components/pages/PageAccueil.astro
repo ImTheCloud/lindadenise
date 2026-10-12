@@ -5,6 +5,7 @@ import CarteDessin from '../CarteDessin.astro';
 import CarteToile from '../CarteToile.astro';
 import Etapes from '../Etapes.astro';
 import Apercu from '../Apercu.astro';
+import IconeLivraison from '../IconeLivraison.astro';
 import Etang from '../Etang.astro';
 import Feuilles from '../Feuilles.astro';
 import { t, chemin, dessins, toiles, type Lang } from '../../i18n';
@@ -55,6 +56,7 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
         <span class="porte__nombre">{a.nombre(dessins.length)}</span>
         <span class="porte__nom">{d.nav.dessins}</span>
         <span class="porte__phrase">{a.portes.dessins(d.dessins.prix)}</span>
+        <span class="porte__livraison"><IconeLivraison genre="dessin" />{d.livraison.dessin}</span>
         <span class="porte__cta">{a.portes.dessinsCta}</span>
       </span>
     </a>
@@ -73,6 +75,7 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
         <span class="porte__nombre">{a.nombreToiles(toiles.length)}</span>
         <span class="porte__nom">{d.nav.toiles}</span>
         <span class="porte__phrase">{a.portes.toiles(tt.prix(PRIX_TOILE))}</span>
+        <span class="porte__livraison"><IconeLivraison genre="toile" />{d.livraison.toile}</span>
         <span class="porte__cta">{a.portes.toilesCta}</span>
       </span>
     </a>
@@ -157,6 +160,7 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   .porte__nombre { font-family: var(--titre); font-size: 1.3rem; }
   .porte__nom { font-family: var(--titre); font-size: clamp(3.2rem, 1.6rem + 5vw, 5.6rem); line-height: 0.95; }
   .porte__phrase { max-width: 34ch; font-size: 1.1rem; line-height: 1.45; }
+  .porte__livraison { display: inline-flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 600; }
   .porte__cta { display: inline-flex; align-items: center; min-height: 48px; margin-top: 6px; padding: 0 1.3em; font-family: var(--titre); font-size: 1.35rem; color: var(--p); background: #fff; border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
 
   /* Une rangée par monde : mêmes éléments, mêmes places */
