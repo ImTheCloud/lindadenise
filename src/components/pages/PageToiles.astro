@@ -62,7 +62,6 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
               <source type="image/webp" srcset={sources(x.id, 'webp')} sizes="(min-width: 1200px) 260px, (min-width: 640px) 40vw, 80vw" />
               <img src={`/toiles/${x.id}-800.jpg`} width="400" height="566" alt={x.alt} loading="lazy" decoding="async" />
             </picture>
-            <span class="toile__reflet" aria-hidden="true"></span>
             <span class="toile__choisie" aria-hidden="true">✓</span>
             {x.vendue && <span class="toile__vendue">{tt.vendue}</span>}
           </button>
@@ -102,7 +101,7 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
         <figcaption>{tt.videoFilm}</figcaption>
       </figure>
       <figure class="videos__vraies apparait">
-        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} />
+        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} son />
         <figcaption>{tt.videoVraies}</figcaption>
       </figure>
     </div>
@@ -298,7 +297,7 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
     });
     el(barre, '[data-sel-vider]').addEventListener('click', () => { selection = []; majSelection(); });
 
-    // Relief et reflet doux qui suivent le doigt ou la souris.
+    // Léger relief qui suit le doigt ou la souris.
     if (!reduit) {
       mur.querySelectorAll<HTMLElement>('.toile').forEach((b) => {
         const bouge = (e: PointerEvent) => {
@@ -307,7 +306,6 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
           const py = (e.clientY - r.top) / r.height - 0.5;
           b.style.setProperty('--tx', `${(px * 7).toFixed(2)}deg`);
           b.style.setProperty('--ty', `${(-py * 7).toFixed(2)}deg`);
-          b.style.setProperty('--reflet', `${(px * 100 + 50).toFixed(0)}%`);
         };
         b.addEventListener('pointermove', bouge);
         b.addEventListener('pointerdown', bouge);
@@ -356,10 +354,7 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
     transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15), box-shadow 0.5s;
   }
   .toile img { width: 100%; height: auto; aspect-ratio: 297 / 420; border-radius: 3px; }
-  .toile::after { content: ''; position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 40%); pointer-events: none; }
-  .toile__reflet { position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(110deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.32) 50%, rgba(255, 255, 255, 0) 62%) no-repeat; background-size: 260% 100%; background-position: var(--reflet, 120%) 0; opacity: 0; transition: opacity 0.4s; pointer-events: none; }
   .toile:hover, .toile:focus-visible { transform: translateY(calc(var(--h) - 6px)) perspective(900px) rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg)) rotate(0deg) scale(1.02); box-shadow: 0 0 0 1px #c3c9cd, 0 0 0 2px #eef1f3, 0 0 0 3px #9aa2a8, 0 4px 6px rgba(60, 40, 20, 0.2), 0 22px 26px -8px rgba(60, 40, 20, 0.32), 0 44px 56px -16px rgba(60, 40, 20, 0.32); }
-  .toile:hover .toile__reflet, .toile:active .toile__reflet { opacity: 1; }
   .toile__choisie { position: absolute; top: -14px; right: -14px; display: none; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--vert-fonce); color: #fff; font-size: 1.3rem; border: 3px solid #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25); }
   .choisie .toile__choisie { display: grid; }
   .vendue .toile picture { filter: grayscale(0.9) opacity(0.7); }
@@ -450,6 +445,5 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
   @media (min-width: 1240px) { .mur__liste { grid-template-columns: repeat(4, minmax(0, 260px)); } }
   @media (prefers-reduced-motion: reduce) {
     .toile, .toile:hover, .toile:focus-visible { transform: translateY(var(--h)) rotate(var(--r)); }
-    .toile__reflet { display: none; }
   }
 </style>

@@ -1,7 +1,8 @@
 // Coupe la vidéo des vraies toiles filmée au téléphone (brute, 25 Mo, hors du dépôt) en public/video/vraies-toiles.mp4.
 // Pour chaque toile, le passage le plus net et le plus stable (repéré par ordinateur le 2026-10-11) : 2,5 s,
-// fondus de 0,4 s, sans le son (bruits de manipulation). Deux passes : le montage, puis un léger débruitage
-// et une compression plus forte pour rester sous 10 Mo.
+// fondus de 0,4 s. Le son d'origine (bruits de manipulation) est retiré et remplacé par une musique originale
+// (musique.py, style « reel » : une mesure = 2,1 s = une toile). Trois passes : le montage, un léger débruitage
+// et une compression plus forte pour rester sous 10 Mo, puis la musique (l'image n'est pas recompressée).
 // Usage : node scripts/video/vraies-toiles.mjs [vidéo brute]   (par défaut la vidéo WhatsApp du 2026-10-10 dans ~/Downloads)
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -29,6 +30,11 @@ for (let i = 1; i < DEBUTS.length; i++) {
 const montage = path.join(os.tmpdir(), 'vraies-toiles-montage.mp4');
 const h264 = (crf) => ['-c:v', 'libx264', '-preset', 'slow', '-crf', crf, '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-movflags', '+faststart'];
 execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', SOURCE, '-filter_complex', filtres.join(';'), '-map', `[${courant}]`, '-an', ...h264('23'), montage], { stdio: 'inherit' });
-execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', montage, '-vf', 'hqdn3d=1.5:1.5:4:4', '-an', ...h264('27'), 'public/video/vraies-toiles.mp4'], { stdio: 'inherit' });
-fs.rmSync(montage);
+const muet = path.join(os.tmpdir(), 'vraies-toiles-muet.mp4');
+const musique = path.join(os.tmpdir(), 'vraies-toiles-musique.wav');
+execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', montage, '-vf', 'hqdn3d=1.5:1.5:4:4', '-an', ...h264('27'), muet], { stdio: 'inherit' });
+const duree = execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', muet]).toString().trim();
+execFileSync('python3', [path.join(import.meta.dirname, 'musique.py'), 'reel', duree, musique], { stdio: 'inherit' });
+execFileSync('python3', [path.join(import.meta.dirname, 'assembler.py'), muet, musique, 'public/video/vraies-toiles.mp4', 'copie'], { stdio: 'inherit' });
+for (const f of [montage, muet, musique]) fs.rmSync(f);
 console.log('public/video/vraies-toiles.mp4 prête.');

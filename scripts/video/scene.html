@@ -1,15 +1,13 @@
 <!doctype html>
-<!-- Scène des vidéos « Les toiles » : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
+<!-- Scène de la vidéo « Les toiles » (16:9, 60 s) : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
 <html>
 <head>
 <meta charset="utf-8">
 <style>
-  @font-face { font-family: 'Gochi Hand'; src: url('../../node_modules/@fontsource/gochi-hand/files/gochi-hand-latin-400-normal.woff2') format('woff2'); }
-  @font-face { font-family: 'Itim'; src: url('../../node_modules/@fontsource/itim/files/itim-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Lilita One'; src: url('./polices/lilita-one-latin-400-normal.woff2') format('woff2'); }
   html, body { margin: 0; padding: 0; background: #fff; overflow: hidden; }
   svg { display: block; }
-  text { font-family: 'Gochi Hand'; }
-  .st { font-family: 'Itim'; }
+  text { font-family: 'Lilita One'; }
 </style>
 </head>
 <body>
@@ -17,37 +15,55 @@
 <script>
 const P = new URLSearchParams(location.search);
 const LANG = P.get('lang') || 'fr';
-const VERT = P.get('format') === 'v';
-const W = VERT ? 1080 : 1920, H = VERT ? 1920 : 1080;
+const W = 1920, H = 1080;
 const REPO = new URL('../..', location.href).href.replace(/\/$/, '');
 const NS = 'http://www.w3.org/2000/svg';
 const racine = document.getElementById('racine');
 racine.setAttribute('width', W); racine.setAttribute('height', H); racine.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
+const BLANC = '#fff', ORANGE = '#FFA52E', VERT_NUIT = '#1f5a2e';
+
+// Textes (à l'écran : seulement ce que le site dit déjà ; ni prix ni remise). Légendes : [début, fin, texte, mis en avant].
 const T = {
   fr: {
-    titre: 'Les toiles', sous: 'de Linda Denise',
-    st: ['Des dessins faits au doigt, imprimés sur aluminium.', 'Format A3, 29,7 × 42 cm. Chaque toile est unique.', 'Elles ont été imprimées pour une exposition à Ostende.', 'Le lieu a fermé avant l’accrochage.', 'Elles cherchent aujourd’hui un nouveau mur.'],
-    stCourt: ['Des dessins imprimés sur aluminium, au format A3.', 'Chaque toile est unique.', 'Elles cherchent aujourd’hui un nouveau mur.'],
-    prix: '200 €', parToile: 'la toile', belgique: 'Livraison en Belgique', lot: '−10 % dès 2 toiles, −20 % dès 3',
-    court: '200 € la toile · Belgique', fin: 'Les toiles',
+    titre: 'Les toiles', sous: 'de Linda Denise', fin: 'Les toiles',
+    legendes: [
+      [4.5, 5.5, 'Des dessins', false], [5.5, 7.0, 'faits au doigt', true],
+      [7.5, 8.5, 'imprimés', false], [8.5, 10.0, 'sur aluminium', true],
+      [10.5, 11.5, 'Format A3', false], [11.5, 13.3, 'Chaque toile est unique', true],
+      [18.0, 19.5, 'Elles ont été imprimées', false], [19.5, 21.0, 'pour une exposition', false], [21.0, 23.5, 'à Ostende', true],
+      [26.0, 27.5, 'Le lieu a fermé', false], [27.5, 30.0, 'avant l’accrochage', true],
+      [47.0, 48.5, 'Elles cherchent', false], [48.5, 50.0, 'aujourd’hui', false], [50.0, 53.2, 'un nouveau mur', true],
+    ],
   },
   nl: {
-    titre: 'De doeken', sous: 'van Linda Denise',
-    st: ['Tekeningen met de vinger, gedrukt op aluminium.', 'A3-formaat, 29,7 × 42 cm. Elk doek is uniek.', 'Ze werden gedrukt voor een tentoonstelling in Oostende.', 'De plek sloot nog voor ze opgehangen werden.', 'Vandaag zoeken ze een nieuwe muur.'],
-    stCourt: ['Tekeningen gedrukt op aluminium, in A3-formaat.', 'Elk doek is uniek.', 'Vandaag zoeken ze een nieuwe muur.'],
-    prix: '200 €', parToile: 'per doek', belgique: 'Levering in België', lot: '−10 % vanaf 2 doeken, −20 % vanaf 3',
-    court: '200 € per doek · België', fin: 'De doeken',
+    titre: 'De doeken', sous: 'van Linda Denise', fin: 'De doeken',
+    legendes: [
+      [4.5, 5.5, 'Tekeningen', false], [5.5, 7.0, 'met de vinger', true],
+      [7.5, 8.5, 'gedrukt', false], [8.5, 10.0, 'op aluminium', true],
+      [10.5, 11.5, 'A3-formaat', false], [11.5, 13.3, 'Elk doek is uniek', true],
+      [18.0, 19.5, 'Ze werden gedrukt', false], [19.5, 21.0, 'voor een tentoonstelling', false], [21.0, 23.5, 'in Oostende', true],
+      [26.0, 27.5, 'De plek sloot', false], [27.5, 30.0, 'nog voor ze opgehangen werden', true],
+      [47.0, 48.5, 'Vandaag zoeken ze', false], [48.5, 53.2, 'een nieuwe muur', true],
+    ],
   },
 }[LANG];
+
+// Les 23 toiles (titres tirés du site) : 7 au mur de la galerie, 16 montrées une à une
+const donnees = (() => { const x = new XMLHttpRequest(); x.open('GET', `${REPO}/src/data/toiles.json`, false); x.send(); return JSON.parse(x.responseText); })();
+const titreToile = (id) => donnees.find((x) => x.id === id).titre[LANG].replace(/'/g, '’');
+const GALERIE = ['frangipanier', 'iris', 'le-tournesol', 'bouleaux-en-hiver', 'chat-a-l-ile-de-brehat', 'tournesols', 'sweet'];
+const UNE_A_UNE = ['mauves', 'bois-de-hal', 'chat-au-repos', 'jonquilles', 'vieux-cerisier', 'le-chemin-de-foret', 'time-gambade', 'fleurs-bleues',
+  'l-oiseau', 'montagne-et-tournesols', 'printemps', 'chats-camoufles', 'narcisses', 'sous-bois', 'time-s-amuse', 'la-cloture'];
 
 // ---------- outils ----------
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 const prog = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
 const io = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const ss = (x) => x * x * (3 - 2 * x); // fondu doux, sans à-coup au début ni à la fin
+const sinus = (x) => 0.5 - 0.5 * Math.cos(Math.PI * x);
 const out = (x) => 1 - Math.pow(1 - x, 3);
 const outBack = (x) => { const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
-const lerp = (a, b, x) => a + (b - a) * x;
 function el(tag, attrs = {}, parent = racine) {
   const e = document.createElementNS(NS, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
@@ -56,6 +72,7 @@ function el(tag, attrs = {}, parent = racine) {
 }
 let uid = 0;
 const id = (p) => `${p}${uid++}`;
+const montrer = (g, v) => g.setAttribute('display', v ? 'inline' : 'none');
 
 const defs = el('defs');
 // texture d'enduit, calculée une seule fois
@@ -71,27 +88,11 @@ const ombre = el('filter', { id: 'ombre', x: '-20%', y: '-15%', width: '140%', h
 el('feDropShadow', { dx: 0, dy: 14, stdDeviation: 16, 'flood-color': '#3a2a18', 'flood-opacity': 0.32 }, ombre);
 const flou = el('filter', { id: 'flou', x: '-50%', y: '-50%', width: '200%', height: '200%' }, defs);
 el('feGaussianBlur', { stdDeviation: 6 }, flou);
-const gReflet = el('linearGradient', { id: 'reflet', x1: 0, y1: 0, x2: 1, y2: 0.35 }, defs);
-[[0, 0], [0.42, 0], [0.5, 0.42], [0.58, 0], [1, 0]].forEach(([o, a]) => el('stop', { offset: o, 'stop-color': '#fff', 'stop-opacity': a }, gReflet));
 const gLumiere = el('radialGradient', { id: 'lumiere', cx: 0.5, cy: 0, r: 0.75 }, defs);
 el('stop', { offset: 0, 'stop-color': '#fffaf0', 'stop-opacity': 0.95 }, gLumiere);
 el('stop', { offset: 1, 'stop-color': '#fffaf0', 'stop-opacity': 0 }, gLumiere);
 
-// ---------- les toiles ----------
-const TOILES = {
-  frangipanier: { fr: 'Frangipanier', nl: 'Frangipani' },
-  iris: { fr: 'Iris', nl: 'Iris' },
-  'le-tournesol': { fr: 'Le tournesol', nl: 'De zonnebloem' },
-  'bouleaux-en-hiver': { fr: 'Bouleaux en hiver', nl: 'Berken in de winter' },
-  'chat-a-l-ile-de-brehat': { fr: 'Chat à l’île de Bréhat', nl: 'Kat op het eiland Bréhat' },
-  tournesols: { fr: 'Tournesols', nl: 'Zonnebloemen' },
-  sweet: { fr: 'Sweet', nl: 'Sweet' },
-  mauves: { fr: 'Mauves', nl: 'Kaasjeskruid' },
-  'vieux-cerisier': { fr: 'Vieux cerisier', nl: 'Oude kersenboom' },
-  'time-gambade': { fr: 'Timé gambade', nl: 'Timé huppelt' },
-};
-
-// Une toile accrochée à un clou : se peint au pinceau, se balance doucement, reçoit un reflet.
+// Une toile accrochée à un clou : se peint au pinceau, puis se balance doucement.
 function toile(parent, nom, largeur) {
   const l = largeur, h = Math.round(largeur * 420 / 297);
   const g = el('g', {}, parent);
@@ -110,27 +111,88 @@ function toile(parent, nom, largeur) {
   el('rect', { x: -l / 2 - 3, y: 15, width: l + 6, height: h + 6, rx: 3, fill: '#c9ced2' }, peint);
   el('image', { href: `${REPO}/public/toiles/${nom}-800.webp`, x: -l / 2, y: 18, width: l, height: h, preserveAspectRatio: 'xMidYMid slice' }, peint);
   el('rect', { x: -l / 2, y: 18, width: l, height: h, fill: 'none', stroke: '#9aa2a8', 'stroke-width': 2 }, peint);
-  const clip = el('clipPath', { id: id('c') }, defs);
-  el('rect', { x: -l / 2, y: 18, width: l, height: h }, clip);
-  const reflet = el('rect', { x: -l / 2 - l, y: 18, width: l * 1.2, height: h, fill: 'url(#reflet)', 'clip-path': `url(#${clip.id})`, opacity: 0 }, peint);
   const clou = el('g', {}, g);
   el('circle', { cx: 1.5, cy: 3, r: 7, fill: '#000', opacity: 0.18, filter: 'url(#flou)' }, clou);
   el('circle', { cx: 0, cy: 0, r: 6.5, fill: '#9a9a9a' }, clou);
   el('circle', { cx: -1.8, cy: -1.8, r: 2.6, fill: '#fff', opacity: 0.85 }, clou);
   return {
     l, h, g,
-    // p : avancement du pinceau (0 à 1), b : temps depuis la fin de la peinture (balancement), r : position du reflet (0 à 1)
-    maj({ x, y, p = 1, b = 99, r = -1, echelle = 1, pente = 0, opacite = 1 }) {
-      const angle = pente + 4.5 * Math.exp(-b / 0.9) * Math.cos(b * 5.2);
-      g.setAttribute('transform', `translate(${x},${y}) scale(${echelle})`);
-      g.setAttribute('opacity', opacite);
+    // p : avancement du pinceau (0 à 1), b : temps depuis la fin de la peinture (balancement : il ne bouge pas avant)
+    maj({ x, y, p = 1, b = 99, echelle = 1, pente = 0, opacite = 1 }) {
+      const angle = pente + 4.5 * Math.exp(-Math.max(0, b) / 0.9) * Math.cos(Math.max(0, b) * 5.2);
+      g.setAttribute('transform', `translate(${x.toFixed(2)},${y.toFixed(2)}) scale(${echelle.toFixed(4)})`);
+      g.setAttribute('opacity', opacite.toFixed(3));
       corps.setAttribute('transform', `rotate(${angle.toFixed(3)})`);
       trait.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
       clou.setAttribute('opacity', p > 0 ? 1 : 0);
-      reflet.setAttribute('opacity', r >= 0 && r <= 1 ? 1 : 0);
-      reflet.setAttribute('x', (-l / 2 - l * 1.2 + r * l * 2.4).toFixed(1));
     },
   };
+}
+
+// ---------- gros textes (style des vidéos courtes : gros titres qui sautent, mot après mot) ----------
+// Chaque mot est dessiné deux fois (ombre dure, puis le mot avec son contour) et « saute » à son tour.
+function mots(parent, texte, cx, cy, taille, { remplir = BLANC, contour = VERT_NUIT, largeurMax = W - 240 } = {}) {
+  const g = el('g', {}, parent);
+  const liste = texte.split(' ');
+  const sonde = el('text', { 'font-size': taille }, g);
+  const larg = liste.map((m) => { sonde.textContent = m; return sonde.getComputedTextLength(); });
+  g.removeChild(sonde);
+  const espace = taille * 0.28;
+  const total = larg.reduce((a, b) => a + b, 0) + espace * (liste.length - 1);
+  const k = Math.min(1, largeurMax / total);
+  const t2 = taille * k;
+  let x = cx - total * k / 2;
+  const motsListe = liste.map((m, i) => {
+    const mx = x + larg[i] * k / 2; x += (larg[i] + espace) * k;
+    const mg = el('g', { opacity: 0 }, g);
+    const attrs = { x: 0, y: 0, 'font-size': t2, 'text-anchor': 'middle', 'stroke-linejoin': 'round', 'stroke-width': t2 * 0.18, 'paint-order': 'stroke' };
+    el('text', { ...attrs, fill: contour, stroke: contour, transform: `translate(0,${t2 * 0.08})` }, mg).textContent = m;
+    el('text', { ...attrs, fill: Array.isArray(remplir) ? remplir[i] : remplir, stroke: contour }, mg).textContent = m;
+    return { mg, mx, rot: i % 2 ? 3 : -3 };
+  });
+  return {
+    g,
+    maj(p) { // p : 0 (rien) à 1 (tous les mots posés)
+      const n = motsListe.length;
+      motsListe.forEach((w, i) => {
+        const q = prog(p, (i / n) * 0.55, (i / n) * 0.55 + 0.45);
+        w.mg.setAttribute('opacity', Math.min(1, q * 5).toFixed(3));
+        w.mg.setAttribute('transform', `translate(${w.mx.toFixed(1)},${(cy + (1 - q) * 46).toFixed(1)}) rotate(${(w.rot * (1 - q)).toFixed(2)}) scale(${Math.max(0, outBack(q)).toFixed(4)})`);
+      });
+    },
+  };
+}
+
+// Un titre sur une ou deux lignes (coupé au mot qui équilibre les deux lignes)
+function titre(parent, texte, cx, cy, taille, largeurMax, remplir = BLANC) {
+  const g = el('g', {}, parent);
+  const m = texte.split(' ');
+  let lignes = [texte];
+  if (texte.length > 13 && m.length > 1) {
+    let meilleur = 1;
+    for (let s = 1; s < m.length; s++) if (Math.abs(m.slice(0, s).join(' ').length - m.slice(s).join(' ').length) < Math.abs(m.slice(0, meilleur).join(' ').length - m.slice(meilleur).join(' ').length)) meilleur = s;
+    lignes = [m.slice(0, meilleur).join(' '), m.slice(meilleur).join(' ')];
+  }
+  const liste = lignes.map((l, j) => mots(g, l, cx, cy + (j - (lignes.length - 1) / 2) * taille * 1.02, taille, { largeurMax, remplir }));
+  return { g, maj: (p) => liste.forEach((x, j) => x.maj(prog(p, j * 0.3, j * 0.3 + 0.7))) };
+}
+
+// Légendes : quelques mots à la fois, en bas de l'image, qui sautent puis s'effacent
+function legendes(parent, morceaux) {
+  const cy = H - 118;
+  const liste = morceaux.map(([a, b, texte, accent]) => {
+    const g = el('g', { display: 'none' }, parent);
+    return { a, b, g, n: texte.split(' ').length, m: mots(g, texte, W / 2, cy, 128, { remplir: accent ? ORANGE : BLANC }) };
+  });
+  return (t) => liste.forEach(({ a, b, g, n, m }) => {
+    const vis = t >= a && t < b;
+    montrer(g, vis);
+    if (!vis) return;
+    m.maj(prog(t, a, a + 0.16 + 0.1 * n));
+    const s = ss(prog(t, b - 0.2, b));
+    g.setAttribute('opacity', (1 - s).toFixed(3));
+    g.setAttribute('transform', `translate(${W / 2},${cy - 45}) scale(${(1 + 0.06 * s).toFixed(4)}) translate(${-W / 2},${-(cy - 45)})`);
+  });
 }
 
 // ---------- décor ----------
@@ -209,60 +271,6 @@ function mur(parent, x, y, l, h) {
   return g;
 }
 
-// Texte écrit lettre à lettre (chaque lettre monte et apparaît)
-function ecrit(parent, texte, x, y, taille, couleur, ancre = 'middle', classe = '') {
-  const t = el('text', { x, y, 'font-size': taille, fill: couleur, 'text-anchor': ancre, class: classe }, parent);
-  const lettres = [...texte].map((c) => { const s = el('tspan', {}, t); s.textContent = c; return s; });
-  return (p) => {
-    const n = lettres.length;
-    lettres.forEach((s, i) => {
-      const k = clamp(p * (n + 6) - i, 0, 6) / 6;
-      s.setAttribute('opacity', out(k).toFixed(3));
-      s.setAttribute('dy', i === 0 ? 0 : 0);
-    });
-    t.setAttribute('transform', `translate(0,${(1 - out(clamp(p * 1.4, 0, 1))) * 14})`);
-  };
-}
-
-// Sous-titre incrusté : bandeau blanc arrondi en bas, texte en Itim
-function sousTitre(parent) {
-  const g = el('g', { opacity: 0 }, parent);
-  const fond = el('rect', { rx: 26, fill: '#fff', stroke: '#2B6E3A', 'stroke-width': 3, opacity: 0.94 }, g);
-  const t = el('text', { x: W / 2, y: 0, 'font-size': VERT ? 46 : 44, fill: '#2b3b2b', 'text-anchor': 'middle', class: 'st' }, g);
-  let actuel = '';
-  const lignes = (txt) => {
-    if (!VERT || txt.length < 34) return [txt];
-    const mots = txt.split(' '); const a = []; let l = '';
-    for (const m of mots) { if ((l + ' ' + m).trim().length > 32 && l) { a.push(l); l = m; } else l = (l + ' ' + m).trim(); }
-    a.push(l); return a;
-  };
-  return (txt, p, yb) => {
-    g.setAttribute('opacity', (p <= 0 ? 0 : Math.min(1, p * 6, (1 - p) * 8)).toFixed(3));
-    if (txt !== actuel) {
-      actuel = txt; t.textContent = '';
-      lignes(txt).forEach((l, i) => { const s = el('tspan', { x: W / 2, dy: i ? (VERT ? 58 : 54) : 0 }, t); s.textContent = l; });
-    }
-    const n = t.childNodes.length, lh = VERT ? 58 : 54;
-    t.setAttribute('y', yb - (n - 1) * lh);
-    const bb = t.getBBox();
-    fond.setAttribute('x', bb.x - 34); fond.setAttribute('y', bb.y - 16); fond.setAttribute('width', bb.width + 68); fond.setAttribute('height', bb.height + 32);
-    g.setAttribute('transform', `translate(0,${(1 - out(clamp(p * 6, 0, 1))) * 20})`);
-  };
-}
-
-// Grand coup de pinceau qui traverse l'écran (transition entre deux scènes)
-function coupDePinceau(parent, couleur) {
-  const d = `M${-W * 0.2},${H * 0.25} C${W * 0.3},${H * 0.05} ${W * 0.55},${H * 0.55} ${W * 1.2},${H * 0.3} M${W * 1.2},${H * 0.62} C${W * 0.6},${H * 0.85} ${W * 0.3},${H * 0.45} ${-W * 0.2},${H * 0.8}`;
-  const p = el('path', { d, fill: 'none', stroke: couleur, 'stroke-width': Math.max(W, H) * 0.42, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1 }, parent);
-  // x : 0 → 0,5 le trait couvre l'écran, 0,5 → 1 il s'efface par l'autre bout
-  return (x) => {
-    if (x <= 0 || x >= 1) { p.setAttribute('opacity', 0); return; }
-    p.setAttribute('opacity', 1);
-    if (x < 0.5) { p.setAttribute('stroke-dasharray', '1 1'); p.setAttribute('stroke-dashoffset', (1 - io(x * 2)).toFixed(4)); }
-    else { const k = io((x - 0.5) * 2); p.setAttribute('stroke-dasharray', `${(1 - k).toFixed(4)} 1`); p.setAttribute('stroke-dashoffset', (-k).toFixed(4)); }
-  };
-}
-
 function logo(parent) {
   const g = el('g', {}, parent);
   el('image', { href: `${REPO}/public/favicon.svg`, x: -110, y: -110, width: 220, height: 220 }, g);
@@ -284,57 +292,58 @@ function poussieres(parent, n) {
   });
 }
 
-// ---------- Tilleul (moteur du site, inchangé) ----------
-const porteChat = el('g', {});
-const scene = el('svg', { width: W, height: 280, overflow: 'visible' }, porteChat);
-const chat = new Tilleul.Chat(scene, { decor: { lotus: () => [], feuilles: () => [] }, libre: true, reduit: false, dort: false, toucher() {}, taire() {}, suit() {} });
-scene.setAttribute('width', W); scene.setAttribute('height', 280);
-racine.removeChild(porteChat);
-let chatPret = false;
-// Positions dans le repère du moteur (largeur de l'écran, bande de 280 de haut)
-function chatEntre(depart, cible) {
-  chat.ordre('assis');
-  chat.x = depart; chat.cibleX = cible; chat.etat = depart === cible ? 'assis' : 'marche';
-}
-// Il suit le pointeur du regard : on « pointe » la toile
-function regarde(x, y) { window.dispatchEvent(new PointerEvent('pointermove', { clientX: x, clientY: y })); }
+// ================= Montage (construit une fois les polices chargées : les mots sont mesurés) =================
+window.pret = (async () => {
+  await document.fonts.load('80px "Lilita One"');
 
-// ================= Montage =================
-const calques = { fond: el('g'), scene: el('g'), texte: el('g'), pinceau: el('g') };
-el('rect', { width: W, height: H, fill: '#fff' }, calques.fond);
-let rendre;
+  // Tilleul : le moteur du site, inchangé
+  const porteChat = el('g', {});
+  const scene = el('svg', { width: W, height: 280, overflow: 'visible' }, porteChat);
+  const chat = new Tilleul.Chat(scene, { decor: { lotus: () => [], feuilles: () => [] }, libre: true, reduit: false, dort: false, toucher() {}, taire() {}, suit() {} });
+  scene.setAttribute('width', W); scene.setAttribute('height', 280);
+  racine.removeChild(porteChat);
+  let chatPret = false;
+  // Positions dans le repère du moteur (largeur de l'écran, bande de 280 de haut)
+  const chatEntre = (depart, cible) => { chat.ordre('assis'); chat.x = depart; chat.cibleX = cible; chat.etat = depart === cible ? 'assis' : 'marche'; };
+  // Il suit le pointeur du regard : on « pointe » la toile
+  const regarde = (x, y) => window.dispatchEvent(new PointerEvent('pointermove', { clientX: x, clientY: y }));
 
-if (!VERT) {
-  // ---- Version longue 16:9 ----
+  const calques = { fond: el('g'), scene: el('g'), texte: el('g') };
+  el('rect', { width: W, height: H, fill: '#fff' }, calques.fond);
+
+  // 0 – 4,4 : titre
   const intro = el('g', {}, calques.scene);
   const tombe = feuilles(intro, 9, 1);
   const lg = logo(intro);
   const bassinIntro = etang(intro, 905);
-  const titre = ecrit(intro, T.titre, W / 2, 560, 150, '#2B6E3A');
-  const sous = ecrit(intro, T.sous, W / 2, 660, 76, '#e0780c');
-  const souligne = el('path', { d: `M${W / 2 - 260},700 C${W / 2 - 100},680 ${W / 2 + 120},716 ${W / 2 + 270},692`, fill: 'none', stroke: '#F28A1E', 'stroke-width': 10, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1' }, intro);
+  const introTitre = mots(intro, T.titre, W / 2, 600, 250, { remplir: [BLANC, ORANGE] });
+  const introSous = mots(intro, T.sous, W / 2, 770, 120, { remplir: [BLANC, BLANC, ORANGE] });
 
-  // galerie : un long mur qu'on longe
+  // 4 – 14 : un long mur qu'on longe, sept toiles qui se peignent et se balancent
   const galerie = el('g', {}, calques.scene);
   const camera = el('g', {}, galerie);
-  const PAN = 6 * 560 + 380 - W + 380;
+  const ECART = 560, PAN = 380 + 6 * ECART - 1500; // la dernière toile s'arrête à x = 1500
   mur(camera, -200, -300, PAN + W + 400, H + 300);
-  const decalage = (t) => io(prog(t, 5.0, 14.6)) * PAN;
-  const accroches = ['frangipanier', 'iris', 'le-tournesol', 'bouleaux-en-hiver', 'chat-a-l-ile-de-brehat', 'tournesols', 'sweet'].map((nom, i) => {
-    const x = 380 + i * 560;
-    let debut = 5.5;
-    while (debut < 14 && x - decalage(debut) > W * 0.8) debut += 0.05;
-    return { t: toile(camera, nom, 400), x, y: 120 + (i % 2 ? 34 : 0), pente: [-0.8, 0.6, -0.3, 0.9, -0.6, 0.4, -0.5][i], debut: Math.max(5.5 + i * 0.35, debut - 0.6) };
+  const decalage = (t) => sinus(prog(t, 4.0, 12.6)) * PAN;
+  const accroches = GALERIE.map((nom, i) => {
+    const x = 380 + i * ECART;
+    // le pinceau commence quand la toile entre dans l'image, et finit toujours avant la fin du défilement
+    let debut = 4.3 + i * 0.3;
+    while (debut < 11.4 && x - decalage(debut) - 200 > W - 40) debut += 0.05;
+    return { t: toile(camera, nom, 400), x, y: 120 + (i % 2 ? 34 : 0), pente: [-0.8, 0.6, -0.3, 0.9, -0.6, 0.4, -0.5][i], debut };
   });
+  console.log('galerie : fin de la peinture de la dernière toile à', (accroches[6].debut + 1.1).toFixed(2), 's (défilement fini à 12,6 s)');
   const grain = poussieres(galerie, 26);
 
-  // gros plans
+  // 14 – 46 : les seize autres toiles, une par une (une toile par mesure de 2 s)
   const gros = el('g', {}, calques.scene);
   mur(gros, 0, 0, W, H);
-  const plans = ['mauves', 'vieux-cerisier', 'time-gambade'].map((nom) => ({ nom, t: toile(gros, nom, 470) }));
-  const cartels = plans.map((p) => ecrit(gros, TOILES[p.nom][LANG], W * 0.72, 560, 84, '#2B6E3A'));
+  const unes = UNE_A_UNE.map((nom, i) => {
+    const a = 14 + i * 2, gauche = i % 2 === 0;
+    return { a, gauche, t: toile(gros, nom, 470), nom: titre(gros, titreToile(nom), gauche ? W * 0.71 : W * 0.29, 500, 132, 700) };
+  });
 
-  // un nouveau mur : Tilleul, l'étang et une toile
+  // 46 – 54 : un nouveau mur ; Tilleul arrive et regarde la toile
   const nouveau = el('g', {}, calques.scene);
   el('rect', { width: W, height: H, fill: '#fff' }, nouveau);
   const tombe2 = feuilles(nouveau, 6, 3);
@@ -343,183 +352,79 @@ if (!VERT) {
   const bassin = etang(nouveau, 830);
   nouveau.appendChild(porteChat);
 
-  // prix
-  const prix = el('g', {}, calques.scene);
-  el('rect', { width: W, height: H, fill: '#fff4e3' }, prix);
-  const tombe3 = feuilles(prix, 8, 5);
-  const carte = el('g', {}, prix);
-  el('path', { d: 'M-430,-250 C-150,-268 170,-244 432,-256 C446,-80 426,90 440,252 C150,268 -160,240 -436,258 C-448,80 -424,-90 -430,-250 Z', fill: '#fff', stroke: '#b05200', 'stroke-width': 6 }, carte);
-  const prixMontant = ecrit(carte, T.prix, 0, -40, 200, '#b05200');
-  const prixParToile = ecrit(carte, T.parToile, 0, 50, 70, '#2B6E3A');
-  const prixBelgique = ecrit(carte, T.belgique, 0, 140, 52, '#2b3b2b', 'middle', 'st');
-  const prixLot = ecrit(carte, T.lot, 0, 205, 40, '#4d5d4d', 'middle', 'st');
-
-  // fin
+  // 54 – 60 : fin
   const fin = el('g', {}, calques.scene);
   el('rect', { width: W, height: H, fill: '#fff' }, fin);
   const tombe4 = feuilles(fin, 9, 7);
   const bassinFin = etang(fin, 925);
   const lgFin = logo(fin);
-  const finNom = ecrit(fin, 'Linda Denise', W / 2, 700, 130, '#2B6E3A');
-  const finSous = ecrit(fin, T.fin, W / 2, 800, 80, '#e0780c');
+  const finNom = mots(fin, 'Linda Denise', W / 2, 700, 190, { remplir: [BLANC, ORANGE] });
+  const finSous = mots(fin, T.fin, W / 2, 860, 110);
 
-  const st = sousTitre(calques.texte);
-  const pinceaux = [coupDePinceau(calques.pinceau, '#3E9A47'), coupDePinceau(calques.pinceau, '#F28A1E'), coupDePinceau(calques.pinceau, '#fff4e3'), coupDePinceau(calques.pinceau, '#3E9A47')];
+  const legende = legendes(calques.texte, T.legendes);
 
-  const montrer = (g, v) => g.setAttribute('display', v ? 'inline' : 'none');
-  rendre = (t) => {
-    // 0 – 5,6 : titre
-    montrer(intro, t < 5.6);
-    if (t < 5.6) {
+  const rendre = (t) => {
+    // titre
+    montrer(intro, t < 4.4);
+    if (t < 4.4) {
       tombe(t); bassinIntro(t);
       const k = outBack(prog(t, 0.2, 1.3));
       lg.setAttribute('transform', `translate(${W / 2},${270 + Math.sin(t * 1.2) * 6}) scale(${k * 0.95}) rotate(${(1 - k) * -40})`);
-      titre(prog(t, 1.0, 2.4)); sous(prog(t, 2.2, 3.3));
-      souligne.setAttribute('stroke-dashoffset', 1 - io(prog(t, 3.1, 3.9)));
+      introTitre.maj(prog(t, 0.8, 1.9)); introSous.maj(prog(t, 1.9, 3.0));
     }
-    // 5,6 – 14,2 : on longe le mur, les toiles se peignent et se balancent
-    montrer(galerie, t >= 4.9 && t < 14.6);
-    if (t >= 4.9 && t < 14.6) {
-      camera.setAttribute('transform', `translate(${-decalage(t)},0)`);
-      accroches.forEach((a) => {
-        const p = io(prog(t, a.debut, a.debut + 1.1));
-        a.t.maj({ x: a.x, y: a.y, p, b: t - a.debut - 1.1, pente: a.pente, r: prog(t, a.debut + 1.5, a.debut + 2.6) });
+    // galerie (fondu depuis le titre)
+    montrer(galerie, t >= 3.4 && t < 14.1);
+    if (t >= 3.4 && t < 14.1) {
+      galerie.setAttribute('opacity', ss(prog(t, 3.4, 4.2)).toFixed(3));
+      camera.setAttribute('transform', `translate(${(-decalage(t)).toFixed(2)},0)`);
+      accroches.forEach((a) => a.t.maj({ x: a.x, y: a.y, p: io(prog(t, a.debut, a.debut + 1.1)), b: t - a.debut - 1.1, pente: a.pente, opacite: 1 - ss(prog(t, 13.0, 13.7)) }));
+      grain(t, 1 - ss(prog(t, 13.0, 13.7)));
+    }
+    // les seize toiles, une par une : fondu enchaîné d'une toile à l'autre, la toile est peinte avant de partir
+    montrer(gros, t >= 13.2 && t < 46.2);
+    if (t >= 13.2 && t < 46.2) {
+      gros.setAttribute('opacity', ss(prog(t, 13.2, 14.0)).toFixed(3));
+      unes.forEach((u, i) => {
+        const visible = t >= u.a - 0.3 && t < u.a + 2.0;
+        montrer(u.t.g, visible); montrer(u.nom.g, visible);
+        if (!visible) return;
+        const op = ss(prog(t, u.a - 0.3, u.a)) * (1 - ss(prog(t, u.a + 1.7, u.a + 2.0)));
+        const k = prog(t, u.a - 0.3, u.a + 2.0);
+        u.t.maj({ x: (u.gauche ? W * 0.29 : W * 0.71) + (k - 0.5) * 70 * (u.gauche ? 1 : -1), y: 120 - (k - 0.5) * 20, p: io(prog(t, u.a - 0.3, u.a + 0.8)), b: t - u.a - 0.8, echelle: 1 + k * 0.07, pente: i % 2 ? 0.7 : -0.7, opacite: op });
+        u.nom.maj(prog(t, u.a + 0.1, u.a + 0.9));
+        u.nom.g.setAttribute('opacity', op.toFixed(3));
       });
-      grain(t, 1);
     }
-    // 14,2 – 22,4 : gros plans, l'histoire d'Ostende
-    montrer(gros, t >= 13.9 && t < 22.7);
-    if (t >= 13.9 && t < 22.7) {
-      plans.forEach((p, i) => {
-        const a = 14.2 + i * 2.75, b = a + 2.75;
-        const vis = t >= a - 0.3 && t < b + 0.3;
-        const k = prog(t, a - 0.3, b + 0.3);
-        p.t.maj({ x: W * 0.36 + (k - 0.5) * 120, y: 120 - (k - 0.5) * 20, p: io(prog(t, a - 0.3, a + 0.7)), b: t - a - 0.7, echelle: 1 + k * 0.08, pente: (i % 2 ? 0.7 : -0.7), r: prog(t, a + 0.8, a + 2.2), opacite: vis ? Math.min(1, (b + 0.3 - t) * 3) : 0 });
-        cartels[i](vis ? prog(t, a + 0.3, a + 1.2) * Math.min(1, (b + 0.3 - t) * 3) : 0);
-      });
-    }
-    // 22,4 – 28,8 : un nouveau mur ; Tilleul arrive et regarde la toile
-    montrer(nouveau, t >= 22.1 && t < 29.1);
-    if (t >= 22.1 && t < 29.1) {
+    // nouveau mur
+    montrer(nouveau, t >= 45.4 && t < 54.2);
+    if (t >= 45.4 && t < 54.2) {
+      nouveau.setAttribute('opacity', ss(prog(t, 45.4, 46.2)).toFixed(3));
       if (!chatPret) { chatEntre(1520, 1207); chatPret = true; }
-      if (t > 28 && chat.etat !== 'assis') chat.ordre('assis');
+      if (t > 51.5 && chat.etat !== 'assis') chat.ordre('assis');
       regarde(970, 780);
       tombe2(t);
-      murDessine(io(prog(t, 22.3, 23.5)));
-      seule.maj({ x: W * 0.43, y: 150, p: io(prog(t, 22.9, 24.0)), b: t - 24.0, pente: -0.5, r: prog(t, 26.5, 27.8) });
+      murDessine(io(prog(t, 45.6, 46.8)));
+      seule.maj({ x: W * 0.43, y: 150, p: io(prog(t, 46.2, 47.3)), b: t - 47.3, pente: -0.5 });
       bassin(t);
       porteChat.setAttribute('transform', `translate(-1190,${826 - 276 * 2.1}) scale(2.1)`);
     }
-    // 28,8 – 34,4 : le prix
-    montrer(prix, t >= 28.5 && t < 34.7);
-    if (t >= 28.5 && t < 34.7) {
-      tombe3(t);
-      const k = outBack(prog(t, 28.8, 29.8));
-      carte.setAttribute('transform', `translate(${W / 2},${H / 2 - 20}) scale(${0.6 + 0.4 * k}) rotate(${-1.2 + (1 - k) * 6})`);
-      carte.setAttribute('opacity', prog(t, 28.8, 29.2));
-      prixMontant(prog(t, 29.2, 30.0)); prixParToile(prog(t, 29.9, 30.6)); prixBelgique(prog(t, 30.6, 31.6)); prixLot(prog(t, 31.5, 32.8));
-    }
-    // 34,4 – 39 : fin
-    montrer(fin, t >= 34.1);
-    if (t >= 34.1) {
+    // fin (puis fondu vers le blanc)
+    montrer(fin, t >= 53.4);
+    if (t >= 53.4) {
+      fin.setAttribute('opacity', (ss(prog(t, 53.4, 54.2)) * (1 - ss(prog(t, 59.2, 60)))).toFixed(3));
       tombe4(t); bassinFin(t);
-      const k = outBack(prog(t, 34.6, 35.6));
-      lgFin.setAttribute('transform', `translate(${W / 2},${400}) scale(${k * 1.1})`);
-      finNom(prog(t, 35.3, 36.6)); finSous(prog(t, 36.4, 37.4));
-      fin.setAttribute('opacity', 1 - prog(t, 38.2, 39));
+      lgFin.setAttribute('transform', `translate(${W / 2},${400}) scale(${outBack(prog(t, 54.4, 55.4)) * 1.1})`);
+      finNom.maj(prog(t, 55.0, 56.1)); finSous.maj(prog(t, 56.1, 57.0));
     }
-    // sous-titres
-    const temps = [[5.8, 9.9], [10.0, 14.0], [14.3, 18.3], [18.4, 22.3], [23.0, 28.6]];
-    const i = temps.findIndex(([a, b]) => t >= a && t < b);
-    st(i >= 0 ? T.st[i] : '', i >= 0 ? prog(t, temps[i][0], temps[i][1]) : 0, H - 70);
-    // transitions au pinceau
-    pinceaux[0](prog(t, 4.6, 5.9)); pinceaux[1](prog(t, 21.8, 23.0)); pinceaux[2](prog(t, 28.0, 29.3)); pinceaux[3](prog(t, 33.8, 35.0));
+    legende(t);
   };
-  window.DUREE = 39;
-} else {
-  // ---- Version courte 9:16 ----
-  const intro = el('g', {}, calques.scene);
-  const tombe = feuilles(intro, 7, 2);
-  const lg = logo(intro);
-  const bassinIntro = etang(intro, 1660);
-  const titre = ecrit(intro, T.titre, W / 2, 1010, 150, '#2B6E3A');
-  const sous = ecrit(intro, T.sous, W / 2, 1110, 76, '#e0780c');
+  window.DUREE = 60;
+  window.image = (t) => { avancer(1000 / 30); rendre(t); };
 
-  const galerie = el('g', {}, calques.scene);
-  const camera = el('g', {}, galerie);
-  mur(camera, -100, -200, W + 200, H * 2.1);
-  const pile = ['iris', 'le-tournesol', 'bouleaux-en-hiver'].map((nom, i) => ({ t: toile(camera, nom, 540), x: W / 2 + (i % 2 ? 90 : -90), y: 150 + i * 860, pente: [-0.7, 0.8, -0.4][i], debut: 3.2 + i * 1.2 }));
-  const grain = poussieres(galerie, 18);
-
-  const gros = el('g', {}, calques.scene);
-  mur(gros, 0, 0, W, H);
-  const grande = toile(gros, 'chat-a-l-ile-de-brehat', 700);
-
-  const nouveau = el('g', {}, calques.scene);
-  el('rect', { width: W, height: H, fill: '#fff' }, nouveau);
-  const seule = toile(nouveau, 'sweet', 400);
-  const bassin = etang(nouveau, 1500);
-  nouveau.appendChild(porteChat);
-
-  const fin = el('g', {}, calques.scene);
-  el('rect', { width: W, height: H, fill: '#fff4e3' }, fin);
-  const tombe4 = feuilles(fin, 7, 6);
-  const bassinFin = etang(fin, 1660);
-  const lgFin = logo(fin);
-  const finNom = ecrit(fin, 'Linda Denise', W / 2, 1030, 120, '#2B6E3A');
-  const finPrix = ecrit(fin, T.court, W / 2, 1150, 62, '#b05200');
-
-  const st = sousTitre(calques.texte);
-  const pinceaux = [coupDePinceau(calques.pinceau, '#3E9A47'), coupDePinceau(calques.pinceau, '#F28A1E'), coupDePinceau(calques.pinceau, '#3E9A47')];
-  const montrer = (g, v) => g.setAttribute('display', v ? 'inline' : 'none');
-  rendre = (t) => {
-    montrer(intro, t < 3.2);
-    if (t < 3.2) {
-      tombe(t); bassinIntro(t);
-      const k = outBack(prog(t, 0.1, 1.0));
-      lg.setAttribute('transform', `translate(${W / 2},${720}) scale(${k})`);
-      titre(prog(t, 0.6, 1.7)); sous(prog(t, 1.5, 2.4));
-    }
-    montrer(galerie, t >= 2.7 && t < 9.0);
-    if (t >= 2.7 && t < 9.0) {
-      const k = io(prog(t, 3.0, 9.0));
-      camera.setAttribute('transform', `translate(0,${-k * 1720})`);
-      pile.forEach((a) => a.t.maj({ x: a.x, y: a.y, p: io(prog(t, a.debut, a.debut + 1.0)), b: t - a.debut - 1.0, pente: a.pente, r: prog(t, a.debut + 1.3, a.debut + 2.3) }));
-      grain(t, 1);
-    }
-    montrer(gros, t >= 8.8 && t < 12.9);
-    if (t >= 8.8 && t < 12.9) {
-      const k = prog(t, 8.8, 12.9);
-      grande.maj({ x: W / 2, y: 330 - k * 30, p: io(prog(t, 8.8, 9.8)), b: t - 9.8, echelle: 1 + k * 0.06, pente: 0.5, r: prog(t, 10.2, 11.6) });
-    }
-    montrer(nouveau, t >= 12.6 && t < 16.4);
-    if (t >= 12.6 && t < 16.4) {
-      if (!chatPret) { chatEntre(659, 659); chatPret = true; }
-      if (t > 14.2 && t < 14.25) chat.salue();
-      regarde(543, 1570);
-      seule.maj({ x: W / 2 - 90, y: 360, p: io(prog(t, 12.8, 13.8)), b: t - 13.8, pente: -0.6 });
-      bassin(t);
-      porteChat.setAttribute('transform', `translate(-800,${1496 - 276 * 2.3}) scale(2.3)`);
-    }
-    montrer(fin, t >= 16.1);
-    if (t >= 16.1) {
-      tombe4(t); bassinFin(t);
-      const k = outBack(prog(t, 16.4, 17.3));
-      lgFin.setAttribute('transform', `translate(${W / 2},${740}) scale(${k * 1.05})`);
-      finNom(prog(t, 16.9, 17.9)); finPrix(prog(t, 17.6, 18.5));
-      fin.setAttribute('opacity', 1 - prog(t, 19.2, 20));
-    }
-    const temps = [[3.4, 8.7], [9.2, 12.6], [13.0, 16.2]];
-    const i = temps.findIndex(([a, b]) => t >= a && t < b);
-    st(i >= 0 ? T.stCourt[i] : '', i >= 0 ? prog(t, temps[i][0], temps[i][1]) : 0, H - 170);
-    pinceaux[0](prog(t, 2.4, 3.6)); pinceaux[1](prog(t, 12.0, 13.2)); pinceaux[2](prog(t, 15.6, 16.8));
-  };
-  window.DUREE = 20;
-}
-
-window.image = (t) => { avancer(1000 / 30); rendre(t); };
-const hrefs = [...new Set([...racine.querySelectorAll('image')].map((i) => i.getAttribute('href')).filter((h) => h.startsWith('file:')))];
-window.pret = Promise.all([document.fonts.load('80px "Gochi Hand"'), document.fonts.load('40px Itim'), ...hrefs.map((h) => new Promise((ok) => { const i = new Image(); i.onload = i.onerror = ok; i.src = h; }))]).then(() => true);
+  const hrefs = [...new Set([...racine.querySelectorAll('image')].map((i) => i.getAttribute('href')).filter((h) => h.startsWith('file:')))];
+  await Promise.all(hrefs.map((h) => new Promise((ok) => { const i = new Image(); i.onload = i.onerror = ok; i.src = h; })));
+  return true;
+})();
 </script>
 </body>
 </html>

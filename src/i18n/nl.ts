@@ -46,7 +46,7 @@ export const nl: Dico = {
     impressionTexte: (n: number) => `Een tekening leeft niet alleen op een scherm. Linda liet ${n} van haar tekeningen drukken op aluminium, in A3-formaat: echte doeken die je in je handen houdt en thuis ophangt. Elk doek is een uniek stuk.`,
     impressionTexte2: 'De vingerstreek en de kleuren komen zo veel sterker tot hun recht. Kijk maar.',
     impressionCta: 'Bekijk de doeken',
-    impressionAlt: 'film van 20 seconden over de doeken van Linda, met Tilleul, tekst in beeld en zachte muziek, zonder stem',
+    impressionAlt: 'film van een minuut over de doeken van Linda, met Tilleul, grote tekst in beeld en vrolijke muziek, zonder stem',
     aproposTitre: 'Maak kennis met Linda',
     aproposTexte:
       'Na lange tijd kooklessen te hebben gegeven kreeg Linda in 2022 haar eerste smartphone en ontdekte ze een eenvoudig plezier: tekenen met de vinger. Ze zoekt de schoonheid van de natuur en van katten, met levendige kleuren en veel zachtheid.',
@@ -149,9 +149,9 @@ export const nl: Dico = {
     expoCta: 'Een plek voorstellen',
     videoTitre: 'De doeken in beeld',
     videoFilm: 'De doeken op muziek',
-    videoFilmAlt: 'film van 39 seconden: de doeken aan een getekende muur, het verhaal van Oostende en Tilleul, met tekst in beeld en zachte muziek, zonder stem',
+    videoFilmAlt: 'film van een minuut: de doeken aan een getekende muur, het verhaal van Oostende en Tilleul, met grote tekst in beeld en vrolijke muziek, zonder stem',
     videoVraies: 'De echte doeken, één voor één gefilmd',
-    videoVraiesAlt: 'video zonder geluid van 49 seconden: de 23 doeken in een huis, één voor één gefilmd',
+    videoVraiesAlt: 'video van 49 seconden, met muziek: de 23 doeken in een huis, één voor één gefilmd',
   },
   apropos: {
     meta: 'Linda Denise tekent met haar vinger op haar smartphone: de natuur, bloemen en katten. Ontdek haar verhaal.',

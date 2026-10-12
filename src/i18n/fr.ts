@@ -45,7 +45,7 @@ export const fr = {
     impressionTexte: (n: number) => `Un dessin ne vit pas seulement sur un écran. Linda a fait imprimer ${n} de ses dessins sur aluminium, au format A3 : de vraies toiles, que l’on tient dans les mains et que l’on accroche chez soi. Chacune est une pièce unique.`,
     impressionTexte2: 'Le trait du doigt et les couleurs y prennent une tout autre ampleur. Regardez.',
     impressionCta: 'Voir les toiles',
-    impressionAlt: 'film de 20 secondes sur les toiles de Linda, avec Tilleul, textes à l’écran et musique douce, sans voix',
+    impressionAlt: 'film d’une minute sur les toiles de Linda, avec Tilleul, gros textes à l’écran et musique entraînante, sans voix',
     aproposTitre: 'Rencontrez Linda',
     aproposTexte:
       'Après avoir longtemps enseigné la cuisine, Linda a reçu son premier smartphone en 2022 et y a découvert un plaisir tout simple : dessiner avec le doigt. Elle y cherche la beauté de la nature et des chats, avec des couleurs vibrantes et beaucoup de douceur.',
@@ -148,9 +148,9 @@ export const fr = {
     expoCta: 'Proposer un lieu',
     videoTitre: 'Les toiles en vidéo',
     videoFilm: 'Les toiles en musique',
-    videoFilmAlt: 'film de 39 secondes : les toiles accrochées sur un mur dessiné, l’histoire d’Ostende et Tilleul, avec textes à l’écran et musique douce, sans voix',
+    videoFilmAlt: 'film d’une minute : les toiles accrochées sur un mur dessiné, l’histoire d’Ostende et Tilleul, avec gros textes à l’écran et musique entraînante, sans voix',
     videoVraies: 'Les vraies toiles, filmées une à une',
-    videoVraiesAlt: 'vidéo sans son de 49 secondes : les 23 toiles posées dans une maison, filmées une à une',
+    videoVraiesAlt: 'vidéo de 49 secondes, avec de la musique : les 23 toiles posées dans une maison, filmées une à une',
   },
   apropos: {
     meta: 'Linda Denise dessine avec le doigt sur son smartphone : la nature, les fleurs et les chats. Découvrez son histoire.',

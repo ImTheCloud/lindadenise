@@ -1,24 +1,27 @@
-// Fabrique les vidéos « Les toiles » (motion design) : scene.html est rendue image par image dans Chrome,
+// Fabrique la vidéo « Les toiles » (motion design, 16:9, 60 s) : scene.html est rendue image par image dans Chrome,
 // en temps virtuel (1/30 s par image), puis ffmpeg assemble l'image et la musique composée par musique.py.
 //
-// Outils (gratuits, hors du dépôt) : Google Chrome, ffmpeg (brew install ffmpeg), python3 avec numpy,
+// Outils (gratuits, hors du dépôt) : Chrome ou Chromium (variable CHROME si le chemin diffère), ffmpeg, python3 avec numpy,
 // et puppeteer-core installé sans toucher package.json : npm i --no-save puppeteer-core
+// Police des gros textes : Lilita One (licence OFL), fournie dans scripts/video/polices/.
 //
-// Depuis la racine du projet :
-//   node scripts/video/rendu.mjs fr h /tmp/brut-fr-h.mp4          (h : 16:9, 39 s ; v : 9:16, 20 s)
-//   python3 scripts/video/musique.py 39 /tmp/musique-long.wav       (20 pour la version courte)
-//   python3 scripts/video/assembler.py /tmp/brut-fr-h.mp4 /tmp/musique-long.wav public/video/toiles-fr.mp4 26
-// Version courte : sortie public/video/toiles-court-fr.mp4 ; NL : nl au lieu de fr, sorties en -nl.
-// Images d'essai : node scripts/video/rendu.mjs fr h essai 2,9.5,24  (PNG dans le dossier courant)
+// Depuis n'importe quel dossier (les images d'essai sont écrites dans le dossier courant) :
+//   node scripts/video/rendu.mjs fr /tmp/brut-fr.mp4
+//   python3 scripts/video/musique.py motion 60 /tmp/musique-motion.wav
+//   python3 scripts/video/assembler.py /tmp/brut-fr.mp4 /tmp/musique-motion.wav public/video/toiles-fr.mp4 20
+// NL : nl au lieu de fr, sortie toiles-nl.mp4.
+// Images d'essai : node scripts/video/rendu.mjs fr essai 2,9.5,24  (PNG dans le dossier courant)
 import puppeteer from 'puppeteer-core';
 import { spawn, execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const [lang, format, sortie, instants] = process.argv.slice(2);
-const W = format === 'v' ? 1080 : 1920;
-const H = format === 'v' ? 1920 : 1080;
+const [lang, sortie, instants] = process.argv.slice(2);
+const W = 1920;
+const H = 1080;
 const ici = path.dirname(new URL(import.meta.url).pathname);
+const depot = path.join(ici, '..', '..');
+const chrome = [process.env.CHROME, '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/opt/pw-browsers/chromium', '/usr/bin/chromium', '/usr/bin/google-chrome'].find((c) => c && fs.existsSync(c));
 
 // Temps virtuel : l'horloge n'avance que d'une image à la fois, le hasard est reproductible.
 const horloge = `(() => {
@@ -30,18 +33,19 @@ const horloge = `(() => {
   window.avancer = (ms) => { maintenant += ms; const l = file; file = []; l.forEach((cb) => cb(maintenant)); };
 })();`;
 // Le moteur de Tilleul du site, tel quel
-const tilleul = execSync('npx --yes esbuild src/components/tilleul/chat.ts --bundle --format=iife --global-name=Tilleul --log-level=warning').toString();
+const tilleul = execSync('npx --yes esbuild src/components/tilleul/chat.ts --bundle --format=iife --global-name=Tilleul --log-level=warning', { cwd: depot }).toString();
 
 const nav = await puppeteer.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: chrome,
   headless: 'new',
-  args: ['--allow-file-access-from-files', '--hide-scrollbars', '--force-color-profile=srgb'],
+  args: ['--allow-file-access-from-files', '--hide-scrollbars', '--force-color-profile=srgb', '--no-sandbox'],
 });
 const page = await nav.newPage();
 await page.setViewport({ width: W, height: H, deviceScaleFactor: 1 });
 page.on('pageerror', (e) => console.error('Erreur dans la page :', e.message));
+page.on('console', (m) => console.log('page :', m.text()));
 await page.evaluateOnNewDocument(horloge + tilleul);
-await page.goto(`file://${ici}/scene.html?lang=${lang}&format=${format}`);
+await page.goto(`file://${ici}/scene.html?lang=${lang}`);
 await page.evaluate(() => window.pret);
 const duree = await page.evaluate(() => window.DUREE);
 const cdp = await page.createCDPSession();
@@ -53,7 +57,7 @@ if (sortie === 'essai') {
   for (let i = 0; i < N && i / 30 <= Math.max(...voulus); i++) {
     await page.evaluate((t) => window.image(t), i / 30);
     const v = voulus.find((x) => Math.abs(x - i / 30) < 1 / 60);
-    if (v !== undefined) fs.writeFileSync(`essai-${lang}-${format}-${v}.png`, await capture());
+    if (v !== undefined) fs.writeFileSync(`essai-${lang}-${v}.png`, await capture());
   }
 } else {
   const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', '30', '-c:v', 'png', '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', sortie], { stdio: ['pipe', 'inherit', 'inherit'] });
@@ -61,7 +65,7 @@ if (sortie === 'essai') {
     await page.evaluate((t) => window.image(t), i / 30);
     const png = await capture();
     if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once('drain', r));
-    if (i % 300 === 0) console.log(`${lang} ${format} : image ${i} sur ${N}`);
+    if (i % 300 === 0) console.log(`${lang} : image ${i} sur ${N}`);
   }
   ff.stdin.end();
   await new Promise((r) => ff.on('close', r));

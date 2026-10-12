@@ -89,7 +89,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
         <p>{a.impressionTexte2}</p>
       </div>
       <figure class="impression__video apparait cadre">
-        <Video lang={lang} nom={`toiles-court-${lang}`} largeur={1080} hauteur={1920} description={a.impressionAlt} son />
+        <Video lang={lang} nom={`toiles-${lang}`} largeur={1920} hauteur={1080} description={a.impressionAlt} son />
       </figure>
       <p class="impression__cta apparait"><a class="bouton bouton--vert" href={chemin('toiles', lang)}>{a.impressionCta}</a></p>
     </div>
@@ -148,7 +148,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .prix__montant { font-family: var(--titre); font-size: clamp(2.4rem, 6vw, 3.4rem); color: var(--orange-fonce); margin: 0; line-height: 1.1; }
   .impression { display: grid; gap: 32px; align-items: center; }
   .impression__cta { margin: 0; text-align: center; }
-  .impression__video { width: min(78%, 320px); margin: 0 auto; padding: 10px; background: var(--vert-pale); transform: rotate(2deg); }
+  .impression__video { width: 100%; max-width: 640px; margin: 0 auto; padding: 10px; background: var(--vert-pale); transform: rotate(1.5deg); }
   .apropos { display: grid; gap: 36px; align-items: center; }
   .apropos__photo { width: min(78%, 360px); margin-inline: auto; background: var(--vert-pale); padding: 10px; border: var(--trait) solid var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; box-shadow: var(--ombre); transform: rotate(-3deg); }
   .apropos__photo img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }
@@ -169,7 +169,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   @media (min-width: 960px) {
     .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: 48px; }
     .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
-    .impression { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
+    .impression { grid-template-columns: 1.15fr 0.85fr; gap: 56px; }
     .impression__video { order: -1; }
   }
 </style>
