@@ -2,7 +2,8 @@
 #   motion : la vidéo « Les toiles » (motion design) : pop électro, 120 BPM, sol majeur (sol - ré - mi mineur - do).
 #            Une mesure = 2 s, une toile par mesure (44 s : 22 mesures). Intro, mur, toiles une par une, pause pour Tilleul, montée, final.
 #   reel   : la vidéo « Les vraies toiles » : pop acoustique chaloupée, 114,3 BPM (une mesure = 2,1 s = le rythme
-#            des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, piano électrique, sifflet.
+#            des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, basse, piano électrique,
+#            claquements de doigts. Volontairement simple et sec : pas de bruit de synthèse, pas d'écho.
 # Usage : python musique.py motion|reel duree_en_secondes sortie.wav
 import sys, wave
 import numpy as np
@@ -114,16 +115,6 @@ def piano_elec(n, d=1.2):  # piano électrique doux
     t = tps(d); f = hz(n)
     s = np.sin(2 * np.pi * f * t) * np.exp(-t * 2.2) + 0.55 * np.sin(2 * np.pi * 2 * f * t + 0.5) * np.exp(-t * 5) + 0.18 * np.sin(2 * np.pi * 3 * f * t) * np.exp(-t * 9)
     return s * np.minimum(1, t * 400)
-
-def sifflet(n, d):  # sifflement : sinus avec un petit vibrato qui s'installe, un peu de souffle
-    t = tps(d); f = hz(n)
-    vib = 0.012 * np.sin(2 * np.pi * 5.5 * t) * np.minimum(1, t * 3)
-    s = np.sin(2 * np.pi * f * t + 2 * np.pi * f * np.cumsum(vib) / SR * 40) + 0.08 * np.sin(2 * np.pi * 2 * f * t)
-    return (s + 0.02 * aigus(bruit(d))) * np.minimum(1, t / 0.04) * np.minimum(1, (d - t) / 0.08)
-
-def kalimba(n, d=0.9):
-    t = tps(d); f = hz(n)
-    return (np.sin(2 * np.pi * f * t) + 0.3 * np.sin(2 * np.pi * 5.4 * f * t) * np.exp(-t * 25)) * np.exp(-t * 4) * np.minimum(1, t * 500)
 
 
 # ---------- fabrication ----------
@@ -252,18 +243,14 @@ def reel():
             for tb in (0.5, 2.5) if s == 'A' else (0.5, 1.5, 2.5, 3.5):
                 for n in ACP[c]: poser('lead', piano_elec(n), t0 + sw(tb) * B, 0.3, 0.2)
         if s == 'pause':
-            for k in range(8): poser('lead', kalimba(ACC[c][[1, 2, 3, 2][k % 4]] + 12), t0 + sw(k / 2) * B, 0.35 if k % 2 else -0.35, 0.35)
+            for k in range(8): poser('lead', piano_elec(ACP[c][[0, 1, 2, 1][k % 4]] + 12), t0 + sw(k / 2) * B, 0.3 if k % 2 else -0.3, 0.3)
             poser('basse', basse_douce(RAC[c], 4 * B), t0, 0, 0.7)
             for tb in (1, 3): poser('batt', doigts(), t0 + tb * B, 0.1, 0.5)
-        # sifflet : entre au milieu du premier couplet, présent au refrain
+        # mélodie au piano électrique : entre au milieu du premier couplet, présente au refrain
         if (s == 'A' and b >= 6) or s == 'B':
-            for tb, n, d in HOOK[c]: poser('lead', sifflet(n, d * B), t0 + tb * B, 0, 0.45)
-        if s == 'B' and b % 2 == 1:
-            for k in range(4): poser('lead', kalimba(ACP[c][k % 3] + 24), t0 + (2 + k * 0.5) * B, 0.4 if k % 2 else -0.4, 0.28)
+            for tb, n, d in HOOK[c]: poser('lead', piano_elec(n), t0 + tb * B, 0.1, 0.45)
         if s == 'montee':
-            poser('batt', montee(BAR), t0, 0, 0.55)
             for i in range(8): poser('batt', doigts(), t0 + i * B / 2, 0.1, 0.4 + 0.07 * i)
-        if b in (2, 12): poser('batt', cymbale(), t0, 0, 0.3)
         if s == 'fin':
             poser('harm', nappe([48, 52, 55, 60, 64], duree - t0), t0, 0, 0.8)
             for j, n in enumerate(ACC[0]): poser('harm', guitare(n, 2.6), t0 + j * 0.02, -0.2, 0.55)
@@ -308,9 +295,9 @@ duck_b = pompage(0.55 if style == 'motion' else 0.0); duck_h = pompage(0.6 if st
 batt = bus['batt'] * niveau['batt']
 basse = bus['basse'] * niveau['basse'] * duck_b
 harm = bus['harm'] * niveau['harm'] * duck_h
-lead = echo(bus['lead'], 0.75 * 60 / 120 if style == 'motion' else 0.75 * 2.1 / 4, 3, 0.45) * niveau['lead']
+lead = (echo(bus['lead'], 0.75 * 60 / 120, 3, 0.45) if style == 'motion' else bus['lead']) * niveau['lead']
 brillant = harm + lead
-mix = batt + basse + brillant + reverb(brillant) * 0.55
+mix = batt + basse + brillant + reverb(brillant) * (0.55 if style == 'motion' else 0.15)
 
 t = np.arange(N) / SR
 env = np.minimum(1, t / 0.05) * np.minimum(1, (duree - t) / 1.0)

@@ -37,15 +37,8 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
 <Base lang={lang} titre={tt.titre} description={tt.meta} chemins={chemins} image={`/toiles/${toiles[0].id}-800.jpg`}>
   <section class="section toiles-haut">
     <div class="contenu centre">
-      <p class="surtitre">{tt.surtitre}</p>
       <h1>{tt.titre}</h1>
       <p class="chapeau">{tt.intro(toiles.length)}</p>
-      <p class="histoire">{tt.histoire}</p>
-      <ul class="pastilles">
-        <li>{tt.prixTexte(PRIX_TOILE)}</li>
-        {remises.map((r) => <li>{tt.remise(r.des, r.pourcent)}</li>)}
-        <li>{tt.envoiOffert(ENVOI_OFFERT_DES)}</li>
-      </ul>
       <p class="aide">{tt.murAide}</p>
     </div>
   </section>
@@ -72,6 +65,22 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
     <div class="mur__plinthe" aria-hidden="true"></div>
   </section>
 
+  <section class="section videos-bande">
+    <div class="contenu">
+      <h2 class="centre apparait">{tt.videoTitre}</h2>
+      <div class="videos">
+        <figure class="videos__film apparait">
+          <Video lang={lang} nom={`toiles-${lang}`} largeur={1920} hauteur={1080} description={tt.videoFilmAlt} son />
+          <figcaption>{tt.videoFilm}</figcaption>
+        </figure>
+        <figure class="videos__vraies apparait">
+          <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} son />
+          <figcaption>{tt.videoVraies}</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <section class="section">
     <div class="contenu infos">
       <article class="info cadre apparait">
@@ -93,20 +102,6 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
     </div>
   </section>
 
-  <section class="section">
-    <div class="contenu videos">
-      <h2 class="centre apparait">{tt.videoTitre}</h2>
-      <figure class="videos__film apparait">
-        <Video lang={lang} nom={`toiles-${lang}`} largeur={1920} hauteur={1080} description={tt.videoFilmAlt} son />
-        <figcaption>{tt.videoFilm}</figcaption>
-      </figure>
-      <figure class="videos__vraies apparait">
-        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} son />
-        <figcaption>{tt.videoVraies}</figcaption>
-      </figure>
-    </div>
-  </section>
-
   <section class="section section--orange">
     <div class="contenu etapes-toiles apparait"><Etapes titre={tt.commanderTitre} etapes={tt.etapes} /></div>
   </section>
@@ -114,6 +109,7 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
   <section class="section">
     <div class="contenu expo apparait">
       <h2>{tt.expoTitre}</h2>
+      <p class="histoire">{tt.histoire}</p>
       <p class="chapeau">{tt.expoTexte}</p>
       <p>{tt.expoTexte2}</p>
       <p class="expo__signature">Linda</p>
@@ -320,11 +316,11 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
 </script>
 
 <style>
-  .toiles-haut { padding-bottom: 28px; }
-  .histoire { max-width: 46ch; margin: 18px auto 0; font-family: var(--titre); font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.7rem); line-height: 1.3; color: var(--vert-fonce); }
-  .pastilles { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; margin: 24px 0 0; padding: 0; }
-  .pastilles li { padding: 6px 14px; background: var(--orange-creme); color: var(--orange-fonce); border: 2px solid var(--orange-fonce); border-radius: var(--rayon-petit); font-size: 1rem; line-height: 1.3; }
-  .aide { margin: 22px 0 0; color: var(--encre-douce); font-size: 1rem; }
+  .toiles-haut { padding-block: 24px 8px; }
+  .toiles-haut h1 { margin: 0 0 6px; }
+  .toiles-haut .chapeau { margin-top: 0; margin-bottom: 4px; font-size: 1.1em; }
+  .aide { margin: 0; color: var(--encre-douce); font-size: 0.95rem; }
+  .histoire { max-width: 46ch; margin: 0 auto 18px; font-family: var(--titre); font-size: clamp(1.3rem, 1.1rem + 0.6vw, 1.55rem); line-height: 1.3; color: var(--vert-fonce); }
 
   /* Le mur de galerie : enduit clair, lumière qui tombe du haut, plinthe et parquet. */
   .mur {
@@ -374,10 +370,12 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
   .coches li { position: relative; padding-left: 28px; line-height: 1.4; }
   .coches li::before { content: '✓'; position: absolute; left: 0; color: var(--orange-fonce); font-weight: 700; }
   .etapes-toiles { max-width: 980px; }
-  .videos { display: grid; gap: 28px; justify-items: center; }
-  .videos figure { margin: 0; width: 100%; padding: 10px; background: var(--vert-pale); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
-  .videos__vraies { max-width: 340px; }
-  .videos figcaption { padding: 8px 4px 0; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--vert-fonce); }
+  /* Deux films à la même hauteur (--h) : le film large et celui des vraies toiles, en portrait, côte à côte. */
+  .videos-bande h2 { margin: 0 0 24px; }
+  .videos { --h: 400px; display: grid; justify-content: center; justify-items: center; gap: 28px 32px; }
+  .videos figure { box-sizing: border-box; width: 100%; margin: 0; padding: 10px; background: var(--vert-pale); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  .videos__vraies { max-width: 300px; }
+  .videos figcaption { width: 0; min-width: 100%; padding: 8px 4px 0; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--vert-fonce); }
   .expo { max-width: 760px; text-align: center; }
   .expo .chapeau { margin-inline: auto; }
   .expo__signature { font-family: var(--titre); font-size: 1.8rem; color: var(--orange-titre); margin: -6px 0 18px; }
@@ -434,8 +432,11 @@ const TOILE = { x: 145.15, y: 36, l: 29.7, h: 42 };
   }
   @media (min-width: 900px) {
     .infos { grid-template-columns: 1fr 1fr; }
-    .videos { grid-template-columns: 2.6fr 1fr; align-items: center; }
-    .videos h2 { grid-column: 1 / -1; }
+    .videos { grid-template-columns: max-content max-content; align-items: start; }
+    .videos__film :global(.video) { width: calc(var(--h) * 16 / 9); }
+    .videos figure { width: fit-content; }
+    .videos__vraies { max-width: none; }
+    .videos__vraies :global(.video) { width: calc(var(--h) * 478 / 850); }
     .fiche__boite { grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr); align-items: center; padding: 40px 24px; }
     .fiche__image img, .salon svg { max-height: 86svh; }
     .fiche__fleche--prec { left: -6px; }

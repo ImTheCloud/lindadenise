@@ -21,6 +21,11 @@ Appliqués :
 - **« À la main » au lieu de « au doigt »** : vidéo, accroches, méta, « Dessins faits à la main », cartes, pied de page, anecdote de Tilleul (FR et NL). Gardé : l'histoire de Linda (page À propos, accueil) qui raconte qu'elle dessine avec le doigt sur son smartphone, c'est sa façon réelle de faire ; à relire par Claudiu.
 - Musique recalée sur 44 s (22 mesures, une toile par mesure).
 
+### 3e retour (2026-10-12) : appliqué
+- **Page Toiles, haut compact** : titre, une phrase, une aide ; les toiles sont visibles dès le premier écran. Surtitre et pastilles de prix retirés du haut (les prix restent sous chaque toile et dans « Prix et envoi »), l'histoire d'Ostende descend dans la section « Un mur pour mes toiles ».
+- **Vidéos** : bande « Les toiles en vidéo » juste sous le mur, deux cartes à la même hauteur (film large + vraies toiles en portrait), une colonne sur téléphone.
+- **Musique des vraies toiles refaite**, plus simple et sans effets (plus de sifflet, de cloche, d'écho ni de montée de bruit) : guitare, basse, piano électrique, claquements de doigts. Limiteur ajouté à `assembler.py` (crête −1,2 dB). Toujours vérifiée par mesures, pas à l'oreille.
+
 ## Mission Tilleul : fluidité, clics, marche et vraie page de jeu (2026-10-11, non publiée)
 
 Consigne complète : `docs/prive/prompt-tilleul.md`. Quatre phases, un commit `[skip ci]` à la fin de chacune.

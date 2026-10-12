@@ -91,7 +91,6 @@ export const nl: Dico = {
   toiles: {
     titre: 'De doeken',
     meta: 'Tekeningen van Linda Denise, gedrukt op aluminium in A3-formaat. Unieke stukken, geleverd in België.',
-    surtitre: 'Gedrukt op aluminium',
     intro: (n: number) => `${n} tekeningen van Linda, gedrukt op aluminium in A3-formaat. Elk doek is een uniek stuk.`,
     histoire: 'Deze doeken werden gedrukt voor een tentoonstelling in Oostende. De plek sloot nog voor ze opgehangen werden. Vandaag zoeken ze een nieuwe muur.',
     murTitre: 'De muur met doeken',

@@ -90,7 +90,6 @@ export const fr = {
   toiles: {
     titre: 'Les toiles',
     meta: 'Des dessins de Linda Denise imprimés sur aluminium, au format A3. Des pièces uniques, livrées en Belgique.',
-    surtitre: 'Imprimées sur aluminium',
     intro: (n: number) => `${n} dessins de Linda, imprimés sur aluminium au format A3. Chaque toile est une pièce unique.`,
     histoire: 'Ces toiles ont été imprimées en vue d’une exposition à Ostende. Le lieu a fermé avant l’accrochage. Elles cherchent aujourd’hui un nouveau mur.',
     murTitre: 'Le mur des toiles',

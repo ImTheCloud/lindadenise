@@ -1,7 +1,7 @@
 // Coupe la vidéo des vraies toiles filmée au téléphone (brute, 25 Mo, hors du dépôt) en public/video/vraies-toiles.mp4.
 // Pour chaque toile, le passage le plus net et le plus stable (repéré par ordinateur le 2026-10-11) : 2,5 s,
 // fondus de 0,4 s. Le son d'origine (bruits de manipulation) est retiré et remplacé par une musique originale
-// (musique.py, style « reel » : une mesure = 2,1 s = une toile). Trois passes : le montage, un léger débruitage
+// (musique.py, style « reel » : guitare et piano, sans effets ; une mesure = 2,1 s = une toile). Trois passes : le montage, un léger débruitage
 // et une compression plus forte pour rester sous 10 Mo, puis la musique (l'image n'est pas recompressée).
 // Usage : node scripts/video/vraies-toiles.mjs [vidéo brute]   (par défaut la vidéo WhatsApp du 2026-10-10 dans ~/Downloads)
 import { execFileSync } from 'node:child_process';
