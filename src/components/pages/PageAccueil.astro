@@ -35,8 +35,8 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
           <a class="bouton bouton--brun" href={chemin('toiles', lang)}>{a.portes.toilesCta}</a>
         </div>
         <ul class="heros__points">
-          <li><IconeLivraison genre="dessin" /><span><strong>{a.nombre(dessins.length)}</strong> · {d.livraison.dessin}</span></li>
-          <li><IconeLivraison genre="toile" /><span><strong>{a.nombreToiles(toiles.length)}</strong> · {d.livraison.toile}</span></li>
+          <li><IconeLivraison genre="dessin" /><span><strong>{d.nav.dessins}</strong> · {d.livraison.dessin}</span></li>
+          <li><IconeLivraison genre="toile" /><span><strong>{d.nav.toiles}</strong> · {d.livraison.toile}</span></li>
         </ul>
       </div>
       <div class="heros__video">
