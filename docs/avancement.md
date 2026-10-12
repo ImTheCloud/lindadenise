@@ -59,6 +59,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Gros check de compacité (demande de Claudiu)** : marges des sections réduites partout (`.section` 28 à 56 px au lieu de 48 à 96), cartes plus serrées (titre, prix, ligne de livraison, bouton), grilles plus resserrées, titres de rubrique et de page plus petits, FAQ plus compacte, accueil (hero, portes avec vitrine plus basse, rangées, étapes, « Je suis Linda ») resserré. **Panier** : un seul grand cadre qui regroupe les deux blocs (dessins, toiles) puis le récapitulatif et le total ; articles sur une ligne (vignette 56 px, titre, prix), « Retirer » devenu une petite croix ronde, libellé du genre masqué sauf « Toile sur commande », sous-totaux sur une ligne avec un point vert ou orange, total en pointillé. À vérifier par Claudiu sur un vrai téléphone.
 
+- **Galeries sur téléphone** : titre et interrupteur Dessins / Toiles toujours sur une ligne (interrupteur à droite) ; les filtres de rubrique deviennent une liste déroulante pleine largeur (une ligne, tous les choix avec leur nombre, synchronisée avec le titre et l'adresse `#rubrique`) ; les pastilles restent dès 700 px.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
