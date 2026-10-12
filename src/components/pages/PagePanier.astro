@@ -51,7 +51,7 @@ const donnees = {
           <ul class="panier__liste" data-liste-toiles></ul>
         </section>
         <div class="panier__recap cadre">
-          <dl data-lignes></dl>
+          <div class="recap__lignes" data-lignes></div>
           <p class="panier__note">{p.note}</p>
           <p class="panier__note" data-delai hidden>{p.delaiCommande}</p>
           <p class="panier__actions">
@@ -134,13 +134,25 @@ const donnees = {
       delai.hidden = p.commande.length === 0;
       const c = calculPanier(p.dessin.length, nombreToiles);
       const l = d.textes.lignes;
-      const rangs: HTMLElement[] = [];
-      if (p.dessin.length) rangs.push(ligne(l.dessins.replace('{n}', String(p.dessin.length)), euros(c.sousTotalDessins)));
-      if (nombreToiles) rangs.push(ligne(l.toiles.replace('{n}', String(nombreToiles)), euros(c.sousTotal)));
-      if (c.offertes) rangs.push(ligne((c.offertes > 1 ? l.lotPlusieurs : l.lotUne).replace('{n}', String(c.offertes)), `−${euros(c.offertes * d.prix.toile)}`));
-      if (nombreToiles) rangs.push(ligne(l.envoi, c.envoi ? euros(c.envoi) : l.envoiOffert));
-      rangs.push(ligne(l.total, euros(c.total), true));
-      lignes.replaceChildren(...rangs);
+      // un sous-total par monde : dessins (vert), toiles (brun) avec l'offre de lot et l'envoi, puis le total
+      const groupe = (monde: string, rangs: HTMLElement[]) => {
+        const g = noeud('dl', 'recap__groupe');
+        g.dataset.monde = monde;
+        g.append(...rangs);
+        return g;
+      };
+      const blocs: HTMLElement[] = [];
+      if (p.dessin.length) blocs.push(groupe('dessins', [ligne(l.dessins.replace('{n}', String(p.dessin.length)), euros(c.sousTotalDessins))]));
+      if (nombreToiles) {
+        const rangs = [ligne(l.toiles.replace('{n}', String(nombreToiles)), euros(c.sousTotal))];
+        if (c.offertes) rangs.push(ligne((c.offertes > 1 ? l.lotPlusieurs : l.lotUne).replace('{n}', String(c.offertes)), `−${euros(c.offertes * d.prix.toile)}`));
+        rangs.push(ligne(l.envoi, c.envoi ? euros(c.envoi) : l.envoiOffert));
+        blocs.push(groupe('toiles', rangs));
+      }
+      const fin = noeud('dl', 'recap__fin');
+      fin.append(ligne(l.total, euros(c.total), true));
+      blocs.push(fin);
+      lignes.replaceChildren(...blocs);
     }
 
     el('[data-vider]').addEventListener('click', vider);
@@ -172,7 +184,10 @@ const donnees = {
   .panier__liste :global(.article__retirer) { font: inherit; font-size: 1rem; padding: 8px 12px; cursor: pointer; color: var(--vert-fonce); background: #fff; border: 2px solid var(--vert-fonce); border-radius: var(--rayon-petit); }
   .panier__liste :global(.article__retirer:hover) { border-color: var(--orange-fonce); color: var(--orange-fonce); }
   .panier__recap { padding: clamp(18px, 4vw, 30px); }
-  .panier__recap dl { margin: 0 0 12px; display: grid; gap: 6px; }
+  .panier__recap :global(.recap__lignes) { display: grid; gap: 10px; margin-bottom: 12px; }
+  .panier__recap :global(dl) { margin: 0; }
+  .panier__recap :global(.recap__groupe) { display: grid; gap: 6px; padding: 10px 14px; background: var(--vert-creme); border-left: 6px solid var(--vert-fonce); border-radius: 4px var(--rayon-petit) var(--rayon-petit) 4px; }
+  .panier__recap :global(.recap__groupe .ligne dt) { color: var(--vert-fonce); font-weight: 600; }
   .panier__recap :global(.ligne) { display: flex; justify-content: space-between; gap: 16px; }
   .panier__recap :global(.ligne dt), .panier__recap :global(.ligne dd) { margin: 0; }
   .panier__recap :global(.ligne--total) { margin-top: 6px; padding-top: 10px; border-top: 3px dashed var(--vert-pale); font-family: var(--titre); font-size: 1.7rem; color: var(--orange-fonce); }
