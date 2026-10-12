@@ -39,11 +39,11 @@ const jsonld = {
           </button>
         </div>
         <div class="fiche__infos">
-          <p class="surtitre">{d.dessins.surtitre} · <a href={`${chemin('dessins', lang)}#${dessin.rubrique}`}>{rub.court}</a></p>
+          <p class="surtitre">{d.dessins.surtitre}</p>
           <h1>{titre}</h1>
           <p class="fiche__prix">{d.dessins.prix}</p>
           <p>{d.dessins.prixTexte}</p>
-          <p class="fiche__livraison"><IconeLivraison genre="dessin" />{d.dessins.phrase}</p>
+          <p class="fiche__livraison"><IconeLivraison genre="dessin" />{d.livraison.dessin}</p>
           <p class="fiche__panier">
             <button type="button" class="bouton" aria-pressed="false" data-panier={`dessin:${dessin.id}`} data-ajouter={d.panier.ajouter} data-dedans={d.panier.dedans}>{d.panier.ajouter}</button>
             <a href={chemin('panier', lang)}>{d.panier.voir}</a>

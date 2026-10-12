@@ -35,11 +35,11 @@ const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
           </button>
         </div>
         <div class="fiche__infos">
-          <p class="surtitre">{tt.surtitre} · <a href={`${chemin('toiles', lang)}#${toile.rubrique}`}>{d.rubriques[toile.rubrique].court}</a></p>
+          <p class="surtitre">{tt.surtitre}</p>
           <h1>{titre}</h1>
           <p class="fiche__prix">{toile.vendue ? tt.vendue : tt.prix(PRIX_TOILE)}</p>
           <p>{toile.vendue ? tt.vendueTexte : tt.caracteristiques}</p>
-          {!toile.vendue && <p class="fiche__livraison"><IconeLivraison genre="toile" />{tt.phrase}</p>}
+          {!toile.vendue && <p class="fiche__livraison"><IconeLivraison genre="toile" />{d.livraison.toile}</p>}
           {toile.vendue ? <p class="fiche__vendue">{tt.vendueTexte}</p> : (
             <p class="fiche__panier">
               <button type="button" class="bouton" aria-pressed="false" data-panier={`toile:${toile.id}`} data-ajouter={d.panier.ajouter} data-dedans={d.panier.dedans}>{d.panier.ajouter}</button>

@@ -59,7 +59,7 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Gros check de compacité (demande de Claudiu)** : marges des sections réduites partout (`.section` 28 à 56 px au lieu de 48 à 96), cartes plus serrées (titre, prix, ligne de livraison, bouton), grilles plus resserrées, titres de rubrique et de page plus petits, FAQ plus compacte, accueil (hero, portes avec vitrine plus basse, rangées, étapes, « Je suis Linda ») resserré. **Panier** : un seul grand cadre qui regroupe les deux blocs (dessins, toiles) puis le récapitulatif et le total ; articles sur une ligne (vignette 56 px, titre, prix), « Retirer » devenu une petite croix ronde, libellé du genre masqué sauf « Toile sur commande », sous-totaux sur une ligne avec un point vert ou orange, total en pointillé. À vérifier par Claudiu sur un vrai téléphone.
 
-- **Galeries sur téléphone** : titre et interrupteur Dessins / Toiles toujours sur une ligne (interrupteur à droite) ; les filtres de rubrique deviennent une liste déroulante pleine largeur (une ligne, tous les choix avec leur nombre, synchronisée avec le titre et l'adresse `#rubrique`) ; les pastilles restent dès 700 px.
+- **Galeries sur téléphone** : titre et interrupteur Dessins / Toiles toujours sur une ligne (interrupteur à droite) ; les filtres de rubrique restent des pastilles, rangées en grille de trois colonnes (deux lignes au plus) ; la liste déroulante testée avant a été retirée.
 
 - **Pas de mot seul sur une ligne (consigne de Claudiu, notée dans `CLAUDE.md`)** : bouton du panier « Envoyer ma demande » (sans « à Linda »), ligne de livraison des cartes sur une ligne, `text-wrap: balance` sur titres, étiquettes, boutons et questions de la FAQ, `pretty` sur les paragraphes, questions de la FAQ un peu plus petites sur téléphone. Contrôle automatique à 360 et 390 px sur accueil, galeries, fiches, panier, contact, FAQ, À propos.
 
@@ -76,6 +76,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 - **Panier, ligne de livraison** : « Frais de livraison de la toile 12 € » pour une seule toile, « Frais de livraison des toiles : Offerts » dès deux (NL « Leveringskosten van het doek / van de doeken », « Gratis ») ; même texte dans le total du formulaire.
 
 - **Interrupteur Dessins / Toiles** : plus de moitié blanche ; l'onglet inactif est teinté de la couleur pâle de son monde (vert pâle / orange pâle), l'actif est plein avec le texte blanc. (Interprétation de « blanche » : à confirmer par Claudiu.)
+
+- **Fiches et textes courts** : plus de rubrique (« · Chats ») dans le surtitre des fiches (déjà dite par la section) ; la phrase de livraison des fiches est celle des badges (« Livrée par bpost », « Reçu par e-mail ») ; filtres des galeries sur téléphone : grille de trois colonnes (deux lignes). Règles notées dans `CLAUDE.md` : textes courts, jamais de répétition d'une information déjà visible à côté.
 
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 

@@ -42,13 +42,6 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   </div>
   <div class="boutique__barre">
     <div class="contenu">
-      <label class="filtre-select">
-        <span class="sr-only">{groupe}</span>
-        <select data-filtre-select>
-          <option value="tous">{tous} ({total})</option>
-          {rubriques.map((r) => <option value={r.code}>{r.nom} ({r.nombre})</option>)}
-        </select>
-      </label>
       <div class="filtres" role="group" aria-label={groupe}>
         <button type="button" class="filtre" data-filtre="tous" data-nombre={total} aria-pressed="true">{tous}</button>
         {rubriques.map((r) => (
@@ -67,7 +60,6 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
     const boutons = document.querySelectorAll('.filtre');
     const blocs = document.querySelectorAll('[data-bloc]');
     const nombre = document.querySelector("[data-total]");
-    const liste = document.querySelector('[data-filtre-select]');
     const appliquer = (f) => {
       let n = 0;
       boutons.forEach((b) => {
@@ -80,7 +72,6 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
         c.hidden = f !== 'tous' && c.dataset.bloc !== f;
         if (!c.hidden && !premier) premier = c;
       });
-      if (liste) liste.value = f;
       blocs.forEach((c) => c.classList.toggle('rubrique-bloc--premier', c === premier));
       if (nombre) nombre.textContent = '(' + n + ')';
     };
@@ -91,7 +82,6 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
         history.replaceState(null, '', f === 'tous' ? location.pathname : '#' + f);
       }),
     );
-    if (liste) liste.addEventListener('change', () => { const f = liste.value; appliquer(f); history.replaceState(null, '', f === 'tous' ? location.pathname : '#' + f); });
     const depuisAdresse = () => {
       const f = location.hash.slice(1) || 'tous';
       if ([...boutons].some((b) => b.dataset.filtre === f)) appliquer(f);
@@ -130,15 +120,14 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .filtre { flex: none; font-family: var(--titre); font-size: 1.25rem; line-height: 1; padding: 0.5em 1em; cursor: pointer; background: #fff; color: var(--vert-fonce); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: transform 0.15s; }
   .filtre:hover { transform: rotate(-2deg) translateY(-2px); }
   .filtre[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .filtre-select { display: none; }
-  .filtre-select select { width: 100%; min-height: 44px; padding: 0 40px 0 16px; font-family: var(--titre); font-size: 1.25rem; color: var(--vert-fonce); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 9l7 7 7-7' fill='none' stroke='%23444' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center / 20px; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); appearance: none; cursor: pointer; }
-  /* Téléphone : titre et interrupteur Dessins / Toiles sur une ligne, filtres dans une liste déroulante (une seule ligne) */
+  /* Téléphone : titre et interrupteur Dessins / Toiles sur une ligne, filtres en grille de trois colonnes */
   @media (max-width: 699px) {
     .boutique__tete { flex-wrap: nowrap; justify-content: space-between; gap: 8px; }
     .boutique h1 { font-size: 1.9rem; white-space: nowrap; }
     .onglet { padding: 4px 11px; font-size: 1.1rem; }
-    .filtres { display: none; }
-    .filtre-select { display: block; }
+    /* filtres en grille : trois colonnes, deux lignes au plus */
+    .filtres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 2px 0 6px; }
+    .filtre { padding: 0.4em 0.3em; text-align: center; white-space: nowrap; font-size: 1.1rem; }
   }
-  @media (max-width: 699px) { .boutique__barre { position: static; } .filtre { font-size: 1.1rem; padding: 0.45em 0.85em; } }
+  @media (max-width: 699px) { .boutique__barre { position: static; } }
 </style>
