@@ -50,11 +50,6 @@ export const nl: Dico = {
     rubrique: 'Rubriek',
     prix: '10 €',
     etiquette: 'Tekening',
-    info: [
-      { titre: 'Digitaal bestand', texte: 'Zonder watermerk, om op papier af te drukken voor privégebruik.' },
-      { titre: '10 € per tekening', texte: 'Geen verzendkosten.' },
-      { titre: 'Per e-mail ontvangen', texte: 'Na je gesprek met Linda.' },
-    ],
     surtitre: 'Digitale tekening',
     prixTexte: 'Je ontvangt het digitale bestand, zonder watermerk.',
     etapesTitre: 'Hoe ontvang je een tekening?',
@@ -85,11 +80,6 @@ export const nl: Dico = {
     histoire: 'Mijn doeken werden gedrukt voor een tentoonstelling in Oostende. De plek sloot nog voor ze opgehangen werden. Vandaag zoeken ze een nieuwe muur.',
     etiquette: 'Doek',
     bonus: `Gratis verzending vanaf ${ENVOI_OFFERT_DES} doeken · ${lot}`,
-    info: [
-      { titre: 'Gedrukt op aluminium', texte: 'A3, 29,7 × 42 cm, 3 mm, haakje inbegrepen, uniek stuk.' },
-      { titre: `${PRIX_TOILE} € per doek`, texte: `+ ${FRAIS_ENVOI} € verzending.` },
-      { titre: 'Door Linda verstuurd', texte: `Na je gesprek met haar, binnen ${DELAI_ENVOI.nl}.` },
-    ],
     surtitre: 'Doek op aluminium',
     retour: '← Alle doeken',
     agrandir: 'Vergroot het doek',
@@ -318,7 +308,7 @@ export const nl: Dico = {
       { q: 'Hoe neem ik contact op met Linda?', r: 'Via het contactformulier: zij antwoordt je persoonlijk.' },
     ],
   },
-  video: { lancer: 'Video afspelen', couper: 'Geluid uit', remettre: 'Geluid aan' },
+  video: { lancer: 'Video afspelen' },
   mascotte: {
     nom: 'Tilleul',
     parler: 'Tilleul, de kat van Linda, aaien',

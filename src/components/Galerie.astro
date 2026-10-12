@@ -1,5 +1,4 @@
 ---
-import IconeLivraison from './IconeLivraison.astro';
 // Galerie commune aux dessins et aux toiles, façon boutique : petit titre avec le nombre, filtres par rubrique collés sous l'en-tête, grille de cartes.
 interface Props {
   titre: string;
@@ -7,25 +6,15 @@ interface Props {
   groupe: string;
   rubriques: { code: string; nom: string; nombre: number }[];
   total: number;
-  genre: 'dessin' | 'toile';
-  info: { titre: string; texte: string }[];
   bonus?: string;
 }
-const { titre, tous, groupe, rubriques, total, genre, info, bonus } = Astro.props;
+const { titre, tous, groupe, rubriques, total, bonus } = Astro.props;
 ---
 <section class="boutique">
   <div class="contenu boutique__tete">
     <h1>{titre} <span class="boutique__nombre" data-total>({total})</span></h1>
   </div>
   <div class="contenu">
-    <ul class="info">
-      {info.map((x, i) => (
-        <li class="info__item">
-          <span class="info__icone" aria-hidden="true">{i === 2 ? <IconeLivraison genre={genre} /> : i === 0 ? <svg viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="22" height="24" rx="2" /><path d="M10 22l5-7 4 5 3-3 3 5" /></svg> : <b>€</b>}</span>
-          <span class="info__texte"><strong>{x.titre}</strong><span>{x.texte}</span></span>
-        </li>
-      ))}
-    </ul>
     {bonus && (
       <p class="bonus">
         <svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="24" height="16" rx="2" /><path d="M16 12v16M3 12h26v-4H3zM16 8c-3 0-6-1-6-3s3-2 6 3c3-5 6-5 6-3s-3 3-6 3z" /></svg>
@@ -85,16 +74,6 @@ const { titre, tous, groupe, rubriques, total, genre, info, bonus } = Astro.prop
   .boutique { padding-bottom: clamp(32px, 6vw, 72px); }
   .boutique__tete { padding-block: clamp(18px, 3vw, 32px) 8px; }
   .boutique h1 { margin: 0; font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.4rem); }
-  /* Ce que c'est, le prix, comment on le reçoit : une rangée discrète sous le titre */
-  .info { display: grid; gap: 8px; list-style: none; margin: 4px 0 18px; padding: 0; }
-  .info__item { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--vert-creme); border-radius: var(--rayon-petit); }
-  .info__icone { flex: none; display: grid; place-items: center; width: 34px; height: 34px; font-family: var(--titre); font-size: 1.2rem; line-height: 1; color: #fff; background: var(--vert-fonce); border-radius: 50%; }
-  .info__icone b { font-weight: 400; }
-  .info__texte { display: grid; line-height: 1.25; }
-  .info__texte strong { font-family: var(--titre); font-weight: 400; font-size: 1.25rem; color: var(--vert-fonce); }
-  .info__texte span { font-size: 0.95rem; color: var(--encre-douce); }
-  @media (max-width: 699px) { .info { grid-template-columns: repeat(3, 1fr); gap: 6px; } .info__item { justify-content: center; padding: 8px 6px; text-align: center; } .info__icone, .info__texte span { display: none; } .info__texte strong { font-size: 1.05rem; line-height: 1.15; } }
-  @media (min-width: 700px) { .info { grid-template-columns: repeat(3, 1fr); gap: 14px; } }
   .bonus { display: flex; align-items: center; gap: 8px; margin: -8px 0 16px; font-size: 0.98rem; font-weight: 600; color: var(--orange-fonce); }
   .bonus svg { flex: none; }
   .boutique__nombre { color: var(--orange-titre); }
@@ -104,7 +83,7 @@ const { titre, tous, groupe, rubriques, total, genre, info, bonus } = Astro.prop
   .filtres::-webkit-scrollbar { display: none; }
   .filtre { flex: none; font-family: var(--titre); font-size: 1.25rem; line-height: 1; padding: 0.5em 1em; cursor: pointer; background: #fff; color: var(--vert-fonce); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: transform 0.15s; }
   .filtre:hover { transform: rotate(-2deg) translateY(-2px); }
-  .filtre[aria-pressed='true'] { background: var(--vert-fonce); color: #fff; }
+  .filtre[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
   .grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; margin-top: clamp(20px, 3vw, 30px); }
   @media (min-width: 700px) { .grille { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 22px; } }
   @media (min-width: 1000px) { .grille { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

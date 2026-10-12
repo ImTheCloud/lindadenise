@@ -23,6 +23,8 @@
   --ombre: 0 6px 0 rgba(43, 110, 58, 0.12);
 
   /* Les deux mondes du site : couleurs fixes, pour les repères qui doivent rester verts ou bruns partout */
+  --accent: #2b6e3a; /* couleur des boutons, badges et filtres actifs de chaque monde */
+  --bord-carte: #2b6e3a;
   --monde-dessins: #2b6e3a;
   --monde-toiles: #d9700b;
   --fond: #fff;
@@ -30,18 +32,20 @@
 
 /* Le monde des toiles reprend exactement les mêmes variables, en brun terre et crème : tout ce qui s'appuie sur elles change seul */
 [data-monde='toiles'] {
-  --vert: #f28a1e;
-  --vert-fonce: #d9700b;
-  --vert-creme: #fff4e3;
-  --vert-pale: #ffe0b8;
+  --accent: #d9700b;
+  --bord-carte: #e4d6c4;
+  --vert: #5a4a3e;
+  --vert-fonce: #3a2f28;
+  --vert-creme: #fff7ec;
+  --vert-pale: #eadfd0;
   --orange: #f28a1e;
   --orange-clair: #ffb347;
   --orange-creme: #fff4e3;
-  --orange-fonce: #a84e00;
-  --orange-titre: #a84e00;
+  --orange-fonce: #c25a00;
+  --orange-titre: #c25a00;
   --encre: #3a2a20;
   --encre-douce: #6b5546;
-  --ombre: 0 6px 0 rgba(217, 112, 11, 0.2);
+  --ombre: 0 6px 0 rgba(58, 47, 40, 0.1);
   --fond: #fffaf2;
 }
 
@@ -95,9 +99,9 @@ p { margin: 0 0 1em; }
 }
 .bouton:hover { color: #fff; transform: translateY(-2px) rotate(-1deg); box-shadow: 0 7px 0 #8f4300; }
 .bouton:active { transform: translateY(3px); box-shadow: 0 2px 0 #8f4300; }
-.bouton--vert { background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 5px 0 #173f20; }
-.bouton--vert:hover { box-shadow: 0 7px 0 #173f20; }
-.bouton[aria-pressed='true'] { background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 5px 0 #173f20; }
+.bouton--vert { background: var(--accent); border-color: color-mix(in srgb, var(--accent) 60%, #000); box-shadow: 0 5px 0 color-mix(in srgb, var(--accent) 60%, #000); }
+.bouton--vert:hover { box-shadow: 0 7px 0 color-mix(in srgb, var(--accent) 60%, #000); }
+.bouton[aria-pressed='true'] { background: var(--accent); border-color: color-mix(in srgb, var(--accent) 60%, #000); box-shadow: 0 5px 0 color-mix(in srgb, var(--accent) 60%, #000); }
 .bouton--contour { background: #fff; color: var(--vert-fonce); border-color: var(--vert-fonce); box-shadow: 0 5px 0 rgba(43, 110, 58, 0.35); }
 .bouton--contour:hover { color: var(--orange-fonce); border-color: var(--orange-fonce); }
 
@@ -116,7 +120,7 @@ p { margin: 0 0 1em; }
 }
 
 /* Cartes des dessins et des toiles (CarteDessin.astro, CarteToile.astro) : grille de boutique, cadres dessinés à la main, couleurs du monde (html[data-monde]) */
-.carte { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s; }
+.carte { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 10px; background: #fff; border: var(--trait) solid var(--bord-carte); border-radius: var(--rayon); box-shadow: var(--ombre); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s; }
 .carte[hidden] { display: none; }
 .carte:hover, .carte:focus-within { transform: translateY(-6px) rotate(-1.2deg); box-shadow: 0 12px 0 rgba(43, 110, 58, 0.14); }
 .carte__lien { display: block; flex: 1; text-decoration: none; }
@@ -126,7 +130,7 @@ p { margin: 0 0 1em; }
 /* Une toile : même carte, avec le bord d'aluminium */
 .carte--toile .carte__image { padding: 5px; border-radius: 4px; background: #e9ecee; box-shadow: inset 0 0 0 1px #c3c9cd; }
 .carte--toile .carte__image img { border-radius: 2px; box-shadow: 0 0 0 1px #9aa2a8; }
-.carte__etiquette { position: absolute; z-index: 2; left: calc(var(--trait) * -1); top: 22px; padding: 5px 14px 6px 12px; font-family: var(--titre); font-size: 1.15rem; line-height: 1.1; color: #fff; background: var(--vert-fonce); border-radius: 0 12px 12px 0; box-shadow: 0 2px 4px rgba(60, 40, 20, 0.3); pointer-events: none; }
+.carte__etiquette { position: absolute; z-index: 2; left: calc(var(--trait) * -1); top: 22px; padding: 5px 14px 6px 12px; font-family: var(--titre); font-size: 1.15rem; line-height: 1.1; color: #fff; background: var(--accent); border-radius: 0 12px 12px 0; box-shadow: 0 2px 4px rgba(60, 40, 20, 0.3); pointer-events: none; }
 .carte__vendue { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 62px; height: 62px; font-family: var(--titre); font-size: 1.05rem; color: #fff; background: var(--encre-douce); border: 3px solid #fff; border-radius: 50%; transform: rotate(-8deg); }
 .carte--vendue .carte__image img { filter: grayscale(0.9) opacity(0.7); }
 .carte__titre { display: flex; align-items: center; justify-content: center; padding: 8px 6px 0; font-family: var(--titre); font-size: 1.6rem; line-height: 1.15; text-align: center; text-wrap: balance; color: var(--vert-fonce); }
@@ -135,7 +139,7 @@ p { margin: 0 0 1em; }
 .carte:hover .carte__titre { color: var(--orange-fonce); }
 .carte__panier { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: auto; padding: 7px 10px; font-family: var(--titre); font-size: 1.1rem; line-height: 1.1; cursor: pointer; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); }
 .carte__panier:hover { background: var(--orange-creme); color: var(--orange-fonce); border-color: var(--orange-fonce); }
-.carte__panier[aria-pressed='true'] { background: var(--vert-fonce); color: #fff; border-color: var(--vert-fonce); }
+.carte__panier[aria-pressed='true'] { background: var(--accent); color: #fff; border-color: var(--accent); }
 @media (max-width: 619px) {
   .carte { padding: 7px; }
   .carte__titre { font-size: 1.3rem; }

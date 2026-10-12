@@ -41,6 +41,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 - **Discret mais présent** : sur la page Toiles, une ligne avec icône cadeau sous la bande d'info (« Envoi offert dès 2 toiles · 5 toiles achetées, la 6e est offerte », y compris sur téléphone) ; l'offre reste aussi dans la FAQ et le récapitulatif du panier.
 - **Panier** : bouton « Envoyer ma demande » en vert ; sous-totaux du récapitulatif en cadres dessinés (bord de la couleur du monde, coins irréguliers, petite ombre) au lieu de barres carrées.
 
+- **Toiles plus classiques (2026-10-12)** : le monde des toiles ne repose plus sur de l'orange partout : titres, bordures et textes en brun-gris foncé `#3a2f28`, bords de cartes doux (`--bord-carte`), l'orange `#d9700b` (variable `--accent`, ajoutée aussi au vert des dessins) réservé aux badges, boutons, filtre actif, langue active et prix. **Bande des trois blocs d'info retirée** des deux galeries (Claudiu n'aimait pas), ses textes supprimés ; reste la ligne discrète « Envoi offert dès 2 toiles · 5 toiles achetées, la 6e est offerte » sur la page Toiles. Bouton « Couper le son » de la vidéo des vraies toiles supprimé (commandes natives du lecteur). **À proposer à Claudiu** : une autre présentation pour « dessin = e-mail, toile = envoyée par Linda » (les badges des cartes et des portes sont gardés en attendant).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

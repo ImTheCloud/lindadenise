@@ -49,11 +49,6 @@ export const fr = {
     rubrique: 'Rubrique',
     prix: '10 €',
     etiquette: 'Dessin',
-    info: [
-      { titre: 'Fichier numérique', texte: 'Sans filigrane, à imprimer sur papier pour votre usage privé.' },
-      { titre: '10 € le dessin', texte: 'Sans frais d’envoi.' },
-      { titre: 'Reçu par e-mail', texte: 'Après votre échange avec Linda.' },
-    ],
     surtitre: 'Dessin numérique',
     prixTexte: 'Vous recevez le fichier numérique, sans filigrane.',
     etapesTitre: 'Comment recevoir un dessin ?',
@@ -84,11 +79,6 @@ export const fr = {
     histoire: 'Mes toiles ont été imprimées en vue d’une exposition à Ostende. Le lieu a fermé avant l’accrochage. Elles cherchent aujourd’hui un nouveau mur.',
     etiquette: 'Toile',
     bonus: `Envoi offert dès ${ENVOI_OFFERT_DES} toiles · ${lot}`,
-    info: [
-      { titre: 'Impression sur aluminium', texte: 'A3, 29,7 × 42 cm, 3 mm, crochet intégré, pièce unique.' },
-      { titre: `${PRIX_TOILE} € la toile`, texte: `+ ${FRAIS_ENVOI} € d’envoi.` },
-      { titre: 'Envoyée par Linda', texte: `Après votre échange avec elle, en ${DELAI_ENVOI.fr}.` },
-    ],
     surtitre: 'Toile sur aluminium',
     retour: '← Toutes les toiles',
     agrandir: 'Agrandir la toile',
@@ -317,7 +307,7 @@ export const fr = {
       { q: 'Comment contacter Linda ?', r: 'Par le formulaire de contact : elle vous répond personnellement.' },
     ],
   },
-  video: { lancer: 'Lancer la vidéo', couper: 'Couper le son', remettre: 'Remettre le son' },
+  video: { lancer: 'Lancer la vidéo' },
   mascotte: {
     nom: 'Tilleul',
     parler: 'Caresser Tilleul, le chat de Linda',
