@@ -286,7 +286,6 @@ export const nl: Dico = {
       { titre: 'Prijs', texte: [`${PRIX_TOILE} € per doek, plus ${FRAIS_ENVOI} € verzendkosten. De verzending is gratis vanaf ${ENVOI_OFFERT_DES} doeken.`, `Lotaanbod, alleen op de doeken: ${lot}.`] },
       { titre: 'Bestelling en betaling', texte: ['Er is geen betaling op de site. Je stuurt je aanvraag via het formulier; Linda antwoordt met het totaalbedrag, de manier van betalen en de verzending.'] },
       { titre: 'Verzending', texte: ['Levering alleen in België.', `Linda verpakt het doek zelf, met zorg, en verstuurt het met bpost, binnen ${DELAI_ENVOI.nl}. Je ontvangt de details van de zending per e-mail.`] },
-      { titre: 'Retour', texte: ['Je kunt een doek terugsturen: de verzendkosten van het retour zijn voor jouw rekening.', 'Digitale tekeningen van 10 € worden niet teruggenomen of terugbetaald.'] },
       { titre: 'Auteursrecht', texte: ['Wie een doek koopt, krijgt niet het recht om de tekening te reproduceren: het auteursrecht blijft bij Linda Denise.'] },
     ],
   },

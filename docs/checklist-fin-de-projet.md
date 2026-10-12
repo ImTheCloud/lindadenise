@@ -76,3 +76,14 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Boutique : liens de téléchargement signés et à durée limitée, webhooks Stripe vérifiés, originaux jamais accessibles publiquement.
 - Formulaire et abonnement : anti-spam, pas de données superflues.
 - Test d'intrusion de base (accès direct aux fichiers, aux routes admin, aux originaux) avant la mise en ligne.
+
+## Notes de Linda à mettre sur le site seulement quand on vend en ligne (ne rien afficher avant)
+Aucun paiement n'est proposé : pour une toile ou un dessin numérique, on contacte Linda. Ces règles sont donc **notées, pas affichées** (page Conditions de vente des toiles sans bloc « Retours »).
+- **Retours des toiles** : possibles dans les **14 jours**, la toile doit revenir **dans le même état**, frais de renvoi à la charge de l'acheteur ; quand Linda reçoit le colis et que tout est en ordre, elle rembourse les 200 €.
+- **Dessins numériques à 10 €** : ni repris ni remboursés.
+- **Signature** sur le dos de la toile (pas encore faite, ne pas en parler sur le site).
+- **Expositions et dépôts** : à voir avec la galerie quand elle contacte Linda.
+- Rappel du statut légal de Linda avant tout paiement (voir `docs/prive/suivi-client.md`).
+
+## Vidéo motion design : texte à ajouter à la fin du projet
+L'image et la musique sont validées. Ajouter seulement du texte aux moments où l'écran n'en a pas, avec les infos de Linda : épaisseur 3 mm, environ 500 g, finition mate, crochet compris, envoi par bpost en 1 à 2 semaines, 5 toiles achetées = la 6e offerte, toile sur commande à partir d'un dessin numérique en 1 à 3 semaines. Toujours **sans prix** ni histoire d'Ostende (règle déjà en place). Refaire avec `scripts/video/` (voir `docs/avancement.md`), FR et NL.

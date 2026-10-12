@@ -12,7 +12,8 @@ Appliqué :
 - **Offre de lot** : plus de pourcentages, **5 toiles achetées, la 6e offerte** (6 toiles = 1 000 €). Envoi offert dès 2 toiles conservé (à confirmer).
 - **Toile** : 3 mm d'épaisseur, environ 500 g, finition mate (page Toiles, fiche, caractéristiques).
 - **Envoi** : bpost, 1 à 2 semaines (`DELAI_ENVOI`).
-- **Retours** : toile retournable, frais de livraison du retour à la charge de l'acheteur ; dessins numériques ni repris ni remboursés (page Conditions de vente des toiles).
+- **Retours** : notés dans `docs/checklist-fin-de-projet.md` (14 jours, même état, renvoi aux frais de l'acheteur, remboursement des 200 € après contrôle ; pas de retour pour les dessins numériques), **pas affichés sur le site** : rien lié au paiement tant qu'on ne vend pas en ligne (choix de Claudiu), on contacte Linda. Bloc « Retours » retiré de la page Conditions de vente. Toutes les toiles sont en vente (aucune vendue), crochet compris. Signature au dos : ne pas en parler. Les toiles qui n'existent pas en numérique ne doivent pas apparaître dans le catalogue numérique (c'est déjà le cas).
+- **Vidéo** : texte à ajouter en fin de projet (détails dans la checklist).
 - **Expositions et dépôts** : à voir avec la galerie qui contactera Linda (rien d'écrit sur le site).
 
 ## Retours de Claudiu sur les toiles et les vidéos (2026-10-12, non publiés)

@@ -285,7 +285,6 @@ export const fr = {
       { titre: 'Prix', texte: [`${PRIX_TOILE} € la toile, plus ${FRAIS_ENVOI} € de frais d’envoi. L’envoi est offert dès ${ENVOI_OFFERT_DES} toiles.`, `Offre de lot, sur les toiles seulement : ${lot}.`] },
       { titre: 'Commande et paiement', texte: ['Il n’y a pas de paiement sur le site. Vous envoyez votre demande par le formulaire ; Linda vous répond avec le montant total, le mode de paiement et l’envoi.'] },
       { titre: 'Envoi', texte: ['Livraison uniquement en Belgique.', `Linda emballe la toile elle-même, avec soin, et l’expédie avec bpost, en ${DELAI_ENVOI.fr}. Vous recevez les détails de l’envoi par e-mail.`] },
-      { titre: 'Retours', texte: ['Vous pouvez retourner une toile : les frais de livraison du retour sont à votre charge.', 'Les dessins numériques à 10 € ne sont ni repris ni remboursés.'] },
       { titre: 'Droit d’auteur', texte: ['Acheter une toile ne donne pas le droit de reproduire le dessin : le droit d’auteur reste à Linda Denise.'] },
     ],
   },
