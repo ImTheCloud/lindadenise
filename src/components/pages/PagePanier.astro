@@ -74,7 +74,7 @@ const donnees = {
     textes: {
       genres: { dessin: string; toile: string; commande: string };
       retirer: string;
-      lignes: { dessins: string; toiles: string; lotUne: string; lotPlusieurs: string; lotDessinUn: string; lotDessinsPlusieurs: string; envoi: string; envoiOffert: string; total: string };
+      lignes: { dessins: string; toiles: string; lotUne: string; lotPlusieurs: string; lotDessinUn: string; lotDessinsPlusieurs: string; envoi: string; envoiPlusieurs: string; envoiOffert: string; total: string };
     };
   }
   const racine = document.querySelector<HTMLElement>('[data-panier-page]');
@@ -96,15 +96,18 @@ const donnees = {
     function article(genre: 'dessin' | 'toile' | 'commande', id: string) {
       const src = genre === 'toile' ? d.toiles[id] : d.dessins[id];
       const li = noeud('li', `article article--${genre}`);
+      // toute la ligne (vignette, titre, prix) ouvre la page de l'article, avec ses autres options
+      const lien = noeud('a', 'article__lien');
+      lien.href = src.href;
       const img = noeud('img', 'article__img');
       img.src = src.img; img.alt = ''; img.width = 56; img.loading = 'lazy';
       const corps = noeud('div', 'article__corps');
-      const lien = noeud('a', 'article__titre', src.titre);
-      lien.href = src.href;
+      const titre = noeud('span', 'article__titre', src.titre);
       const prix = genre === 'dessin' ? d.prix.dessin : d.prix.toile;
       // le bloc dit déjà « dessins » ou « toiles » : on ne précise que la toile sur commande
       if (genre === 'commande') corps.append(noeud('span', 'article__genre', d.textes.genres.commande));
-      corps.append(lien, noeud('span', 'article__prix', euros(prix)));
+      corps.append(titre, noeud('span', 'article__prix', euros(prix)));
+      lien.append(img, corps);
       // retirer : une petite croix (le texte reste pour les lecteurs d'écran)
       const retirer = noeud('button', 'article__retirer');
       retirer.type = 'button';
@@ -112,7 +115,7 @@ const donnees = {
       retirer.dataset.ajouter = d.textes.retirer;
       retirer.dataset.dedans = d.textes.retirer;
       retirer.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" /></svg><span class="sr-only" data-panier-texte></span>';
-      li.append(img, corps, retirer);
+      li.append(lien, retirer);
       return li;
     }
 
@@ -153,7 +156,7 @@ const donnees = {
       if (nombreToiles) {
         rangs.push(ligne(l.toiles.replace('{n}', String(nombreToiles)), euros(c.sousTotal), 'toiles'));
         if (c.offertes) rangs.push(ligne((c.offertes > 1 ? l.lotPlusieurs : l.lotUne).replace('{n}', String(c.offertes)), `−${euros(c.offertes * d.prix.toile)}`, 'toiles'));
-        rangs.push(ligne(l.envoi, c.envoi ? euros(c.envoi) : l.envoiOffert, 'toiles'));
+        rangs.push(ligne(nombreToiles > 1 ? l.envoiPlusieurs : l.envoi, c.envoi ? euros(c.envoi) : l.envoiOffert, 'toiles'));
       }
       rangs.push(ligne(l.total, euros(c.total), undefined, true));
       lignes.replaceChildren(...rangs);
@@ -181,7 +184,9 @@ const donnees = {
   .groupe__tete h2 { margin: 0; font-size: 1.35rem; }
   .groupe__tete p { margin: 0; font-size: 0.92rem; color: var(--encre-douce); }
   .panier__liste { list-style: none; margin: 0; padding: 0 14px; display: grid; }
-  .panier__liste :global(.article) { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 2px dashed var(--vert-pale); }
+  .panier__liste :global(.article) { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 2px dashed var(--vert-pale); }
+  .panier__liste :global(.article__lien) { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; min-width: 0; text-decoration: none; color: inherit; }
+  .panier__liste :global(.article__lien:hover .article__titre) { color: var(--orange-fonce); text-decoration: underline; text-underline-offset: 3px; }
   .panier__liste :global(.article:last-child) { border-bottom: 0; }
   .groupe[data-monde] :global(.article__img) { border-radius: 2px; box-shadow: 0 0 0 1px #9aa2a8, 0 0 0 3px #e9ecee; }
   .panier__liste :global(.article__img) { width: 56px; height: 56px; object-fit: cover; object-position: top; border-radius: 8px 4px 8px 5px / 5px 8px 4px 8px; background: var(--vert-creme); }

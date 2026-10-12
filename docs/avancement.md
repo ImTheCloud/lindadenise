@@ -71,6 +71,10 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **C'est bpost qui livre** (précision de Claudiu) : badges « Livrée par bpost », « bpost vous les livre » (panier), « Pièce unique livrée par bpost », étapes, FAQ et conditions ; Linda emballe, bpost livre (NL « Geleverd door bpost »).
 
+- **Panier : un article ouvre sa page** : toute la ligne (vignette, titre, prix) est un lien vers la page du dessin ou de la toile (grande image, options, toile sur commande pour un dessin) ; la croix de retrait reste à part.
+
+- **Panier, ligne de livraison** : « Frais de livraison de la toile 12 € » pour une seule toile, « Frais de livraison des toiles : Offerts » dès deux (NL « Leveringskosten van het doek / van de doeken », « Gratis ») ; même texte dans le total du formulaire.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

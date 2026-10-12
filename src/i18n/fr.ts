@@ -181,7 +181,7 @@ export const fr = {
     ajouterAria: 'Ajouter « {t} » au panier',
     dedansAria: 'Retirer « {t} » du panier',
     voir: 'Voir mon panier',
-    lignes: { dessins: 'Dessins ({n})', toiles: 'Toiles ({n})', lotUne: 'Offre de lot : 1 toile offerte', lotPlusieurs: 'Offre de lot : {n} toiles offertes', lotDessinUn: 'Offre de lot : 1 dessin offert', lotDessinsPlusieurs: 'Offre de lot : {n} dessins offerts', envoi: 'Frais de livraison', envoiOffert: 'Livraison gratuite', total: 'Total' },
+    lignes: { dessins: 'Dessins ({n})', toiles: 'Toiles ({n})', lotUne: 'Offre de lot : 1 toile offerte', lotPlusieurs: 'Offre de lot : {n} toiles offertes', lotDessinUn: 'Offre de lot : 1 dessin offert', lotDessinsPlusieurs: 'Offre de lot : {n} dessins offerts', envoi: 'Frais de livraison de la toile', envoiPlusieurs: 'Frais de livraison des toiles', envoiOffert: 'Offerts', total: 'Total' },
     delaiCommande: `Toile sur commande : délai d’${DELAI_TOILE_SUR_COMMANDE.fr}.`,
     titreDessins: 'Dessins',
     titreToiles: 'Toiles',

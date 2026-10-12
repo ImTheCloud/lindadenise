@@ -182,7 +182,7 @@ export const nl: Dico = {
     ajouterAria: 'Voeg “{t}” toe aan het mandje',
     dedansAria: 'Verwijder “{t}” uit het mandje',
     voir: 'Mijn mandje bekijken',
-    lignes: { dessins: 'Tekeningen ({n})', toiles: 'Doeken ({n})', lotUne: 'Lotaanbod: 1 doek gratis', lotPlusieurs: 'Lotaanbod: {n} doeken gratis', lotDessinUn: 'Lotaanbod: 1 tekening gratis', lotDessinsPlusieurs: 'Lotaanbod: {n} tekeningen gratis', envoi: 'Leveringskosten', envoiOffert: 'Gratis levering', total: 'Totaal' },
+    lignes: { dessins: 'Tekeningen ({n})', toiles: 'Doeken ({n})', lotUne: 'Lotaanbod: 1 doek gratis', lotPlusieurs: 'Lotaanbod: {n} doeken gratis', lotDessinUn: 'Lotaanbod: 1 tekening gratis', lotDessinsPlusieurs: 'Lotaanbod: {n} tekeningen gratis', envoi: 'Leveringskosten van het doek', envoiPlusieurs: 'Leveringskosten van de doeken', envoiOffert: 'Gratis', total: 'Totaal' },
     delaiCommande: `Doek op bestelling: termijn ${DELAI_TOILE_SUR_COMMANDE.nl}.`,
     titreDessins: 'Tekeningen',
     titreToiles: 'Doeken',
