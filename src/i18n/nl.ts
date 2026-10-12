@@ -51,7 +51,7 @@ export const nl: Dico = {
     etiquette: 'Tekening',
     info: [
       { titre: 'Digitaal bestand', texte: 'Zonder watermerk, om op papier af te drukken voor privégebruik.' },
-      { titre: '10 €', texte: 'per tekening.' },
+      { titre: '10 € per tekening', texte: 'Geen verzendkosten.' },
       { titre: 'Per e-mail ontvangen', texte: 'Na je gesprek met Linda.' },
     ],
     surtitre: 'Digitale tekening',
@@ -85,7 +85,7 @@ export const nl: Dico = {
     etiquette: 'Doek',
     info: [
       { titre: 'Gedrukt op aluminium', texte: 'A3, 29,7 × 42 cm, 3 mm, haakje inbegrepen, uniek stuk.' },
-      { titre: `${PRIX_TOILE} €`, texte: `+ ${FRAIS_ENVOI} € verzending, gratis vanaf ${ENVOI_OFFERT_DES} doeken. ${lot}.` },
+      { titre: `${PRIX_TOILE} € per doek`, texte: `+ ${FRAIS_ENVOI} € verzending, gratis vanaf ${ENVOI_OFFERT_DES} doeken.` },
       { titre: 'Door Linda verstuurd', texte: `Na je gesprek met haar, binnen ${DELAI_ENVOI.nl}.` },
     ],
     surtitre: 'Doek op aluminium',

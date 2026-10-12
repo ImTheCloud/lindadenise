@@ -50,7 +50,7 @@ export const fr = {
     etiquette: 'Dessin',
     info: [
       { titre: 'Fichier numérique', texte: 'Sans filigrane, à imprimer sur papier pour votre usage privé.' },
-      { titre: '10 €', texte: 'le dessin.' },
+      { titre: '10 € le dessin', texte: 'Sans frais d’envoi.' },
       { titre: 'Reçu par e-mail', texte: 'Après votre échange avec Linda.' },
     ],
     surtitre: 'Dessin numérique',
@@ -84,7 +84,7 @@ export const fr = {
     etiquette: 'Toile',
     info: [
       { titre: 'Impression sur aluminium', texte: 'A3, 29,7 × 42 cm, 3 mm, crochet intégré, pièce unique.' },
-      { titre: `${PRIX_TOILE} €`, texte: `+ ${FRAIS_ENVOI} € d’envoi, offert dès ${ENVOI_OFFERT_DES} toiles. ${lot}.` },
+      { titre: `${PRIX_TOILE} € la toile`, texte: `+ ${FRAIS_ENVOI} € d’envoi, offert dès ${ENVOI_OFFERT_DES} toiles.` },
       { titre: 'Envoyée par Linda', texte: `Après votre échange avec elle, en ${DELAI_ENVOI.fr}.` },
     ],
     surtitre: 'Toile sur aluminium',
