@@ -37,6 +37,10 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Étapes** : le rond du point 2 garde la couleur de son monde (plus de rond d'une autre couleur) sur l'accueil et sur les fiches.
 
+- **Ton des textes (corrigé)** : « je » pour ce qui est personnel (accroche de l'accueil, À propos, contact, remerciement, « Un mur pour mes toiles », rubriques) ; « Linda / elle » pour la logistique de la boutique (badges « Envoyée par Linda », bande d'info, étapes, panier, notes du formulaire, FAQ, pied de page), parce que « Je vous envoie vos toiles » sonnait faux dans un bandeau. Règle ajoutée dans `CLAUDE.md`.
+- **Discret mais présent** : sur la page Toiles, une ligne avec icône cadeau sous la bande d'info (« Envoi offert dès 2 toiles · 5 toiles achetées, la 6e est offerte », y compris sur téléphone) ; l'offre reste aussi dans la FAQ et le récapitulatif du panier.
+- **Panier** : bouton « Envoyer ma demande » en vert ; sous-totaux du récapitulatif en cadres dessinés (bord de la couleur du monde, coins irréguliers, petite ombre) au lieu de barres carrées.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
