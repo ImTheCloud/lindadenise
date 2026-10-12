@@ -33,6 +33,10 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Panier plus lisible** : deux groupes séparés, « Dessins numériques » (vert, icône enveloppe, « Après notre échange, vous recevez vos dessins par e-mail ») et « Toiles » (brun, icône colis, « Après notre échange, je vous envoie vos toiles »), chacun avec son entête colorée, ses articles aux couleurs de son monde (cadres bruns et bord d'aluminium pour les toiles) ; les phrases de livraison ne sont plus dans le récapitulatif. **Récapitulatif séparé aussi** : un bloc vert « Dessins numériques (n) » avec son sous-total, un bloc brun « Toiles (n) » avec son sous-total, l'offre de lot et l'envoi, puis le total.
 
+- **ESSAI : tout le brun est passé en orange (demande de Claudiu, à valider ou à annuler)** : monde des toiles `#d9700b` (fonds crème `#fff4e3`, accents texte `#a84e00`), accents du reste du site (boutons, prix, « Denise ») `#cf6408`, boutons orange avec ombre `#7a3a00`. Pour revenir au brun caramel `#b05200` : le bloc `[data-monde='toiles']` et `--monde-toiles`, `--orange-fonce`, `--orange-titre` de `global.css` (commit précédent). Contraste : le blanc sur `#d9700b` est limité (environ 3,6 sur 1) pour les petits textes, à surveiller.
+
+- **Étapes** : le rond du point 2 garde la couleur de son monde (plus de rond d'une autre couleur) sur l'accueil et sur les fiches.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

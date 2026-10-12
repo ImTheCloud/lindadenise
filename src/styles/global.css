@@ -3,8 +3,8 @@
   --orange: #f28a1e;
   --orange-clair: #ffb347;
   --orange-creme: #fff4e3;
-  --orange-fonce: #b05200;
-  --orange-titre: #b05200;
+  --orange-fonce: #cf6408;
+  --orange-titre: #cf6408;
   --vert: #3e9a47;
   --vert-fonce: #2b6e3a;
   --vert-creme: #f1f9f1;
@@ -24,24 +24,24 @@
 
   /* Les deux mondes du site : couleurs fixes, pour les repères qui doivent rester verts ou bruns partout */
   --monde-dessins: #2b6e3a;
-  --monde-toiles: #b05200;
+  --monde-toiles: #d9700b;
   --fond: #fff;
 }
 
 /* Le monde des toiles reprend exactement les mêmes variables, en brun terre et crème : tout ce qui s'appuie sur elles change seul */
 [data-monde='toiles'] {
-  --vert: #c9741a;
-  --vert-fonce: #b05200;
+  --vert: #f28a1e;
+  --vert-fonce: #d9700b;
   --vert-creme: #fff4e3;
-  --vert-pale: #f6dfc0;
-  --orange: #c9803f;
-  --orange-clair: #e0a463;
+  --vert-pale: #ffe0b8;
+  --orange: #f28a1e;
+  --orange-clair: #ffb347;
   --orange-creme: #fff4e3;
-  --orange-fonce: #7a3a00;
-  --orange-titre: #7a3a00;
+  --orange-fonce: #a84e00;
+  --orange-titre: #a84e00;
   --encre: #3a2a20;
   --encre-douce: #6b5546;
-  --ombre: 0 6px 0 rgba(176, 82, 0, 0.18);
+  --ombre: 0 6px 0 rgba(217, 112, 11, 0.2);
   --fond: #fffaf2;
 }
 
@@ -90,11 +90,11 @@ p { margin: 0 0 1em; }
   font-family: var(--titre); font-size: 1.35rem; line-height: 1;
   padding: 0.7em 1.3em; cursor: pointer; text-decoration: none;
   border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon);
-  background: var(--orange-fonce); color: #fff; border-color: #7a3a00;
-  box-shadow: 0 5px 0 #6b3200; transition: transform 0.15s, box-shadow 0.15s;
+  background: var(--orange-fonce); color: #fff; border-color: #8f4300;
+  box-shadow: 0 5px 0 #7a3a00; transition: transform 0.15s, box-shadow 0.15s;
 }
-.bouton:hover { color: #fff; transform: translateY(-2px) rotate(-1deg); box-shadow: 0 7px 0 #7a3a00; }
-.bouton:active { transform: translateY(3px); box-shadow: 0 2px 0 #7a3a00; }
+.bouton:hover { color: #fff; transform: translateY(-2px) rotate(-1deg); box-shadow: 0 7px 0 #8f4300; }
+.bouton:active { transform: translateY(3px); box-shadow: 0 2px 0 #8f4300; }
 .bouton--vert { background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 5px 0 #173f20; }
 .bouton--vert:hover { box-shadow: 0 7px 0 #173f20; }
 .bouton[aria-pressed='true'] { background: var(--vert-fonce); border-color: #173f20; box-shadow: 0 5px 0 #173f20; }

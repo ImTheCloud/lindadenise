@@ -99,7 +99,7 @@ const vignette = (x: Toile) => `/toiles/${x.id}-400.webp`;
           <image href={`/toiles/${toile.id}-400.webp`} x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} preserveAspectRatio="xMidYMid slice" />
           <rect x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} fill="none" stroke="#a9b0b5" stroke-width="0.5" />
         </g>
-        <g class="salon__cote" stroke="#b05200" stroke-width="0.5" fill="none">
+        <g class="salon__cote" stroke="#d9700b" stroke-width="0.5" fill="none">
           <path d={`M${TOILE.x} ${TOILE.y - 5} h${TOILE.l} M${TOILE.x} ${TOILE.y - 7} v4 M${TOILE.x + TOILE.l} ${TOILE.y - 7} v4`} />
           <path d={`M${TOILE.x + TOILE.l + 5} ${TOILE.y} v${TOILE.h} M${TOILE.x + TOILE.l + 3} ${TOILE.y} h4 M${TOILE.x + TOILE.l + 3} ${TOILE.y + TOILE.h} h4`} />
         </g>
