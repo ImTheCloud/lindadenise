@@ -11,7 +11,7 @@ export const nl: Dico = {
     description:
       'Digitale tekeningen van Linda Denise, met de hand gemaakt: natuur, bloemen, katten en dieren. Ontdek de galerij en schenk jezelf een tekening.',
   },
-  nav: { dessins: 'Tekeningen', toiles: 'Doeken', apropos: 'Over mij', contact: 'Contact', menu: 'Menu', fermer: 'Sluiten', accueil: 'Home' },
+  nav: { dessins: 'Tekeningen', toiles: 'Doeken', apropos: 'Over mij', contact: 'Contact', menu: 'Menu', fermer: 'Sluiten', accueil: 'Home', jouer: 'Spelen' },
   langues: { fr: 'Français', nl: 'Nederlands' },
   rubriques: {
     chats: { nom: 'De katten', court: 'Katten', texte: 'De katten van een vriend uit Quebec: ze klimmen, dromen en luieren.' },
@@ -216,7 +216,6 @@ export const nl: Dico = {
     conditionsToiles: 'Verkoopvoorwaarden',
     confidentialite: 'Privacy',
     phrase: 'Met de hand getekend, in België.',
-    jouer: 'Spelen met Tilleul',
     toiles: 'De doeken',
   },
   jeu: {

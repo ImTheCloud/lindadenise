@@ -7,7 +7,7 @@ import Etapes from '../Etapes.astro';
 import Apercu from '../Apercu.astro';
 import Etang from '../Etang.astro';
 import Feuilles from '../Feuilles.astro';
-import { t, chemin, cheminDessin, dessins, toiles, type Lang } from '../../i18n';
+import { t, chemin, dessins, toiles, type Lang } from '../../i18n';
 import { PRIX_TOILE } from '../../data/vente';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -16,8 +16,7 @@ const a = d.accueil;
 const tt = d.toiles;
 const chemins = { fr: chemin('accueil', 'fr'), nl: chemin('accueil', 'nl') };
 const trouve = (id: string) => dessins.find((x) => x.id === id)!;
-const collage = ['trois-tournesols', 'l-ile-de-brehat', 'time-et-rouroux-a-la-plage'].map(trouve);
-const vitrineDessins = collage;
+const vitrineDessins = ['trois-tournesols', 'l-ile-de-brehat', 'time-et-rouroux-a-la-plage'].map(trouve);
 const vitrineToiles = toiles.slice(0, 3);
 const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/${id}-${l}.${format} ${l}w`).join(', ');
 ---
@@ -35,13 +34,6 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
       </div>
       <div class="heros__video">
         <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} cadre />
-      </div>
-      <div class="collage">
-        {collage.map((x, i) => (
-          <a class={`collage__img collage__img--${i + 1}`} href={cheminDessin(x.id, lang)}>
-            <Apercu id={x.id} alt={d.dessins.altDe(x.titre[lang])} largeur={x.largeur} hauteur={x.hauteur} chargement="eager" />
-          </a>
-        ))}
       </div>
     </div>
     <Etang />
@@ -135,20 +127,10 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   .heros__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
   .bouton--brun { background: var(--monde-toiles); border-color: #7a3a00; box-shadow: 0 5px 0 #6b3200; }
   .bouton--brun:hover { box-shadow: 0 7px 0 #6b3200; }
-  /* Les trois dessins : sous la vidéo sur téléphone, dans la colonne de droite sur grand écran */
-  .collage { position: relative; width: min(100%, 360px); aspect-ratio: 1 / 0.85; margin: 6px auto 0; }
-  .collage__img { position: absolute; display: block; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 6px; box-shadow: var(--ombre); transition: transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1); }
-  .collage__img :global(img) { width: 100%; height: auto; border-radius: 8px; }
-  .collage__img--1 { width: 44%; left: 0; top: 6%; transform: rotate(-7deg); animation: collage-flotte 7s ease-in-out infinite; }
-  .collage__img--2 { width: 46%; right: 0; top: 0; transform: rotate(5deg); z-index: 2; animation: collage-flotte 8s ease-in-out -2s infinite; }
-  .collage__img--3 { width: 46%; left: 27%; bottom: 0; transform: rotate(-2deg); z-index: 3; animation: collage-flotte 9s ease-in-out -4s infinite; }
-  .collage__img:hover { transform: scale(1.06) rotate(0deg); z-index: 5; animation-play-state: paused; }
-  @keyframes collage-flotte { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
-  /* Grand écran : titre à gauche, grande vidéo au centre, dessins à droite : toute la largeur sert */
+  /* Grand écran : titre à gauche, grande vidéo à droite : toute la largeur sert */
   @media (min-width: 1100px) {
-    .heros__grille { grid-template-columns: minmax(250px, 0.75fr) minmax(0, 2.1fr) minmax(210px, 0.85fr); gap: clamp(24px, 3vw, 56px); }
+    .heros__grille { grid-template-columns: minmax(280px, 0.8fr) minmax(0, 2fr); gap: clamp(24px, 3vw, 56px); }
     .heros__texte h1 { font-size: clamp(3.4rem, 0.8rem + 5.2vw, 7rem); }
-    .collage { width: 100%; max-width: 340px; aspect-ratio: 1 / 1.15; margin: 0; }
   }
 
   /* Deux grands blocs dessinés : vert pour les dessins, brun pour les toiles */

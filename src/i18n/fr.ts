@@ -10,7 +10,7 @@ export const fr = {
     description:
       'Dessins numériques de Linda Denise, faits à la main : nature, fleurs, chats et animaux. Découvrez la galerie et offrez-vous un dessin.',
   },
-  nav: { dessins: 'Dessins', toiles: 'Toiles', apropos: 'À propos', contact: 'Contact', menu: 'Menu', fermer: 'Fermer', accueil: 'Accueil' },
+  nav: { dessins: 'Dessins', toiles: 'Toiles', apropos: 'À propos', contact: 'Contact', menu: 'Menu', fermer: 'Fermer', accueil: 'Accueil', jouer: 'Jouer' },
   langues: { fr: 'Français', nl: 'Nederlands' },
   rubriques: {
     chats: { nom: 'Les chats', court: 'Chats', texte: 'Les chats d’un ami québécois : ils grimpent, rêvent et se prélassent.' },
@@ -215,7 +215,6 @@ export const fr = {
     conditionsToiles: 'Conditions de vente',
     confidentialite: 'Confidentialité',
     phrase: 'Dessiné à la main, en Belgique.',
-    jouer: 'Jouer avec Tilleul',
     toiles: 'Les toiles',
   },
   jeu: {

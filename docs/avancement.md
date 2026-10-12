@@ -13,7 +13,7 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 - À valider par Claudiu : l'aspect sur téléphone, le brun, la vidéo d'accueil (elle parle des toiles), le poids de la vidéo qui démarre seule (7,7 Mo).
 - Pas encore fait : fiches détail (`PageDessin`, `PageToile`) seulement recolorées par le monde, pas refaites ; texte « Chaque toile est unique » de la vidéo coupé sur le bandeau de la page Toiles (cadrage 16:9 limité en hauteur).
 
-- **Accueil, premier écran (dernier état)** : sur ordinateur (dès 1100 px), tout tient dans l'écran (hauteur de l'écran moins l'en-tête) et toute la largeur sert, en trois colonnes : titre et deux boutons à gauche, grande vidéo seule au centre (rien posé dessus), les trois dessins d'origine (tournesols, île de Bréhat, plage) à droite, étang et lotus tout en bas ; les deux portes Dessins / Toiles sont sous la ligne de flottaison. Téléphone : titre, boutons, vidéo, trois dessins, étang, puis les portes.
+- **Accueil, premier écran (dernier état)** : sur ordinateur (dès 1100 px), tout tient dans l'écran (hauteur de l'écran moins l'en-tête) et toute la largeur sert, en deux colonnes : titre et deux boutons à gauche, très grande vidéo seule à droite (rien posé dessus), étang et lotus tout en bas ; **les trois dessins d'origine sont retirés** (retirés à la demande de Claudiu). **« Jouer » (page de jeu) est dans le menu de l'en-tête** (`nav.jouer`) et n'est plus dans le pied de page ; les deux portes Dessins / Toiles sont sous la ligne de flottaison. Téléphone : titre, boutons, vidéo, trois dessins, étang, puis les portes.
 
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
