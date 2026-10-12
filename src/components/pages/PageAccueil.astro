@@ -42,6 +42,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   <section class="section">
     <div class="contenu">
       <h2 class="centre apparait">{a.rubriquesTitre}</h2>
+      <p class="centre apparait rubriques__total">{a.total(dessins.length)}</p>
       <div class="rubriques">
         {RUBRIQUES.map((r, i) => {
           const c = trouve(couvertures[r]);
@@ -134,6 +135,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .rubrique__texte { color: var(--encre-douce); font-size: 1rem; padding: 6px 10px 8px; }
   .rubrique__nombre { margin-top: auto; font-family: var(--titre); font-size: 1.2rem; color: var(--vert-fonce); }
 
+  .rubriques__total { margin: 6px 0 0; font-family: var(--titre); font-size: 1.4rem; color: var(--orange-titre); }
   .rubriques__suite { margin-top: 34px; }
   .offrir { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 26px; margin: 34px 0; }
   .offre { background: #fff; border: var(--trait) solid var(--orange-fonce); border-radius: var(--rayon); padding: 22px 22px 8px; box-shadow: 0 6px 0 rgba(196, 94, 0, 0.18); }

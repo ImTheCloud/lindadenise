@@ -2,6 +2,12 @@
 
 Dernière mise à jour : 2026-10-12 (retours vidéos et toiles : voir la première section ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Musique de forêt, total des dessins, bug du chat (2026-10-12, non publiés)
+
+- **Musique de forêt calme**, activable et désactivable : bouton rond en bas à gauche (`Musique.astro`, dans `Base.astro`). Coupée par défaut, le fichier ne se charge qu'au clic ; le choix est gardé sur l'appareil (localStorage) et la musique reprend où elle en était d'une page à l'autre (sessionStorage) ; silence si l'onglet est caché ; volume doux avec fondu. Sur la page Toiles, le bouton monte au-dessus de la barre de sélection. Fichier `public/audio/foret.m4a` (96 s en boucle, 0,96 Mo), **composée par code** (`scripts/foret.py`, numpy, aucune licence) : nappes de ré majeur, kalimba pentatonique avec écho, vent léger, oiseaux lointains, réverbération ; vérifiée par mesures (−19 LUFS, crête −6,5 dB), **pas à l'oreille : à écouter par Claudiu**.
+- **Accueil** : « 76 dessins au total » sous le titre « Quatre univers à explorer » (FR et NL), calculé depuis le catalogue.
+- **Bug du chat sur le formulaire** : il s'effaçait à chaque champ, case à cocher ou liste (comme si le clavier du téléphone s'ouvrait), puis revenait d'un coup. Maintenant il ne s'efface que sur téléphone (écran tactile) et seulement pour un champ de texte ; jamais sur ordinateur ni pour les cases et listes ; retour décalé de 0,25 s pour ne pas clignoter entre deux champs.
+
 ## Infos de Linda et corrections (2026-10-12, non publiées)
 
 Validés par Claudiu : musiques, frais d'envoi 12 €, titres NL, anecdotes de Tilleul.

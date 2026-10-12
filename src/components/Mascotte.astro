@@ -244,14 +244,21 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       }, 450);
     }
 
-    // Il s'efface (glisse sous le bord de l'écran) quand on écrit dans un formulaire, ou quand le menu du téléphone est ouvert
+    // Il s'efface (glisse sous le bord de l'écran) quand le clavier du téléphone s'ouvre sur un champ de texte, ou quand le menu du téléphone
+    // est ouvert. Jamais sur ordinateur, ni pour une case à cocher, une liste ou un bouton : il n'y a pas de clavier à l'écran.
     const burger = document.querySelector('[data-burger]');
+    const ecranTactile = window.matchMedia('(pointer: coarse)');
+    const champTexte = (n: Element | null) => !!n?.matches('textarea, input:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=hidden])');
+    let retour = 0;
     const effacer = () => {
-      const ecrit = !!document.activeElement?.matches('input, textarea, select');
-      racine.classList.toggle('efface', ecrit || burger?.getAttribute('aria-expanded') === 'true');
+      window.clearTimeout(retour);
+      const ecrit = ecranTactile.matches && champTexte(document.activeElement);
+      const menu = burger?.getAttribute('aria-expanded') === 'true';
+      if (ecrit || menu) racine.classList.add('efface');
+      else retour = window.setTimeout(() => racine.classList.remove('efface'), 250); // on passe d'un champ à l'autre : il ne clignote pas
     };
     document.addEventListener('focusin', (e) => {
-      if ((e.target as HTMLElement).matches('input, textarea, select')) taire();
+      if (champTexte(e.target as HTMLElement)) taire();
       effacer();
     });
     document.addEventListener('focusout', () => window.setTimeout(effacer));

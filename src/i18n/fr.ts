@@ -12,6 +12,7 @@ export const fr = {
   },
   nav: { dessins: 'Dessins', toiles: 'Toiles', apropos: 'À propos', contact: 'Contact', menu: 'Menu', fermer: 'Fermer', accueil: 'Accueil' },
   langues: { fr: 'Français', nl: 'Nederlands' },
+  musique: { activer: 'Mettre la musique de forêt', couper: 'Couper la musique de forêt' },
   rubriques: {
     chats: { nom: 'Les chats', court: 'Chats', texte: 'Les chats d’un ami québécois : ils grimpent, rêvent et se prélassent.' },
     nature: { nom: 'La nature', court: 'Nature', texte: 'Arbres, forêts, rivières et bord de mer, tels que Linda les voit.' },
@@ -25,6 +26,7 @@ export const fr = {
     cta2: 'Qui est Linda ?',
     rubriquesTitre: 'Quatre univers à explorer',
     nombre: (n: number) => `${n} dessins`,
+    total: (n: number) => `${n} dessins au total`,
     tousLesDessins: 'Voir tous les dessins',
     offrirTitre: 'Un dessin, c’est un moment de calme, à garder ou à offrir',
     offrir: [
