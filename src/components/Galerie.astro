@@ -7,21 +7,16 @@ interface Props {
   groupe: string;
   rubriques: { code: string; nom: string; nombre: number }[];
   total: number;
-  /** un monde ou l'autre : l'onglet actif, l'icône et la phrase de livraison */
+  /** un monde ou l'autre : l'icône et la phrase de livraison */
   genre: 'dessin' | 'toile';
   phrase: string;
-  onglets: { dessin: { href: string; nom: string }; toile: { href: string; nom: string } };
   bonus?: string[];
 }
-const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } = Astro.props;
+const { titre, tous, groupe, rubriques, total, genre, phrase, bonus } = Astro.props;
 ---
 <section class="boutique">
   <div class="contenu boutique__tete">
     <h1>{titre} <span class="boutique__nombre" data-total>({total})</span></h1>
-    <nav class="onglets" aria-label={`${onglets.dessin.nom} / ${onglets.toile.nom}`}>
-      <a class="onglet onglet--dessin" href={onglets.dessin.href} aria-current={genre === 'dessin' ? 'page' : undefined}>{onglets.dessin.nom}</a>
-      <a class="onglet onglet--toile" href={onglets.toile.href} aria-current={genre === 'toile' ? 'page' : undefined}>{onglets.toile.nom}</a>
-    </nav>
   </div>
   <div class="contenu boutique__notes">
     <p class="phrase"><IconeLivraison genre={genre} />{phrase}</p>
@@ -95,16 +90,6 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .boutique { padding-bottom: clamp(20px, 3vw, 40px); }
   .boutique__tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding-block: clamp(10px, 2vw, 18px) 4px; }
   .boutique h1 { margin: 0; font-size: clamp(2rem, 1.5rem + 2vw, 2.8rem); }
-  /* Interrupteur Dessins / Toiles : l'onglet actif prend la couleur de son monde */
-  /* le cadre est un anneau extérieur (ombre), pas une bordure : plus de fin liseré blanc entre le cadre et l'onglet actif */
-  .onglets { display: inline-flex; border-radius: var(--rayon-petit); overflow: hidden; box-shadow: 0 0 0 var(--trait) var(--vert-fonce); background: #fff; margin: var(--trait); }
-  .onglet { display: flex; align-items: center; gap: 8px; padding: 6px 16px; font-family: var(--titre); font-size: 1.25rem; line-height: 1.2; text-decoration: none; color: var(--encre); }
-  .onglet::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--monde-dessins); }
-  .onglet--toile::before { background: var(--monde-toiles); }
-  .onglet:hover { color: var(--encre); background: var(--vert-creme); }
-  .onglet[aria-current='page'] { color: #fff; background: var(--monde-dessins); }
-  .onglet--toile[aria-current='page'] { background: var(--monde-toiles); }
-  .onglet[aria-current='page']::before { background: #fff; }
   .boutique__notes { display: grid; gap: 2px; margin-bottom: 8px; }
   .phrase { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 600; color: var(--encre-douce); }
   .phrase :global(svg) { flex: none; color: var(--accent); }
@@ -119,11 +104,10 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .filtre { flex: none; font-family: var(--titre); font-size: 1.25rem; line-height: 1; padding: 0.5em 1em; cursor: pointer; background: #fff; color: var(--vert-fonce); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: transform 0.15s; }
   .filtre:hover { transform: rotate(-2deg) translateY(-2px); }
   .filtre[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
-  /* Téléphone : titre et interrupteur Dessins / Toiles sur une ligne, filtres en grille de trois colonnes */
+  /* Téléphone : filtres en grille de trois colonnes */
   @media (max-width: 699px) {
     .boutique__tete { flex-wrap: nowrap; justify-content: space-between; gap: 8px; }
     .boutique h1 { font-size: 1.9rem; white-space: nowrap; }
-    .onglet { padding: 4px 11px; font-size: 1.1rem; }
     /* filtres en grille : trois colonnes, deux lignes au plus */
     .filtres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 2px 0 6px; }
     .filtre { padding: 0.4em 0.3em; text-align: center; white-space: nowrap; font-size: 1.1rem; }

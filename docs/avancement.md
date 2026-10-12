@@ -85,6 +85,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Toile « Fleurs mauves »** (avant : « Mauves ; NL « Paarse bloemen » au lieu de « Kaasjeskruid ») : titre changé dans `scripts/preparer-toiles.mjs` et `toiles.json` ; l'identifiant reste `mauves` (adresse inchangée).
 
+- **Interrupteur Dessins / Toiles supprimé** des galeries (demande de Claudiu ; on passe d'un monde à l'autre par le menu de l'en-tête) ; il ne reste que le titre, la phrase de livraison, l'offre et les filtres de rubrique.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
