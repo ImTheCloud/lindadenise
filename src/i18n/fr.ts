@@ -187,6 +187,8 @@ export const fr = {
     voir: 'Voir mon panier',
     lignes: { dessins: 'Dessins numériques ({n})', toiles: 'Toiles ({n})', lotUne: 'Offre de lot : 1 toile offerte', lotPlusieurs: 'Offre de lot : {n} toiles offertes', envoi: 'Envoi (Belgique)', envoiOffert: 'Envoi offert', total: 'Total' },
     delaiCommande: `Toile sur commande : délai d’${DELAI_TOILE_SUR_COMMANDE.fr}.`,
+    titreDessins: 'Dessins numériques',
+    titreToiles: 'Toiles',
     livraisonDessin: 'Après notre échange, vous recevez vos dessins par e-mail.',
     livraisonToile: 'Après notre échange, je vous envoie vos toiles.',
     note: 'Pas de paiement sur le site : je vous confirme le montant, le mode de paiement et l’envoi.',

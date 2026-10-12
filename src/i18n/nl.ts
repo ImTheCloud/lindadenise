@@ -188,6 +188,8 @@ export const nl: Dico = {
     voir: 'Mijn mandje bekijken',
     lignes: { dessins: 'Digitale tekeningen ({n})', toiles: 'Doeken ({n})', lotUne: 'Lotaanbod: 1 doek gratis', lotPlusieurs: 'Lotaanbod: {n} doeken gratis', envoi: 'Verzending (België)', envoiOffert: 'Gratis verzending', total: 'Totaal' },
     delaiCommande: `Doek op bestelling: termijn ${DELAI_TOILE_SUR_COMMANDE.nl}.`,
+    titreDessins: 'Digitale tekeningen',
+    titreToiles: 'Doeken',
     livraisonDessin: 'Na ons gesprek ontvang je je tekeningen per e-mail.',
     livraisonToile: 'Na ons gesprek stuur ik je doeken op.',
     note: 'Geen betaling op de site: ik bevestig het bedrag, de manier van betalen en de verzending.',

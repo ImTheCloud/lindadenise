@@ -31,6 +31,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Linda parle à la première personne (choix de Claudiu)** : tous les textes FR et NL hors pages légales sont passés en « je / mon / écrivez-moi » (accueil, galeries, fiches, panier, formulaire, merci, FAQ, pied de page, À propos déjà ainsi) ; ex. « Je vous l'envoie » (toiles), « Écrivez-moi », « Je suis Linda » à la place de « Rencontrez Linda ». Inchangés : les pages légales, les titres et textes alternatifs « de Linda Denise », et les anecdotes de Tilleul (3e personne). Règle ajoutée dans `CLAUDE.md`. À relire par Claudiu, surtout le NL.
 
+- **Panier plus lisible** : deux groupes séparés, « Dessins numériques » (vert, icône enveloppe, « Après notre échange, vous recevez vos dessins par e-mail ») et « Toiles » (brun, icône colis, « Après notre échange, je vous envoie vos toiles »), chacun avec son entête colorée, ses articles aux couleurs de son monde (cadres bruns et bord d'aluminium pour les toiles) ; les phrases de livraison ne sont plus dans le récapitulatif. Récapitulatif et total inchangés.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

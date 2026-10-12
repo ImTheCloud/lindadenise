@@ -1,4 +1,5 @@
 ---
+import IconeLivraison from '../IconeLivraison.astro';
 import Base from '../../layouts/Base.astro';
 import { t, chemin, cheminDessin, cheminToile, dessins, toiles, type Lang } from '../../i18n';
 import { PRIX_DESSIN, PRIX_TOILE } from '../../data/vente';
@@ -33,13 +34,26 @@ const donnees = {
       </div>
 
       <div class="panier__contenu" data-contenu hidden>
-        <ul class="panier__liste" data-liste></ul>
+        <section class="groupe" data-groupe-dessins hidden>
+          <header class="groupe__tete">
+            <span class="groupe__icone"><IconeLivraison genre="dessin" taille={22} /></span>
+            <h2>{p.titreDessins}</h2>
+            <p>{p.livraisonDessin}</p>
+          </header>
+          <ul class="panier__liste" data-liste-dessins></ul>
+        </section>
+        <section class="groupe" data-monde="toiles" data-groupe-toiles hidden>
+          <header class="groupe__tete">
+            <span class="groupe__icone"><IconeLivraison genre="toile" taille={22} /></span>
+            <h2>{p.titreToiles}</h2>
+            <p>{p.livraisonToile}</p>
+          </header>
+          <ul class="panier__liste" data-liste-toiles></ul>
+        </section>
         <div class="panier__recap cadre">
           <dl data-lignes></dl>
           <p class="panier__note">{p.note}</p>
           <p class="panier__note" data-delai hidden>{p.delaiCommande}</p>
-          <p class="panier__note" data-livraison-dessin hidden>{p.livraisonDessin}</p>
-          <p class="panier__note" data-livraison-toile hidden>{p.livraisonToile}</p>
           <p class="panier__actions">
             <a class="bouton" data-demander href={`${chemin('contact', lang)}?sujet=commande`}>{p.demander}</a>
             <button type="button" class="panier__vider" data-vider>{p.vider}</button>
@@ -66,9 +80,9 @@ const donnees = {
   if (racine) {
     const d = JSON.parse(racine.dataset.donnees ?? '{}') as Donnees;
     const el = <T extends Element>(s: string) => racine.querySelector<T>(s)!;
-    const vide = el<HTMLElement>('[data-vide]'), contenu = el<HTMLElement>('[data-contenu]'), liste = el<HTMLElement>('[data-liste]');
+    const vide = el<HTMLElement>('[data-vide]'), contenu = el<HTMLElement>('[data-contenu]'), listeDessins = el<HTMLElement>('[data-liste-dessins]'), listeToiles = el<HTMLElement>('[data-liste-toiles]');
+    const groupeDessins = el<HTMLElement>('[data-groupe-dessins]'), groupeToiles = el<HTMLElement>('[data-groupe-toiles]');
     const lignes = el<HTMLElement>('[data-lignes]'), delai = el<HTMLElement>('[data-delai]');
-    const livraisonDessin = el<HTMLElement>('[data-livraison-dessin]'), livraisonToile = el<HTMLElement>('[data-livraison-toile]');
     const euros = (n: number) => `${n} €`;
     const noeud = <K extends keyof HTMLElementTagNameMap>(nom: K, classe: string, texte = '') => {
       const n = document.createElement(nom);
@@ -113,10 +127,11 @@ const donnees = {
       const total = p.dessin.length + nombreToiles;
       vide.hidden = total > 0;
       contenu.hidden = total === 0;
-      liste.replaceChildren(...p.dessin.map((id) => article('dessin', id)), ...p.toile.map((id) => article('toile', id)), ...p.commande.map((id) => article('commande', id)));
+      listeDessins.replaceChildren(...p.dessin.map((id) => article('dessin', id)));
+      listeToiles.replaceChildren(...p.toile.map((id) => article('toile', id)), ...p.commande.map((id) => article('commande', id)));
+      groupeDessins.hidden = p.dessin.length === 0;
+      groupeToiles.hidden = nombreToiles === 0;
       delai.hidden = p.commande.length === 0;
-      livraisonDessin.hidden = p.dessin.length === 0;
-      livraisonToile.hidden = nombreToiles === 0;
       const c = calculPanier(p.dessin.length, nombreToiles);
       const l = d.textes.lignes;
       const rangs: HTMLElement[] = [];
@@ -138,9 +153,16 @@ const donnees = {
   .panier__vide { margin-top: 30px; padding: 34px 20px; }
   .panier__liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 18px 0 0; }
   .panier__vide[hidden], .panier__contenu[hidden] { display: none; }
-  .panier__contenu { display: grid; gap: 26px; margin-top: 30px; }
+  .panier__contenu { display: grid; gap: 30px; margin-top: 30px; }
+  .groupe { display: grid; gap: 14px; }
+  .groupe[hidden] { display: none; }
+  .groupe__tete { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 12px; padding: 12px 16px; background: var(--vert-creme); border-radius: var(--rayon-petit); }
+  .groupe__icone { grid-row: 1 / span 2; display: grid; place-items: center; width: 44px; height: 44px; color: #fff; background: var(--vert-fonce); border-radius: 50%; }
+  .groupe__tete h2 { margin: 0; font-size: 1.7rem; }
+  .groupe__tete p { margin: 0; font-size: 1rem; color: var(--encre-douce); }
   .panier__liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
   .panier__liste :global(.article) { display: grid; grid-template-columns: 90px 1fr auto; gap: 16px; align-items: center; padding: 10px 14px 10px 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  .groupe[data-monde] :global(.article__img) { border-radius: 3px; box-shadow: 0 0 0 1px #9aa2a8, 0 0 0 4px #e9ecee; }
   .panier__liste :global(.article__img) { width: 90px; height: 90px; object-fit: cover; object-position: top; border-radius: 10px 5px 10px 6px / 6px 10px 5px 10px; background: var(--vert-creme); }
   .panier__liste :global(.article__corps) { display: grid; gap: 2px; min-width: 0; }
   .panier__liste :global(.article__genre) { font-size: 0.95rem; color: var(--encre-douce); }
