@@ -7,7 +7,7 @@ import Etapes from '../Etapes.astro';
 import Apercu from '../Apercu.astro';
 import Etang from '../Etang.astro';
 import Feuilles from '../Feuilles.astro';
-import { t, chemin, dessins, toiles, type Lang } from '../../i18n';
+import { t, chemin, cheminDessin, dessins, toiles, type Lang } from '../../i18n';
 import { PRIX_TOILE } from '../../data/vente';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -16,7 +16,8 @@ const a = d.accueil;
 const tt = d.toiles;
 const chemins = { fr: chemin('accueil', 'fr'), nl: chemin('accueil', 'nl') };
 const trouve = (id: string) => dessins.find((x) => x.id === id)!;
-const vitrineDessins = ['trois-tournesols', 'l-ile-de-brehat', 'time-et-rouroux-a-la-plage'].map(trouve);
+const collage = ['trois-tournesols', 'l-ile-de-brehat', 'time-et-rouroux-a-la-plage'].map(trouve);
+const vitrineDessins = collage;
 const vitrineToiles = toiles.slice(0, 3);
 const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/${id}-${l}.${format} ${l}w`).join(', ');
 ---
@@ -32,13 +33,21 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
           <a class="bouton bouton--brun" href={chemin('toiles', lang)}>{a.portes.toilesCta}</a>
         </div>
       </div>
-      <div class="heros__video">
-        <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} cadre />
+      <div class="heros__scene">
+        <div class="heros__video">
+          <Bandeau lang={lang} nom={`toiles-${lang}`} description={a.impressionAlt} cadre />
+        </div>
+        <div class="collage">
+          {collage.map((x, i) => (
+            <a class={`collage__img collage__img--${i + 1}`} href={cheminDessin(x.id, lang)}>
+              <Apercu id={x.id} alt={d.dessins.altDe(x.titre[lang])} largeur={x.largeur} hauteur={x.hauteur} chargement="eager" />
+            </a>
+          ))}
+        </div>
       </div>
     </div>
+    <Etang />
   </section>
-
-  <div class="riviere" aria-hidden="true"><Etang /></div>
 
   <!-- Les deux mondes : mêmes blocs, couleurs inversées -->
   <section class="portes" aria-label={a.portesAria}>
@@ -121,14 +130,29 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
 </Base>
 
 <style>
-  .heros { position: relative; overflow: hidden; padding-block: clamp(28px, 5vw, 64px) clamp(20px, 3vw, 36px); background: linear-gradient(#fff 55%, #f6fbf6); }
-  .heros__grille { position: relative; z-index: 1; display: grid; gap: 28px; align-items: center; }
-  .heros__texte h1 { font-size: clamp(3.6rem, 1.4rem + 8vw, 7.2rem); margin-bottom: 0.1em; line-height: 0.95; }
+  /* Premier écran : titre, vidéo et trois dessins, avec l'étang tout en bas ; les deux portes viennent ensuite */
+  .heros { position: relative; overflow: hidden; display: flex; align-items: center; min-height: calc(100svh - 68px); padding-top: clamp(24px, 4vw, 56px); padding-bottom: clamp(150px, 22vw, 290px); background: linear-gradient(#fff 55%, #f6fbf6); }
+  .heros__grille { position: relative; z-index: 1; width: 100%; display: grid; gap: 28px; align-items: center; }
+  .heros__texte h1 { font-size: clamp(3.4rem, 1.4rem + 7vw, 7rem); margin-bottom: 0.1em; line-height: 0.95; }
   .heros__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
   .bouton--brun { background: var(--monde-toiles); border-color: #7a3a00; box-shadow: 0 5px 0 #6b3200; }
   .bouton--brun:hover { box-shadow: 0 7px 0 #6b3200; }
-  @media (min-width: 960px) { .heros__grille { grid-template-columns: 0.8fr 1.2fr; gap: 48px; } }
-  .riviere { position: relative; height: clamp(130px, 18vw, 230px); margin-top: -1px; background: var(--fond); overflow: hidden; }
+  .heros__scene { position: relative; }
+  /* Les trois dessins : en dessous de la vidéo sur téléphone, posés sur son coin bas gauche sur ordinateur */
+  .collage { position: relative; width: min(100%, 420px); aspect-ratio: 1 / 0.8; margin: 14px auto 0; }
+  .collage__img { position: absolute; display: block; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); padding: 6px; box-shadow: var(--ombre); transition: transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  .collage__img :global(img) { width: 100%; height: auto; border-radius: 8px; }
+  .collage__img--1 { width: 36%; left: 4%; top: 8%; transform: rotate(-7deg); animation: collage-flotte 7s ease-in-out infinite; }
+  .collage__img--2 { width: 38%; right: 4%; top: 0; transform: rotate(5deg); z-index: 2; animation: collage-flotte 8s ease-in-out -2s infinite; }
+  .collage__img--3 { width: 37%; left: 31%; bottom: 0; transform: rotate(-2deg); z-index: 3; animation: collage-flotte 9s ease-in-out -4s infinite; }
+  .collage__img:hover { transform: scale(1.06) rotate(0deg); z-index: 5; animation-play-state: paused; }
+  @keyframes collage-flotte { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+  @media (min-width: 960px) {
+    .heros__grille { grid-template-columns: 0.8fr 1.2fr; gap: 48px; }
+    .collage { position: absolute; left: -12%; bottom: -16%; width: 44%; margin: 0; z-index: 3; }
+  }
+  @media (min-width: 960px) and (max-height: 760px) { .collage { width: 36%; } }
+
   /* Deux grands blocs dessinés : vert pour les dessins, brun pour les toiles */
   .portes { position: relative; overflow: hidden; padding-block: clamp(24px, 4vw, 48px) clamp(40px, 6vw, 72px); background: var(--fond); }
   .portes__grille { position: relative; z-index: 1; display: grid; gap: clamp(18px, 3vw, 32px); }

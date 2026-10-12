@@ -1,6 +1,6 @@
 ---
-// Vidéo en tête de page : une affiche avec un bouton Lecture. Au clic, la vidéo démarre avec le son ; on peut la mettre en pause,
-// couper le son ou la passer en plein écran. Rien ne se charge ni ne démarre avant le clic.
+// Vidéo en tête de page : une affiche avec un bouton Lecture. Au clic, la vidéo démarre avec le son, avec les commandes
+// habituelles du navigateur (pause, barre de temps, volume, plein écran). Rien ne se charge ni ne démarre avant le clic.
 import { t, type Lang } from '../i18n';
 interface Props {
   lang: Lang;
@@ -11,7 +11,7 @@ interface Props {
 const { lang, nom, description, cadre = false } = Astro.props;
 const v = t(lang).video;
 ---
-<div class:list={['bandeau', cadre && 'bandeau--cadre']} data-bandeau={`/video/${nom}.mp4`} data-pause={v.pause} data-lecture={v.lecture} data-couper={v.couper} data-remettre={v.remettre}>
+<div class:list={['bandeau', cadre && 'bandeau--cadre']} data-bandeau={`/video/${nom}.mp4`}>
   <picture>
     <source type="image/avif" srcset={`/video/${nom}.avif`} />
     <img class="bandeau__affiche" src={`/video/${nom}.webp`} width="1920" height="1080" alt="" fetchpriority="high" decoding="async" />
@@ -19,46 +19,21 @@ const v = t(lang).video;
   <button type="button" class="bandeau__lancer" aria-label={`${v.lancer} : ${description}`}>
     <span class="bandeau__icone" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M14 9 L32 20 L14 31 Z" fill="currentColor" /></svg></span>
   </button>
-  <div class="bandeau__outils" hidden>
-    <button type="button" class="bandeau__bouton" data-lecture-bouton>{v.pause}</button>
-    <button type="button" class="bandeau__bouton" data-son-bouton>{v.couper}</button>
-    <button type="button" class="bandeau__bouton" data-grand-bouton>{v.agrandir}</button>
-  </div>
 </div>
 <script>
   document.querySelectorAll<HTMLElement>('[data-bandeau]').forEach((boite) => {
     const lancer = boite.querySelector<HTMLButtonElement>('.bandeau__lancer')!;
-    const outils = boite.querySelector<HTMLElement>('.bandeau__outils')!;
-    const lecture = boite.querySelector<HTMLButtonElement>('[data-lecture-bouton]')!;
-    const son = boite.querySelector<HTMLButtonElement>('[data-son-bouton]')!;
-    const grand = boite.querySelector<HTMLButtonElement>('[data-grand-bouton]')!;
     lancer.addEventListener('click', () => {
       const video = document.createElement('video');
       video.className = 'bandeau__video';
       video.src = boite.dataset.bandeau!;
-      video.loop = true;
+      video.controls = true;
       video.playsInline = true;
       video.preload = 'auto';
       video.setAttribute('aria-label', lancer.getAttribute('aria-label') ?? '');
-      const majLecture = () => { lecture.textContent = (video.paused ? boite.dataset.lecture : boite.dataset.pause) ?? ''; };
-      const majSon = () => { son.textContent = (video.muted ? boite.dataset.remettre : boite.dataset.couper) ?? ''; };
-      video.addEventListener('play', majLecture);
-      video.addEventListener('pause', majLecture);
-      video.addEventListener('volumechange', majSon);
-      lecture.addEventListener('click', () => { if (video.paused) void video.play().catch(() => {}); else video.pause(); });
-      son.addEventListener('click', () => { video.muted = !video.muted; });
-      grand.addEventListener('click', () => {
-        const v = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
-        if (document.fullscreenElement) void document.exitFullscreen();
-        else if (v.requestFullscreen) void v.requestFullscreen().catch(() => {});
-        else v.webkitEnterFullscreen?.(); // iPhone
-      });
       lancer.replaceWith(video);
-      outils.hidden = false;
-      void video.play().catch(() => { /* le visiteur peut relancer avec le bouton Lecture */ });
-      lecture.focus();
-      majLecture();
-      majSon();
+      void video.play().catch(() => { /* le lecteur reste affiché, le visiteur peut relancer */ });
+      video.focus();
     });
   });
 </script>
@@ -71,8 +46,4 @@ const v = t(lang).video;
   .bandeau__lancer { padding: 0; border: 0; background: none; cursor: pointer; }
   .bandeau__icone { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center; width: 84px; height: 84px; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
   .bandeau__lancer:hover .bandeau__icone, .bandeau__lancer:focus-visible .bandeau__icone { transform: scale(1.08) rotate(-4deg); }
-  .bandeau__outils { position: absolute; inset: auto 10px 10px 10px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-  .bandeau__outils[hidden] { display: none; }
-  .bandeau__bouton { min-height: 40px; padding: 0 14px; font-family: var(--titre); font-size: 1.05rem; color: #fff; cursor: pointer; background: rgba(20, 12, 8, 0.6); border: var(--trait) solid rgba(255, 255, 255, 0.85); border-radius: var(--rayon-petit); backdrop-filter: blur(6px); }
-  .bandeau__bouton:hover { background: rgba(20, 12, 8, 0.85); }
 </style>
