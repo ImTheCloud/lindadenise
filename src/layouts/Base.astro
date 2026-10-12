@@ -8,7 +8,6 @@ import policeTexte from '@fontsource/itim/files/itim-latin-400-normal.woff2?url'
 import Entete from '../components/Entete.astro';
 import PiedDePage from '../components/PiedDePage.astro';
 import Mascotte from '../components/Mascotte.astro';
-import Musique from '../components/Musique.astro';
 import { t, SITE, type Lang } from '../i18n';
 
 interface Props {
@@ -58,7 +57,6 @@ const canonique = SITE + chemins[lang];
     <main id="principal"><slot /></main>
     <PiedDePage lang={lang} />
     <Mascotte lang={lang} />
-    <Musique lang={lang} />
     <script>
       // Apparition douce des blocs au défilement
       const blocs = document.querySelectorAll('.apparait');

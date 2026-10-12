@@ -13,7 +13,6 @@ export const nl: Dico = {
   },
   nav: { dessins: 'Tekeningen', toiles: 'Doeken', apropos: 'Over mij', contact: 'Contact', menu: 'Menu', fermer: 'Sluiten', accueil: 'Home' },
   langues: { fr: 'Français', nl: 'Nederlands' },
-  musique: { activer: 'Bosmuziek aanzetten', couper: 'Bosmuziek uitzetten' },
   rubriques: {
     chats: { nom: 'De katten', court: 'Katten', texte: 'De katten van een vriend uit Quebec: ze klimmen, dromen en luieren.' },
     nature: { nom: 'De natuur', court: 'Natuur', texte: 'Bomen, bossen, rivieren en de kust, zoals Linda ze ziet.' },
