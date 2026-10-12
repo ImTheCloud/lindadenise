@@ -8,13 +8,12 @@ const d = t(lang);
 const p = d.panier;
 ---
 <article class="carte carte--dessin" data-rubrique={dessin.rubrique}>
+  <span class="carte__etiquette">{d.dessins.etiquette}</span>
   <a class="carte__lien" href={cheminDessin(dessin.id, lang)}>
     <span class="carte__image">
       <Apercu id={dessin.id} alt={`${titre} – Linda Denise`} largeur={dessin.largeur} hauteur={dessin.hauteur} chargement={priorite ? 'eager' : 'lazy'} />
-      <span class="carte__etiquette">{d.dessins.etiquette}</span>
     </span>
     <span class="carte__titre">{titre}</span>
-    <span class="carte__rubrique">{d.rubriques[dessin.rubrique].court}</span>
     <span class="carte__prix">{d.dessins.prix}</span>
   </a>
   <button type="button" class="carte__panier" aria-pressed="false" aria-label={p.ajouterAria.replace('{t}', titre)} data-panier={`dessin:${dessin.id}`} data-titre={titre} data-ajouter={p.ajouter} data-dedans={p.dedans} data-aria-ajouter={p.ajouterAria} data-aria-dedans={p.dedansAria}>

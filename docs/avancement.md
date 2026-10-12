@@ -19,6 +19,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Cartes** : le titre occupe toujours deux lignes de haut (centré, retours à la ligne équilibrés) : prix et boutons restent alignés d'une carte à l'autre. Accueil : vidéo un peu plus grande (colonnes 0.9 / 1.1), titre sur une ligne.
 
+- **Retours de Claudiu (suite)** : cartes sans la ligne de rubrique, titre et prix plus grands, badge « Dessin » / « Toile » collé à la bordure gauche de la carte ; accueil sur ordinateur : conteneur de 1300 px, vidéo plus grande ; sur téléphone, les deux boutons côte à côte sous le titre ; les portes ont l'image en haut et le texte (dont « 78 dessins ») sur fond uni dessous, donc lisible sur téléphone.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

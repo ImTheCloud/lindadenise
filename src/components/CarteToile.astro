@@ -11,6 +11,7 @@ const sources = (format: string) => [400, 800].map((l) => `/toiles/${toile.id}-$
 const tailles = '(min-width: 1000px) 24vw, (min-width: 700px) 32vw, 46vw';
 ---
 <article class:list={['carte', 'carte--toile', toile.vendue && 'carte--vendue']} data-rubrique={toile.rubrique}>
+  <span class="carte__etiquette">{tt.etiquette}</span>
   <a class="carte__lien" href={cheminToile(toile.id, lang)}>
     <span class="carte__image">
       <picture>
@@ -18,11 +19,9 @@ const tailles = '(min-width: 1000px) 24vw, (min-width: 700px) 32vw, 46vw';
         <source type="image/webp" srcset={sources('webp')} sizes={tailles} />
         <img src={`/toiles/${toile.id}-800.jpg`} width="400" height="566" alt={tt.altDe(titre, toile.description[lang])} loading={priorite ? 'eager' : 'lazy'} decoding="async" />
       </picture>
-      <span class="carte__etiquette">{tt.etiquette}</span>
       {toile.vendue && <span class="carte__vendue">{tt.vendue}</span>}
     </span>
     <span class="carte__titre">{titre}</span>
-    <span class="carte__rubrique">{d.rubriques[toile.rubrique].court}</span>
     <span class="carte__prix">{toile.vendue ? tt.vendueTexte : tt.prix(PRIX_TOILE)}</span>
   </a>
   {!toile.vendue && (
