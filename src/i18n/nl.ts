@@ -81,7 +81,7 @@ export const nl: Dico = {
     histoire: 'Mijn doeken werden gedrukt voor een tentoonstelling in Oostende. De plek sloot nog voor ze opgehangen werden. Vandaag zoeken ze een nieuwe muur.',
     etiquette: 'Doek',
     phrase: 'Uniek stuk, door Linda verstuurd',
-    bonus: `Gratis verzending vanaf ${ENVOI_OFFERT_DES} doeken · ${lot}`,
+    bonus: [`Gratis verzending vanaf ${ENVOI_OFFERT_DES} doeken`, `${TOILES_ACHETEES} doeken gekocht, de ${TOILES_ACHETEES + 1}e is gratis`],
     surtitre: 'Doek op aluminium',
     retour: '← Alle doeken',
     agrandir: 'Vergroot het doek',

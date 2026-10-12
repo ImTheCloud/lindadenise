@@ -80,7 +80,7 @@ export const fr = {
     histoire: 'Mes toiles ont été imprimées en vue d’une exposition à Ostende. Le lieu a fermé avant l’accrochage. Elles cherchent aujourd’hui un nouveau mur.',
     etiquette: 'Toile',
     phrase: 'Pièce unique envoyée par Linda',
-    bonus: `Envoi offert dès ${ENVOI_OFFERT_DES} toiles · ${lot}`,
+    bonus: [`Envoi offert dès ${ENVOI_OFFERT_DES} toiles`, `${TOILES_ACHETEES} toiles achetées, la ${TOILES_ACHETEES + 1}e est offerte`],
     surtitre: 'Toile sur aluminium',
     retour: '← Toutes les toiles',
     agrandir: 'Agrandir la toile',

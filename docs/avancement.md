@@ -45,6 +45,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Interrupteur Dessins / Toiles (choix de Claudiu)** : en haut de chaque galerie, à droite du titre, deux onglets (l'actif prend la couleur de son monde, point vert ou orange) et une seule phrase dessous : « Fichier numérique envoyé par e-mail » (dessins) / « Pièce unique envoyée par Linda » (toiles), avec icône ; la ligne cadeau reste sous la phrase sur la page Toiles. Phrases de livraison raccourcies : panier et formulaire « Vous les recevez par e-mail. » / « Linda vous les envoie. » (NL : « Je ontvangt ze per e-mail. » / « Linda stuurt ze naar je op. »). Badges des cartes et des portes inchangés.
 
+- **En-tête et pied de page** : toujours aux couleurs par défaut (vert et orange du logo), même sur la page Toiles. **Offre** : deux lignes courtes qui ne se coupent plus (« Envoi offert dès 2 toiles », « 5 toiles achetées, la 6e est offerte »).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.

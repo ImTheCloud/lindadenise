@@ -11,7 +11,7 @@ interface Props {
   genre: 'dessin' | 'toile';
   phrase: string;
   onglets: { dessin: { href: string; nom: string }; toile: { href: string; nom: string } };
-  bonus?: string;
+  bonus?: string[];
 }
 const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } = Astro.props;
 ---
@@ -26,10 +26,13 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   <div class="contenu boutique__notes">
     <p class="phrase"><IconeLivraison genre={genre} />{phrase}</p>
     {bonus && (
-      <p class="bonus">
-        <svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="24" height="16" rx="2" /><path d="M16 12v16M3 12h26v-4H3zM16 8c-3 0-6-1-6-3s3-2 6 3c3-5 6-5 6-3s-3 3-6 3z" /></svg>
-        {bonus}
-      </p>
+      <ul class="bonus">
+        <li><span aria-hidden="true">✓</span>{bonus[0]}</li>
+        <li>
+          <svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="24" height="16" rx="2" /><path d="M16 12v16M3 12h26v-4H3zM16 8c-3 0-6-1-6-3s3-2 6 3c3-5 6-5 6-3s-3 3-6 3z" /></svg>
+          {bonus[1]}
+        </li>
+      </ul>
     )}
   </div>
   <div class="boutique__barre">
@@ -96,7 +99,8 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, onglets, bonus } =
   .boutique__notes { display: grid; gap: 4px; margin-bottom: 14px; }
   .phrase { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 600; color: var(--encre-douce); }
   .phrase :global(svg) { flex: none; color: var(--accent); }
-  .bonus { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 0.98rem; font-weight: 600; color: var(--orange-fonce); }
+  .bonus { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 0; padding: 0; list-style: none; font-size: 0.98rem; font-weight: 600; color: var(--orange-fonce); }
+  .bonus li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .bonus svg { flex: none; }
   .boutique__nombre { color: var(--orange-titre); }
   /* Filtres : une rangée collée sous l'en-tête, qui défile de côté sur téléphone */
