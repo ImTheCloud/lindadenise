@@ -65,6 +65,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Livraison, plus d'« envoi »** : pour les toiles, tous les textes FR et NL parlent de livraison (« Livrée par Linda », « Linda vous les livre », « Pièce unique livrée par Linda avec bpost », étapes, FAQ, conditions de vente, confidentialité) ; dessins : « livré par e-mail » dans les phrases, « reçu par e-mail » sur les badges. « Envoyer » reste seulement pour le formulaire. Panier : titre du bloc « Dessins » (plus « numériques », pour que la phrase de livraison tienne sur une ligne), sous-total « Dessins (n) ». Règle ajoutée dans `CLAUDE.md`.
 
+- **Frais de livraison** : la ligne du panier et du formulaire s'appelle « Frais de livraison » (NL « Leveringskosten »), sans « (Belgique) » ; la fiche d'un dessin dit « + frais de livraison » pour la toile sur commande. La Belgique reste dite dans la phrase « livrées uniquement en Belgique » (FAQ, conditions, formulaire).
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
