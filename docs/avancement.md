@@ -75,7 +75,7 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Panier, ligne de livraison** : « Frais de livraison de la toile 12 € » pour une seule toile, « Frais de livraison des toiles : Offerts » dès deux (NL « Leveringskosten van het doek / van de doeken », « Gratis ») ; même texte dans le total du formulaire.
 
-- **Interrupteur Dessins / Toiles** : plus de moitié blanche ; l'onglet inactif est teinté de la couleur pâle de son monde (vert pâle / orange pâle), l'actif est plein avec le texte blanc. (Interprétation de « blanche » : à confirmer par Claudiu.)
+- **Interrupteur Dessins / Toiles** : plus de moitié blanche ; l'onglet inactif reste blanc (rien d'orange tant qu'il n'est pas sélectionné), l'actif est plein avec le texte blanc ; le cadre est un anneau extérieur (ombre) et non une bordure, pour supprimer le fin liseré blanc entre le cadre et l'onglet actif.
 
 - **Fiches et textes courts** : plus de rubrique (« · Chats ») dans le surtitre des fiches (déjà dite par la section) ; la phrase de livraison des fiches est celle des badges (« Livrée par bpost », « Reçu par e-mail ») ; filtres des galeries sur téléphone : grille de trois colonnes (deux lignes). Règles notées dans `CLAUDE.md` : textes courts, jamais de répétition d'une information déjà visible à côté.
 
