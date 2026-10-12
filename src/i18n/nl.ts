@@ -22,6 +22,7 @@ export const nl: Dico = {
   },
   accueil: {
     surtitre: 'Tekeningen met de hand gemaakt',
+    texte: 'Bomen, bloemen en katten vol kleur, met de hand getekend door Linda, voormalige kooklerares. Kom binnen, kijk rond, haal adem.',
     nombre: (n: number) => `${n} tekeningen`,
     impressionAlt: 'film van een minuut over de doeken van Linda, met Tilleul, grote tekst in beeld en vrolijke muziek, zonder stem',
     portesAria: 'De twee werelden van Linda',

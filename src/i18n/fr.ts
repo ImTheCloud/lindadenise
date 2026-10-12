@@ -21,6 +21,7 @@ export const fr = {
   },
   accueil: {
     surtitre: 'Dessins faits à la main',
+    texte: 'Des arbres, des fleurs et des chats pleins de couleurs, dessinés à la main par Linda, ancienne professeure de cuisine. Entrez, regardez, respirez.',
     nombre: (n: number) => `${n} dessins`,
     impressionAlt: 'film d’une minute sur les toiles de Linda, avec Tilleul, gros textes à l’écran et musique entraînante, sans voix',
     portesAria: 'Les deux univers de Linda',
