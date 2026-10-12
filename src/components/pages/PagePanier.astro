@@ -170,14 +170,16 @@ const donnees = {
   .panier__liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 18px 0 0; }
   .panier__vide[hidden], .panier__contenu[hidden] { display: none; }
   .panier__contenu { display: grid; gap: 30px; margin-top: 30px; }
-  .groupe { display: grid; gap: 14px; }
+  /* Un seul gros bloc par monde : l'en-tête puis les articles, séparés par un pointillé */
+  .groupe { display: grid; overflow: hidden; background: #fff; border: var(--trait) solid var(--accent); border-radius: var(--rayon); box-shadow: var(--ombre); }
   .groupe[hidden] { display: none; }
-  .groupe__tete { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 12px; padding: 12px 16px; background: var(--vert-creme); border-radius: var(--rayon-petit); }
-  .groupe__icone { grid-row: 1 / span 2; display: grid; place-items: center; width: 44px; height: 44px; color: #fff; background: var(--vert-fonce); border-radius: 50%; }
+  .groupe__tete { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 12px; padding: 14px 18px; background: var(--vert-creme); border-bottom: var(--trait) solid var(--accent); }
+  .groupe__icone { grid-row: 1 / span 2; display: grid; place-items: center; width: 44px; height: 44px; color: #fff; background: var(--accent); border-radius: 50%; }
   .groupe__tete h2 { margin: 0; font-size: 1.7rem; }
   .groupe__tete p { margin: 0; font-size: 1rem; color: var(--encre-douce); }
-  .panier__liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
-  .panier__liste :global(.article) { display: grid; grid-template-columns: 90px 1fr auto; gap: 16px; align-items: center; padding: 10px 14px 10px 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  .panier__liste { list-style: none; margin: 0; padding: 0 18px; display: grid; }
+  .panier__liste :global(.article) { display: grid; grid-template-columns: 90px 1fr auto; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 2px dashed var(--vert-pale); }
+  .panier__liste :global(.article:last-child) { border-bottom: 0; }
   .groupe[data-monde] :global(.article__img) { border-radius: 3px; box-shadow: 0 0 0 1px #9aa2a8, 0 0 0 4px #e9ecee; }
   .panier__liste :global(.article__img) { width: 90px; height: 90px; object-fit: cover; object-position: top; border-radius: 10px 5px 10px 6px / 6px 10px 5px 10px; background: var(--vert-creme); }
   .panier__liste :global(.article__corps) { display: grid; gap: 2px; min-width: 0; }
@@ -190,7 +192,7 @@ const donnees = {
   .panier__recap { padding: clamp(18px, 4vw, 30px); }
   .panier__recap :global(.recap__lignes) { display: grid; gap: 10px; margin-bottom: 12px; }
   .panier__recap :global(dl) { margin: 0; }
-  .panier__recap :global(.recap__groupe) { display: grid; gap: 6px; padding: 12px 16px; background: var(--vert-creme); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); box-shadow: 0 4px 0 var(--vert-pale); }
+  .panier__recap :global(.recap__groupe) { display: grid; gap: 6px; padding: 12px 16px; background: var(--vert-creme); border: var(--trait) solid var(--accent); border-radius: var(--rayon-petit); box-shadow: 0 4px 0 var(--vert-pale); }
   .panier__recap :global(.recap__groupe .ligne dt) { color: var(--vert-fonce); font-weight: 600; }
   .panier__recap :global(.ligne) { display: flex; justify-content: space-between; gap: 16px; }
   .panier__recap :global(.ligne dt), .panier__recap :global(.ligne dd) { margin: 0; }
@@ -199,7 +201,8 @@ const donnees = {
   .panier__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin: 16px 0 0; }
   .panier__vider { font: inherit; font-size: 1rem; padding: 6px 4px; cursor: pointer; color: var(--vert-fonce); background: none; border: 0; text-decoration: underline; }
   @media (max-width: 519px) {
-    .panier__liste :global(.article) { grid-template-columns: 72px 1fr; }
+    .panier__liste :global(.article) { display: grid; grid-template-columns: 90px 1fr auto; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 2px dashed var(--vert-pale); }
+  .panier__liste :global(.article:last-child) { border-bottom: 0; }
     .panier__liste :global(.article__img) { width: 72px; height: 72px; }
     .panier__liste :global(.article__retirer) { grid-column: 1 / -1; justify-self: end; padding: 6px 12px; }
   }

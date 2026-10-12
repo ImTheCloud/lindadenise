@@ -53,6 +53,8 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Galeries** : trait en pointillé après chaque titre de rubrique (sauf le premier bloc visible, pour ne pas doubler celui de la barre des filtres) ; sur la page Toiles, ordre des trois lignes : phrase de livraison, « 5 toiles achetées, la 6e est offerte » (icône cadeau), puis « Livraison gratuite dès 2 toiles » (✓).
 
+- **Panier, un gros bloc par monde** : l'en-tête (icône, titre, phrase) et les articles sont regroupés dans un seul cadre dessiné, de la couleur du monde (vert pour les dessins, orange pour les toiles) ; les articles y sont de simples lignes séparées par un pointillé, sans cadre chacun.
+
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
 Demande de Claudiu : même site, donc mêmes fonctions, boutons, design et couleurs ; seule la page Toiles doit montrer tout de suite que ce sont des toiles.
