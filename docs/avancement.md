@@ -63,11 +63,13 @@ Demande de Claudiu : structure d'un site de vente pro (type Nike), **mais en gar
 
 - **Pas de mot seul sur une ligne (consigne de Claudiu, notée dans `CLAUDE.md`)** : bouton du panier « Envoyer ma demande » (sans « à Linda »), ligne de livraison des cartes sur une ligne, `text-wrap: balance` sur titres, étiquettes, boutons et questions de la FAQ, `pretty` sur les paragraphes, questions de la FAQ un peu plus petites sur téléphone. Contrôle automatique à 360 et 390 px sur accueil, galeries, fiches, panier, contact, FAQ, À propos.
 
-- **Livraison, plus d'« envoi »** : pour les toiles, tous les textes FR et NL parlent de livraison (« Livrée par Linda », « Linda vous les livre », « Pièce unique livrée par Linda avec bpost », étapes, FAQ, conditions de vente, confidentialité) ; dessins : « livré par e-mail » dans les phrases, « reçu par e-mail » sur les badges. « Envoyer » reste seulement pour le formulaire. Panier : titre du bloc « Dessins » (plus « numériques », pour que la phrase de livraison tienne sur une ligne), sous-total « Dessins (n) ». Règle ajoutée dans `CLAUDE.md`.
+- **Livraison, plus d'« envoi »** : pour les toiles, tous les textes FR et NL parlent de livraison (« Livrée par bpost », « bpost vous les livre », « Pièce unique livrée par bpost », étapes, FAQ, conditions de vente, confidentialité) ; dessins : « livré par e-mail » dans les phrases, « reçu par e-mail » sur les badges. « Envoyer » reste seulement pour le formulaire. Panier : titre du bloc « Dessins » (plus « numériques », pour que la phrase de livraison tienne sur une ligne), sous-total « Dessins (n) ». Règle ajoutée dans `CLAUDE.md`.
 
 - **Frais de livraison** : la ligne du panier et du formulaire s'appelle « Frais de livraison » (NL « Leveringskosten »), sans « (Belgique) » ; la fiche d'un dessin dit « + frais de livraison » pour la toile sur commande. La Belgique reste dite dans la phrase « livrées uniquement en Belgique » (FAQ, conditions, formulaire).
 
 - **Page de jeu, plus de bouton qui change de couleur à l'arrivée** : le HTML n'allume aucun bouton ; un petit script en ligne, avant l'affichage, allume « Dormir » si le visiteur a mis Tilleul en silence (`mascotte-muet`), sinon « S'asseoir » ; le script de la page repart de ce bouton ; plus de fondu de couleur sur ces boutons. Vérifié : état vu à chaque image = un seul bouton, dès la première (silence : Dormir ; sinon : S'asseoir). Règle générale : un état connu avant l'affichage ne doit jamais apparaître après (même cause que le bouton du panier).
+
+- **C'est bpost qui livre** (précision de Claudiu) : badges « Livrée par bpost », « bpost vous les livre » (panier), « Pièce unique livrée par bpost », étapes, FAQ et conditions ; Linda emballe, bpost livre (NL « Geleverd door bpost »).
 
 ## Pages Toiles alignées sur les Dessins (2026-10-12, non publié)
 
