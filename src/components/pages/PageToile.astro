@@ -22,7 +22,7 @@ const autres = [...toiles.slice(i + 1), ...toiles.slice(0, i)].slice(0, 4);
     <div class="contenu">
       <p><a href={chemin('toiles', lang)}>{tt.retour}</a></p>
       <div class="fiche">
-        <div class="fiche__image cadre">
+        <div class="fiche__image cadre toile-crochet">
           <button type="button" class="fiche__zoom" data-zoom aria-label={tt.agrandir}>
             <picture>
               <source type="image/avif" srcset={[400, 800, 1000].map((l) => `/toiles/${toile.id}-${l}.avif ${l}w`).join(', ')} sizes="(min-width: 860px) 45vw, 92vw" />

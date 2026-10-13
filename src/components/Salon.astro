@@ -42,12 +42,15 @@ const keyframes = `@keyframes salon-defile { 0% { opacity: 0 } 1.5% { opacity: 1
       <path d="M22 145 h3 M22 155 h3 M22 165 h3 M22 175 h3 M22 140 h1.6 M22 150 h1.6 M22 160 h1.6 M22 170 h1.6 M22 180 h1.6" stroke="#6b5212" stroke-width="0.5" />
       <text x="33" y="162" class="salon__texte">50 cm</text>
     </g>
-    <circle cx={TOILE.x + TOILE.l / 2} cy={TOILE.y + 3} r="0.7" fill="#888" />
     <g filter="url(#salon-ombre)">
       {ids.map((id, i) => (
         <image href={`/toiles/${id}-400.webp`} x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} preserveAspectRatio="xMidYMid slice" class:list={['salon__toile', defile && 'salon__toile--defile']} style={defile ? `animation-delay:${i * PAS}s` : undefined} opacity={i === 0 ? 1 : 0} />
       ))}
       <rect x={TOILE.x} y={TOILE.y} width={TOILE.l} height={TOILE.h} fill="none" stroke="#a9b0b5" stroke-width="0.5" />
+    </g>
+    <g stroke="#5f676d" stroke-linejoin="round">
+      <circle cx={TOILE.x + TOILE.l / 2} cy={TOILE.y + 2.6} r="2" fill="none" stroke-width="1" />
+      <circle cx={TOILE.x + TOILE.l / 2} cy={TOILE.y + 6} r="2.3" fill="#8a949b" stroke-width="0.6" />
     </g>
     <g class="salon__cote" stroke="#d9700b" stroke-width="0.5" fill="none">
       <path d={`M${TOILE.x} ${TOILE.y - 5} h${TOILE.l} M${TOILE.x} ${TOILE.y - 7} v4 M${TOILE.x + TOILE.l} ${TOILE.y - 7} v4`} />
