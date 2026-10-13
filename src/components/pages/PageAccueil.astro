@@ -148,7 +148,7 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   .portes { position: relative; overflow: hidden; padding-block: clamp(16px, 3vw, 32px) clamp(24px, 4vw, 44px); background: var(--fond); }
   .portes__grille { position: relative; z-index: 1; display: grid; gap: clamp(18px, 3vw, 32px); }
   .porte { --p: var(--monde-dessins); --p-fonce: #2b6e3a; --p-pale: #e3f1e3; position: relative; display: grid; grid-template-rows: auto 1fr; overflow: hidden; color: #fff; text-decoration: none; background: var(--p); border: var(--trait) solid var(--p); border-radius: var(--rayon); box-shadow: 0 8px 0 var(--p-fonce); transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1); }
-  .porte--toiles { --p: var(--monde-toiles); --p-fonce: #a84e00; --p-pale: #ffe0b8; }
+  .porte--toiles { --p: var(--monde-toiles); --p-fonce: #d9700b; --p-pale: #ffe0b8; }
   .porte:hover { color: #fff; transform: translateY(-6px) rotate(-0.6deg); }
   .porte__vitrine { position: relative; overflow: hidden; height: clamp(170px, 24vw, 230px); background: var(--p-pale); }
   .porte__image { position: absolute; bottom: -10%; width: 30%; max-width: 220px; aspect-ratio: 5 / 7; overflow: hidden; padding: 5px; background: #fff; border: 3px solid var(--p); border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; box-shadow: 0 10px 0 rgba(0, 0, 0, 0.12); transition: transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1); }
