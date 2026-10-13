@@ -3,6 +3,7 @@
 Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du projet.
 
 ## Formulaire de contact (à ne pas oublier au déploiement final)
+- **Fait le 2026-10-14** : site publié, formulaire détecté par Netlify, message de test reçu dans Forms avec tous les champs, e-mail de notification reçu par Claudiu. Reste : un envoi depuis un vrai téléphone (page Merci), l'adresse de Linda dans les notifications, et la suppression régulière des messages traités.
 - Le formulaire échoue en ligne tant qu'aucun déploiement n'a eu lieu depuis l'activation de la détection (Netlify affiche 0 formulaire détecté). Décision de Claudiu (2026-10-10) : attendre le déploiement final.
 - Après ce déploiement : vérifier dans Netlify (Forms) que `contact` est détecté, envoyer un message de test, vérifier l'email reçu (aussi dans les indésirables), marquer « Not spam » si besoin.
 - La notification email est déjà réglée (Forms → Form submission notifications) sur l'adresse de Claudiu : y mettre ou y ajouter celle de Linda quand elle sera prête.
