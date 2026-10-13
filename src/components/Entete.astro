@@ -65,10 +65,9 @@ const actuel = Astro.url.pathname;
   .menu ul { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
   .menu a:not(.langue) { font-family: var(--titre); font-size: 1.45rem; text-decoration: none; color: var(--vert-fonce); padding: 6px 14px; border-radius: var(--rayon-petit); display: block; }
   .menu a:not(.langue):hover, .menu a[aria-current='page'] { background: var(--orange-creme); color: var(--orange-fonce); }
-  /* Les deux mondes gardent leur couleur sur toutes les pages : point vert pour les dessins, point brun pour les toiles */
+  /* Point vert devant Dessins et Toiles, sur toutes les pages (choix de Claudiu) */
   .menu a[data-monde-lien] { display: flex; align-items: center; gap: 8px; }
   .menu a[data-monde-lien]::before { content: ''; width: 11px; height: 11px; border-radius: 50%; background: var(--monde-dessins); }
-  .menu a[data-monde-lien='toiles']::before { background: var(--monde-toiles); }
   .langue { display: inline-flex; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); overflow: hidden; text-decoration: none; font-family: var(--titre); font-size: 1.15rem; }
   .langue span { padding: 3px 11px; color: var(--vert-fonce); }
   .langue .actif { background: var(--accent); color: #fff; }

@@ -2,6 +2,10 @@
 
 Dernière mise à jour : 2026-10-13 (salon de la vidéo redessiné : voir la première section ; les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Menu : point vert devant Toiles (2026-10-13)
+
+Demande de Claudiu : dans le menu de l'en-tête, le point devant « Toiles » est vert comme celui de « Dessins » (plus d'orange), sur toutes les pages (`Entete.astro`).
+
 ## Vidéo : salon redessiné (2026-10-13)
 
 Retour de Claudiu sur la vidéo : « beaucoup mieux », sauf le salon (le canapé ne ressemblait pas à un canapé, et les phrases passaient sur les coussins). Trois propositions en images (A : buffet bas, B : vrai canapé, C : une toile en grand) ; **il a choisi A puis B**.
