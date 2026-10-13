@@ -26,18 +26,17 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
   </Galerie>
 
   <section class="section">
-    <div class="contenu salon-bloc">
-      <h2 class="apparait">{tt.echelle}</h2>
-      <div class="apparait"><Salon lang={lang} ids={toiles.filter((x) => !x.vendue).map((x) => x.id)} /></div>
-    </div>
-  </section>
-
-  <section class="section videos-bande">
-    <div class="contenu">
-      <h2 class="centre apparait">{tt.videoVraies}</h2>
-      <figure class="vraies apparait">
-        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} />
-      </figure>
+    <div class="contenu duo">
+      <div class="duo__salon">
+        <h2 class="apparait">{tt.echelle}</h2>
+        <div class="apparait"><Salon lang={lang} ids={toiles.filter((x) => !x.vendue).map((x) => x.id)} /></div>
+      </div>
+      <div class="duo__video">
+        <h2 class="apparait">{tt.videoVraies}</h2>
+        <figure class="vraies apparait">
+          <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} />
+        </figure>
+      </div>
     </div>
   </section>
 
@@ -55,10 +54,14 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
 </Base>
 
 <style>
-  .salon-bloc { max-width: 880px; margin-inline: auto; }
-  .salon-bloc h2 { margin-top: 0; text-align: center; }
-  .videos-bande { background: var(--vert-creme); text-align: center; }
-  .videos-bande h2 { margin: 0 0 24px; }
+  /* Téléphone : l'échelle puis la vidéo ; ordinateur : côte à côte */
+  .duo { display: grid; gap: 48px; align-items: start; }
+  .duo h2 { margin: 0 0 20px; text-align: center; }
+  .duo__video { text-align: center; }
+  @media (min-width: 860px) {
+    .duo { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 56px; }
+    .duo__video h2 { margin-top: 0; }
+  }
   .vraies { width: min(100%, 300px); margin: 0 auto; padding: 10px; background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
   .expo { max-width: 760px; text-align: center; }
   .expo .chapeau { margin-inline: auto; }
