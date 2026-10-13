@@ -45,8 +45,8 @@
 [data-monde='toiles'] {
   --accent: #d9700b;
   --bord-carte: #e4d6c4;
-  --vert: #5a4a3e;
-  --vert-fonce: #3a2f28;
+  --vert: #8a5a3c;
+  --vert-fonce: #5b3a29;
   --vert-creme: #fff7ec;
   --vert-pale: #eadfd0;
   --orange: #f28a1e;
@@ -54,9 +54,9 @@
   --orange-creme: #fff4e3;
   --orange-fonce: #d06505;
   --orange-titre: #d9700b;
-  --encre: #3a2a20;
-  --encre-douce: #6b5546;
-  --ombre: 0 6px 0 rgba(58, 47, 40, 0.1);
+  --encre: #5b3a29;
+  --encre-douce: #7a5a46;
+  --ombre: 0 6px 0 rgba(91, 58, 41, 0.1);
   --fond: #fffaf2;
 }
 
