@@ -10,7 +10,7 @@ interface Props {
 const { lang, nom, description } = Astro.props;
 const v = t(lang).video;
 ---
-<div class="bandeau" data-bandeau={`/video/${nom}.mp4`}>
+<div class="bandeau" data-bandeau={`/video/${nom}.mp4`} data-description={description}>
   <picture>
     <source type="image/avif" srcset={`/video/${nom}.avif`} />
     <img class="bandeau__affiche" src={`/video/${nom}.webp`} width="1920" height="1080" alt="" fetchpriority="high" decoding="async" />
@@ -29,7 +29,7 @@ const v = t(lang).video;
       video.controls = true;
       video.playsInline = true;
       video.preload = 'auto';
-      video.setAttribute('aria-label', lancer.getAttribute('aria-label') ?? '');
+      video.setAttribute('aria-label', boite.dataset.description ?? '');
       lancer.replaceWith(video);
       void video.play().catch(() => { /* le lecteur reste affiché, le visiteur peut relancer */ });
       video.focus();
@@ -38,10 +38,14 @@ const v = t(lang).video;
 </script>
 <style>
   .bandeau { position: relative; isolation: isolate; overflow: hidden; width: 100%; aspect-ratio: 16 / 9; background: #1d130d; color: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  /* le contour du focus (global.css) serait coupé par overflow: hidden : on le met sur la boîte */
+  .bandeau:has(:focus-visible) { outline: 3px dashed var(--orange-fonce); outline-offset: 3px; }
   .bandeau__affiche, .bandeau :global(.bandeau__video), .bandeau__lancer { position: absolute; inset: 0; width: 100%; height: 100%; }
   .bandeau__affiche, .bandeau :global(.bandeau__video) { object-fit: cover; }
   .bandeau :global(.bandeau__video) { background: #000; }
   .bandeau__lancer { padding: 0; border: 0; background: none; cursor: pointer; }
-  .bandeau__icone { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center; width: 84px; height: 84px; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+  /* bouton posé sur l'étang de l'affiche, sous le titre, et à la taille de la vidéo */
+  .bandeau__icone { position: absolute; left: 50%; top: 86%; translate: -50% -50%; display: grid; place-items: center; width: clamp(40px, 12%, 84px); aspect-ratio: 1; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+  .bandeau__icone svg { width: 48%; height: auto; }
   .bandeau__lancer:hover .bandeau__icone, .bandeau__lancer:focus-visible .bandeau__icone { transform: scale(1.08) rotate(-4deg); }
 </style>

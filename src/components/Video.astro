@@ -11,7 +11,7 @@ interface Props {
 const { lang, nom, largeur, hauteur, description } = Astro.props;
 const v = t(lang).video;
 ---
-<div class="video" data-video={`/video/${nom}.mp4`} style={`aspect-ratio:${largeur} / ${hauteur}`}>
+<div class:list={['video', { 'video--portrait': hauteur > largeur }]} data-video={`/video/${nom}.mp4`} data-description={description} style={`aspect-ratio:${largeur} / ${hauteur}`}>
   <button type="button" class="video__lancer" aria-label={`${v.lancer} : ${description}`}>
     <picture>
       <source type="image/avif" srcset={`/video/${nom}.avif`} />
@@ -29,7 +29,7 @@ const v = t(lang).video;
       video.controls = true;
       video.playsInline = true;
       video.preload = 'auto';
-      video.setAttribute('aria-label', lancer.getAttribute('aria-label') ?? '');
+      video.setAttribute('aria-label', boite.dataset.description ?? '');
       lancer.replaceWith(video);
       void video.play().catch(() => { /* le lecteur reste affiché, le visiteur peut relancer */ });
       video.focus();
@@ -38,10 +38,15 @@ const v = t(lang).video;
 </script>
 <style>
   .video { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
+  /* le contour du focus (global.css) serait coupé par overflow: hidden : on le met sur la boîte */
+  .video:has(:focus-visible) { outline: 3px dashed var(--orange-fonce); outline-offset: 3px; }
   .video :global(video), .video__lancer, .video__lancer img { display: block; width: 100%; height: 100%; }
   .video :global(video) { object-fit: contain; background: #000; }
   .video__lancer { position: relative; padding: 0; border: 0; background: none; cursor: pointer; }
   .video__lancer img { object-fit: cover; }
-  .video__icone { position: absolute; left: 50%; top: 72%; translate: -50% -50%; display: grid; place-items: center; width: 84px; height: 84px; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+  .video__icone { position: absolute; left: 50%; top: 72%; translate: -50% -50%; display: grid; place-items: center; width: clamp(46px, 14%, 84px); aspect-ratio: 1; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+  /* le bouton suit la largeur de la vidéo (plus petit sur une petite vidéo) ; une vidéo en hauteur est plus étroite */
+  .video--portrait .video__icone { width: clamp(46px, 28%, 84px); }
+  .video__icone svg { width: 48%; height: auto; }
   .video__lancer:hover .video__icone, .video__lancer:focus-visible .video__icone { transform: scale(1.08) rotate(-4deg); }
 </style>
