@@ -1,4 +1,4 @@
-// Fabrique la vidéo « Les toiles » (motion design, 16:9, 44 s) : scene.html est rendue image par image dans Chrome,
+// Fabrique la vidéo « Dessins et toiles » (motion design, 16:9, 58 s) : scene.html est rendue image par image dans Chrome,
 // en temps virtuel (1/30 s par image), puis ffmpeg assemble l'image et la musique composée par musique.py.
 //
 // Outils (gratuits, hors du dépôt) : Chrome ou Chromium (variable CHROME si le chemin diffère), ffmpeg, python3 avec numpy,
@@ -7,9 +7,9 @@
 //
 // Depuis n'importe quel dossier (les images d'essai sont écrites dans le dossier courant) :
 //   node scripts/video/rendu.mjs fr /tmp/brut-fr.mp4
-//   python3 scripts/video/musique.py motion 44 /tmp/musique-motion.wav
-//   python3 scripts/video/assembler.py /tmp/brut-fr.mp4 /tmp/musique-motion.wav public/video/toiles-fr.mp4 20
-// NL : nl au lieu de fr, sortie toiles-nl.mp4.
+//   python3 scripts/video/musique.py motion 58 /tmp/musique-motion.wav
+//   python3 scripts/video/assembler.py /tmp/brut-fr.mp4 /tmp/musique-motion.wav public/video/toiles-fr.mp4 24
+// NL : nl au lieu de fr, sortie toiles-nl.mp4. Affiches : l'image à 26,4 s (le mur des toiles), réduite à 960 × 540.
 // Images d'essai : node scripts/video/rendu.mjs fr essai 2,9.5,24  (PNG dans le dossier courant)
 import puppeteer from 'puppeteer-core';
 import { spawn, execSync } from 'node:child_process';

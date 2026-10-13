@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Scène de la vidéo « Les toiles » (16:9, 44 s) : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
+<!-- Scène de la vidéo « Dessins et toiles » (16:9, 58 s) : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -23,20 +23,23 @@ racine.setAttribute('width', W); racine.setAttribute('height', H); racine.setAtt
 
 const BLANC = '#fff', ORANGE = '#FFA52E', VERT_NUIT = '#1f5a2e';
 
-// Textes (à l'écran : ni prix ni remise, rien sur Ostende). Légendes : [début, fin, texte, mis en avant].
+// Textes (à l'écran : ni prix ni remise, rien sur Ostende). Légendes du mur : [début, fin, texte, mis en avant], en secondes
+// depuis la fin des dessins. Dessins : le gros texte à côté de chaque dessin (repris du site : accroche, Tilleul, rubriques).
 const T = {
   fr: {
-    titre: 'Les toiles', sous: 'de Linda Denise', fin: 'Les toiles',
+    titre: 'Dessins et toiles', sous: 'de Linda Denise', fin: 'Dessins et toiles',
+    dessins: ['Des dessins', 'faits à la main, sur son téléphone', 'Les chats', 'La nature', 'Les fleurs', 'Les animaux', 'Les psaumes'],
     legendes: [
-      [4.5, 5.5, 'Des dessins', false], [5.5, 7.0, 'faits à la main', true],
+      [4.5, 5.5, 'Aussi en', false], [5.5, 7.0, 'grand format', true],
       [7.5, 8.5, 'imprimés', false], [8.5, 10.0, 'sur aluminium', true],
       [10.5, 11.5, 'Format A3', false], [11.5, 13.3, 'Chaque toile est unique', true],
     ],
   },
   nl: {
-    titre: 'De doeken', sous: 'van Linda Denise', fin: 'De doeken',
+    titre: 'Tekeningen en doeken', sous: 'van Linda Denise', fin: 'Tekeningen en doeken',
+    dessins: ['Tekeningen', 'met de hand gemaakt, op haar telefoon', 'De katten', 'De natuur', 'De bloemen', 'De dieren', 'De psalmen'],
     legendes: [
-      [4.5, 5.5, 'Tekeningen', false], [5.5, 7.0, 'met de hand gemaakt', true],
+      [4.5, 5.5, 'Ook in', false], [5.5, 7.0, 'groot formaat', true],
       [7.5, 8.5, 'gedrukt', false], [8.5, 10.0, 'op aluminium', true],
       [10.5, 11.5, 'A3-formaat', false], [11.5, 13.3, 'Elk doek is uniek', true],
     ],
@@ -49,6 +52,9 @@ const titreToile = (id) => donnees.find((x) => x.id === id).titre[LANG].replace(
 const GALERIE = ['frangipanier', 'iris', 'mauves', 'le-tournesol', 'bouleaux-en-hiver', 'chat-a-l-ile-de-brehat', 'tournesols', 'sweet', 'jonquilles',
   'fleurs-bleues', 'le-chemin-de-foret', 'montagne-et-tournesols', 'sous-bois', 'time-s-amuse'];
 const UNE_A_UNE = ['bois-de-hal', 'chat-au-repos', 'vieux-cerisier', 'time-gambade', 'l-oiseau', 'printemps', 'chats-camoufles', 'narcisses', 'la-cloture'];
+// Les dessins numériques (aperçus filigranés du site), un par texte de T.dessins : deux pour la présentation, puis un par rubrique
+const DESSINS = ['tiroux-et-les-arbres', 'couleurs', 'time-au-clair-de-lune', 'l-ile-de-brehat', 'lys-tigre', 'coccinelles', 'plante-pres-du-ruisseau'];
+const DEC = DESSINS.length * 2; // la partie des dessins (2 s par dessin) décale tout ce qui suit
 
 // ---------- outils ----------
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -87,7 +93,8 @@ el('stop', { offset: 0, 'stop-color': '#fffaf0', 'stop-opacity': 0.95 }, gLumier
 el('stop', { offset: 1, 'stop-color': '#fffaf0', 'stop-opacity': 0 }, gLumiere);
 
 // Une toile accrochée à un clou : se peint au pinceau, puis se balance doucement.
-function toile(parent, nom, largeur) {
+// Un dessin (dessin = true) : même pinceau, dans la carte blanche au bord vert du site, sans clou.
+function toile(parent, nom, largeur, dessin = false) {
   const l = largeur, h = Math.round(largeur * 420 / 297);
   const g = el('g', {}, parent);
   const corps = el('g', { filter: 'url(#ombre)' }, g);
@@ -102,13 +109,19 @@ function toile(parent, nom, largeur) {
   }
   const trait = el('path', { d, fill: 'none', stroke: '#fff', 'stroke-width': ep, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1 }, masque);
   const peint = el('g', { mask: `url(#${masque.id})` }, corps);
-  el('rect', { x: -l / 2 - 3, y: 15, width: l + 6, height: h + 6, rx: 3, fill: '#c9ced2' }, peint);
-  el('image', { href: `${REPO}/public/toiles/${nom}-800.webp`, x: -l / 2, y: 18, width: l, height: h, preserveAspectRatio: 'xMidYMid slice' }, peint);
-  el('rect', { x: -l / 2, y: 18, width: l, height: h, fill: 'none', stroke: '#9aa2a8', 'stroke-width': 2 }, peint);
-  const clou = el('g', {}, g);
-  el('circle', { cx: 1.5, cy: 3, r: 7, fill: '#000', opacity: 0.18, filter: 'url(#flou)' }, clou);
-  el('circle', { cx: 0, cy: 0, r: 6.5, fill: '#9a9a9a' }, clou);
-  el('circle', { cx: -1.8, cy: -1.8, r: 2.6, fill: '#fff', opacity: 0.85 }, clou);
+  let clou = null;
+  if (dessin) {
+    el('rect', { x: -l / 2 - 12, y: 6, width: l + 24, height: h + 24, rx: 18, fill: '#fff', stroke: '#2b6e3a', 'stroke-width': 6 }, peint);
+    el('image', { href: `${REPO}/public/dessins/${nom}.webp`, x: -l / 2, y: 18, width: l, height: h, preserveAspectRatio: 'xMidYMid slice' }, peint);
+  } else {
+    el('rect', { x: -l / 2 - 3, y: 15, width: l + 6, height: h + 6, rx: 3, fill: '#c9ced2' }, peint);
+    el('image', { href: `${REPO}/public/toiles/${nom}-800.webp`, x: -l / 2, y: 18, width: l, height: h, preserveAspectRatio: 'xMidYMid slice' }, peint);
+    el('rect', { x: -l / 2, y: 18, width: l, height: h, fill: 'none', stroke: '#9aa2a8', 'stroke-width': 2 }, peint);
+    clou = el('g', {}, g);
+    el('circle', { cx: 1.5, cy: 3, r: 7, fill: '#000', opacity: 0.18, filter: 'url(#flou)' }, clou);
+    el('circle', { cx: 0, cy: 0, r: 6.5, fill: '#9a9a9a' }, clou);
+    el('circle', { cx: -1.8, cy: -1.8, r: 2.6, fill: '#fff', opacity: 0.85 }, clou);
+  }
   return {
     l, h, g,
     // p : avancement du pinceau (0 à 1), b : temps depuis la fin de la peinture (balancement : il ne bouge pas avant)
@@ -118,7 +131,7 @@ function toile(parent, nom, largeur) {
       g.setAttribute('opacity', opacite.toFixed(3));
       corps.setAttribute('transform', `rotate(${angle.toFixed(3)})`);
       trait.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
-      clou.setAttribute('opacity', p > 0 ? 1 : 0);
+      if (clou) clou.setAttribute('opacity', p > 0 ? 1 : 0);
     },
   };
 }
@@ -310,9 +323,20 @@ window.pret = (async () => {
   const tombe = feuilles(intro, 9, 1);
   const lg = logo(intro);
   const bassinIntro = etang(intro, 905);
-  const introTitre = mots(intro, T.titre, W / 2, 600, 250, { remplir: [BLANC, ORANGE] });
+  const introTitre = mots(intro, T.titre, W / 2, 600, 250, { remplir: [ORANGE, BLANC, ORANGE] });
   const introSous = mots(intro, T.sous, W / 2, 770, 120, { remplir: [BLANC, BLANC, ORANGE] });
 
+  // 4 – 18 : les dessins, un par un (un dessin par mesure de 2 s), sur le fond blanc du titre, avec l'étang
+  const dessinsG = el('g', {}, calques.scene);
+  el('rect', { width: W, height: H, fill: '#fff' }, dessinsG);
+  const tombeD = feuilles(dessinsG, 7, 5);
+  const bassinD = etang(dessinsG, 905);
+  const parDessin = DESSINS.map((nom, i) => {
+    const a = 4 + i * 2, gauche = i % 2 === 0;
+    return { a, gauche, t: toile(dessinsG, nom, 470, true), nom: titre(dessinsG, T.dessins[i], gauche ? W * 0.71 : W * 0.29, 500, 132, 700) };
+  });
+
+  // Tout ce qui suit est décalé de DEC secondes (la partie des dessins) : les temps ci-dessous comptent depuis la fin des dessins.
   // 4 – 16 : un long mur qu'on longe, quatorze toiles qui se peignent et se balancent
   const galerie = el('g', {}, calques.scene);
   const camera = el('g', {}, galerie);
@@ -366,7 +390,25 @@ window.pret = (async () => {
       lg.setAttribute('transform', `translate(${W / 2},${270 + Math.sin(t * 1.2) * 6}) scale(${k * 0.95}) rotate(${(1 - k) * -40})`);
       introTitre.maj(prog(t, 0.8, 1.9)); introSous.maj(prog(t, 1.9, 3.0));
     }
-    // galerie (fondu depuis le titre)
+    // les dessins (fondu depuis le titre), un par un ; le dessin est peint avant de partir, il ne se balance pas
+    montrer(dessinsG, t >= 3.4 && t < DEC + 4.2);
+    if (t >= 3.4 && t < DEC + 4.2) {
+      dessinsG.setAttribute('opacity', ss(prog(t, 3.4, 4.2)).toFixed(3));
+      tombeD(t); bassinD(t);
+      parDessin.forEach((u, i) => {
+        const visible = t >= u.a - 0.3 && t < u.a + (i === DESSINS.length - 1 ? 2.2 : 2.0);
+        montrer(u.t.g, visible); montrer(u.nom.g, visible);
+        if (!visible) return;
+        // le premier arrive avec le fond, le dernier reste pendant que le mur des toiles apparaît par-dessus
+        const op = (i === 0 ? 1 : ss(prog(t, u.a - 0.3, u.a))) * (i === DESSINS.length - 1 ? 1 : 1 - ss(prog(t, u.a + 1.7, u.a + 2.0)));
+        const k = prog(t, u.a - 0.3, u.a + 2.0);
+        u.t.maj({ x: (u.gauche ? W * 0.29 : W * 0.71) + (k - 0.5) * 70 * (u.gauche ? 1 : -1), y: 120 - (k - 0.5) * 20, p: io(prog(t, u.a - 0.3, u.a + 0.8)), echelle: 1 + k * 0.07, pente: i % 2 ? 0.7 : -0.7, opacite: op });
+        u.nom.maj(prog(t, u.a + 0.1, u.a + 0.9));
+        u.nom.g.setAttribute('opacity', op.toFixed(3));
+      });
+    }
+    t -= DEC; // la suite, telle qu'elle était avant l'ajout des dessins
+    // galerie (fondu depuis les dessins)
     montrer(galerie, t >= 3.4 && t < 15.9);
     if (t >= 3.4 && t < 15.9) {
       galerie.setAttribute('opacity', ss(prog(t, 3.4, 4.2)).toFixed(3));
@@ -412,7 +454,7 @@ window.pret = (async () => {
     }
     legende(t);
   };
-  window.DUREE = 44;
+  window.DUREE = 44 + DEC;
   window.image = (t) => { avancer(1000 / 30); rendre(t); };
 
   const hrefs = [...new Set([...racine.querySelectorAll('image')].map((i) => i.getAttribute('href')).filter((h) => h.startsWith('file:')))];

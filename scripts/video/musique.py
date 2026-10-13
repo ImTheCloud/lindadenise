@@ -1,6 +1,7 @@
 # Musiques originales des vidéos, composées et synthétisées ici (numpy seulement, aucune bibliothèque sous licence).
-#   motion : la vidéo « Les toiles » (motion design) : pop électro, 120 BPM, sol majeur (sol - ré - mi mineur - do).
-#            Une mesure = 2 s, une toile par mesure (44 s : 22 mesures). Intro, mur, toiles une par une, pause pour Tilleul, montée, final.
+#   motion : la vidéo « Dessins et toiles » (motion design) : pop électro, 120 BPM, sol majeur (sol - ré - mi mineur - do).
+#            Une mesure = 2 s, un dessin ou une toile par mesure (58 s : 29 mesures). Intro, dessins puis mur, toiles une par une,
+#            pause pour Tilleul, montée, final.
 #   reel   : la vidéo « Les vraies toiles » : pop acoustique chaloupée, 114,3 BPM (une mesure = 2,1 s = le rythme
 #            des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, basse, piano électrique,
 #            claquements de doigts. Volontairement simple et sec : pas de bruit de synthèse, pas d'écho.
@@ -134,7 +135,7 @@ def motion():
 
     def section(b):
         if b < 2: return 'intro'
-        if b < nb - 14: return 'A'      # le mur et ses toiles qui défilent
+        if b < nb - 14: return 'A'      # les dessins, puis le mur et ses toiles qui défilent
         if b < nb - 5: return 'B'       # les toiles une par une
         if b < nb - 3: return 'pause'   # Tilleul
         if b == nb - 3: return 'montee'
