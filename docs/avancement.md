@@ -1,10 +1,14 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-14 (validations de Claudiu : voir la première section ; salon de la vidéo redessiné : voir la première section ; les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+Dernière mise à jour : 2026-10-14 (**version publiée sur Netlify le 2026-10-14** : voir la première section ; validations de Claudiu : voir la première section ; salon de la vidéo redessiné : voir la première section ; les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
 ## Menu : point vert devant Toiles (2026-10-13)
 
 Demande de Claudiu : dans le menu de l'en-tête, le point devant « Toiles » est vert comme celui de « Dessins » (plus d'orange), sur toutes les pages (`Entete.astro`).
+
+## Publication du 2026-10-14
+
+Claudiu a validé le site et demandé la mise en ligne : commit vide sans `[skip ci]` (`860b8a6`), déploiement Netlify automatique, https://lindadenise.netlify.app. Vérifié après : accueil, dessins, toiles, une fiche, panier, contact, NL, FAQ, jeu, vidéo répondent en 200 ; **Netlify détecte le formulaire `contact`** avec tous ses champs (commande, total, rue, code_postal, localite, pays, conditions, conditions_toile, sujet, message). **Reste à faire** : envoyer un vrai message de test (panier mixte) depuis le site publié, vérifier l'e-mail reçu (et les indésirables) et marquer « Not spam » si besoin. Les commits suivants repassent en `[skip ci]` jusqu'à la prochaine publication demandée.
 
 ## Validations de Claudiu (2026-10-14)
 
