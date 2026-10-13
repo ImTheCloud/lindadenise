@@ -175,10 +175,17 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
       if (moinsDeMouvement) { vu.textContent = message; terminer(); return; }
       chat.parle = true;
       ecrit = true;
+      // le texte entier est déjà là, seule la fin est cachée : un mot qui ne tient pas sur la ligne passe à la suivante dès sa première lettre (écrit tel quel, il sautait d'une ligne à l'autre en s'écrivant)
+      const ecritDeja = document.createTextNode('');
+      const reste = document.createElement('span');
+      reste.style.opacity = '0';
+      reste.textContent = message;
+      vu.replaceChildren(ecritDeja, reste);
       let i = 0;
       frappe = window.setInterval(() => {
         i += 1;
-        vu.textContent = message.slice(0, i);
+        ecritDeja.data = message.slice(0, i);
+        reste.textContent = message.slice(i);
         if (i >= message.length) { window.clearInterval(frappe); terminer(); }
       }, 34);
     };
