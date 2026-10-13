@@ -70,7 +70,7 @@ const jsonld = {
           <p class="option-toile__nom">{d.dessins.toilePrix(PRIX_TOILE)}</p>
           <p>{d.dessins.toileDelai(DELAI_TOILE_SUR_COMMANDE[lang])}</p>
           <p>{d.dessins.toileLot}</p>
-          <button type="button" class="bouton bouton--vert" aria-pressed="false" data-panier={`commande:${dessin.id}`} data-ajouter={d.panier.ajouterToile} data-dedans={d.panier.dedans}>{d.panier.ajouterToile}</button>
+          <button type="button" class="bouton bouton--vert" aria-pressed="false" data-panier={`commande:${dessin.id}`} data-ajouter={d.panier.ajouter} data-dedans={d.panier.dedans}>{d.panier.ajouter}</button>
           <p class="option-toile__note">{d.dessins.toileNote}</p>
         </div>
       </div>

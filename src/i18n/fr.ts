@@ -170,7 +170,6 @@ export const fr = {
     genres: { dessin: 'Dessin numérique', toile: 'Toile', commande: 'Toile sur commande' },
     retirer: 'Retirer',
     ajouter: 'Ajouter au panier',
-    ajouterToile: 'Ajouter cette toile au panier',
     dedans: 'Dans le panier ✓',
     ajouterAria: 'Ajouter « {t} » au panier',
     dedansAria: 'Retirer « {t} » du panier',

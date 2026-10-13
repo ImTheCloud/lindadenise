@@ -171,7 +171,6 @@ export const nl: Dico = {
     genres: { dessin: 'Digitale tekening', toile: 'Doek', commande: 'Doek op bestelling' },
     retirer: 'Verwijderen',
     ajouter: 'In het mandje',
-    ajouterToile: 'Dit doek in het mandje',
     dedans: 'In het mandje ✓',
     ajouterAria: 'Voeg “{t}” toe aan het mandje',
     dedansAria: 'Verwijder “{t}” uit het mandje',
