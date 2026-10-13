@@ -62,7 +62,6 @@ export const nl: Dico = {
       { titre: 'Ontvang je bestand', texte: 'De tekening wordt je per e-mail geleverd, als digitaal bestand zonder watermerk, om op papier af te drukken voor privégebruik.' },
     ],
     licence: 'Bekijk de gebruiksvoorwaarden',
-    autres: 'Nog meer tekeningen om te ontdekken',
     agrandir: 'Tekening vergroten',
     fermer: 'Sluiten',
     altDe: (t: string) => `Tekening “${t}” van Linda Denise`,

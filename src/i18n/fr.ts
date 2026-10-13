@@ -61,7 +61,6 @@ export const fr = {
       { titre: 'Recevez votre fichier', texte: 'Le dessin vous est livré par e-mail, en fichier numérique sans filigrane, à imprimer sur papier pour votre usage privé.' },
     ],
     licence: 'Conditions d’utilisation',
-    autres: 'D’autres dessins à découvrir',
     agrandir: 'Agrandir le dessin',
     fermer: 'Fermer',
     altDe: (t: string) => `Dessin « ${t} » de Linda Denise`,
