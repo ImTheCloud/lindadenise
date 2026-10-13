@@ -42,6 +42,12 @@ const chemins = { fr: cheminToile(toile.id, 'fr'), nl: cheminToile(toile.id, 'nl
           <p class="fiche__petit"><a href={chemin('conditionsToiles', lang)}>{tt.conditions}</a> · <a href="#echelle">{tt.echelle}</a></p>
         </div>
       </div>
+      {!toile.vendue && (
+        <div class="fiche__barre">
+          <span class="fiche__barre-prix" aria-hidden="true">{tt.prix(PRIX_TOILE)}</span>
+          <button type="button" class="bouton" aria-pressed="false" data-panier={`toile:${toile.id}`} data-ajouter={d.panier.ajouter} data-dedans={d.panier.dedans}>{d.panier.ajouter}</button>
+        </div>
+      )}
     </div>
   </section>
   <section class="section section--vert" id="echelle">
@@ -73,17 +79,25 @@ const chemins = { fr: cheminToile(toile.id, 'fr'), nl: cheminToile(toile.id, 'nl
   .zoom img { width: auto; height: auto; max-width: 96vw; max-height: 94svh; border-radius: 10px; background: #fff; }
   .zoom__fermer { position: absolute; top: 12px; right: 14px; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #fff; color: var(--vert-fonce); font-size: 2rem; line-height: 1; cursor: pointer; }
   .fiche { display: grid; gap: 18px; align-items: start; }
-  .fiche__image { --k: 1.5; padding-top: 40px; max-width: 680px; margin-inline: auto; }
+  .fiche__image { --k: 1.5; padding-top: 36px; max-width: 680px; margin-inline: auto; }
   .fiche__image :global(img) { display: block; width: 100%; height: auto; }
   .fiche__prix { font-family: var(--titre); font-size: 2.6rem; color: var(--orange-fonce); margin: 0 0 4px; line-height: 1.1; }
   .fiche__petit { font-size: 0.98rem; }
   .fiche__panier { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
   .fiche__panier a { font-family: var(--titre); font-size: 1.2rem; }
+  .fiche__barre { display: none; }
+  @media (max-width: 859px) {
+    .fiche__panier { display: none; }
+    /* Le bouton reste visible en bas de l'écran pendant qu'on regarde l'image, jusqu'à la fin de la fiche */
+    .fiche__barre { position: sticky; bottom: 0; z-index: 20; display: flex; align-items: center; gap: 14px; margin: 14px calc(var(--gouttiere) * -1) 0; padding: 10px var(--gouttiere) calc(10px + env(safe-area-inset-bottom)); background: #fff; border-top: var(--trait) solid var(--vert-pale); box-shadow: 0 -8px 14px rgba(0, 0, 0, 0.06); }
+    .fiche__barre-prix { font-family: var(--titre); font-size: 2rem; line-height: 1; white-space: nowrap; color: var(--orange-fonce); }
+    .fiche__barre .bouton { flex: 1; justify-content: center; padding: 10px 14px; font-size: 1.2rem; white-space: nowrap; }
+  }
   /* Mobile : le dessin, son titre, son prix et le bouton tiennent dans un seul écran. */
   @media (max-width: 859px) {
     .section--fiche { padding-top: 14px; }
     .section--fiche > .contenu > p { margin: 0 0 8px; }
-    .fiche__image { padding: 36px 8px 8px; margin-inline: -8px; }
+    .fiche__image { padding: 30px 8px 8px; margin-inline: -8px; }
     .fiche__infos { display: grid; grid-template-columns: auto auto 1fr; align-items: center; column-gap: 16px; }
     .fiche__infos > :nth-child(1), .fiche__infos > :nth-child(2), .fiche__infos > :nth-child(4), .fiche__infos > :nth-child(6), .fiche__infos > :nth-child(7) { grid-column: 1 / -1; }
     .fiche__infos > :nth-child(3) { grid-column: 2; grid-row: 3; }
