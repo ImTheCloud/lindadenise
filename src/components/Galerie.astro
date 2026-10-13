@@ -103,7 +103,7 @@ const { titre, tous, groupe, rubriques, total, genre, phrase, bonus } = Astro.pr
   .filtres { display: flex; flex-wrap: wrap; gap: 8px 10px; padding: 4px 4px 8px; }
   .filtre { flex: none; font-family: var(--titre); font-size: 1.25rem; line-height: 1; padding: 0.5em 1em; cursor: pointer; background: #fff; color: var(--vert-fonce); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); transition: transform 0.15s; }
   .filtre:hover { transform: rotate(-2deg) translateY(-2px); }
-  .filtre[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filtre[aria-pressed='true'] { background: var(--vert-fonce); border-color: var(--vert-fonce); color: #fff; }
   /* Téléphone : filtres en grille de trois colonnes */
   @media (max-width: 699px) {
     .boutique__tete { flex-wrap: nowrap; justify-content: space-between; gap: 8px; }
