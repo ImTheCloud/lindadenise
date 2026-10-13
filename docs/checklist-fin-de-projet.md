@@ -12,8 +12,8 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 
 ## Boutique Stripe : à prévoir pour les dessins ET les toiles
 - Seulement quand le statut légal de Linda est confirmé (Stripe Checkout, Bancontact).
-- **Toute commande (toile ou dessin numérique) envoie automatiquement un e-mail de confirmation au client** avec les détails : récapitulatif, montant, frais d'envoi, délai, coordonnées de Linda ; pour une toile, le transporteur et le suivi.
-- Toiles : remise de lot (−10 % dès 2 toiles, −20 % dès 3, toiles seulement), envoi offert dès 2 toiles, livraison en Belgique uniquement (adresse vérifiée), pièce unique : marquer la toile « vendue » automatiquement après paiement (aujourd'hui à la main dans `src/data/toiles.json`). Les règles sont déjà dans `src/data/vente.ts` (`calculLot`).
+- **Toute commande (toile ou dessin numérique) envoie automatiquement un e-mail de confirmation au client** avec les détails : récapitulatif, montant, frais de livraison, délai, coordonnées de Linda ; pour une toile, le transporteur et le suivi.
+- Offre de lot : 5 achetées, la 6e offerte, calculée séparément pour les dessins numériques et pour les toiles. Toiles : livraison gratuite dès 2 toiles (12 € sinon), livraison par bpost en Belgique uniquement (adresse vérifiée). Une toile peut être refaite : pas de « vendue » automatique à prévoir sauf si Linda le demande (aujourd'hui à la main dans `src/data/toiles.json`). Les règles sont déjà dans `src/data/vente.ts` (`calculLot`, `calculPanier`).
 - Toiles sur commande : délai et prix réels à obtenir de Linda (`DELAI_TOILE_SUR_COMMANDE`).
 - Conditions de vente des toiles (`/conditions-toiles/`) : écrire les retours, le droit de rétractation et la garantie quand Linda sait ce qui s'applique à son statut ; aujourd'hui la page dit seulement « Les conditions de retour seront précisées avant tout paiement. »
 
@@ -43,7 +43,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 
 ## Appareils
 - iPhone (Safari) et Android (Chrome) réels, plus un grand écran d'ordinateur
-- Vérifier la mascotte, le formulaire et le menu sur téléphone : Tilleul au bord de l'étang en défilant, toucher, page de jeu et mini-jeu, Tilleul qui s'efface dans un formulaire et sur la barre de la page Toiles ; un iPhone avec Safari plus ancien que la version 16 (Tilleul reste alors au bord de l'étang de l'accueil)
+- Vérifier la mascotte, le formulaire et le menu sur téléphone : Tilleul dans son coin en bas à droite, toucher, page de jeu, Tilleul qui s'efface dans un formulaire ; un iPhone avec Safari plus ancien que la version 16.
 
 ## Contenu et légal
 - Mentions légales complètes (adresse, numéro d'entreprise selon le statut de Linda), conditions d'utilisation et conditions de vente des toiles relues

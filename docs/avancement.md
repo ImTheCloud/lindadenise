@@ -1,10 +1,18 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-13 (salon de la vidéo redessiné : voir la première section ; les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+Dernière mise à jour : 2026-10-14 (validations de Claudiu : voir la première section ; salon de la vidéo redessiné : voir la première section ; les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
 ## Menu : point vert devant Toiles (2026-10-13)
 
 Demande de Claudiu : dans le menu de l'en-tête, le point devant « Toiles » est vert comme celui de « Dessins » (plus d'orange), sur toutes les pages (`Entete.astro`).
+
+## Validations de Claudiu (2026-10-14)
+
+- **Validés** : le passage du brun à l'orange (monde des toiles `#d9700b`, c'est la couleur définitive), le classement des 23 toiles par rubrique, les textes FR/NL du panier et du bouton, les titres NL des psaumes, la signature « Linda Denise » de la vidéo (police du site).
+- **Bug du bouton à 375 px : plus reproductible.** Mesuré sur les 23 fiches de toile, 6 fiches de dessin et 3 en NL à 375, 360 et 320 px, boutons avant et après clic : aucun débordement (largeur de page = largeur d'écran). Le bouton « Ajouter cette toile au panier » d'une fiche de dessin finit à 334 px sur 375. Corrigé par les retouches précédentes (salon recadré, fond blanc). Rien à changer.
+- Checklist de fin de projet : offre de lot mise à jour (5 achetées, la 6e offerte ; livraison gratuite dès 2 toiles), ligne Tilleul des tests d'appareils corrigée.
+- Psaumes : les 2 fichiers sont bien rangés dans `~/Desktop/DessinsLinda/Psaumes/`. Ce sont toujours des JPEG WhatsApp de 1080 × 1526 px : à remplacer par les vrais fichiers de Linda avant la vente.
+- Reste à faire : tests sur de vrais appareils (voir `docs/checklist-fin-de-projet.md`, « Appareils » et « Formulaire et panier »).
 
 ## Vidéo : salon redessiné (2026-10-13)
 
@@ -16,7 +24,7 @@ Retour de Claudiu sur la vidéo : « beaucoup mieux », sauf le salon (le canap�
 
 ## Plus de crème : fond blanc partout (2026-10-13)
 
-Demande de Claudiu : le trait net entre blanc et crème le gênait ; d'abord un fondu, puis, à sa demande, **le crème est remplacé par le blanc partout** (accueil, fiches, toiles, panier, menu, pied de page, salon dessiné). Les variables `--vert-creme` et `--orange-creme` valent `#fff` dans les deux mondes ; les fonds de sections repassent à l'unite. Le brun des textes des toiles est le brun terre d'origine (`#5b3a29`, `--encre` et `--vert-fonce` dans `[data-monde='toiles']`). Les survols qui changeaient de fond en crème ne changent plus que de couleur de texte et de bordure. Le salon « Voir à l'échelle » (`Salon.astro`) était coupé à droite (viewBox trop étroit) : il montre maintenant toute la pièce (canapé et plante). **À voir** : sur une fiche à 375 px, le bouton « Ajouter cette toile au panier » déborde à droite (page plus large que l'écran, 470 px) : à corriger.
+Demande de Claudiu : le trait net entre blanc et crème le gênait ; d'abord un fondu, puis, à sa demande, **le crème est remplacé par le blanc partout** (accueil, fiches, toiles, panier, menu, pied de page, salon dessiné). Les variables `--vert-creme` et `--orange-creme` valent `#fff` dans les deux mondes ; les fonds de sections repassent à l'unite. Le brun des textes des toiles est le brun terre d'origine (`#5b3a29`, `--encre` et `--vert-fonce` dans `[data-monde='toiles']`). Les survols qui changeaient de fond en crème ne changent plus que de couleur de texte et de bordure. Le salon « Voir à l'échelle » (`Salon.astro`) était coupé à droite (viewBox trop étroit) : il montre maintenant toute la pièce (canapé et plante). Le débordement du bouton à 375 px noté ici n'existe plus (vérifié le 2026-10-14).
 
 ## Branches réunies dans main (2026-10-13)
 
