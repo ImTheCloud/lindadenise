@@ -17,7 +17,7 @@ const donnees = {
   contact: `${chemin('contact', lang)}?sujet=commande`,
 };
 ---
-<Base lang={lang} titre={p.titre} description={p.meta} chemins={chemins} noindex>
+<Base lang={lang} sansChat titre={p.titre} description={p.meta} chemins={chemins} noindex>
   <section class="section">
     <div class="contenu panier" data-panier-page data-donnees={JSON.stringify(donnees)}>
       <header class="centre">

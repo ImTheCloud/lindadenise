@@ -20,8 +20,10 @@ interface Props {
   noindex?: boolean;
   /** monde du site : les dessins (vert) ou les toiles (brun) */
   monde?: 'dessins' | 'toiles';
+  /** pages où l'on doit bien voir l'écran (fiches, panier, formulaire, pages légales) : pas de Tilleul */
+  sansChat?: boolean;
 }
-const { lang, titre, description, chemins, image = '/images/partage.png', noindex = false, monde = 'dessins' } = Astro.props;
+const { lang, titre, description, chemins, image = '/images/partage.png', noindex = false, monde = 'dessins', sansChat = false } = Astro.props;
 const d = t(lang);
 const titrePage = titre ? `${titre} – Linda Denise` : d.meta.titre;
 const desc = description ?? d.meta.description;
@@ -58,7 +60,7 @@ const canonique = SITE + chemins[lang];
     <Entete lang={lang} chemins={chemins} />
     <main id="principal"><slot /></main>
     <PiedDePage lang={lang} />
-    <Mascotte lang={lang} />
+    {!sansChat && <Mascotte lang={lang} />}
     <script>
       import { lire, basculer, nombre, type Genre } from '../components/panier';
       // Apparition douce des blocs au défilement

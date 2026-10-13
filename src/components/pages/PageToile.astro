@@ -17,7 +17,7 @@ const i = toiles.findIndex((x) => x.id === toile.id);
 // Toiles à voir aussi : celles qui suivent celle-ci (différentes d'une fiche à l'autre).
 const autres = [...toiles.slice(i + 1), ...toiles.slice(0, i)].slice(0, 4);
 ---
-<Base lang={lang} monde="toiles" titre={titre} description={`${alt} · ${tt.prix(PRIX_TOILE)}`} chemins={chemins} image={`/toiles/${toile.id}-800.jpg`}>
+<Base lang={lang} sansChat monde="toiles" titre={titre} description={`${alt} · ${tt.prix(PRIX_TOILE)}`} chemins={chemins} image={`/toiles/${toile.id}-800.jpg`}>
   <section class="section section--fiche">
     <div class="contenu">
       <p><a href={chemin('toiles', lang)}>{tt.retour}</a></p>
@@ -98,7 +98,7 @@ const autres = [...toiles.slice(i + 1), ...toiles.slice(0, i)].slice(0, 4);
     .section--fiche { padding-top: 14px; }
     .section--fiche > .contenu > p { margin: 0 0 8px; }
     .fiche__image { padding: 8px; }
-    .fiche__image :global(img) { max-height: max(240px, calc(100svh - 300px)); }
+    .fiche__image :global(img) { max-height: max(200px, calc(100svh - 440px)); }
     .fiche__infos { display: grid; grid-template-columns: auto auto 1fr; align-items: center; column-gap: 16px; }
     .fiche__infos > :nth-child(1), .fiche__infos > :nth-child(2), .fiche__infos > :nth-child(4), .fiche__infos > :nth-child(6), .fiche__infos > :nth-child(7) { grid-column: 1 / -1; }
     .fiche__infos > :nth-child(3) { grid-column: 2; grid-row: 3; }

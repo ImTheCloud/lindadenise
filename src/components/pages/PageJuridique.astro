@@ -12,7 +12,7 @@ const lignesEditrice = page === 'mentions'
   : [];
 const licence = page === 'licence' ? d.licence : null;
 ---
-<Base lang={lang} titre={contenu.titre} description={contenu.meta} chemins={chemins}>
+<Base lang={lang} sansChat titre={contenu.titre} description={contenu.meta} chemins={chemins}>
   <section class="section">
     <div class="contenu texte">
       <h1>{contenu.titre}</h1>
