@@ -1,7 +1,7 @@
 # Musiques originales des vidéos, composées et synthétisées ici (numpy seulement, aucune bibliothèque sous licence).
 #   motion : la vidéo « Dessins et toiles » (motion design) : pop électro, 120 BPM, sol majeur (sol - ré - mi mineur - do).
-#            Une mesure = 2 s (56 s : 28 mesures, voir PLAN) : titre, mur de dessins, un dessin par univers, mur de toiles,
-#            une toile par univers, pause pour Tilleul, montée, final.
+#            Une mesure = 2 s (58 s : 29 mesures, voir PLAN) : titre, mur de dessins, les univers, le salon des toiles,
+#            la fin avec Tilleul (calme), montée, final, signature.
 #   reel   : la vidéo « Les vraies toiles » : pop acoustique chaloupée, 114,3 BPM (une mesure = 2,1 s = le rythme
 #            des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, basse, piano électrique,
 #            claquements de doigts. Volontairement simple et sec : pas de bruit de synthèse, pas d'écho.
@@ -131,9 +131,9 @@ def motion():
         [(0, 76, .5), (.5, 79, .5), (1, 83, 1), (2, 79, .5), (2.5, 76, .5), (3, 74, 1)],
         [(0, 76, .5), (.5, 74, .5), (1, 72, 1), (2, 79, 1), (3, 76, .5), (3.5, 74, .5)],
     ]
-    # le plan de la vidéo, une mesure par case : titre, mur de dessins (A), un dessin par univers (B), mur de toiles (A),
-    # une toile par univers (B), Tilleul (pause), montée, final
-    PLAN = ['intro'] * 2 + ['A'] * 6 + ['B'] * 5 + ['A'] * 6 + ['B'] * 4 + ['pause'] * 2 + ['montee', 'final', 'fin']
+    # le plan de la vidéo, une mesure par case : titre, mur de dessins (A), les univers (B), le salon des toiles (A),
+    # la fin avec Tilleul (pause), montée, final, signature
+    PLAN = ['intro'] * 2 + ['A'] * 6 + ['B'] * 9 + ['A'] * 6 + ['pause'] * 3 + ['montee', 'final', 'fin']
     nb = int(duree // BAR)
     assert nb == len(PLAN), f'la musique dure {len(PLAN) * BAR:.0f} s'
     change = lambda b: b == 0 or PLAN[b] != PLAN[b - 1]  # première mesure d'une partie

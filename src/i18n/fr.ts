@@ -47,7 +47,7 @@ export const fr = {
     impressionTexte: (n: number) => `Un dessin ne vit pas seulement sur un écran. Linda a fait imprimer ${n} de ses dessins sur aluminium, au format A3 : de vraies toiles, que l’on tient dans les mains et que l’on accroche chez soi.`,
     impressionTexte2: 'Le trait de la main et les couleurs y prennent une tout autre ampleur. Regardez.',
     impressionCta: 'Voir les toiles',
-    impressionAlt: 'film de 56 secondes sur les dessins et les toiles de Linda, avec Tilleul, gros textes à l’écran et musique entraînante, sans voix',
+    impressionAlt: 'film de 58 secondes sur les dessins et les toiles de Linda, avec Tilleul, gros textes à l’écran et musique entraînante, sans voix',
     aproposTitre: 'Rencontrez Linda',
     aproposTexte:
       'Après avoir longtemps enseigné la cuisine, Linda a reçu son premier smartphone en 2022 et y a découvert un plaisir tout simple : dessiner avec le doigt. Elle y cherche la beauté de la nature et des chats, avec des couleurs vibrantes et beaucoup de douceur.',
@@ -136,7 +136,7 @@ export const fr = {
     expoCta: 'Proposer un lieu',
     videoTitre: 'Les toiles en vidéo',
     videoFilm: 'Dessins et toiles en musique',
-    videoFilmAlt: 'film de 56 secondes : des dessins de Linda, puis ses toiles accrochées sur un mur dessiné, Tilleul, avec gros textes à l’écran et musique entraînante, sans voix',
+    videoFilmAlt: 'film de 58 secondes : des dessins de Linda et leurs univers, puis ses toiles accrochées dans un salon dessiné, Tilleul, avec gros textes à l’écran et musique entraînante, sans voix',
     videoVraies: 'Les vraies toiles, filmées une à une',
     videoVraiesAlt: 'vidéo de 49 secondes, avec de la musique : les 23 toiles posées dans une maison, filmées une à une',
   },
