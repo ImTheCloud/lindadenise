@@ -22,10 +22,16 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
   <section class="section videos-bande">
     <div class="contenu">
       <h2 class="centre apparait">{tt.videoTitre}</h2>
-      <figure class="video-toiles apparait">
-        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} son />
-        <figcaption>{tt.videoVraies}</figcaption>
-      </figure>
+      <div class="videos">
+        <figure class="videos__film apparait">
+          <Video lang={lang} nom={`toiles-${lang}`} largeur={1920} hauteur={1080} description={tt.videoFilmAlt} son />
+          <figcaption>{tt.videoFilm}</figcaption>
+        </figure>
+        <figure class="videos__vraies apparait">
+          <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={tt.videoVraiesAlt} son />
+          <figcaption>{tt.videoVraies}</figcaption>
+        </figure>
+      </div>
     </div>
   </section>
 
@@ -78,14 +84,21 @@ const rubriques = RUBRIQUES.map((r) => ({ code: r, nom: d.rubriques[r].court, no
   .coches li { position: relative; padding-left: 28px; line-height: 1.4; }
   .coches li::before { content: '✓'; position: absolute; left: 0; color: var(--orange-fonce); font-weight: 700; }
   .etapes-toiles { max-width: 980px; }
-  /* Le film des vraies toiles, en portrait */
+  /* Deux films à la même hauteur (--h) : le film large et celui des vraies toiles, en portrait, côte à côte. */
   .videos-bande h2 { margin: 0 0 24px; }
-  .video-toiles { box-sizing: border-box; width: 100%; max-width: 300px; margin: 0 auto; padding: 10px; background: var(--vert-pale); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
-  .video-toiles figcaption { padding: 8px 4px 0; text-align: center; font-family: var(--titre); font-size: 1.25rem; line-height: 1.2; text-wrap: balance; color: var(--vert-fonce); }
+  .videos { --h: 400px; display: grid; justify-content: center; justify-items: center; gap: 28px 32px; }
+  .videos figure { box-sizing: border-box; width: 100%; margin: 0; padding: 10px; background: var(--vert-pale); border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon); box-shadow: var(--ombre); }
+  .videos__vraies { max-width: 300px; }
+  .videos figcaption { width: 0; min-width: 100%; padding: 8px 4px 0; text-align: center; font-family: var(--titre); font-size: 1.25rem; color: var(--vert-fonce); }
   .expo { max-width: 760px; text-align: center; }
   .expo .chapeau { margin-inline: auto; }
   .expo__signature { font-family: var(--titre); font-size: 1.8rem; color: var(--orange-titre); margin: -6px 0 18px; }
   @media (min-width: 900px) {
     .infos { grid-template-columns: 1fr 1fr; }
+    .videos { grid-template-columns: max-content max-content; align-items: start; }
+    .videos__film :global(.video) { width: calc(var(--h) * 16 / 9); }
+    .videos figure { width: fit-content; }
+    .videos__vraies { max-width: none; }
+    .videos__vraies :global(.video) { width: calc(var(--h) * 478 / 850); }
   }
 </style>

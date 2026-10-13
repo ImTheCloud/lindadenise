@@ -8,9 +8,8 @@ interface Props {
   hauteur: number;
   description: string;
   son?: boolean;
-  bouton?: number; // hauteur du bouton de lecture sur l'affiche, en % (pour ne pas cacher un texte de l'affiche)
 }
-const { lang, nom, largeur, hauteur, description, son = false, bouton = 72 } = Astro.props;
+const { lang, nom, largeur, hauteur, description, son = false } = Astro.props;
 const v = t(lang).video;
 ---
 <div class="video" data-video={`/video/${nom}.mp4`} data-description={description} data-son={son ? '' : undefined} data-couper={v.couper} data-remettre={v.remettre} style={`aspect-ratio:${largeur} / ${hauteur}`}>
@@ -19,7 +18,7 @@ const v = t(lang).video;
       <source type="image/avif" srcset={`/video/${nom}.avif`} />
       <img src={`/video/${nom}.webp`} width={largeur} height={hauteur} alt="" loading="lazy" decoding="async" />
     </picture>
-    <span class="video__icone" style={`top:${bouton}%`} aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M14 9 L32 20 L14 31 Z" fill="currentColor" /></svg></span>
+    <span class="video__icone" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M14 9 L32 20 L14 31 Z" fill="currentColor" /></svg></span>
   </button>
 </div>
 <script>
@@ -56,7 +55,7 @@ const v = t(lang).video;
   .video :global(video) { object-fit: contain; background: #000; }
   .video__lancer { position: relative; padding: 0; border: 0; background: none; cursor: pointer; }
   .video__lancer img { object-fit: cover; }
-  .video__icone { position: absolute; left: 50%; translate: -50% -50%; display: grid; place-items: center; width: 84px; height: 84px; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+  .video__icone { position: absolute; left: 50%; top: 72%; translate: -50% -50%; display: grid; place-items: center; width: 84px; height: 84px; padding-left: 6px; border-radius: 55% 45% 52% 48% / 48% 54% 46% 52%; background: var(--orange-fonce); color: #fff; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
   .video__lancer:hover .video__icone, .video__lancer:focus-visible .video__icone { transform: scale(1.08) rotate(-4deg); }
   :global(.video__son) { margin: 10px auto 0; display: block; font-family: var(--titre); font-size: 1.15rem; padding: 6px 16px; color: var(--vert-fonce); background: #fff; border: var(--trait) solid var(--vert-fonce); border-radius: var(--rayon-petit); cursor: pointer; }
 </style>
