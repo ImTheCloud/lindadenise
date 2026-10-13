@@ -1,7 +1,7 @@
 # Musiques originales des vidéos, composées et synthétisées ici (numpy seulement, aucune bibliothèque sous licence).
 #   motion : la vidéo « Dessins et toiles » (motion design) : pop électro, 120 BPM, sol majeur (sol - ré - mi mineur - do).
-#            Une mesure = 2 s, un dessin ou une toile par mesure (58 s : 29 mesures). Intro, dessins puis mur, toiles une par une,
-#            pause pour Tilleul, montée, final.
+#            Une mesure = 2 s (56 s : 28 mesures, voir PLAN) : titre, mur de dessins, un dessin par univers, mur de toiles,
+#            une toile par univers, pause pour Tilleul, montée, final.
 #   reel   : la vidéo « Les vraies toiles » : pop acoustique chaloupée, 114,3 BPM (une mesure = 2,1 s = le rythme
 #            des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, basse, piano électrique,
 #            claquements de doigts. Volontairement simple et sec : pas de bruit de synthèse, pas d'écho.
@@ -131,19 +131,16 @@ def motion():
         [(0, 76, .5), (.5, 79, .5), (1, 83, 1), (2, 79, .5), (2.5, 76, .5), (3, 74, 1)],
         [(0, 76, .5), (.5, 74, .5), (1, 72, 1), (2, 79, 1), (3, 76, .5), (3.5, 74, .5)],
     ]
+    # le plan de la vidéo, une mesure par case : titre, mur de dessins (A), un dessin par univers (B), mur de toiles (A),
+    # une toile par univers (B), Tilleul (pause), montée, final
+    PLAN = ['intro'] * 2 + ['A'] * 6 + ['B'] * 5 + ['A'] * 6 + ['B'] * 4 + ['pause'] * 2 + ['montee', 'final', 'fin']
     nb = int(duree // BAR)
-
-    def section(b):
-        if b < 2: return 'intro'
-        if b < nb - 14: return 'A'      # les dessins, puis le mur et ses toiles qui défilent
-        if b < nb - 5: return 'B'       # les toiles une par une
-        if b < nb - 3: return 'pause'   # Tilleul
-        if b == nb - 3: return 'montee'
-        if b < nb - 1: return 'final'
-        return 'fin'
+    assert nb == len(PLAN), f'la musique dure {len(PLAN) * BAR:.0f} s'
+    change = lambda b: b == 0 or PLAN[b] != PLAN[b - 1]  # première mesure d'une partie
 
     for b in range(nb):
-        s = section(b); t0 = b * BAR; c = b % 4
+        s = PLAN[b]; t0 = b * BAR; c = b % 4
+        debut = max(d for d in range(b + 1) if change(d))
         # harmonie : accord tenu, arpège brillant
         poser('harm', nappe(ACC[c], BAR + 0.1), t0, 0, {'intro': 0.5, 'pause': 0.7}.get(s, 0.45))
         if s != 'fin':
@@ -184,11 +181,12 @@ def motion():
             poser('batt', montee(BAR), t0, 0, 0.75)
             for i in range(8): poser('batt', caisse_claire(), t0 + i * B / 2, 0, 0.3 + 0.06 * i)
             for i in range(16): poser('batt', caisse_claire(), t0 + 2 * B + i * B / 8, 0, 0.45 + 0.04 * i)
-        if b == 1 or b == nb - 15 or (s == 'B' and (b - (nb - 14)) % 4 == 3):  # roulement de caisse claire avant un changement
+        # roulement de caisse claire avant une partie A ou B, et toutes les quatre mesures d'une partie B
+        if (b + 1 < nb and change(b + 1) and PLAN[b + 1] in ('A', 'B')) or (s == 'B' and (b - debut) % 4 == 3):
             for i in range(8): poser('batt', caisse_claire(), t0 + 3 * B + i * B / 8, 0, 0.35 + 0.05 * i)
-        if b in (2, nb - 14, nb - 5, nb - 2):
+        if change(b) and s in ('A', 'B', 'pause', 'final'):
             poser('batt', cymbale(), t0, 0, 0.55)
-        if b in (2, nb - 2, nb - 1): poser('batt', impact(), t0, 0, 0.9)
+        if b == 2 or s in ('final', 'fin'): poser('batt', impact(), t0, 0, 0.9)
         if s == 'fin':
             kicks.append(t0); poser('batt', grosse_caisse(), t0, 0, 1.0)
             poser('harm', nappe([55, 59, 62, 67], duree - t0), t0, 0, 0.7)
