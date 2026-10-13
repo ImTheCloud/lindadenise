@@ -12,6 +12,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 
 ## Boutique Stripe : à prévoir pour les dessins ET les toiles
 - Seulement quand le statut légal de Linda est confirmé (Stripe Checkout, Bancontact).
+- Définition des fichiers vendus : tous les dessins reçus de Linda (WhatsApp) font 1080 × 1527 px, soit environ 130 ppp sur une feuille A4. À vérifier avec Claudiu avant la vente si c'est suffisant pour l'impression (sinon, demander à Linda ses fichiers d'origine ; aucun problème pour l'affichage sur le site).
 - **Toute commande (toile ou dessin numérique) envoie automatiquement un e-mail de confirmation au client** avec les détails : récapitulatif, montant, frais de livraison, délai, coordonnées de Linda ; pour une toile, le transporteur et le suivi.
 - Offre de lot : 5 achetées, la 6e offerte, calculée séparément pour les dessins numériques et pour les toiles. Toiles : livraison gratuite dès 2 toiles (12 € sinon), livraison par bpost en Belgique uniquement (adresse vérifiée). Une toile peut être refaite : pas de « vendue » automatique à prévoir sauf si Linda le demande (aujourd'hui à la main dans `src/data/toiles.json`). Les règles sont déjà dans `src/data/vente.ts` (`calculLot`, `calculPanier`).
 - Toiles sur commande : délai et prix réels à obtenir de Linda (`DELAI_TOILE_SUR_COMMANDE`).
