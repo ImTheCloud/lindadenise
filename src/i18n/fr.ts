@@ -83,7 +83,6 @@ export const fr = {
     surtitre: 'Toile sur aluminium',
     retour: '← Toutes les toiles',
     agrandir: 'Agrandir la toile',
-    autres: 'D’autres toiles à découvrir',
     vendue: 'Vendue',
     vendueTexte: 'Cette toile est vendue.',
     conditions: 'Conditions de vente des toiles',

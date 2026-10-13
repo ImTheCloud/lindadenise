@@ -84,7 +84,6 @@ export const nl: Dico = {
     surtitre: 'Doek op aluminium',
     retour: '← Alle doeken',
     agrandir: 'Vergroot het doek',
-    autres: 'Nog meer doeken om te ontdekken',
     vendue: 'Verkocht',
     vendueTexte: 'Dit doek is verkocht.',
     conditions: 'Verkoopvoorwaarden van de doeken',
