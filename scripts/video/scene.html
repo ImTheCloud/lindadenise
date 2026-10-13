@@ -77,7 +77,7 @@ const T = {
 const DESSINS_MUR = ['tiroux-et-les-arbres', 'tournesol', 'chapeau-de-soleil', 'paon-indien', 'tiroux-et-les-couleurs', 'trio-glaieuls',
   'time-grimpe', 'marrons', 'couleurs', 'soleil-couchant', 'arbre-rouge-et-lapins', 'trio-d-amaryllis'];
 const DESSINS_UNIVERS = [['time-au-clair-de-lune', 'chats'], ['l-ile-de-brehat', 'nature'], ['lys-tigre', 'fleurs'], ['coccinelles', 'animaux'], ['plante-pres-du-ruisseau', 'psaumes']];
-const TOILES_SALON = [['iris', 'le-tournesol', 'bouleaux-en-hiver'], ['tournesols', 'sweet', 'mauves']]; // deux trios au-dessus du canapé
+const TOILES_SALON = [['iris', 'le-tournesol', 'bouleaux-en-hiver'], ['tournesols', 'sweet', 'mauves']]; // au-dessus du buffet, puis du canapé
 
 // ---------- outils ----------
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -207,14 +207,15 @@ function titre(parent, texte, cx, cy, taille, largeurMax, remplir = BLANC) {
   return { g, maj: (p) => liste.forEach((x, j) => x.maj(prog(p, j * 0.3, j * 0.3 + 0.7))) };
 }
 
-// Légendes : quelques mots à la fois, en bas de l'image, qui sautent puis s'effacent juste avant la suivante (jamais de vide)
-function legendes(parent, morceaux) {
-  const cy = H - 118;
+// Légendes : quelques mots à la fois, qui sautent puis s'effacent juste avant la suivante (jamais de vide) ;
+// place(début) donne la hauteur, la taille et la largeur maximale du texte
+function legendes(parent, morceaux, place) {
   const liste = morceaux.map(([a, b, texte, accent]) => {
+    const { cy, taille, largeurMax } = place(a);
     const g = el('g', { display: 'none' }, parent);
-    return { a, b, g, n: texte.split(' ').length, m: mots(g, texte, W / 2, cy, 128, { remplir: accent ? ORANGE : BLANC }) };
+    return { a, b, g, cy, n: texte.split(' ').length, m: mots(g, texte, W / 2, cy, taille, { remplir: accent ? ORANGE : BLANC, largeurMax }) };
   });
-  return (t) => liste.forEach(({ a, b, g, n, m }) => {
+  return (t) => liste.forEach(({ a, b, g, cy, n, m }) => {
     const vis = t >= a && t < b;
     montrer(g, vis);
     if (!vis) return;
@@ -374,38 +375,68 @@ window.pret = (async () => {
       u.nom.g.setAttribute('opacity', opTexte.toFixed(3)); u.phrase.setAttribute('opacity', opTexte.toFixed(3));
     });
   }
-  // Un salon dessiné : le haut d'un canapé avec ses coussins, une lampe et une plante. Les coussins donnent l'échelle :
-  // une toile A3 (42 cm de haut) fait à peu près la taille d'un coussin.
-  function salon(parent) {
+  // Le salon, en deux temps : un buffet bas en bois (vase, livres, bougie) sous le premier trio de toiles, puis un canapé
+  // (dossier, accoudoirs, assise, pieds, deux coussins) sous le second. Même mur, même lampe, même plante. Les phrases passent
+  // sur le mur nu, entre les toiles et les meubles.
+  const contour = { stroke: VERT_NUIT, 'stroke-width': 6, 'stroke-linejoin': 'round' };
+  const lueur = el('radialGradient', { id: 'lueur' }, defs);
+  el('stop', { offset: 0, 'stop-color': '#ffe2a8', 'stop-opacity': 0.8 }, lueur);
+  el('stop', { offset: 1, 'stop-color': '#ffe2a8', 'stop-opacity': 0 }, lueur);
+  function buffet(parent) {
+    el('rect', { x: 430, y: 1000, width: 22, height: 44, rx: 4, fill: '#8a5a33' }, parent);
+    el('rect', { x: 1468, y: 1000, width: 22, height: 44, rx: 4, fill: '#8a5a33' }, parent);
+    el('rect', { x: 400, y: 862, width: 1120, height: 146, rx: 14, fill: '#e0a868', ...contour }, parent);
+    el('rect', { x: 380, y: 840, width: 1160, height: 32, rx: 10, fill: '#c98a4b', ...contour }, parent);
+    [0, 1, 2, 3].forEach((i) => {
+      const x = 420 + i * 272;
+      el('rect', { x, y: 888, width: 248, height: 100, rx: 10, fill: '#ebb87c', stroke: '#b9773e', 'stroke-width': 4 }, parent);
+      el('circle', { cx: x + (i % 2 ? 22 : 226), cy: 938, r: 8, fill: '#8a5a33' }, parent);
+    });
+    // un petit vase de fleurs, deux livres et une bougie
+    el('path', { d: 'M520,842 C480,842 480,790 505,778 L535,778 C560,790 560,842 520,842 Z', fill: '#7cc3a4', ...contour }, parent);
+    el('path', { d: 'M512,782 C502,770 488,762 470,756 M520,782 C528,770 545,760 570,754 M516,782 C516,775 516,768 518,758', stroke: '#2b6e3a', 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }, parent);
+    [[470, 756], [570, 754], [518, 756], [490, 766], [550, 765]].forEach(([x, y], i) => el('circle', { cx: x, cy: y, r: 13, fill: i % 2 ? '#F28A1E' : '#FFB347' }, parent));
+    el('rect', { x: 1300, y: 810, width: 170, height: 30, rx: 5, fill: '#3e9a47', stroke: VERT_NUIT, 'stroke-width': 4 }, parent);
+    el('rect', { x: 1310, y: 786, width: 150, height: 24, rx: 5, fill: '#F28A1E', stroke: VERT_NUIT, 'stroke-width': 4 }, parent);
+    el('rect', { x: 1365, y: 744, width: 40, height: 42, rx: 6, fill: '#fff', stroke: VERT_NUIT, 'stroke-width': 4 }, parent);
+    el('path', { d: 'M1385,742 C1375,728 1390,720 1385,708 C1400,720 1397,734 1385,742 Z', fill: '#FFB347' }, parent);
+  }
+  function canape(parent) {
+    const vert = '#6a9c76', clair = '#7fb08a', fonce = '#5a8a66';
+    [440, 1480].forEach((x) => el('path', { d: `M${x - 14},996 L${x + 14},996 L${x + 8},1042 L${x - 8},1042 Z`, fill: '#8a5a33' }, parent));
+    el('rect', { x: 470, y: 720, width: 980, height: 200, rx: 46, fill: vert, ...contour }, parent);
+    el('rect', { x: 500, y: 742, width: 452, height: 160, rx: 40, fill: clair, ...contour }, parent);
+    el('rect', { x: 968, y: 742, width: 452, height: 160, rx: 40, fill: clair, ...contour }, parent);
+    el('rect', { x: 450, y: 892, width: 1020, height: 70, rx: 24, fill: vert, ...contour }, parent);
+    el('rect', { x: 476, y: 876, width: 480, height: 62, rx: 24, fill: clair, ...contour }, parent);
+    el('rect', { x: 964, y: 876, width: 480, height: 62, rx: 24, fill: clair, ...contour }, parent);
+    el('rect', { x: 420, y: 950, width: 1080, height: 54, rx: 20, fill: fonce, ...contour }, parent);
+    el('rect', { x: 380, y: 800, width: 130, height: 204, rx: 56, fill: vert, ...contour }, parent);
+    el('rect', { x: 1410, y: 800, width: 130, height: 204, rx: 56, fill: vert, ...contour }, parent);
+    el('path', { d: 'M400,850 C420,830 470,830 490,850 M1430,850 C1450,830 1500,830 1520,850', stroke: fonce, 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }, parent);
+    el('rect', { x: 540, y: 770, width: 170, height: 150, rx: 34, fill: '#f6b26b', ...contour, transform: 'rotate(-8 625 845)' }, parent);
+    el('rect', { x: 1210, y: 770, width: 170, height: 150, rx: 34, fill: '#fde3c3', ...contour, transform: 'rotate(7 1295 845)' }, parent);
+  }
+  // une pièce : le mur, la lampe allumée, le meuble, la plante, et trois toiles qui s'accrochent l'une après l'autre
+  function piece(parent, meuble, noms, debut) {
     mur(parent, 0, 0, W, H);
-    const trait = { stroke: VERT_NUIT, 'stroke-width': 6, 'stroke-linejoin': 'round' };
-    const lueur = el('radialGradient', { id: 'lueur' }, defs);
-    el('stop', { offset: 0, 'stop-color': '#ffe2a8', 'stop-opacity': 0.8 }, lueur);
-    el('stop', { offset: 1, 'stop-color': '#ffe2a8', 'stop-opacity': 0 }, lueur);
     el('circle', { cx: 160, cy: 380, r: 300, fill: 'url(#lueur)' }, parent);
     el('ellipse', { cx: 160, cy: 1062, rx: 70, ry: 16, fill: '#5b4a3a' }, parent);
     el('path', { d: 'M160,1060 L160,380', stroke: '#5b4a3a', 'stroke-width': 10, 'stroke-linecap': 'round' }, parent);
-    el('path', { d: 'M70,390 L250,390 L205,270 L115,270 Z', fill: '#ffd59a', ...trait }, parent);
-    el('rect', { x: 150, y: 780, width: 190, height: 400, rx: 80, fill: '#6a9c76', ...trait }, parent);
-    el('rect', { x: 1580, y: 780, width: 190, height: 400, rx: 80, fill: '#6a9c76', ...trait }, parent);
-    el('rect', { x: 260, y: 700, width: 1400, height: 520, rx: 70, fill: '#7fb08a', ...trait }, parent);
-    [[340, '#f6b26b', -4], [760, '#fde3c3', 2], [1180, '#f6b26b', 5]].forEach(([x, c, a]) => {
-      el('rect', { x, y: 650, width: 400, height: 400, rx: 64, fill: c, ...trait, transform: `rotate(${a} ${x + 200} 850)` }, parent);
-    });
-    el('path', { d: 'M1720,880 L1860,880 L1840,1080 L1740,1080 Z', fill: '#c46b3a', ...trait }, parent);
+    el('path', { d: 'M70,390 L250,390 L205,270 L115,270 Z', fill: '#ffd59a', ...contour }, parent);
+    meuble(parent);
     [[-38, '#3e9a47'], [-12, '#2b6e3a'], [14, '#3e9a47'], [40, '#2b6e3a'], [-62, '#2b6e3a'], [64, '#3e9a47']].forEach(([a, c]) => {
       el('ellipse', { cx: 1790, cy: 760, rx: 34, ry: 120, fill: c, transform: `rotate(${a} 1790 880)` }, parent);
     });
-    const grainSalon = poussieres(parent, 20);
-    // deux trios de toiles accrochées au-dessus du canapé, l'un après l'autre
-    const trios = TOILES_SALON.map((noms, k) => noms.map((nom, i) => ({ t: toile(parent, nom, 290), x: [610, 960, 1310][i], debut: (k ? 40.4 : 34.4) + i * 0.7, pente: [-0.6, 0.4, -0.3][i] })));
+    el('path', { d: 'M1720,880 L1860,880 L1840,1080 L1740,1080 Z', fill: '#c46b3a', ...contour }, parent);
+    const grain = poussieres(parent, 20);
+    const trio = noms.map((nom, i) => ({ t: toile(parent, nom, 260), x: [630, 960, 1290][i], debut: debut + i * 0.7, pente: [-0.6, 0.4, -0.3][i] }));
     return (t) => {
-      grainSalon(t, 1);
-      trios.forEach((trio, k) => trio.forEach((a) => {
-        const op = k ? 1 : 1 - ss(prog(t, 39.9, 40.4));
-        montrer(a.t.g, t >= a.debut && op > 0);
-        a.t.maj({ x: a.x, y: 150, p: io(prog(t, a.debut, a.debut + 1.1)), b: t - a.debut - 1.1, pente: a.pente, opacite: op });
-      }));
+      grain(t, 1);
+      trio.forEach((a) => {
+        montrer(a.t.g, t >= a.debut);
+        a.t.maj({ x: a.x, y: 80, p: io(prog(t, a.debut, a.debut + 1.1)), b: t - a.debut - 1.1, pente: a.pente });
+      });
     };
   }
 
@@ -430,9 +461,11 @@ window.pret = (async () => {
   const annonce2 = mots(annonce, T.univers[1], W / 2, 640, 130);
   const dessinsUnivers = univers(blanc, DESSINS_UNIVERS, 19);
 
-  // 34 – 46 : le salon, les toiles s'y accrochent et se balancent
-  const salonG = el('g', {}, calques.scene);
-  const salonVie = salon(salonG);
+  // 34 – 46 : le salon, les toiles s'y accrochent et se balancent : le buffet (34 – 40,5), puis le canapé (40 – 46)
+  const buffetG = el('g', {}, calques.scene);
+  const buffetVie = piece(buffetG, buffet, TOILES_SALON[0], 34.4);
+  const canapeG = el('g', {}, calques.scene);
+  const canapeVie = piece(canapeG, canape, TOILES_SALON[1], 40.5);
 
   // 46 – 58 : la fin, sans toile : Tilleul arrive au bord de l'étang, quatre phrases du site, puis la signature de Linda Denise
   const fin = el('g', {}, calques.scene);
@@ -452,7 +485,7 @@ window.pret = (async () => {
   signature.textContent = 'Linda Denise';
   const trait = el('path', { d: 'M500,655 C720,695 1060,635 1320,662', fill: 'none', stroke: '#F28A1E', 'stroke-width': 9, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1 }, signatureG);
 
-  const legende = legendes(calques.texte, T.legendes);
+  const legende = legendes(calques.texte, T.legendes, (a) => (a >= 34 && a < 46.2 ? { cy: 615, taille: 118, largeurMax: 1300 } : { cy: H - 118, taille: 128, largeurMax: W - 240 }));
 
   const rendre = (t) => {
     // titre
@@ -477,11 +510,16 @@ window.pret = (async () => {
       }
       dessinsUnivers(t);
     }
-    // le salon (fondu depuis le dernier dessin)
-    montrer(salonG, t >= 33.4 && t < 46.2);
-    if (t >= 33.4 && t < 46.2) {
-      salonG.setAttribute('opacity', ss(prog(t, 33.4, 34.2)).toFixed(3));
-      salonVie(t);
+    // le salon : le buffet (fondu depuis le dernier dessin), puis le canapé en fondu par-dessus
+    montrer(buffetG, t >= 33.4 && t < 40.5);
+    if (t >= 33.4 && t < 40.5) {
+      buffetG.setAttribute('opacity', ss(prog(t, 33.4, 34.2)).toFixed(3));
+      buffetVie(t);
+    }
+    montrer(canapeG, t >= 40.0 && t < 46.2);
+    if (t >= 40.0 && t < 46.2) {
+      canapeG.setAttribute('opacity', ss(prog(t, 40.0, 40.5)).toFixed(3));
+      canapeVie(t);
     }
     // la fin
     montrer(fin, t >= 45.4);

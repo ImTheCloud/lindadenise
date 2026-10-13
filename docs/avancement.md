@@ -1,6 +1,14 @@
 # Avancement du projet (à lire en début de conversation, à mettre à jour en fin de session)
 
-Dernière mise à jour : 2026-10-13 (les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+Dernière mise à jour : 2026-10-13 (salon de la vidéo redessiné : voir la première section ; les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
+
+## Vidéo : salon redessiné (2026-10-13)
+
+Retour de Claudiu sur la vidéo : « beaucoup mieux », sauf le salon (le canapé ne ressemblait pas à un canapé, et les phrases passaient sur les coussins). Trois propositions en images (A : buffet bas, B : vrai canapé, C : une toile en grand) ; **il a choisi A puis B**.
+- 34–40,5 s : le **buffet bas en bois** (portes, petit vase de fleurs, deux livres et une bougie) sous le premier trio (Iris, Le tournesol, Bouleaux en hiver) ;
+- 40–46 s : fondu vers le **canapé redessiné** (dossier et ses deux coussins, assise, accoudoirs arrondis, socle, pieds en bois, deux petits coussins orange et crème) sous le second trio (Tournesols, Sweet, Mauves) ;
+- même mur, même lampe, même plante ; toiles un peu plus petites (260 px) et plus haut ; **les phrases passent sur le mur nu entre les toiles et le meuble** (hauteur 615, taille 118 ; `legendes()` reçoit la place de chaque phrase) ; textes inchangés.
+- Le reste de la vidéo est identique (58 s, même musique, mêmes affiches). Rendu FR et NL ; images de contrôle vues à 34,6, 37, 39,5, 40,25, 41,5 et 44,5 s.
 
 ## Plus de crème : fond blanc partout (2026-10-13)
 
