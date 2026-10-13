@@ -56,8 +56,8 @@ const jsonld = {
   )}
   <section class="section section--vert" id="toile">
     <div class="contenu">
-      <div class="option-toile cadre">
-        <div class="option-toile__image toile-crochet" aria-hidden="true">
+      <div class="option-toile cadre-toile" data-monde="toiles">
+        <div class="option-toile__image toile-alu" aria-hidden="true">
           <Apercu id={dessin.id} alt="" largeur={dessin.largeur} hauteur={dessin.hauteur} />
         </div>
         <div class="option-toile__texte">
@@ -107,7 +107,7 @@ const jsonld = {
   .option-toile__texte { display: grid; gap: 10px; justify-items: center; }
   .option-toile h2 { font-size: clamp(1.7rem, 1.4rem + 1.2vw, 2.3rem); margin: 0; }
   .option-toile p { margin: 0; max-width: 40ch; }
-  .option-toile__image :global(img) { width: 100%; height: auto; border-radius: 3px; box-shadow: 0 0 0 2px #c3c9cd, 0 8px 14px -4px rgba(60, 40, 20, 0.35); transform: rotate(-2deg); }
+  .option-toile__image :global(img) { display: block; width: 100%; height: auto; }
   .option-toile__nom { font-family: var(--titre); font-size: 1.3rem; color: var(--orange-fonce); }
   .option-toile__note { margin: 16px 0 0; font-size: 0.95rem; color: var(--encre-douce); }
   .option-toile .bouton { width: min(100%, 320px); justify-content: center; white-space: normal; }

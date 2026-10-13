@@ -140,13 +140,13 @@ h1, h2, h3, summary, legend, label, .bouton, .carte__titre, .carte__panier { tex
 .carte__image { position: relative; display: block; aspect-ratio: 5 / 7; overflow: hidden; border-radius: 12px 6px 12px 8px / 8px 12px 6px 12px; background: var(--vert-creme); }
 .carte__image picture { display: block; height: 100%; }
 .carte__image img { width: 100%; height: 100%; object-fit: cover; }
-/* Une toile : même carte, avec le bord d'aluminium */
-.carte--toile .carte__image { padding: 5px; border-radius: 4px; background: #e9ecee; box-shadow: inset 0 0 0 1px #c3c9cd; }
-.carte--toile .carte__image img { border-radius: 2px; box-shadow: 0 0 0 1px #9aa2a8; }
-/* Une toile se reconnaît à son petit clou gris, posé au-dessus du bord haut, comme dans la vidéo de l'accueil (cartes, fiches, porte, aperçu) */
-.toile-crochet { position: relative; }
-.carte--toile .carte__image, .porte--toiles .porte__image { overflow: visible; }
-.toile-crochet::after, .carte--toile .carte__image::after, .porte--toiles .porte__image::after { content: ''; position: absolute; top: -12px; left: 50%; width: 10px; height: 10px; translate: -50% 0; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff 0 14%, #a3a3a3 40%, #8c8c8c 100%); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); pointer-events: none; z-index: 2; }
+/* Une toile, partout pareil : une plaque d'aluminium autour de l'image, un crochet (clou, anneau et plaque vissée) posé sur son bord haut, le tout à l'intérieur d'un cadre brun clair (cartes, fiches, porte, aperçu). Le crochet dépasse de 12 px : le cadre garde donc 12 px de plus en haut. */
+.toile-alu, .carte--toile .carte__image, .porte--toiles .porte__image { position: relative; overflow: visible; padding: 5px; border-radius: 4px; background: #e9ecee; box-shadow: inset 0 0 0 1px #c3c9cd; }
+.toile-alu :is(img), .carte--toile .carte__image img, .porte--toiles .porte__image img { border-radius: 2px; box-shadow: 0 0 0 1px #9aa2a8; }
+.toile-alu::after, .carte--toile .carte__image::after, .porte--toiles .porte__image::after { content: ''; position: absolute; top: -12px; left: 50%; z-index: 2; width: 30px; height: 22px; translate: -50% 0; background: url('/images/crochet.svg') center / 100% 100% no-repeat; filter: drop-shadow(0 1px 1px rgba(40, 30, 20, 0.3)); pointer-events: none; }
+.cadre-toile { padding: 24px 12px 12px; background: #fff; border: var(--trait) solid var(--bord-carte); border-radius: var(--rayon); box-shadow: var(--ombre); }
+.carte--toile { padding-top: 22px; }
+.carte--toile .carte__etiquette { top: 34px; }
 .carte__etiquette { position: absolute; z-index: 2; left: calc(var(--trait) * -1); top: 22px; padding: 5px 14px 6px 12px; font-family: var(--titre); font-size: 1.15rem; line-height: 1.1; color: #fff; background: var(--accent); border-radius: 0 12px 12px 0; box-shadow: 0 2px 4px rgba(60, 40, 20, 0.3); pointer-events: none; }
 .carte__vendue { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 62px; height: 62px; font-family: var(--titre); font-size: 1.05rem; color: #fff; background: var(--encre-douce); border: 3px solid #fff; border-radius: 50%; transform: rotate(-8deg); }
 .carte--vendue .carte__image img { filter: grayscale(0.9) opacity(0.7); }
@@ -160,6 +160,8 @@ h1, h2, h3, summary, legend, label, .bouton, .carte__titre, .carte__panier { tex
 @media (max-width: 619px) {
   .carte__livraison { font-size: 0.82rem; gap: 4px; white-space: nowrap; }
   .carte { padding: 7px; }
+  .carte--toile { padding-top: 19px; }
+  .carte--toile .carte__etiquette { top: 28px; }
   .carte__titre { font-size: 1.3rem; }
   .carte__prix { font-size: 1.35rem; }
   .carte__etiquette { top: 16px; font-size: 1rem; }
