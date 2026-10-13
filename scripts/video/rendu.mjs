@@ -9,7 +9,7 @@
 //   node scripts/video/rendu.mjs fr /tmp/brut-fr.mp4
 //   python3 scripts/video/musique.py motion 58 /tmp/musique-motion.wav
 //   python3 scripts/video/assembler.py /tmp/brut-fr.mp4 /tmp/musique-motion.wav public/video/toiles-fr.mp4 24
-// NL : nl au lieu de fr, sortie toiles-nl.mp4. Affiches : l'image à 11 s (le mur des dessins), réduite à 960 × 540.
+// NL : nl au lieu de fr, sortie toiles-nl.mp4. Affiches : l'image à 2,5 s (le titre), réduite à 960 × 540 ; le bouton de lecture est posé sur l'étang (bouton={88}).
 // Images d'essai : node scripts/video/rendu.mjs fr essai 2,9.5,24  (PNG dans le dossier courant)
 import puppeteer from 'puppeteer-core';
 import { spawn, execSync } from 'node:child_process';
