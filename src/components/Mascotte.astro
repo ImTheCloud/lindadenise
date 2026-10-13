@@ -294,7 +294,8 @@ const donnees = JSON.stringify({ accueil: m.accueil, anecdotes: m.anecdotes, par
   .mascotte__bulle[hidden] { display: none; }
   .mascotte__bulle::after { content: ''; position: absolute; left: calc(var(--queue, 60px) - 9px); bottom: -14px; width: 18px; height: 18px; background: #fff; border-right: var(--trait) solid var(--vert-fonce); border-bottom: var(--trait) solid var(--vert-fonce); transform: rotate(45deg) skew(8deg, 8deg); }
   .mascotte__bulle.pop { animation: mascotte-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1); }
-  .mascotte__texte { position: relative; margin: 0; color: var(--encre); }
+  /* coupure des lignes simple et identique pour le texte caché et le texte écrit : « pretty » refait les dernières lignes et faisait sauter la fin */
+  .mascotte__texte { position: relative; margin: 0; color: var(--encre); text-wrap: wrap; }
   .mascotte__cache { opacity: 0; }
   .mascotte__vu { position: absolute; inset: 0; }
   /* Chemin vers la page de jeu, dans la bulle : discret sur la page de jeu elle-même (inutile) */
