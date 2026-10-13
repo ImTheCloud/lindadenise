@@ -169,7 +169,8 @@ const sources = (id: string, format: string) => [400, 800].map((l) => `/toiles/$
   .porte__cta { display: inline-flex; align-items: center; min-height: 48px; margin-top: 6px; padding: 0 1.3em; font-family: var(--titre); font-size: 1.35rem; color: var(--p); background: #fff; border-radius: var(--rayon-petit); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
 
   /* Une rangée par monde : mêmes éléments, mêmes places */
-  .rangee { background: var(--fond); }
+  /* Le crème de la rangée des toiles s'estompe vers le blanc des rangées voisines */
+  .rangee { background: linear-gradient(to bottom, #fff 0, var(--fond) var(--fondu), var(--fond) calc(100% - var(--fondu)), #fff 100%); }
   .rangee__tete { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: clamp(10px, 2vw, 18px); }
   .rangee__tete h2 { font-size: clamp(2rem, 1.5rem + 2vw, 3rem); margin: 0; }
   .rangee__lien { flex: none; font-family: var(--titre); font-size: 1.35rem; color: var(--vert-fonce); text-underline-offset: 5px; }

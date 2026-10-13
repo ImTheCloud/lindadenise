@@ -38,6 +38,7 @@
   --monde-dessins: #2b6e3a;
   --monde-toiles: #d9700b;
   --fond: #fff;
+  --fondu: 90px; /* hauteur du fondu entre une section blanche et une section crème */
 }
 
 /* Le monde des toiles reprend exactement les mêmes variables, en brun terre et crème : tout ce qui s'appuie sur elles change seul */
@@ -90,8 +91,9 @@ h1, h2, h3, summary, legend, label, .bouton, .carte__titre, .carte__panier { tex
 
 .contenu { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gouttiere); }
 .section { padding-block: clamp(28px, 4.5vw, 56px); position: relative; }
-.section--vert { background: var(--vert-creme); }
-.section--orange { background: var(--orange-creme); }
+/* Le crème s'estompe vers le fond de page aux deux bords : pas de trait entre deux sections */
+.section--vert { background: linear-gradient(to bottom, var(--fond) 0, var(--vert-creme) var(--fondu), var(--vert-creme) calc(100% - var(--fondu)), var(--fond) 100%); }
+.section--orange { background: linear-gradient(to bottom, var(--fond) 0, var(--orange-creme) var(--fondu), var(--orange-creme) calc(100% - var(--fondu)), var(--fond) 100%); }
 .centre { text-align: center; }
 .chapeau { font-size: 1.15em; color: var(--encre-douce); max-width: 56ch; }
 .centre .chapeau { margin-inline: auto; }

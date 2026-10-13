@@ -2,6 +2,10 @@
 
 Dernière mise à jour : 2026-10-13 (les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Fondus entre blanc et crème (2026-10-13)
+
+Demande de Claudiu : plus de trait net entre le fond blanc et le crème (rangée « Toiles à découvrir » de l'accueil, sections vertes et crème des fiches). Le crème s'estompe maintenant vers le blanc sur 90 px aux deux bords (`--fondu` dans `global.css`, `.section--vert` et `.section--orange` ; `.rangee` dans `PageAccueil.astro`). Vérifié sur l'accueil et une fiche à 375 px. **À voir** : sur une fiche à 375 px, le bouton « Ajouter cette toile au panier » déborde à droite (page plus large que l'écran, 470 px) : à corriger.
+
 ## Branches réunies dans main (2026-10-13)
 
 Demande de Claudiu : tout mettre dans `main`, tout à son nom, ne garder que `main`.
