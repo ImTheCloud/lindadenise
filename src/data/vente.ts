@@ -10,7 +10,7 @@ export const TOILES_ACHETEES = 5;
 export const DESSINS_ACHETES = 5;
 // Délais donnés par Linda : livraison par bpost d'une toile déjà imprimée, création et livraison d'une toile sur commande.
 export const DELAI_ENVOI = { fr: '1 à 2 semaines', nl: '1 tot 2 weken' };
-export const DELAI_TOILE_SUR_COMMANDE = { fr: 'environ 1 à 3 semaines, création et envoi compris', nl: 'ongeveer 1 tot 3 weken, aanmaak en verzending inbegrepen' };
+export const DELAI_TOILE_SUR_COMMANDE = { fr: 'environ 1 à 3 semaines pour la création et la livraison', nl: 'ongeveer 1 tot 3 weken voor de aanmaak en de levering' };
 
 export function calculLot(nombre: number) {
   const sousTotal = nombre * PRIX_TOILE;
