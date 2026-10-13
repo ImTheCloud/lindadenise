@@ -1,422 +1,277 @@
 <!doctype html>
-<!-- Scène de la vidéo « Les toiles » (16:9, 44 s) : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
+<!-- Scène de la vidéo du site (carrée, 57 s) : rendue image par image par rendu.mjs (voir l'en-tête de ce fichier-là). -->
 <html>
 <head>
 <meta charset="utf-8">
 <style>
-  @font-face { font-family: 'Lilita One'; src: url('./polices/lilita-one-latin-400-normal.woff2') format('woff2'); }
+  /* Polices du site (Fontsource, installées par npm). Le « z » de Gochi Hand ressemble à un « 3 » : il est pris dans Itim, comme sur le site. */
+  @font-face { font-family: 'Gochi Hand'; src: url('../../node_modules/@fontsource/gochi-hand/files/gochi-hand-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Itim'; src: url('../../node_modules/@fontsource/itim/files/itim-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Titre z'; src: url('../../node_modules/@fontsource/itim/files/itim-latin-400-normal.woff2') format('woff2'); unicode-range: U+007A; }
+  :root {
+    --orange-fonce: #b05200; --orange-titre: #e0780c; --vert: #3e9a47; --vert-fonce: #2b6e3a; --encre: #2b3b2b;
+    --titre: 'Titre z', 'Gochi Hand', cursive; --texte: 'Itim', sans-serif;
+  }
   html, body { margin: 0; padding: 0; background: #fff; overflow: hidden; }
+  #scene { position: relative; width: 1080px; height: 1080px; overflow: hidden; background: #fff; }
+  #scene > *, .plan > * { position: absolute; }
   svg { display: block; }
-  text { font-family: 'Lilita One'; }
+  .decor { left: 0; top: 0; }
+
+  /* Carte d'une œuvre : la carte blanche au bord vert du site (global.css, .carte), agrandie pour une image de 1080 px */
+  .carte { left: 50%; top: 28px; translate: -50% 0; padding: 22px; background: #fff; border: 7px solid var(--vert-fonce); border-radius: 56px 24px 48px 28px / 28px 52px 24px 56px; box-shadow: 0 12px 0 rgba(43, 110, 58, 0.12); }
+  .carte__image { position: relative; width: 432px; height: 611px; }
+  .carte__image img { display: block; width: 432px; height: 611px; object-fit: cover; border-radius: 24px 12px 24px 16px / 16px 24px 12px 24px; }
+  .carte__image .film { display: none; border-radius: 8px; }
+  /* une toile : bord d'aluminium du site (global.css, .carte--toile), sans verre ni reflet */
+  .carte--toile .carte__image img { border-radius: 6px; background: #dfe3e6; box-shadow: 0 0 0 2px #c3c9cd, 0 0 0 6px #eef1f3, 0 0 0 9px #9aa2a8, 0 18px 30px -12px rgba(60, 40, 20, 0.35); }
+  .carte__etiquette { position: absolute; left: -14px; top: 22px; padding: 6px 26px 9px; font: 40px/1.1 var(--titre); color: #fff; background: var(--vert-fonce); border: 4px solid #fff; border-radius: 0 22px 22px 0; box-shadow: 0 4px 8px rgba(60, 40, 20, 0.3); }
+  .carte--toile .carte__etiquette, .carte--film .carte__etiquette { background: var(--orange-fonce); }
+
+  /* Textes sous l'œuvre : une ligne de titre (Gochi Hand), puis une ou deux phrases (Itim) */
+  .l1, .l2 { left: 50px; width: 980px; margin: 0; text-align: center; text-wrap: balance; }
+  .l1 { font: 96px/1 var(--titre); color: var(--vert-fonce); }
+  .l1--rubrique { color: var(--orange-titre); }
+  .l2 { font: 58px/1.18 var(--texte); color: var(--encre); white-space: pre-line; }
+  .nom .vert { color: var(--vert); } .nom .orange { color: var(--orange-titre); }
+
+  /* Fin */
+  .fin__logo { left: 50%; top: 70px; translate: -50% 0; width: 150px; height: 150px; }
+  .fin__nom { top: 250px; font-size: 150px; }
+  .fin__message { top: 430px; }
+  .fin__appel { top: 600px; font-size: 84px; color: var(--orange-fonce); }
+  .tilleul { left: 0; top: 0; width: 1080px; height: 280px; transform-origin: 100% 100%; }
 </style>
 </head>
 <body>
-<svg id="racine" xmlns="http://www.w3.org/2000/svg"></svg>
+<div id="scene"></div>
 <script>
 const P = new URLSearchParams(location.search);
 const LANG = P.get('lang') || 'fr';
-const W = 1920, H = 1080;
+const FILM = P.get('film'); // dossier des images du plan filmé (préparées par rendu.mjs)
+const W = 1080, H = 1080;
 const REPO = new URL('../..', location.href).href.replace(/\/$/, '');
 const NS = 'http://www.w3.org/2000/svg';
-const racine = document.getElementById('racine');
-racine.setAttribute('width', W); racine.setAttribute('height', H); racine.setAttribute('viewBox', `0 0 ${W} ${H}`);
+const scene = document.getElementById('scene');
 
-const BLANC = '#fff', ORANGE = '#FFA52E', VERT_NUIT = '#1f5a2e';
-
-// Textes (à l'écran : ni prix ni remise, rien sur Ostende). Légendes : [début, fin, texte, mis en avant].
+// Textes à l'écran, tous repris du site (src/i18n/fr.ts et nl.ts) ; titres des dessins dans src/data/dessins.json.
+// Ni prix, ni remise, ni chiffres qui vieillissent, ni Ostende.
 const T = {
   fr: {
-    titre: 'Les toiles', sous: 'de Linda Denise', fin: 'Les toiles',
-    legendes: [
-      [4.5, 5.5, 'Des dessins', false], [5.5, 7.0, 'faits à la main', true],
-      [7.5, 8.5, 'imprimés', false], [8.5, 10.0, 'sur aluminium', true],
-      [10.5, 11.5, 'Format A3', false], [11.5, 13.3, 'Chaque toile est unique', true],
-    ],
+    ouverture: 'Dessins numériques faits à la main', // meta.description
+    bonjour: 'Bonjour, je suis Linda', belgique: 'Je vis en Belgique.', // page À propos (mots de Linda)
+    smartphone: 'En 2022, j’ai eu mon premier smartphone.', depuis: 'Depuis, j’adore dessiner.',
+    beaute: 'Je cherche à dessiner la beauté de la nature et des chats.',
+    rubriques: { chats: 'Les chats', nature: 'La nature', fleurs: 'Les fleurs', animaux: 'Les animaux', psaumes: 'Les psaumes' },
+    versets: 'Des versets mis en dessin par Linda', // rubrique Psaumes
+    dessin: 'Dessin', toile: 'Toile', toiles: 'Les toiles',
+    aluminium: 'Des dessins imprimés sur aluminium', // page Toiles (meta)
+    unique: 'Chaque toile déjà imprimée est une pièce unique.', // conditions de vente des toiles
+    commande: 'Toile sur commande', enGrand: 'Un dessin vous plaît en grand ?', imprimer: 'Linda peut le faire imprimer en toile.', // panier, Tilleul
+    message: 'Linda répond elle-même\nà chaque message.', ecrire: 'Écrivez-lui !', // Tilleul
   },
   nl: {
-    titre: 'De doeken', sous: 'van Linda Denise', fin: 'De doeken',
-    legendes: [
-      [4.5, 5.5, 'Tekeningen', false], [5.5, 7.0, 'met de hand gemaakt', true],
-      [7.5, 8.5, 'gedrukt', false], [8.5, 10.0, 'op aluminium', true],
-      [10.5, 11.5, 'A3-formaat', false], [11.5, 13.3, 'Elk doek is uniek', true],
-    ],
+    ouverture: 'Digitale tekeningen, met de hand gemaakt',
+    bonjour: 'Hallo, ik ben Linda', belgique: 'Ik woon in België.',
+    smartphone: 'In 2022 kreeg ik mijn eerste smartphone.', depuis: 'Sindsdien teken ik met veel plezier.',
+    beaute: 'Ik probeer de schoonheid van de natuur en van katten te tekenen.',
+    rubriques: { chats: 'De katten', nature: 'De natuur', fleurs: 'De bloemen', animaux: 'De dieren', psaumes: 'De psalmen' },
+    versets: 'Verzen getekend door Linda',
+    dessin: 'Tekening', toile: 'Doek', toiles: 'De doeken',
+    aluminium: 'Tekeningen gedrukt op aluminium',
+    unique: 'Elk doek dat al gedrukt is,\nis een uniek stuk.',
+    commande: 'Doek op bestelling', enGrand: 'Wil je een tekening in het groot?', imprimer: 'Linda kan ze als doek laten drukken.',
+    message: 'Linda beantwoordt zelf\nelk bericht.', ecrire: 'Schrijf haar!',
   },
 }[LANG];
+const dessins = (() => { const x = new XMLHttpRequest(); x.open('GET', `${REPO}/src/data/dessins.json`, false); x.send(); return JSON.parse(x.responseText); })();
+const titre = (id) => dessins.find((d) => d.id === id).titre[LANG].replace(/'/g, '’');
+const R = T.rubriques;
 
-// Les 23 toiles (titres tirés du site) : 14 au mur de la galerie, 9 montrées une à une
-const donnees = (() => { const x = new XMLHttpRequest(); x.open('GET', `${REPO}/src/data/toiles.json`, false); x.send(); return JSON.parse(x.responseText); })();
-const titreToile = (id) => donnees.find((x) => x.id === id).titre[LANG].replace(/'/g, '’');
-const GALERIE = ['frangipanier', 'iris', 'mauves', 'le-tournesol', 'bouleaux-en-hiver', 'chat-a-l-ile-de-brehat', 'tournesols', 'sweet', 'jonquilles',
-  'fleurs-bleues', 'le-chemin-de-foret', 'montagne-et-tournesols', 'sous-bois', 'time-s-amuse'];
-const UNE_A_UNE = ['bois-de-hal', 'chat-au-repos', 'vieux-cerisier', 'time-gambade', 'l-oiseau', 'printemps', 'chats-camoufles', 'narcisses', 'la-cloture'];
+// Déroulé : une mesure de musique = 3 s ; chaque changement tombe au début d'une mesure, fondu enchaîné de 0,6 s.
+// art : un dessin, la toile filmée ou une photo de toile ; l1 : ligne de titre ; l2 : phrases ; ajout : phrase qui s'ajoute en cours de plan.
+const PLANS = [
+  { a: 0, b: 3, art: { dessin: 'tiroux-et-les-arbres' }, nom: true, l2: [T.ouverture] },
+  { a: 3, b: 6, art: { dessin: 'chapeau-de-soleil' }, l1: T.bonjour, l2: [T.belgique] },
+  { a: 6, b: 12, art: { dessin: 'couleurs' }, l2: [T.smartphone], ajout: [9, T.depuis] },
+  { a: 12, b: 18, art: { dessin: 'tiroux-et-les-couleurs' }, l2: [T.beaute] },
+  { a: 18, b: 21, art: { dessin: 'time-au-clair-de-lune' }, l1: R.chats, rubrique: true, l2: [titre('time-au-clair-de-lune')] },
+  { a: 21, b: 24, art: { dessin: 'time-grimpe' }, l1: R.chats, rubrique: true, l2: [titre('time-grimpe')] },
+  { a: 24, b: 27, art: { dessin: 'l-ile-de-brehat' }, l1: R.nature, rubrique: true, l2: [titre('l-ile-de-brehat')] },
+  { a: 27, b: 30, art: { dessin: 'marrons' }, l1: R.nature, rubrique: true, l2: [titre('marrons')] },
+  { a: 30, b: 33, art: { dessin: 'lys-tigre' }, l1: R.fleurs, rubrique: true, l2: [titre('lys-tigre')] },
+  { a: 33, b: 36, art: { dessin: 'coccinelles' }, l1: R.animaux, rubrique: true, l2: [titre('coccinelles')] },
+  { a: 36, b: 39, art: { dessin: 'plante-pres-du-ruisseau' }, l1: R.psaumes, rubrique: true, l2: [T.versets] }, // titre du psaume pas encore validé : non affiché
+  { a: 39, b: 42, art: { film: true }, l1: T.toiles, l2: [T.aluminium] },
+  { a: 42, b: 45, art: { toile: 'mauves' }, l1: T.toiles, l2: [T.unique] },
+  { a: 45, b: 51, art: { dessin: 'trio-glaieuls' }, l1: T.commande, l2: [T.enGrand], ajout: [48, T.imprimer] },
+  { a: 51, b: 57, fin: true },
+];
+const DUREE = 57, FONDU = 0.6;
+const FILM_IMAGES = 63; // 2,1 s filmées à 30 images/s, montrées au ralenti pendant que la toile est à l'écran (3,6 s)
 
-// ---------- outils ----------
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 const prog = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
-const io = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
-const ss = (x) => x * x * (3 - 2 * x); // fondu doux, sans à-coup au début ni à la fin
-const sinus = (x) => 0.5 - 0.5 * Math.cos(Math.PI * x);
-const out = (x) => 1 - Math.pow(1 - x, 3);
-const outBack = (x) => { const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
-function el(tag, attrs = {}, parent = racine) {
-  const e = document.createElementNS(NS, tag);
+const ss = (x) => x * x * (3 - 2 * x); // fondu doux
+function el(tag, attrs = {}, parent = scene, texte) {
+  const e = tag.startsWith('svg:') ? document.createElementNS(NS, tag.slice(4)) : document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (texte !== undefined) e.textContent = texte;
   if (parent) parent.appendChild(e);
   return e;
 }
-let uid = 0;
-const id = (p) => `${p}${uid++}`;
-const montrer = (g, v) => g.setAttribute('display', v ? 'inline' : 'none');
 
-const defs = el('defs');
-// texture d'enduit, calculée une seule fois
-function texture() {
-  const c = document.createElement('canvas'); c.width = c.height = 256;
-  const x = c.getContext('2d'); const img = x.createImageData(256, 256);
-  for (let i = 0; i < img.data.length; i += 4) { const v = 200 + Math.random() * 55; img.data[i] = v; img.data[i + 1] = v * 0.96; img.data[i + 2] = v * 0.88; img.data[i + 3] = 22; }
-  x.putImageData(img, 0, 0); return c.toDataURL();
-}
-const motif = el('pattern', { id: 'enduit', width: 256, height: 256, patternUnits: 'userSpaceOnUse' }, defs);
-el('image', { href: texture(), width: 256, height: 256 }, motif);
-const ombre = el('filter', { id: 'ombre', x: '-20%', y: '-15%', width: '140%', height: '145%' }, defs);
-el('feDropShadow', { dx: 0, dy: 14, stdDeviation: 16, 'flood-color': '#3a2a18', 'flood-opacity': 0.32 }, ombre);
-const flou = el('filter', { id: 'flou', x: '-50%', y: '-50%', width: '200%', height: '200%' }, defs);
-el('feGaussianBlur', { stdDeviation: 6 }, flou);
-const gLumiere = el('radialGradient', { id: 'lumiere', cx: 0.5, cy: 0, r: 0.75 }, defs);
-el('stop', { offset: 0, 'stop-color': '#fffaf0', 'stop-opacity': 0.95 }, gLumiere);
-el('stop', { offset: 1, 'stop-color': '#fffaf0', 'stop-opacity': 0 }, gLumiere);
-
-// Une toile accrochée à un clou : se peint au pinceau, puis se balance doucement.
-function toile(parent, nom, largeur) {
-  const l = largeur, h = Math.round(largeur * 420 / 297);
-  const g = el('g', {}, parent);
-  const corps = el('g', { filter: 'url(#ombre)' }, g);
-  const masque = el('mask', { id: id('m'), maskUnits: 'userSpaceOnUse', x: -l, y: -h * 0.2, width: l * 3, height: h * 1.6 }, defs);
-  // trait de pinceau en zigzag qui couvre la toile
-  const rangs = 5, ep = h / rangs * 1.5;
-  let d = '';
-  for (let i = 0; i < rangs; i++) {
-    const y = 18 + h * (i + 0.5) / rangs;
-    const [a, b] = i % 2 ? [l * 1.08 - l / 2, -l * 1.08 + l / 2] : [-l * 0.58, l * 0.58];
-    d += (i ? ` L${a},${y}` : `M${a},${y}`) + ` Q${(a + b) / 2},${y + (i % 2 ? -18 : 18)} ${b},${y}`;
-  }
-  const trait = el('path', { d, fill: 'none', stroke: '#fff', 'stroke-width': ep, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1 }, masque);
-  const peint = el('g', { mask: `url(#${masque.id})` }, corps);
-  el('rect', { x: -l / 2 - 3, y: 15, width: l + 6, height: h + 6, rx: 3, fill: '#c9ced2' }, peint);
-  el('image', { href: `${REPO}/public/toiles/${nom}-800.webp`, x: -l / 2, y: 18, width: l, height: h, preserveAspectRatio: 'xMidYMid slice' }, peint);
-  el('rect', { x: -l / 2, y: 18, width: l, height: h, fill: 'none', stroke: '#9aa2a8', 'stroke-width': 2 }, peint);
-  const clou = el('g', {}, g);
-  el('circle', { cx: 1.5, cy: 3, r: 7, fill: '#000', opacity: 0.18, filter: 'url(#flou)' }, clou);
-  el('circle', { cx: 0, cy: 0, r: 6.5, fill: '#9a9a9a' }, clou);
-  el('circle', { cx: -1.8, cy: -1.8, r: 2.6, fill: '#fff', opacity: 0.85 }, clou);
-  return {
-    l, h, g,
-    // p : avancement du pinceau (0 à 1), b : temps depuis la fin de la peinture (balancement : il ne bouge pas avant)
-    maj({ x, y, p = 1, b = 99, echelle = 1, pente = 0, opacite = 1 }) {
-      const angle = pente + 4.5 * Math.exp(-Math.max(0, b) / 0.9) * Math.cos(Math.max(0, b) * 5.2);
-      g.setAttribute('transform', `translate(${x.toFixed(2)},${y.toFixed(2)}) scale(${echelle.toFixed(4)})`);
-      g.setAttribute('opacity', opacite.toFixed(3));
-      corps.setAttribute('transform', `rotate(${angle.toFixed(3)})`);
-      trait.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
-      clou.setAttribute('opacity', p > 0 ? 1 : 0);
-    },
-  };
-}
-
-// ---------- gros textes (style des vidéos courtes : gros titres qui sautent, mot après mot) ----------
-// Chaque mot est dessiné deux fois (ombre dure, puis le mot avec son contour) et « saute » à son tour.
-function mots(parent, texte, cx, cy, taille, { remplir = BLANC, contour = VERT_NUIT, largeurMax = W - 240 } = {}) {
-  const g = el('g', {}, parent);
-  const liste = texte.split(' ');
-  const sonde = el('text', { 'font-size': taille }, g);
-  const larg = liste.map((m) => { sonde.textContent = m; return sonde.getComputedTextLength(); });
-  g.removeChild(sonde);
-  const espace = taille * 0.28;
-  const total = larg.reduce((a, b) => a + b, 0) + espace * (liste.length - 1);
-  const k = Math.min(1, largeurMax / total);
-  const t2 = taille * k;
-  let x = cx - total * k / 2;
-  const motsListe = liste.map((m, i) => {
-    const mx = x + larg[i] * k / 2; x += (larg[i] + espace) * k;
-    const mg = el('g', { opacity: 0 }, g);
-    const attrs = { x: 0, y: 0, 'font-size': t2, 'text-anchor': 'middle', 'stroke-linejoin': 'round', 'stroke-width': t2 * 0.18, 'paint-order': 'stroke' };
-    el('text', { ...attrs, fill: contour, stroke: contour, transform: `translate(0,${t2 * 0.08})` }, mg).textContent = m;
-    el('text', { ...attrs, fill: Array.isArray(remplir) ? remplir[i] : remplir, stroke: contour }, mg).textContent = m;
-    return { mg, mx, rot: i % 2 ? 3 : -3 };
-  });
-  return {
-    g,
-    maj(p) { // p : 0 (rien) à 1 (tous les mots posés)
-      const n = motsListe.length;
-      motsListe.forEach((w, i) => {
-        const q = prog(p, (i / n) * 0.55, (i / n) * 0.55 + 0.45);
-        w.mg.setAttribute('opacity', Math.min(1, q * 5).toFixed(3));
-        w.mg.setAttribute('transform', `translate(${w.mx.toFixed(1)},${(cy + (1 - q) * 46).toFixed(1)}) rotate(${(w.rot * (1 - q)).toFixed(2)}) scale(${Math.max(0, outBack(q)).toFixed(4)})`);
-      });
-    },
-  };
-}
-
-// Un titre sur une ou deux lignes (coupé au mot qui équilibre les deux lignes)
-function titre(parent, texte, cx, cy, taille, largeurMax, remplir = BLANC) {
-  const g = el('g', {}, parent);
-  const m = texte.split(' ');
-  let lignes = [texte];
-  if (texte.length > 13 && m.length > 1) {
-    let meilleur = 1;
-    for (let s = 1; s < m.length; s++) if (Math.abs(m.slice(0, s).join(' ').length - m.slice(s).join(' ').length) < Math.abs(m.slice(0, meilleur).join(' ').length - m.slice(meilleur).join(' ').length)) meilleur = s;
-    lignes = [m.slice(0, meilleur).join(' '), m.slice(meilleur).join(' ')];
-  }
-  const liste = lignes.map((l, j) => mots(g, l, cx, cy + (j - (lignes.length - 1) / 2) * taille * 1.02, taille, { largeurMax, remplir }));
-  return { g, maj: (p) => liste.forEach((x, j) => x.maj(prog(p, j * 0.3, j * 0.3 + 0.7))) };
-}
-
-// Légendes : quelques mots à la fois, en bas de l'image, qui sautent puis s'effacent
-function legendes(parent, morceaux) {
-  const cy = H - 118;
-  const liste = morceaux.map(([a, b, texte, accent]) => {
-    const g = el('g', { display: 'none' }, parent);
-    return { a, b, g, n: texte.split(' ').length, m: mots(g, texte, W / 2, cy, 128, { remplir: accent ? ORANGE : BLANC }) };
-  });
-  return (t) => liste.forEach(({ a, b, g, n, m }) => {
-    const vis = t >= a && t < b;
-    montrer(g, vis);
-    if (!vis) return;
-    m.maj(prog(t, a, a + 0.16 + 0.1 * n));
-    const s = ss(prog(t, b - 0.2, b));
-    g.setAttribute('opacity', (1 - s).toFixed(3));
-    g.setAttribute('transform', `translate(${W / 2},${cy - 45}) scale(${(1 + 0.06 * s).toFixed(4)}) translate(${-W / 2},${-(cy - 45)})`);
-  });
-}
-
-// ---------- décor ----------
+// ---------- décor : feuilles de tilleul qui tombent doucement sur les côtés, étang et lotus en bas ----------
 const FEUILLE = 'M50,6 C64,28 88,40 83,64 C80,80 62,85 50,75 C38,85 20,80 17,64 C12,40 36,28 50,6 Z';
-function feuilles(parent, n, seed) {
+function feuilles(parent) {
   const liste = [];
-  for (let i = 0; i < n; i++) {
-    const g = el('g', {}, parent);
-    const c = ['#3E9A47', '#F28A1E', '#FFB347', '#2B6E3A'][(i + seed) % 4];
-    el('path', { d: FEUILLE, fill: c }, g);
-    el('path', { d: 'M50,74 L50,26 M50,56 L36,42 M50,56 L64,42', stroke: '#fff', 'stroke-width': 4, 'stroke-linecap': 'round', fill: 'none', opacity: 0.6 }, g);
-    const k = (i * 9301 + seed * 49297) % 233280 / 233280;
-    liste.push({ g, x0: (i + 0.5) / n * W + (k - 0.5) * 120, taille: 0.45 + k * 0.45, vitesse: 70 + k * 60, dephasage: k * 30, dx: 40 + k * 60 });
+  const COUL = ['#3E9A47', '#F28A1E', '#FFB347', '#2B6E3A'];
+  for (let i = 0; i < 8; i++) {
+    const k = ((i * 9301 + 4927) % 233280) / 233280;
+    const g = el('svg:g', {}, parent);
+    el('svg:path', { d: FEUILLE, fill: COUL[i % 4] }, g);
+    el('svg:path', { d: 'M50,74 L50,26 M50,56 L36,42 M50,56 L64,42', stroke: '#fff', 'stroke-width': 4, 'stroke-linecap': 'round', fill: 'none', opacity: 0.6 }, g);
+    const gauche = i % 2 === 0;
+    liste.push({ g, x0: gauche ? 40 + k * 170 : 870 + k * 170, taille: 0.38 + k * 0.2, vitesse: 34 + k * 22, dephasage: k * 40 + i * 3.1, dx: 20 + k * 25 });
   }
   return (t) => liste.forEach((f) => {
-    const y = ((t * f.vitesse + f.dephasage * 37) % (H + 200)) - 100;
-    const x = f.x0 + Math.sin(t * 0.9 + f.dephasage) * f.dx;
-    f.g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${(t * 40 + f.dephasage * 20) % 360} ) scale(${f.taille}) translate(-50,-50)`);
+    const course = 820;
+    const y = ((t * f.vitesse + f.dephasage * 37) % course) - 80;
+    const x = f.x0 + Math.sin(t * 0.8 + f.dephasage) * f.dx;
+    f.g.setAttribute('opacity', (1 - ss(prog(y, 600, 700))).toFixed(3)); // s'effacent avant la zone des textes
+    f.g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${((t * 30 + f.dephasage * 20) % 360).toFixed(1)}) scale(${f.taille.toFixed(3)}) translate(-50,-50)`);
   });
 }
-
 const PET = 'M0,0 C-27,-18 -29,-60 0,-94 C29,-60 27,-18 0,0 Z';
 const PETALES = [[-80, 0.78, '#FFB347'], [80, 0.78, '#FFB347'], [-52, 0.92, '#F28A1E'], [52, 0.92, '#F28A1E'], [-24, 1, '#F7992B'], [24, 1, '#F7992B'], [0, 1.06, '#F28A1E']];
 function lotus(parent, x, y, s) {
-  const g = el('g', {}, parent);
-  el('ellipse', { cx: 0, cy: 6, rx: 95, ry: 20, fill: '#3e9a47' }, g);
-  el('path', { d: 'M0,6 L95,0 L60,22 Z', fill: '#8fcfb4' }, g);
+  const g = el('svg:g', {}, parent);
+  el('svg:ellipse', { cx: 0, cy: 6, rx: 95, ry: 20, fill: '#3e9a47' }, g);
+  el('svg:path', { d: 'M0,6 L95,0 L60,22 Z', fill: '#8fcfb4' }, g);
   for (const [a, k, c] of PETALES) {
-    const p = el('g', { transform: `rotate(${a}) scale(${k})` }, g);
-    el('path', { d: PET, fill: c }, p);
-    el('path', { d: 'M0,-10 C-4,-36 -3,-62 0,-82', fill: 'none', stroke: '#FFD9A3', 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.6 }, p);
+    const p = el('svg:g', { transform: `rotate(${a}) scale(${k})` }, g);
+    el('svg:path', { d: PET, fill: c }, p);
+    el('svg:path', { d: 'M0,-10 C-4,-36 -3,-62 0,-82', fill: 'none', stroke: '#FFD9A3', 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.6 }, p);
   }
-  return (t, ph) => g.setAttribute('transform', `translate(${x},${y + Math.sin(t * 1.3 + ph) * 5}) rotate(${Math.sin(t * 0.8 + ph) * 3}) scale(${s})`);
+  return (t, ph) => g.setAttribute('transform', `translate(${x},${(y + Math.sin(t * 1.1 + ph) * 3).toFixed(2)}) rotate(${(Math.sin(t * 0.7 + ph) * 2.5).toFixed(2)}) scale(${s})`);
 }
-function etang(parent, y0) {
-  const g = el('g', {}, parent);
-  if (!document.getElementById('eau')) {
-    const grad = el('linearGradient', { id: 'eau', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
-    el('stop', { offset: 0, 'stop-color': '#bfe6d3' }, grad); el('stop', { offset: 1, 'stop-color': '#7cc3a4' }, grad);
-  }
-  const eau = el('path', { fill: 'url(#eau)' }, g);
-  const roseaux = el('g', { stroke: '#2B6E3A', 'stroke-width': 6, 'stroke-linecap': 'round', fill: 'none' }, g);
-  [[0.06, 1], [0.09, -1], [0.93, 1], [0.96, -1]].forEach(([fx, s]) => {
-    const x = fx * W; el('path', { d: `M${x},${H} C${x - 6 * s},${y0 - 30} ${x + 8 * s},${y0 - 80} ${x},${y0 - 140}` }, roseaux);
-    el('ellipse', { cx: x, cy: y0 - 150, rx: 9, ry: 24, fill: '#2B6E3A', stroke: 'none' }, roseaux);
-  });
-  const fleurs = [[0.22, 40, 0.55, 0], [0.5, 70, 0.8, 2], [0.78, 35, 0.6, 4]].map(([fx, dy, s, ph]) => [lotus(g, fx * W, y0 + dy, s), ph]);
+const EAU = 1000; // ligne de l'eau : l'étang occupe le bas de l'image, sous la barre du lecteur (aucun texte)
+function etang(parent) {
+  const defs = el('svg:defs', {}, parent);
+  const grad = el('svg:linearGradient', { id: 'eau', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+  el('svg:stop', { offset: 0, 'stop-color': '#bfe6d3' }, grad);
+  el('svg:stop', { offset: 1, 'stop-color': '#7cc3a4' }, grad);
+  const eau = el('svg:path', { fill: 'url(#eau)' }, parent);
+  const fleurs = [[110, 34, 0.42, 0], [330, 52, 0.5, 2], [560, 38, 0.4, 4]].map(([x, dy, s, ph]) => [lotus(parent, x, EAU + dy, s), ph]);
   return (t) => {
-    let d = `M0,${H} L0,${y0}`;
-    for (let x = 0; x <= W; x += 40) d += ` L${x},${(y0 + Math.sin(x / 140 + t * 1.4) * 7).toFixed(1)}`;
+    let d = `M0,${H} L0,${EAU}`;
+    for (let x = 0; x <= W; x += 30) d += ` L${x},${(EAU + Math.sin(x / 120 + t * 1.1) * 5).toFixed(1)}`;
     eau.setAttribute('d', d + ` L${W},${H} Z`);
     fleurs.forEach(([f, ph]) => f(t, ph));
   };
 }
 
-// Pan de mur dessiné (bord irrégulier), pour la scène de Tilleul
-function panneau(parent, x, y, l, h) {
-  const g = el('g', {}, parent);
-  const d = `M${x},${y + 8} C${x + l * 0.3},${y - 6} ${x + l * 0.7},${y + 12} ${x + l},${y} C${x + l + 8},${y + h * 0.4} ${x + l - 6},${y + h * 0.7} ${x + l + 4},${y + h} C${x + l * 0.6},${y + h + 10} ${x + l * 0.3},${y + h - 8} ${x},${y + h + 4} C${x - 8},${y + h * 0.6} ${x + 6},${y + h * 0.3} ${x},${y + 8} Z`;
-  el('path', { d, fill: '#f3eee4' }, g);
-  el('path', { d, fill: 'url(#enduit)' }, g);
-  el('path', { d, fill: 'url(#lumiere)', opacity: 0.9 }, g);
-  const bord = el('path', { d, fill: 'none', stroke: '#2B6E3A', 'stroke-width': 5, 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': '1 1' }, g);
-  return (p) => bord.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
-}
-
-// Mur de galerie : enduit, lumière du haut, plinthe
-function mur(parent, x, y, l, h) {
-  const g = el('g', {}, parent);
-  el('rect', { x, y, width: l, height: h, fill: '#f3eee4' }, g);
-  el('rect', { x, y, width: l, height: h, fill: 'url(#enduit)' }, g);
-  el('rect', { x, y, width: l, height: h * 0.8, fill: 'url(#lumiere)' }, g);
-  el('rect', { x, y: y + h - 70, width: l, height: 30, fill: '#fdfcf9' }, g);
-  el('rect', { x, y: y + h - 42, width: l, height: 4, fill: '#d9cfbf' }, g);
-  el('rect', { x, y: y + h - 38, width: l, height: 38, fill: '#e6cba0' }, g);
-  return g;
-}
-
-function logo(parent) {
-  const g = el('g', {}, parent);
-  el('image', { href: `${REPO}/public/favicon.svg`, x: -110, y: -110, width: 220, height: 220 }, g);
-  return g;
-}
-
-// Grain de lumière : petites poussières dorées qui flottent dans la lumière
-function poussieres(parent, n) {
-  const l = [];
-  for (let i = 0; i < n; i++) {
-    const k = ((i * 7919) % 1000) / 1000;
-    const c = el('circle', { r: 2 + k * 3.5, fill: '#ffe2a8', filter: 'url(#flou)' }, parent);
-    l.push({ c, x: k * W, y: ((i * 3571) % 1000) / 1000 * H * 0.7, v: 6 + k * 14, ph: k * 20 });
+// ---------- éléments d'un plan ----------
+function carte(art) {
+  const c = el('div', { class: `carte ${art.dessin ? 'carte--dessin' : art.film ? 'carte--film' : 'carte--toile'}` });
+  const boite = el('div', { class: 'carte__image' }, c);
+  let images = [];
+  if (art.dessin) images = [el('img', { src: `${REPO}/public/dessins/${art.dessin}.webp`, alt: '' }, boite)];
+  if (art.toile) images = [el('img', { src: `${REPO}/public/toiles/${art.toile}-1000.webp`, alt: '' }, boite)];
+  if (art.film) {
+    for (let i = 1; i <= FILM_IMAGES; i++) images.push(el('img', { class: 'film', src: `file://${FILM}/${String(i).padStart(3, '0')}.png`, alt: '' }, boite));
   }
-  return (t, op) => l.forEach((p) => {
-    p.c.setAttribute('cx', (p.x + Math.sin(t * 0.3 + p.ph) * 40).toFixed(1));
-    p.c.setAttribute('cy', ((p.y - t * p.v) % (H * 0.7) + H * 0.7) % (H * 0.7));
-    p.c.setAttribute('opacity', (op * (0.35 + 0.35 * Math.sin(t * 1.7 + p.ph))).toFixed(3));
-  });
+  el('span', { class: 'carte__etiquette' }, boite, art.dessin ? T.dessin : T.toile);
+  return { el: c, images };
+}
+// Place les textes d'un plan les uns sous les autres, à partir du haut de la zone des textes
+const HAUT_TEXTES = 716;
+function textes(plan) {
+  const liste = [];
+  let y = HAUT_TEXTES;
+  const poser = (e, ecart) => { e.style.top = `${y}px`; y += e.offsetHeight + ecart; return e; };
+  if (plan.nom) {
+    const n = el('p', { class: 'l1 nom' });
+    el('span', { class: 'vert' }, n, 'Linda'); n.append(' '); el('span', { class: 'orange' }, n, 'Denise');
+    liste.push({ cle: 'nom', e: poser(n, 10) });
+  }
+  if (plan.l1) liste.push({ cle: `l1:${plan.l1}`, e: poser(el('p', { class: `l1${plan.rubrique ? ' l1--rubrique' : ''}` }, scene, plan.l1), 10) });
+  for (const p of plan.l2) liste.push({ cle: `l2:${p}:${plan.a}`, e: poser(el('p', { class: 'l2' }, scene, p), 4) });
+  if (plan.ajout) liste.push({ cle: `ajout:${plan.ajout[1]}`, e: poser(el('p', { class: 'l2' }, scene, plan.ajout[1]), 4), a: plan.ajout[0] });
+  const bas = Math.max(...liste.map((x) => x.e.offsetTop + x.e.offsetHeight));
+  if (bas > EAU - 30) console.log(`Textes trop bas au plan de ${plan.a} s : ils descendent jusqu'à ${bas}px`);
+  return liste;
 }
 
-// ================= Montage (construit une fois les polices chargées : les mots sont mesurés) =================
+// ================= Montage (construit une fois les polices chargées : les textes sont mesurés) =================
 window.pret = (async () => {
-  await document.fonts.load('80px "Lilita One"');
+  await Promise.all(['96px "Gochi Hand"', '58px "Itim"', '58px "Titre z"'].map((f) => document.fonts.load(f, 'Az')));
 
-  // Tilleul : le moteur du site, inchangé
-  const porteChat = el('g', {});
-  const scene = el('svg', { width: W, height: 280, overflow: 'visible' }, porteChat);
-  const chat = new Tilleul.Chat(scene, { decor: { lotus: () => [], feuilles: () => [] }, libre: true, reduit: false, dort: false, toucher() {}, taire() {}, suit() {} });
-  scene.setAttribute('width', W); scene.setAttribute('height', 280);
-  racine.removeChild(porteChat);
-  let chatPret = false;
-  // Positions dans le repère du moteur (largeur de l'écran, bande de 280 de haut)
-  const chatEntre = (depart, cible) => { chat.ordre('assis'); chat.x = depart; chat.cibleX = cible; chat.etat = depart === cible ? 'assis' : 'marche'; };
-  // Il suit le pointeur du regard : on « pointe » la toile
-  const regarde = (x, y) => window.dispatchEvent(new PointerEvent('pointermove', { clientX: x, clientY: y }));
+  const decor = el('svg:svg', { class: 'decor', width: W, height: H, viewBox: `0 0 ${W} ${H}` });
+  const tombe = feuilles(decor);
+  const eau = etang(decor);
 
-  const calques = { fond: el('g'), scene: el('g'), texte: el('g') };
-  el('rect', { width: W, height: H, fill: '#fff' }, calques.fond);
+  // Pistes : une œuvre, puis chaque ligne de texte. Deux plans qui se suivent avec la même ligne (« Les chats ») la gardent
+  // telle quelle, sans fondu. Une carte reste entière sous la suivante pendant que celle-ci apparaît (pas de creux).
+  const cartes = [], lignes = [];
+  let fin = null;
+  for (const plan of PLANS) {
+    if (plan.fin) { fin = plan; continue; }
+    cartes.push({ a: plan.a, b: plan.b, film: !!plan.art.film, ...carte(plan.art) });
+    for (const x of textes(plan)) {
+      const avant = lignes.find((l) => l.cle === x.cle && l.b === plan.a);
+      if (avant) { avant.b = plan.b; x.e.remove(); } else lignes.push({ cle: x.cle, a: x.a ?? plan.a, b: plan.b, e: x.e });
+    }
+  }
 
-  // 0 – 4,4 : titre
-  const intro = el('g', {}, calques.scene);
-  const tombe = feuilles(intro, 9, 1);
-  const lg = logo(intro);
-  const bassinIntro = etang(intro, 905);
-  const introTitre = mots(intro, T.titre, W / 2, 600, 250, { remplir: [BLANC, ORANGE] });
-  const introSous = mots(intro, T.sous, W / 2, 770, 120, { remplir: [BLANC, BLANC, ORANGE] });
-
-  // 4 – 16 : un long mur qu'on longe, quatorze toiles qui se peignent et se balancent
-  const galerie = el('g', {}, calques.scene);
-  const camera = el('g', {}, galerie);
-  const ECART = 450, PAN = 380 + (GALERIE.length - 1) * ECART - 1500; // la dernière toile s'arrête à x = 1500
-  mur(camera, -200, -300, PAN + W + 400, H + 300);
-  const decalage = (t) => sinus(prog(t, 4.0, 14.6)) * PAN;
-  const accroches = GALERIE.map((nom, i) => {
-    const x = 380 + i * ECART;
-    // le pinceau commence quand la toile entre dans l'image, et finit toujours avant la fin du défilement
-    let debut = 4.3 + i * 0.3;
-    while (debut < 13.2 && x - decalage(debut) - 200 > W - 40) debut += 0.05;
-    return { t: toile(camera, nom, 380), x, y: 120 + (i % 2 ? 34 : 0), pente: [-0.8, 0.6, -0.3, 0.9, -0.6, 0.4, -0.5][i % 7], debut };
-  });
-  console.log('galerie : fin de la peinture de la dernière toile à', (accroches[accroches.length - 1].debut + 1.1).toFixed(2), 's (défilement fini à 14,6 s)');
-  const grain = poussieres(galerie, 30);
-
-  // 16 – 34 : les neuf autres toiles, une par une (une toile par mesure de 2 s)
-  const gros = el('g', {}, calques.scene);
-  mur(gros, 0, 0, W, H);
-  const unes = UNE_A_UNE.map((nom, i) => {
-    const a = 16 + i * 2, gauche = i % 2 === 0;
-    return { a, gauche, t: toile(gros, nom, 470), nom: titre(gros, titreToile(nom), gauche ? W * 0.71 : W * 0.29, 500, 132, 700) };
-  });
-
-  // 34 – 40 : un nouveau mur ; Tilleul arrive et regarde la toile
-  const nouveau = el('g', {}, calques.scene);
-  el('rect', { width: W, height: H, fill: '#fff' }, nouveau);
-  const tombe2 = feuilles(nouveau, 6, 3);
-  const murDessine = panneau(nouveau, W * 0.22, 70, W * 0.42, 690);
-  const seule = toile(nouveau, 'frangipanier', 330);
-  const bassin = etang(nouveau, 830);
-  nouveau.appendChild(porteChat);
-
-  // 40 – 44 : fin
-  const fin = el('g', {}, calques.scene);
-  el('rect', { width: W, height: H, fill: '#fff' }, fin);
-  const tombe4 = feuilles(fin, 9, 7);
-  const bassinFin = etang(fin, 925);
-  const lgFin = logo(fin);
-  const finNom = mots(fin, 'Linda Denise', W / 2, 700, 190, { remplir: [BLANC, ORANGE] });
-  const finSous = mots(fin, T.fin, W / 2, 860, 110);
-
-  const legende = legendes(calques.texte, T.legendes);
+  // Fin : le logo, « Linda Denise », l'invitation à écrire à Linda (texte simple : Tilleul ne parle pas), Tilleul assis au bord de l'étang
+  const finG = el('div', { class: 'plan' });
+  finG.style.cssText = 'position:absolute;inset:0';
+  el('img', { class: 'fin__logo', src: `${REPO}/public/favicon.svg`, alt: '' }, finG);
+  const nom = el('p', { class: 'l1 nom fin__nom' }, finG);
+  el('span', { class: 'vert' }, nom, 'Linda'); nom.append(' '); el('span', { class: 'orange' }, nom, 'Denise');
+  el('p', { class: 'l2 fin__message' }, finG, T.message);
+  el('p', { class: 'l1 fin__appel' }, finG, T.ecrire);
+  const bande = el('svg:svg', { class: 'tilleul', width: W, height: 280 }, finG);
+  const chat = new Tilleul.Chat(bande, { decor: { lotus: () => [], feuilles: () => [] }, libre: false, reduit: false, dort: false, toucher() {}, taire() {}, suit() {} });
+  chat.retenu = true; // il garde sa pose assise jusqu'à la fin et regarde le visiteur (il ne parle pas : pas de bulle)
+  chat.x = chat.cibleX = 925; // un peu à gauche de son coin habituel : sa queue reste dans l'image
+  bande.style.transform = `translateY(${EAU + 6 - 280}px) scale(1.7)`;
 
   const rendre = (t) => {
-    // titre
-    montrer(intro, t < 4.4);
-    if (t < 4.4) {
-      tombe(t); bassinIntro(t);
-      const k = outBack(prog(t, 0.2, 1.3));
-      lg.setAttribute('transform', `translate(${W / 2},${270 + Math.sin(t * 1.2) * 6}) scale(${k * 0.95}) rotate(${(1 - k) * -40})`);
-      introTitre.maj(prog(t, 0.8, 1.9)); introSous.maj(prog(t, 1.9, 3.0));
-    }
-    // galerie (fondu depuis le titre)
-    montrer(galerie, t >= 3.4 && t < 15.9);
-    if (t >= 3.4 && t < 15.9) {
-      galerie.setAttribute('opacity', ss(prog(t, 3.4, 4.2)).toFixed(3));
-      camera.setAttribute('transform', `translate(${(-decalage(t)).toFixed(2)},0)`);
-      accroches.forEach((a) => a.t.maj({ x: a.x, y: a.y, p: io(prog(t, a.debut, a.debut + 1.1)), b: t - a.debut - 1.1, pente: a.pente, opacite: 1 - ss(prog(t, 14.9, 15.6)) }));
-      grain(t, 1 - ss(prog(t, 14.9, 15.6)));
-    }
-    // les neuf toiles, une par une : fondu enchaîné d'une toile à l'autre, la toile est peinte avant de partir
-    montrer(gros, t >= 15.0 && t < 34.2);
-    if (t >= 15.0 && t < 34.2) {
-      gros.setAttribute('opacity', ss(prog(t, 15.0, 15.8)).toFixed(3));
-      unes.forEach((u, i) => {
-        const visible = t >= u.a - 0.3 && t < u.a + 2.0;
-        montrer(u.t.g, visible); montrer(u.nom.g, visible);
-        if (!visible) return;
-        const op = ss(prog(t, u.a - 0.3, u.a)) * (1 - ss(prog(t, u.a + 1.7, u.a + 2.0)));
-        const k = prog(t, u.a - 0.3, u.a + 2.0);
-        u.t.maj({ x: (u.gauche ? W * 0.29 : W * 0.71) + (k - 0.5) * 70 * (u.gauche ? 1 : -1), y: 120 - (k - 0.5) * 20, p: io(prog(t, u.a - 0.3, u.a + 0.8)), b: t - u.a - 0.8, echelle: 1 + k * 0.07, pente: i % 2 ? 0.7 : -0.7, opacite: op });
-        u.nom.maj(prog(t, u.a + 0.1, u.a + 0.9));
-        u.nom.g.setAttribute('opacity', op.toFixed(3));
-      });
-    }
-    // nouveau mur
-    montrer(nouveau, t >= 33.4 && t < 40.2);
-    if (t >= 33.4 && t < 40.2) {
-      nouveau.setAttribute('opacity', ss(prog(t, 33.4, 34.2)).toFixed(3));
-      if (!chatPret) { chatEntre(1420, 1207); chatPret = true; }
-      if (t > 38.2 && chat.etat !== 'assis') chat.ordre('assis');
-      regarde(970, 780);
-      tombe2(t);
-      murDessine(io(prog(t, 33.6, 34.8)));
-      seule.maj({ x: W * 0.43, y: 150, p: io(prog(t, 34.2, 35.3)), b: t - 35.3, pente: -0.5 });
-      bassin(t);
-      porteChat.setAttribute('transform', `translate(-1190,${826 - 276 * 2.1}) scale(2.1)`);
-    }
-    // fin (puis fondu vers le blanc)
-    montrer(fin, t >= 39.4);
-    if (t >= 39.4) {
-      fin.setAttribute('opacity', (ss(prog(t, 39.4, 40.2)) * (1 - ss(prog(t, 43.2, 44)))).toFixed(3));
-      tombe4(t); bassinFin(t);
-      lgFin.setAttribute('transform', `translate(${W / 2},${400}) scale(${outBack(prog(t, 40.4, 41.4)) * 1.1})`);
-      finNom.maj(prog(t, 41.0, 42.1)); finSous.maj(prog(t, 42.1, 43.0));
-    }
-    legende(t);
+    tombe(t); eau(t);
+    cartes.forEach((c, i) => {
+      const suivante = cartes[i + 1];
+      const tient = suivante && suivante.a === c.b; // la suivante la recouvre : elle reste entière dessous
+      const entree = c.a === 0 ? 1 : ss(prog(t, c.a, c.a + FONDU));
+      const sortie = tient ? (t < c.b + FONDU ? 1 : 0) : 1 - ss(prog(t, c.b, c.b + FONDU));
+      const op = t < c.a ? 0 : entree * sortie;
+      c.el.style.opacity = op.toFixed(3);
+      c.el.style.display = op > 0 ? 'block' : 'none';
+      c.el.style.zIndex = 10 + i;
+      if (c.film && op > 0) {
+        const k = Math.min(FILM_IMAGES - 1, Math.floor(prog(t, c.a, c.b + FONDU) * FILM_IMAGES));
+        c.images.forEach((img, j) => { img.style.display = j === k ? 'block' : 'none'; });
+      }
+    });
+    lignes.forEach((l) => {
+      // un texte s'efface avant que le suivant apparaisse à la même place : jamais deux phrases l'une sur l'autre
+      const entree = l.a === 0 ? ss(prog(t, 0.2, 0.8)) : ss(prog(t, l.a + 0.25, l.a + FONDU));
+      const op = t < l.a ? 0 : entree * (1 - ss(prog(t, l.b, l.b + 0.3)));
+      l.e.style.opacity = op.toFixed(3);
+      l.e.style.display = op > 0 ? 'block' : 'none';
+      l.e.style.zIndex = 50;
+    });
+    const opFin = ss(prog(t, fin.a + 0.25, fin.a + FONDU)); // comme les textes : la fin arrive quand le dernier texte est parti
+    finG.style.opacity = opFin.toFixed(3);
+    finG.style.display = opFin > 0 ? 'block' : 'none';
+    finG.style.zIndex = 60;
   };
-  window.DUREE = 44;
+  window.DUREE = DUREE;
   window.image = (t) => { avancer(1000 / 30); rendre(t); };
 
-  const hrefs = [...new Set([...racine.querySelectorAll('image')].map((i) => i.getAttribute('href')).filter((h) => h.startsWith('file:')))];
-  await Promise.all(hrefs.map((h) => new Promise((ok) => { const i = new Image(); i.onload = i.onerror = ok; i.src = h; })));
+  // toutes les images chargées et décodées avant la première capture
+  await Promise.all([...scene.querySelectorAll('img')].map((i) => i.decode().catch(() => console.log('Image illisible :', i.src))));
   return true;
 })();
 </script>

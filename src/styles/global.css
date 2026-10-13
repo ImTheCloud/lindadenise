@@ -1,3 +1,13 @@
+/* Le « z » minuscule de Gochi Hand ressemble à un « 3 » (« Rencontre3 Linda ») : dans les titres, cette lettre seule est prise dans Itim. */
+@font-face {
+  font-family: 'Titre z';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/itim/files/itim-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+007A;
+}
+
 :root {
   --blanc: #fff;
   --orange: #f28a1e;
@@ -12,7 +22,7 @@
   --encre: #2b3b2b;
   --encre-douce: #4d5d4d;
 
-  --titre: 'Gochi Hand', 'Segoe Print', cursive;
+  --titre: 'Titre z', 'Gochi Hand', 'Segoe Print', cursive;
   --texte: 'Itim', 'Segoe Print', system-ui, sans-serif;
 
   --trait: 3px;

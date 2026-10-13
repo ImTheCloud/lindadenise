@@ -34,7 +34,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Liens cassés (tout le site, FR et NL) et validité du HTML
 - En-têtes de sécurité (securityheaders.com) : à ajouter dans `netlify.toml` (Content-Security-Policy, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS)
 - Poids des images : remesurer après le passage en AVIF
-- Vidéos (`public/video/`, chargées au clic seulement) : environ 8 Mo chacune ; si un texte ou une toile change, refaire le motion design (`scripts/video/`, voir `docs/avancement.md`) ; les vidéos ne parlent ni de prix ni de remises
+- Vidéos (`public/video/`, chargées au clic seulement) : `site-{fr,nl}.mp4` et `vraies-toiles.mp4` ; si un texte, un dessin ou une toile de la vidéo change, la refaire (`scripts/video/`, voir `docs/avancement.md`) ; les vidéos ne parlent ni de prix ni de remises, et restent légères sur les détails des toiles
 
 ## Accessibilité
 - axe (extension navigateur), navigation au clavier seul, VoiceOver sur iPhone
@@ -84,9 +84,6 @@ Aucun paiement n'est proposé : pour une toile ou un dessin numérique, on conta
 - **Signature** sur le dos de la toile (pas encore faite, ne pas en parler sur le site).
 - **Expositions et dépôts** : à voir avec la galerie quand elle contacte Linda.
 - Rappel du statut légal de Linda avant tout paiement (voir `docs/prive/suivi-client.md`).
-
-## Vidéo motion design : texte à ajouter à la fin du projet
-L'image et la musique sont validées. Ajouter seulement du texte aux moments où l'écran n'en a pas, avec les infos de Linda : épaisseur 3 mm, environ 500 g, finition mate, crochet compris, envoi par bpost en 1 à 2 semaines, 5 toiles achetées = la 6e offerte, toile sur commande à partir d'un dessin numérique en 1 à 3 semaines. Toujours **sans prix** ni histoire d'Ostende (règle déjà en place). Refaire avec `scripts/video/` (voir `docs/avancement.md`), FR et NL.
 
 ## Formulaire et panier : à vérifier après le déploiement final
 - Netlify → Forms : le formulaire `contact` doit contenir les champs `commande`, `total`, `rue`, `code_postal`, `localite`, `pays`, `conditions`, `conditions_toile`, `message` (plus de champ `toiles`). Envoyer une vraie demande avec un panier mixte (dessins + toile) et vérifier l'e-mail reçu.

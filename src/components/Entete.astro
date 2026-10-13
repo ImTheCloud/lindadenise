@@ -87,5 +87,7 @@ const actuel = Astro.url.pathname;
     .marque img { width: 44px; height: 44px; }
     .langue span { padding: 3px 9px; }
   }
-  @media (max-width: 400px) { .marque__nom { font-size: 1.4rem; } .marque img { width: 38px; height: 38px; } .entete__droite { gap: 8px; } .burger, .panier-lien { width: 44px; height: 44px; } }
+  /* petits téléphones : le nom, le panier, la langue et le menu tiennent sur une ligne sans se chevaucher */
+  @media (max-width: 430px) { .marque { flex-shrink: 0; gap: 6px; } .marque__nom { font-size: 1.15rem; } .marque img { width: 36px; height: 36px; } .entete__droite { gap: 6px; } .burger, .panier-lien { width: 42px; height: 42px; } .langue span { padding: 3px 6px; } }
+  @media (max-width: 349px) { .marque__nom { display: none; } }
 </style>

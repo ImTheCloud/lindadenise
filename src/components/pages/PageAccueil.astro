@@ -39,6 +39,15 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
     <Etang />
   </section>
 
+  <section class="section film">
+    <div class="contenu">
+      <figure class="film__cadre cadre apparait">
+        <Video lang={lang} nom={`site-${lang}`} largeur={1080} hauteur={1080} description={a.videoAlt} son bouton={44} />
+      </figure>
+      <p class="centre apparait film__suite"><a class="bouton" href={chemin('contact', lang)}>{d.pied.ecrire}</a></p>
+    </div>
+  </section>
+
   <section class="section">
     <div class="contenu">
       <h2 class="centre apparait">{a.rubriquesTitre}</h2>
@@ -90,7 +99,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
         <p>{a.impressionTexte2}</p>
       </div>
       <figure class="impression__video apparait cadre">
-        <Video lang={lang} nom={`toiles-${lang}`} largeur={1920} hauteur={1080} description={a.impressionAlt} son />
+        <Video lang={lang} nom="vraies-toiles" largeur={478} hauteur={850} description={d.toiles.videoVraiesAlt} son />
       </figure>
       <p class="impression__cta apparait"><a class="bouton bouton--vert" href={chemin('toiles', lang)}>{a.impressionCta}</a></p>
     </div>
@@ -152,7 +161,11 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   .prix__montant { font-family: var(--titre); font-size: clamp(2.4rem, 6vw, 3.4rem); color: var(--orange-fonce); margin: 0; line-height: 1.1; }
   .impression { display: grid; gap: 32px; align-items: center; }
   .impression__cta { margin: 0; text-align: center; }
-  .impression__video { width: 100%; max-width: 640px; margin: 0 auto; padding: 10px; background: var(--vert-pale); transform: rotate(1.5deg); }
+  .impression__video { width: 100%; max-width: 300px; margin: 0 auto; padding: 10px; background: var(--vert-pale); transform: rotate(1.5deg); }
+  /* la vidéo du site : carrée, droite (pas penchée : les dessins y sont droits) */
+  .film { padding-top: clamp(24px, 4vw, 48px); }
+  .film__cadre { width: 100%; max-width: 600px; margin: 0 auto; padding: 10px; background: var(--vert-pale); }
+  .film__suite { margin: 28px 0 0; }
   .apropos { display: grid; gap: 36px; align-items: center; }
   .apropos__photo { width: min(78%, 360px); margin-inline: auto; background: var(--vert-pale); padding: 10px; border: var(--trait) solid var(--vert-fonce); border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; box-shadow: var(--ombre); transform: rotate(-3deg); }
   .apropos__photo img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%; }
@@ -174,7 +187,7 @@ const couvertures: Record<string, string> = { chats: 'tiroux-le-sage', nature: '
   @media (min-width: 960px) {
     .heros__grille { grid-template-columns: 0.95fr 1.05fr; gap: 48px; }
     .apropos { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
-    .impression { grid-template-columns: 1.15fr 0.85fr; gap: 56px; }
+    .impression { grid-template-columns: 340px 1fr; gap: 56px; }
     .impression__video { order: -1; }
   }
 </style>

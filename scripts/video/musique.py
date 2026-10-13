@@ -1,10 +1,13 @@
 # Musiques originales des vidéos, composées et synthétisées ici (numpy seulement, aucune bibliothèque sous licence).
-#   motion : la vidéo « Les toiles » (motion design) : pop électro, 120 BPM, sol majeur (sol - ré - mi mineur - do).
-#            Une mesure = 2 s, une toile par mesure (44 s : 22 mesures). Intro, mur, toiles une par une, pause pour Tilleul, montée, final.
-#   reel   : la vidéo « Les vraies toiles » : pop acoustique chaloupée, 114,3 BPM (une mesure = 2,1 s = le rythme
-#            des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, basse, piano électrique,
-#            claquements de doigts. Volontairement simple et sec : pas de bruit de synthèse, pas d'écho.
-# Usage : python musique.py motion|reel duree_en_secondes sortie.wav
+#   site : la vidéo du site (motion design carré) : douce et acoustique, 80 BPM, fa majeur (fa - ré mineur - si bémol - do).
+#          Une mesure = 3 s ; chaque changement de plan tombe au début d'une mesure (57 s : 19 mesures). Piano électrique seul,
+#          puis guitare en arpèges et basse ronde pour les mots de Linda, le thème pour les dessins, une seconde voix pour les
+#          toiles, puis l'accord du début égrené au piano, sans basse, et l'accord final qui s'éteint.
+#          Pas de batterie, pas de cymbale, pas de montée.
+#   reel : la vidéo « Les vraies toiles » : pop acoustique chaloupée, 114,3 BPM (une mesure = 2,1 s = le rythme
+#          des changements de toile), do majeur (do - la mineur - fa - sol) : guitare, basse, piano électrique,
+#          claquements de doigts. Volontairement simple et sec : pas de bruit de synthèse, pas d'écho.
+# Usage : python musique.py site|reel duree_en_secondes sortie.wav
 import sys, wave
 import numpy as np
 
@@ -14,7 +17,6 @@ N = int(SR * duree)
 rng = np.random.default_rng(3)
 BUS = ('batt', 'basse', 'harm', 'lead')
 bus = {k: np.zeros((2, N)) for k in BUS}
-kicks = []  # instants des grosses caisses (pour le « pompage » des nappes et de la basse)
 
 
 def hz(n):  # numéro MIDI -> fréquence
@@ -33,7 +35,7 @@ def poser(nom, signal, t, pan=0.0, gain=1.0):
     bus[nom][1, i:i + len(s)] += s * np.sqrt((1 + pan) / 2)
 
 
-def aigus(x):  # filtre passe-haut du premier ordre : garde le souffle des cymbales
+def aigus(x):  # filtre passe-haut du premier ordre : garde le souffle des percussions
     return np.diff(x, prepend=0)
 
 
@@ -56,12 +58,6 @@ def claquement(d=0.35):  # mains qui claquent : trois petites rafales puis une q
     e = sum(np.exp(-np.clip(t - o, 0, None) * 140) * (t >= o) for o in (0, 0.011, 0.022)) + 0.45 * np.exp(-t * 16) * (t >= 0.022)
     return aigus(bruit(d)) * e * 0.7
 
-def charleston(d=0.07, chute=70):
-    return aigus(aigus(bruit(d))) * np.exp(-tps(d) * chute) * 0.8
-
-def cymbale(d=2.4):
-    return aigus(aigus(bruit(d))) * np.exp(-tps(d) * 1.7) * 0.6
-
 def doigts(d=0.12):  # claquement de doigts
     t = tps(d)
     return aigus(bruit(d)) * np.exp(-t * 55) * 0.8 + np.sin(2 * np.pi * 1700 * t) * np.exp(-t * 90) * 0.25
@@ -69,21 +65,6 @@ def doigts(d=0.12):  # claquement de doigts
 def secoue(d=0.1):  # oeuf sonore : bruit court à attaque douce
     t = tps(d)
     return aigus(bruit(d)) * np.exp(-t * 45) * np.minimum(1, t * 250) * 0.7
-
-def montee(d):  # bruit qui monte, plus un sifflement de plus en plus aigu
-    t = tps(d); k = t / d
-    return aigus(aigus(bruit(d))) * k ** 2 * 0.5 + np.sin(2 * np.pi * np.cumsum(300 * (10 ** k)) / SR) * k ** 2 * 0.25
-
-def impact(d=1.6):
-    t = tps(d)
-    return np.sin(2 * np.pi * 42 * t) * np.exp(-t * 2.4) + 0.5 * aigus(bruit(d)) * np.exp(-t * 5)
-
-
-# ---------- instruments ----------
-def basse_pop(n, d):  # basse pincée, riche au début puis ronde
-    t = tps(d); f = hz(n)
-    s = sum(np.sin(2 * np.pi * f * k * t) / k * np.exp(-t * (1.5 + 1.2 * k)) for k in range(1, 9))
-    return s * np.minimum(1, t * 300) * np.minimum(1, (d - t) / 0.03)
 
 def basse_douce(n, d):  # basse ronde, presque sinusoïdale
     t = tps(d); f = hz(n)
@@ -98,14 +79,6 @@ def nappe(notes, d):  # accord tenu, deux voix désaccordées par note
             s += sum(np.sin(2 * np.pi * f * k * t) / k ** 1.5 for k in (1, 2, 3, 4))
     return s * np.minimum(1, t / 0.05) * np.minimum(1, (d - t) / 0.12) / len(notes)
 
-def pincee(n, d=0.4):  # note pincée brillante (arpèges)
-    t = tps(d); f = hz(n)
-    return sum(np.sin(2 * np.pi * f * k * t) / k * np.exp(-t * (7 + 5 * k)) for k in range(1, 7)) * np.minimum(1, t * 600)
-
-def cloche(n, d=0.9):  # petite cloche synthétique (modulation de fréquence)
-    t = tps(d); f = hz(n)
-    return np.sin(2 * np.pi * f * t + 3 * np.exp(-t * 5) * np.sin(2 * np.pi * 2 * f * t)) * np.exp(-t * 3.2) * np.minimum(1, t * 500)
-
 def guitare(n, d=1.3):  # corde de guitare : harmoniques qui s'éteignent de plus en plus vite
     t = tps(d); f = hz(n)
     s = sum(np.sin(2 * np.pi * f * k * t * (1 + 0.0003 * k * k)) / k ** 1.1 * np.exp(-t * (2.6 + 1.3 * k)) for k in range(1, 9))
@@ -118,82 +91,60 @@ def piano_elec(n, d=1.2):  # piano électrique doux
 
 
 # ---------- fabrication ----------
-def motion():
-    B = 60 / 120; BAR = 4 * B; S = B / 4
-    ACC = [[55, 59, 62], [50, 54, 57], [52, 55, 59], [48, 52, 55]]  # sol, ré, mi mineur, do
-    RAC = [43, 38, 40, 36]
-    BASSE = [(0, 0), (3, 0), (6, 12), (10, 0), (12, 0), (14, 12)]  # (pas de 16e, octave en plus) : basse syncopée
-    # motif (temps, note, durée en temps) joué en boucle sur les quatre accords
-    MOTIF = [
-        [(0, 74, .5), (.5, 71, .5), (1, 74, .5), (1.5, 76, .5), (2, 79, 1), (3, 76, .5), (3.5, 74, .5)],
-        [(0, 74, .5), (.5, 76, .5), (1, 74, 1), (2, 69, .5), (2.5, 71, .5), (3, 74, 1)],
-        [(0, 76, .5), (.5, 79, .5), (1, 83, 1), (2, 79, .5), (2.5, 76, .5), (3, 74, 1)],
-        [(0, 76, .5), (.5, 74, .5), (1, 72, 1), (2, 79, 1), (3, 76, .5), (3.5, 74, .5)],
+def site():
+    BAR = 3.0; B = BAR / 4; C = B / 2  # 80 BPM : un temps = 0,75 s, une croche = 0,375 s
+    ACC = [[53, 57, 60], [50, 53, 57], [46, 50, 53], [48, 52, 55]]  # fa, ré mineur, si bémol, do
+    RAC = [41, 38, 34, 36]
+    ARP = [[53, 60, 65, 69], [50, 57, 62, 65], [46, 53, 58, 62], [48, 55, 60, 64]]  # notes des arpèges de guitare
+    PICKING = [0, 1, 2, 3, 2, 1, 2, 1]  # une note par croche
+    # thème (temps, note, durée en temps), une phrase sur les quatre accords
+    THEME = [
+        [(0, 72, 1), (1, 77, 1), (2, 76, .5), (2.5, 74, .5), (3, 72, 1)],
+        [(0, 69, 1.5), (1.5, 72, .5), (2, 74, 1), (3, 72, 1)],
+        [(0, 70, 1), (1, 74, 1), (2, 77, 1), (3, 76, .5), (3.5, 74, .5)],
+        [(0, 76, 1.5), (1.5, 74, .5), (2, 72, 2)],
     ]
-    nb = int(duree // BAR)
+    nb = int(round(duree / BAR))
 
     def section(b):
-        if b < 2: return 'intro'
-        if b < nb - 14: return 'A'      # le mur et ses toiles qui défilent
-        if b < nb - 5: return 'B'       # les toiles une par une
-        if b < nb - 3: return 'pause'   # Tilleul
-        if b == nb - 3: return 'montee'
-        if b < nb - 1: return 'final'
+        if b == 0: return 'ouverture'   # premier dessin, « Linda Denise »
+        if b < 6: return 'linda'        # ses mots
+        if b < 13: return 'dessins'     # un dessin par plan
+        if b < nb - 2: return 'toiles'  # les toiles et la toile sur commande
+        if b < nb - 1: return 'retour'
         return 'fin'
 
     for b in range(nb):
-        s = section(b); t0 = b * BAR; c = b % 4
-        # harmonie : accord tenu, arpège brillant
-        poser('harm', nappe(ACC[c], BAR + 0.1), t0, 0, {'intro': 0.5, 'pause': 0.7}.get(s, 0.45))
-        if s != 'fin':
-            for k in range(16 if s in ('A', 'B', 'final') else 8):
-                pas = S if s in ('A', 'B', 'final') else 2 * S
-                n = ACC[c][[0, 1, 2, 1][k % 4]] + 12 + (12 if k % 8 >= 4 else 0)
-                g = 0.5 + 0.2 * (k % 4 == 0)
-                if s == 'intro': g *= 0.4 + 0.6 * (t0 + k * pas) / (2 * BAR)
-                poser('harm', pincee(n), t0 + k * pas, 0.4 if k % 2 else -0.4, g * 0.55)
-        # motif
-        if s in ('B', 'final') or (s == 'A' and b >= 4) or s == 'pause':
-            for tb, n, d in MOTIF[c]:
-                if s == 'pause' and tb not in (0, 2): continue
-                poser('lead', cloche(n, d * B + 0.7), t0 + tb * B, 0.15, 0.5 if s != 'pause' else 0.4)
-        # batterie et basse
-        fort = s in ('A', 'B', 'final')
-        if fort:
-            for beat in range(4):
-                kicks.append(t0 + beat * B); poser('batt', grosse_caisse(), t0 + beat * B, 0, 0.7)
-        if s == 'pause':
-            kicks.append(t0); poser('batt', grosse_caisse(0.4, 52, 90), t0, 0, 0.6)
-        if fort:
-            for k in range(8):  # croches : fermées sur le temps, ouvertes entre les temps
-                ouverte = k % 2 == 1
-                poser('batt', charleston(0.3 if ouverte else 0.07, 12 if ouverte else 70), t0 + k * B / 2, 0.25, 0.28 if ouverte else 0.2)
-            if s != 'A' or b >= 4:
-                for beat in (1, 3): poser('batt', claquement(), t0 + beat * B, 0, 0.6)
-            if s != 'A':
-                for k in range(16): poser('batt', secoue(), t0 + k * S, -0.3, 0.12 + 0.1 * (k % 4 == 2))
-            for pas, oct_ in BASSE:
-                poser('basse', basse_pop(RAC[c] + oct_, S * 3 if pas % 4 == 0 else S * 1.6), t0 + pas * S, 0, 0.9)
-        if s == 'pause':
-            poser('basse', basse_douce(RAC[c], BAR), t0, 0, 0.6)
-            for k in range(8): poser('batt', charleston(), t0 + k * B / 2, 0.25, 0.12)
-        # montées et passages
-        if s == 'intro' and b == 1: poser('batt', montee(BAR), t0, 0, 0.55)
-        if s == 'montee':
-            poser('batt', montee(BAR), t0, 0, 0.75)
-            for i in range(8): poser('batt', caisse_claire(), t0 + i * B / 2, 0, 0.3 + 0.06 * i)
-            for i in range(16): poser('batt', caisse_claire(), t0 + 2 * B + i * B / 8, 0, 0.45 + 0.04 * i)
-        if b == 1 or b == nb - 15 or (s == 'B' and (b - (nb - 14)) % 4 == 3):  # roulement de caisse claire avant un changement
-            for i in range(8): poser('batt', caisse_claire(), t0 + 3 * B + i * B / 8, 0, 0.35 + 0.05 * i)
-        if b in (2, nb - 14, nb - 5, nb - 2):
-            poser('batt', cymbale(), t0, 0, 0.55)
-        if b in (2, nb - 2, nb - 1): poser('batt', impact(), t0, 0, 0.9)
-        if s == 'fin':
-            kicks.append(t0); poser('batt', grosse_caisse(), t0, 0, 1.0)
-            poser('harm', nappe([55, 59, 62, 67], duree - t0), t0, 0, 0.7)
-            poser('lead', cloche(79, 2.5), t0, 0.1, 0.7)
-            poser('basse', basse_pop(31, 2.0), t0, 0, 1.0)
-            poser('batt', cymbale(), t0, 0, 0.6)
+        s = section(b); t0 = b * BAR; c = 0 if s == 'retour' else b % 4
+        if s == 'fin':  # l'accord du début, qui s'éteint
+            for j, n in enumerate([41, 53, 60, 65, 69, 72]): poser('harm', guitare(n, duree - t0), t0 + j * 0.03, -0.2, 0.5)
+            for n in (65, 69, 72): poser('lead', piano_elec(n, duree - t0), t0 + 0.05, 0.2, 0.22)
+            poser('harm', nappe([53, 57, 60], duree - t0), t0, 0, 0.18)
+            poser('basse', basse_douce(41, duree - t0), t0, 0, 0.8)
+            continue
+        # l'accord égrené au piano, une note par temps : seul à l'ouverture, sur la guitare au retour
+        if s in ('ouverture', 'retour'):
+            for k in range(4): poser('lead', piano_elec(ARP[c][k] + 12, 2.2), t0 + k * B, 0.2 if k % 2 else -0.2, 0.32)
+        # guitare en arpèges (doigts), à partir des mots de Linda
+        if s != 'ouverture':
+            g = 0.34 if s in ('linda', 'retour') else 0.4
+            for k, j in enumerate(PICKING):
+                poser('harm', guitare(ARP[c][j], 1.6), t0 + k * C, -0.3 if j % 2 else -0.1, g * (1.15 if k == 0 else 1))
+        # basse ronde : fondamentale au premier temps, quinte au troisième
+        if b >= 2 and s != 'retour':  # elle entre à la 2e mesure des mots de Linda et se tait au retour
+            poser('basse', basse_douce(RAC[c], 2 * B), t0, 0, 0.75)
+            poser('basse', basse_douce(RAC[c] + 7, 2 * B), t0 + 2 * B, 0, 0.6)
+        # piano : accords doux pendant les mots de Linda, thème pour les dessins et les toiles
+        if s == 'linda':
+            for tb in (0, 2):
+                for n in ACC[c]: poser('lead', piano_elec(n + 12, 1.8), t0 + tb * B + 0.02, 0.25, 0.13)
+        if s in ('dessins', 'toiles'):
+            for tb, n, d in THEME[c]: poser('lead', piano_elec(n, d * B + 0.8), t0 + tb * B, 0.1, 0.42)
+        # toiles : une seconde voix sur la note de l'accord juste sous la mélodie (jamais à moins d'une tierce), sans monter le volume
+        if s == 'toiles':
+            for tb, n, d in THEME[c]:
+                dessous = max(x for x in [m + 12 * o for m in ACC[c] for o in (1, 2)] if x < n)
+                if n - dessous >= 3: poser('lead', piano_elec(dessous, d * B + 0.6), t0 + tb * B + 0.01, -0.25, 0.22)
 
 
 def reel():
@@ -231,7 +182,7 @@ def reel():
                 for j, n in enumerate(notes):
                     poser('harm', guitare(n), t0 + sw(k / 2) * B + j * 0.011, -0.25, g * gain_g * 0.42)
         if s in ('A', 'B', 'montee'):
-            for tb in (0, 2, 2.5): kicks.append(t0 + sw(tb) * B); poser('batt', grosse_caisse(0.32, 54, 90), t0 + sw(tb) * B, 0, 0.8 if tb != 2.5 else 0.55)
+            for tb in (0, 2, 2.5): poser('batt', grosse_caisse(0.32, 54, 90), t0 + sw(tb) * B, 0, 0.8 if tb != 2.5 else 0.55)
             for tb in (1, 3): poser('batt', doigts(), t0 + tb * B, 0.1, 0.9); poser('batt', caisse_claire(0.15), t0 + tb * B, 0, 0.12)
             if s in ('B', 'montee'):
                 for tb in (1, 3): poser('batt', claquement(0.3), t0 + tb * B, 0, 0.4)
@@ -260,17 +211,8 @@ def reel():
 
 
 # ---------- mélange ----------
-(motion if style == 'motion' else reel)()
-niveau = {'motion': {'batt': 0.9, 'basse': 0.34, 'harm': 0.42, 'lead': 0.5}, 'reel': {'batt': 0.8, 'basse': 0.36, 'harm': 0.5, 'lead': 0.55}}[style]
-
-def pompage(profondeur, creux=0.13):  # la nappe et la basse « respirent » à chaque grosse caisse
-    d = np.ones(N)
-    for k in kicks:
-        i = int(k * SR); L = int(0.35 * SR)
-        if i >= N: continue
-        seg = 1 - profondeur * np.exp(-np.arange(min(L, N - i)) / SR / creux)
-        d[i:i + len(seg)] *= seg
-    return d
+(site if style == 'site' else reel)()
+niveau = {'site': {'batt': 0, 'basse': 0.34, 'harm': 0.5, 'lead': 0.6}, 'reel': {'batt': 0.8, 'basse': 0.36, 'harm': 0.5, 'lead': 0.55}}[style]
 
 def reverb(x, d=1.8):  # réponse impulsionnelle synthétique (bruit qui décroît), réverbération chaude
     t = np.arange(int(SR * d)) / SR
@@ -282,25 +224,11 @@ def reverb(x, d=1.8):  # réponse impulsionnelle synthétique (bruit qui décro�
     y = np.stack([np.fft.irfft(np.fft.rfft(c, taille) * ri_f, taille)[: x.shape[1]] for c in x])
     return y / (np.max(np.abs(y)) + 1e-9) * np.max(np.abs(x)) * 0.5
 
-def echo(x, delai, fois, g):  # écho (croche pointée) qui rebondit d'une oreille à l'autre en s'éteignant
-    y = x.copy()
-    for k in range(1, fois + 1):
-        i = int(delai * SR * k)
-        if i >= N: break
-        e = x[:, :N - i] * g ** k
-        y[:, i:] += e if k % 2 else e[::-1]
-    return y
-
-duck_b = pompage(0.55 if style == 'motion' else 0.0); duck_h = pompage(0.6 if style == 'motion' else 0.0)
-batt = bus['batt'] * niveau['batt']
-basse = bus['basse'] * niveau['basse'] * duck_b
-harm = bus['harm'] * niveau['harm'] * duck_h
-lead = (echo(bus['lead'], 0.75 * 60 / 120, 3, 0.45) if style == 'motion' else bus['lead']) * niveau['lead']
-brillant = harm + lead
-mix = batt + basse + brillant + reverb(brillant) * (0.55 if style == 'motion' else 0.15)
+brillant = bus['harm'] * niveau['harm'] + bus['lead'] * niveau['lead']
+mix = bus['batt'] * niveau['batt'] + bus['basse'] * niveau['basse'] + brillant + reverb(brillant) * (0.35 if style == 'site' else 0.15)
 
 t = np.arange(N) / SR
-env = np.minimum(1, t / 0.05) * np.minimum(1, (duree - t) / 1.0)
+env = np.minimum(1, t / 0.05) * np.minimum(1, (duree - t) / (2.0 if style == 'site' else 1.0))  # la vidéo du site s'éteint sur 2 s
 def adoucir(x):  # passe-bas doux au-dessus de 11 kHz
     f = np.fft.rfftfreq(len(x), 1 / SR)
     return np.fft.irfft(np.fft.rfft(x) / np.sqrt(1 + (f / 11000) ** 4), len(x))
