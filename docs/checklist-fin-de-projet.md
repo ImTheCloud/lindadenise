@@ -79,6 +79,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Boutique : liens de téléchargement signés et à durée limitée, webhooks Stripe vérifiés, originaux jamais accessibles publiquement.
 - Formulaire et abonnement : anti-spam, pas de données superflues.
 - Test d'intrusion de base (accès direct aux fichiers, aux routes admin, aux originaux) avant la mise en ligne.
+- **Rappeler à Claudiu (demande du 2026-10-15) : passer le dépôt GitHub en privé**, et décider quoi faire des originaux haute définition. Aujourd'hui le dépôt est public et les originaux restent hors de git, dans `~/Desktop/DessinsLinda` (seuls les aperçus filigranés sont versionnés). À voir ensemble : vérifier que Netlify déploie toujours depuis un dépôt privé (compte gratuit), où ranger les originaux (sauvegarde sur disque externe ou iCloud, stockage privé Supabase pour la vente de fichiers de la phase 3), et mettre à jour la règle « dépôt public » de `CLAUDE.md`. Ne pas rendre le dépôt privé avant ce rappel.
 
 ## Notes de Linda à mettre sur le site seulement quand on vend en ligne (ne rien afficher avant)
 Aucun paiement n'est proposé : pour une toile ou un dessin numérique, on contacte Linda. Ces règles sont donc **notées, pas affichées** (page Conditions de vente des toiles sans bloc « Retours »).
