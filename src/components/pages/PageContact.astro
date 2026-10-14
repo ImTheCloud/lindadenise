@@ -29,7 +29,8 @@ const sujets = [
         <h1>{c.titre}</h1>
         <p class="chapeau">{c.intro}</p>
       </header>
-      <form class="formulaire cadre" name="contact" method="POST" action={chemin('merci', lang)} data-netlify="true" netlify-honeypot="bot-field" data-donnees={JSON.stringify(donnees)} data-envoi={c.envoi} data-merci={c.merci} data-erreur={c.erreur}>
+      <script type="application/json" id="donnees-contact" set:html={JSON.stringify({ ...donnees, textes: { envoi: c.envoi, merci: c.merci, erreur: c.erreur } }).replace(/</g, '\\u003c')} />
+      <form class="formulaire cadre" name="contact" method="POST" action={chemin('merci', lang)} data-netlify="true" netlify-honeypot="bot-field">
         <input type="hidden" name="form-name" value="contact" />
         <p class="piege"><label>Ne pas remplir <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
         <label for="nom">{c.nom}</label>
@@ -111,10 +112,11 @@ const sujets = [
     };
     modeles: { commande: string; exposition: string };
     erreurs: { panierVide: string; horsBelgique: string; codePostal: string };
+    textes: { envoi: string; merci: string; erreur: string };
   }
   const form = document.querySelector<HTMLFormElement>('form.formulaire');
   if (form) {
-    const donnees = JSON.parse(form.dataset.donnees ?? '{}') as Donnees;
+    const donnees = JSON.parse(document.getElementById('donnees-contact')?.textContent ?? '{}') as Donnees;
     const champ = <T extends Element>(s: string) => form.querySelector<T>(s)!;
     const sujet = champ<HTMLSelectElement>('#sujet');
     const message = champ<HTMLTextAreaElement>('#message');
@@ -190,7 +192,7 @@ const sujets = [
       e.preventDefault();
       const bouton = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
       bouton.disabled = true;
-      etat.textContent = form.dataset.envoi ?? '';
+      etat.textContent = donnees.textes.envoi;
       try {
         const corps = new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString();
         const r = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: corps });
@@ -198,10 +200,10 @@ const sujets = [
         form.reset();
         messageAuto = '';
         majFormulaire();
-        etat.textContent = form.dataset.merci ?? '';
+        etat.textContent = donnees.textes.merci;
         etat.className = 'formulaire__etat ok';
       } catch {
-        etat.textContent = form.dataset.erreur ?? '';
+        etat.textContent = donnees.textes.erreur;
         etat.className = 'formulaire__etat ko';
       } finally {
         bouton.disabled = false;
