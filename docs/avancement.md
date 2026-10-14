@@ -507,11 +507,13 @@ Fait et validé par Claudiu :
 
 ## Publication
 
+**Crédits Netlify (vérifié le 2026-10-14, [docs Netlify](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/how-credits-work/))** : plan gratuit = 300 crédits par mois ; **un déploiement de production réussi coûte 15 crédits** (soit environ 20 par mois), quel que soit l'auteur du push (Claude ou GitHub Desktop) et sans compter le temps de build ; **les déploiements de prévisualisation et de branche sont gratuits**, un déploiement raté et un retour à une version précédente aussi. Bande passante, requêtes et autres usages comptent aussi sur les 300 crédits (très peu à ce trafic). Pour ne pas gaspiller : grouper les changements (commits `[skip ci]` jusqu'à une publication demandée) ; idée si besoin de tester en ligne sans payer : une branche `dev` avec les déploiements de branche activés dans Netlify (réglage à faire par Claudiu), puis fusion dans `main` seulement pour publier. Vercel Hobby interdit l'usage commercial et Cloudflare Pages n'a pas de formulaires intégrés : pas d'intérêt de changer d'hébergeur.
+
 **Plus aucune publication avant la toute fin du projet, ou quand Claudiu le dit.** Les commits restent en `[skip ci]`. Les dessins sont dans l'ordre alphabétique des fichiers source (pas de tri dans la galerie, décision de Claudiu).
 
 ## Fin de projet
 
-**Conformité légale (tâche de fin de projet, demandée par Claudiu le 2026-10-14)** : état des lieux et liste ordonnée dans `docs/conformite-legale.md` (statut de Linda, mentions légales, rétractation et information avant achat, RGPD, accord écrit Claudiu et Linda, droits d'auteur, domaine). **Rappeler à Claudiu de la faire avant la première vente et avant l'annonce du site.**
+**Décision de Claudiu (2026-10-14) : les conditions générales (vente, rétractation, confidentialité, mentions) sont rédigées à la toute fin du projet, pas avant.** **Conformité légale (tâche de fin de projet, demandée par Claudiu le 2026-10-14)** : état des lieux et liste ordonnée dans `docs/conformite-legale.md` (statut de Linda, mentions légales, rétractation et information avant achat, RGPD, accord écrit Claudiu et Linda, droits d'auteur, domaine). **Rappeler à Claudiu de la faire avant la première vente et avant l'annonce du site.**
 
 Tout ce qui reste à faire à la fin est dans `docs/checklist-fin-de-projet.md` (formulaire à valider après le déploiement final, relecture FR/NL, sécurité, SEO, Lighthouse, appareils). **Rappeler à Claudiu de la parcourir quand le projet approche de sa fin.**
 
