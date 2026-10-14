@@ -50,6 +50,7 @@ const CATALOGUE = [
   ['chats', 'Le chat sur les genoux', 'De kat op schoot'],
   ['chats', 'Chat blanc au jardin', 'Witte kat in de tuin'],
   ['chats', 'Portrait de chat', 'Kattenportret'],
+  ['chats', 'Le chat roux sur le chemin', 'De rode kat op het pad'],
   // Fleurs
   ['fleurs', 'Couleurs', 'Kleuren'],
   ['fleurs', 'Frangipanier', 'Frangipani'],

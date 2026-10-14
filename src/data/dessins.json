@@ -370,6 +370,16 @@
     "hauteur": 1075
   },
   {
+    "id": "le-chat-roux-sur-le-chemin",
+    "rubrique": "chats",
+    "titre": {
+      "fr": "Le chat roux sur le chemin",
+      "nl": "De rode kat op het pad"
+    },
+    "largeur": 760,
+    "hauteur": 1075
+  },
+  {
     "id": "couleurs",
     "rubrique": "fleurs",
     "titre": {

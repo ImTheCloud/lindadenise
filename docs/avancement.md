@@ -2,6 +2,10 @@
 
 Dernière mise à jour : 2026-10-14 (**version publiée sur Netlify le 2026-10-14** : voir la première section ; validations de Claudiu : voir la première section ; salon de la vidéo redessiné : voir la première section ; les trois branches réunies dans `main` : voir la première section ; vidéo « Les dessins et toiles » validée : voir la deuxième section ; retours vidéos et toiles du 2026-10-12 juste en dessous ; mission Tilleul terminée, non publiée : voir la section « Mission Tilleul » juste en dessous ; mission Toiles terminée avant). Les règles et la stack sont dans `CLAUDE.md`, le cahier des charges dans `docs/brief.md`, la liste de fin de projet dans `docs/checklist-fin-de-projet.md`. Les infos personnelles et le statut légal de Linda sont dans `docs/prive/suivi-client.md` (non versionné). **Avant d'écrire un email à Linda** : lire `docs/prive/emails-linda.md` (non versionné) : règles (court, jamais de question à Linda : les poser à Claudiu, jamais parler de la suite, aucun mot technique), heures déjà annoncées, ce qu'elle sait déjà, emails envoyés.
 
+## Nouveau dessin ajouté (2026-10-15)
+
+« **Le chat roux sur le chemin** » / « De rode kat op het pad » (rubrique chats, 79 dessins au total), reçu de Linda par WhatsApp (1080 × 1527 px). Titre choisi par Claude d'après l'image, Linda n'en a pas donné : **à valider**. Original rangé dans `~/Desktop/DessinsLinda/Le chat roux sur le chemin.jpg`, entrée ajoutée dans `CATALOGUE` de `scripts/preparer-dessins.mjs`, aperçus générés par `npm run dessins`. Pas encore publié (`[skip ci]`).
+
 ## Menu : point vert devant Toiles (2026-10-13)
 
 Demande de Claudiu : dans le menu de l'en-tête, le point devant « Toiles » est vert comme celui de « Dessins » (plus d'orange), sur toutes les pages (`Entete.astro`).
