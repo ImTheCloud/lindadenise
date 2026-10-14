@@ -511,12 +511,14 @@ Fait et validé par Claudiu :
 
 ## Fin de projet
 
+**Conformité légale (tâche de fin de projet, demandée par Claudiu le 2026-10-14)** : état des lieux et liste ordonnée dans `docs/conformite-legale.md` (statut de Linda, mentions légales, rétractation et information avant achat, RGPD, accord écrit Claudiu et Linda, droits d'auteur, domaine). **Rappeler à Claudiu de la faire avant la première vente et avant l'annonce du site.**
+
 Tout ce qui reste à faire à la fin est dans `docs/checklist-fin-de-projet.md` (formulaire à valider après le déploiement final, relecture FR/NL, sécurité, SEO, Lighthouse, appareils). **Rappeler à Claudiu de la parcourir quand le projet approche de sa fin.**
 
 ## En attente
 
 - **Validation du formulaire** : notification email réglée (2026-10-10). Le formulaire échoue en ligne (aucun formulaire détecté par Netlify) : il ne marchera qu'après le déploiement final, voir la checklist de fin de projet.
-- **Statut légal de Linda** : elle se renseigne elle-même (pension, numéro d'entreprise). Tant que ce n'est pas réglé : pas de paiement en ligne. Détails dans `docs/prive/suivi-client.md`.
+- **Statut légal de Linda** : elle se renseigne elle-même. Tant que ce n'est pas réglé : pas de paiement en ligne. Détails dans `docs/prive/suivi-client.md`.
 - **Textes à faire relire** : page de licence, mentions légales (adresse et numéro d'entreprise manquants). Le néerlandais ne sera pas relu (décision de Claudiu, 2026-10-10).
 - Photo de Linda : on garde celle du site, pas d'autre photo.
 
@@ -530,7 +532,7 @@ Tout ce qui reste à faire à la fin est dans `docs/checklist-fin-de-projet.md` 
 
 ## À la toute fin (ne pas oublier)
 
-**Accord avec Linda (heures et paiement)** : un accord à l'amiable a été rédigé le 2026-10-12 (13 h au 2026-10-12, dont 3 h déjà payées). À la fin du projet, **Claudiu revient vers Claude pour compter les heures totales** et refaire le tableau de l'accord avant d'aller voir Linda sur place. Rappeler à Claudiu de le faire.
+**Accord avec Linda (heures et paiement)** : un accord à l'amiable a été rédigé le 2026-10-12 (détails dans `docs/prive/suivi-client.md`). À la fin du projet, **Claudiu revient vers Claude pour compter les heures totales** et refaire le tableau de l'accord avant d'aller voir Linda sur place. Rappeler à Claudiu de le faire.
 
 Image d'aperçu de partage (WhatsApp, Facebook), Lighthouse et contrastes, test sur vrais téléphones (petit Android, iPhone ancien, mouvement réduit), nettoyage du code inutilisé : voir `docs/checklist-fin-de-projet.md`.
 

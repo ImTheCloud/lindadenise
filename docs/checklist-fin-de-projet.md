@@ -48,6 +48,7 @@ Tout ce qui sert à évaluer et finaliser le site. À reprendre à la fin du pro
 - Vérifier la mascotte, le formulaire et le menu sur téléphone : Tilleul dans son coin en bas à droite, toucher, page de jeu, Tilleul qui s'efface dans un formulaire ; un iPhone avec Safari plus ancien que la version 16.
 
 ## Contenu et légal
+- **Conformité légale : tâche complète dans `docs/conformite-legale.md`** (le site peut-il être attaqué en justice ? statut de Linda, mentions légales avec adresse et numéro d'entreprise, information avant achat et rétractation, RGPD et page Confidentialité, accord écrit Claudiu et Linda, droits d'auteur dont la traduction des psaumes, droit à l'image, domaine). À faire avant la première vente et avant l'annonce du site, avec relecture d'un professionnel.
 - Mentions légales complètes (adresse, numéro d'entreprise selon le statut de Linda), conditions d'utilisation et conditions de vente des toiles relues
 - Titres des dessins : dernière relecture avec Linda
 - Formulaire : notifications email dans Netlify, premier message « Non spam », test d'une vraie demande
